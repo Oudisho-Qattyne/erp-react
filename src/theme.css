@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+/* Light theme (default) */
+:root {
+  /* Primary green */
+  --color-primary: #1a6b3c;
+  --color-primary-dark: #0d4a28;
+  --color-primary-light: #e8f5ec;
+
+  /* Secondary gold */
+  --color-secondary: #c9a84c;
+  --color-secondary-dark: #8a7233;
+  --color-secondary-light: #faf6e8;
+
+  /* Background & surfaces */
+  --color-background: #f2f4f3;
+  --color-card: #ffffff;
+  --color-border: #dce3dc;
+
+  /* Text */
+  --color-text: #1a2e1a;
+  --color-text-muted: #5a7060;
+  --color-text-light: #8fa898;
+
+  /* Semantic */
+  --color-success: #0f6e3a;
+  --color-warning: #a16207;
+  --color-danger: #b91c1c;
+  --color-navy: #1a2e1a;
+
+  /* Gold accent from original */
+  --color-gold: #c9a84c;
+  --color-gold-dark: #8a7233;
+  --color-gold-light: #faf6e8;
+}
+
+/* Dark theme – override variables */
+.dark {
+  --color-primary: #34d399;
+  --color-primary-dark: #065f46;
+  --color-primary-light: #064e3b;
+
+  --color-secondary: #fbbf24;
+  --color-secondary-dark: #92400e;
+  --color-secondary-light: #451a03;
+
+  --color-background: #09090b;
+  --color-card: #18181b;
+  --color-border: #27272a;
+
+  --color-text: #fafafa;
+  --color-text-muted: #a1a1aa;
+  --color-text-light: #71717a;
+
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-navy: #09090b;
+
+  --color-gold: #fbbf24;
+  --color-gold-dark: #b45309;
+  --color-gold-light: #451a03;
+}
+
+/* Or use prefers-color-scheme automatically */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --color-primary: #2a8b54;
+    --color-primary-dark: #1a5a36;
+    --color-primary-light: #1a3a28;
+    /* ... same as .dark overrides ... */
+  }
+}
+
+/* Define the Tailwind theme */
+@theme {
+  /* Colors */
+  --color-primary: var(--color-primary);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-primary-light: var(--color-primary-light);
+
+  --color-secondary: var(--color-secondary);
+  --color-secondary-dark: var(--color-secondary-dark);
+  --color-secondary-light: var(--color-secondary-light);
+
+  --color-background: var(--color-background);
+  --color-card: var(--color-card);
+  --color-border: var(--color-border);
+
+  --color-text: var(--color-text);
+  --color-text-muted: var(--color-text-muted);
+  --color-text-light: var(--color-text-light);
+
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+  --color-navy: var(--color-navy);
+
+  --color-gold: var(--color-gold);
+  --color-gold-dark: var(--color-gold-dark);
+  --color-gold-light: var(--color-gold-light);
+
+  /* Keep original names for direct mapping if needed */
+  --color-green: var(--color-primary);
+  --color-green-dark: var(--color-primary-dark);
+  --color-green-light: var(--color-primary-light);
+
+  /* Font family – as in original ERP */
+  --font-sans: var(--font-noto), var(--font-tajawal), 'Noto Sans Arabic', 'Tajawal', system-ui;
+  --font-mono: monospace;
+
+  --animate-fade-in: fade-in 300ms ease-out;
+  --animate-fade-out: fade-out 250ms ease-in forwards;
+  --animate-zoom-in: zoom-in 300ms ease-out;
+  --animate-zoom-out: zoom-out 250ms ease-in forwards;
+  --animate-shake: shake 400ms ease-in-out;
+  --animate-slide-up: slide-up 400ms ease-out;
+
+  @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes zoom-in { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+  @keyframes zoom-out { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
+  @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+  @keyframes slide-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+}

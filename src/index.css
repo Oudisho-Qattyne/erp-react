@@ -1,0 +1,56 @@
+/* app.css or globals.css */
+@import "tailwindcss";
+
+@import "./theme.css";
+/* Apply the theme variables globally */
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+/* Custom Scrollbar - Modern Minimalist */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+/* Remove Arrows */
+::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1a6b3c;
+  border-radius: 20px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #34d399;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0d4a28;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #10b981;
+}
+
+/* Firefox support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1a6b3c transparent;
+}
+
+.dark * {
+  scrollbar-color: #34d399 transparent;
+}
