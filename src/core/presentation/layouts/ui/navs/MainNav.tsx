@@ -1,6 +1,6 @@
 // src/core/components/MainNav.tsx
 import { NavLink } from 'react-router-dom'
-import { getNavGroups, getNavItems, type NavItem } from '../../../moduleRegistry'
+import { getNavGroups, getNavItems, type NavItem } from '../../../../moduleRegistry'
 
 const MainNav = () => {
   const navItems = getNavItems()

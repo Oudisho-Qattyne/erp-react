@@ -1,13 +1,14 @@
 import { LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { removeToken } from '../../../../infrastructure/auth/authStorage';
 
 export function LogoutButton({ collapsed }: { collapsed: boolean }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
     // Clear auth state, redirect to login
-    localStorage.removeItem('token');
-    navigate('/login');
+    removeToken()
+    navigate('/auth');
   };
 
   return (

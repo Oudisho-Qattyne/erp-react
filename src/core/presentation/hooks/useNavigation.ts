@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getNavGroups, getNavItems, type NavGroup, type NavItem } from '../../../moduleRegistry';
+import { getNavGroups, getNavItems, type NavGroup, type NavItem } from '../../moduleRegistry';
 
 export function useNavigation(role?: string) {
   const [navItems, setNavItems] = useState<NavItem[]>([]);

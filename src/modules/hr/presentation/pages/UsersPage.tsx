@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { InMemoryUserRepository } from '../../infrastructure/repositories'
 import { getAllUsersUseCase } from '../../application/useCases'
 import {type User } from '../../domain'
-import { useLanguage } from '../../../../core/presentation/layouts/i18n/I18nProvider'
+import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider'
 
 const UsersPage = () => {
   const { t } = useLanguage()

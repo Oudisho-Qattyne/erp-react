@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import type { NavGroup, NavItem } from '../../../../moduleRegistry';
-import { useLanguage } from '../../i18n/I18nProvider';
+import { useLanguage } from '../../../context/i18n/I18nProvider';
 
 interface NavGroupItemProps {
   group: NavGroup & { items: NavItem[] };

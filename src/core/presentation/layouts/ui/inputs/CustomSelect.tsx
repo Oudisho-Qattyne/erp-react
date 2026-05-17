@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ChevronDown, Search, Check } from 'lucide-react';
-import { useLanguage } from '../../i18n/I18nProvider';
+import { useLanguage } from '../../../context/i18n/I18nProvider';
 
 interface Option {
   value: string;

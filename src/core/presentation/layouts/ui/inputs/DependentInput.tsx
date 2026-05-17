@@ -1,10 +1,8 @@
-'use client';
-
 import React, { useMemo } from 'react';
 import { useFormContext, useFormState, type FieldValues, type Path } from 'react-hook-form';
 import { SelectOrCreate } from './SelectOrCreate';
 import { Input,type InputType } from './Input';
-import { useDependentField, type ComputedProps } from '../../hooks/useDependentField';
+import { useDependentField, type ComputedProps } from '../../../hooks/useDependentField';
 
 export interface DependentInputProps<T extends FieldValues> {
   name: Path<T>;

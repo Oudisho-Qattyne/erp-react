@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { useMemo } from 'react';
 import { Button } from '../buttons/Button.js';
 import { Input,type InputType } from './Input.js';
-import { useDynamicForm } from '../../hooks/useDynamicForm.js';
+import { useDynamicForm } from '../../../hooks/useDynamicForm.js';
 
 interface FieldConfig {
   key: string;

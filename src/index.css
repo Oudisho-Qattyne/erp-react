@@ -4,9 +4,9 @@
 @import "./theme.css";
 /* Apply the theme variables globally */
 body {
+  font-family: var(--font-tajawal);
   background-color: var(--color-background);
   color: var(--color-text);
-  font-family: var(--font-sans);
 }
 
 /* Custom Scrollbar - Modern Minimalist */

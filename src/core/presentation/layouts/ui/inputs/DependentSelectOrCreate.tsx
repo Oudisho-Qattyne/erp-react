@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { SelectOrCreate } from './SelectOrCreate';

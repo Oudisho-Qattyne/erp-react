@@ -3,12 +3,15 @@ import { useEffect, useState } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { autoRegisterModules, getAllRoutes } from './core/moduleRegistry'
 import LayoutSwitcher from './core/presentation/layouts/LayoutSwitcher'
-import { ThemeProvider } from './core/presentation/layouts/theme/ThemeProvider'
-import { SidebarProvider } from './core/presentation/layouts/SidebarContext/SidebarContext'
-import { LanguageProvider } from './core/presentation/layouts/i18n/I18nProvider'
+import { ThemeProvider } from './core/presentation/context/theme/ThemeProvider'
+import { SidebarProvider } from './core/presentation/context/SidebarContext/SidebarContext'
+import { LanguageProvider } from './core/presentation/context/i18n/I18nProvider'
+
 
 function App() {
   const [isReady, setIsReady] = useState(false)
+
+
 
   useEffect(() => {
     autoRegisterModules().then(() => {
@@ -28,8 +31,16 @@ function App() {
   }
 
   const routes = getAllRoutes()
-  const router = createBrowserRouter(
-    routes.map(route => ({
+  const router = createBrowserRouter([
+    {
+      path: '*',
+      element: (
+        <LayoutSwitcher layout="none">
+          <div />
+        </LayoutSwitcher>
+      ),
+    },
+    ...routes.map(route => ({
       path: route.path,
       element: (
         <LayoutSwitcher layout={route.layout}>
@@ -37,7 +48,7 @@ function App() {
         </LayoutSwitcher>
       ),
     }))
-  )
+  ])
 
   return (
 

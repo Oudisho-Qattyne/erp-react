@@ -1,6 +1,7 @@
+// src/hooks/useDynamicForm.ts
 import { useForm, type FieldValues, type Path, type PathValue, type UseFormProps, } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { ZodSchema } from 'zod/v3';
+import type { ZodSchema } from 'zod';
 
 export function useDynamicForm<T extends FieldValues>({
   schema,

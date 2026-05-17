@@ -1,8 +1,8 @@
 import React from 'react';
 import { Tb } from './Tb';
 import { Tc } from './Tc';
-import { useColumnResize } from '../../hooks/useColumnResize';
-import { useLanguage } from '../../i18n/I18nProvider';
+import { useLanguage } from '../../../context/i18n/I18nProvider';
+import { useColumnResize } from '../../../hooks/useColumnResize';
 
 export interface ColumnDef<T = any> {
   key: string;
@@ -34,7 +34,7 @@ export function ResizableTable<T extends Record<string, any>>({
   const totalWidth = columnWidths.reduce((sum, w) => sum + w, 0);
 
   return (
-    <div className="bg-card rounded-lg shadow-sm border border-border animate-slide-up max-h-[600px] overflow-auto">
+    <div className="bg-card rounded-lg shadow-sm border border-border animate-slide-up max-h-150 overflow-auto">
       <div style={{ minWidth: totalWidth }}>
         <Tb>
           <thead className="sticky top-0 z-30 bg-card">
@@ -55,7 +55,7 @@ export function ResizableTable<T extends Record<string, any>>({
                         startResize(idx, e.clientX, columnWidths[idx], direction);
                       }}
                     >
-                      <div className={`absolute ${direction === 'rtl' ? 'left-0' : 'right-0'} top-1/4 bottom-1/4 w-[1px] bg-border group-hover/th:bg-primary/50`} />
+                      <div className={`absolute ${direction === 'rtl' ? 'left-0' : 'right-0'} top-1/4 bottom-1/4 w-px bg-border group-hover/th:bg-primary/50`} />
                     </div>
                   )}
                 </th>

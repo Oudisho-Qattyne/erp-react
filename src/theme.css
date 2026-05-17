@@ -1,7 +1,19 @@
 @import "tailwindcss";
 
+
+
+@import '@fontsource/tajawal';
+
+
+@import '@fontsource/noto-sans-arabic';
+
+
+
 /* Light theme (default) */
 :root {
+
+  --font-tajawal: 'Tajawal', sans-serif;
+  --font-noto: 'Noto Sans Arabic', sans-serif;
   /* Primary green */
   --color-primary: #1a6b3c;
   --color-primary-dark: #0d4a28;
@@ -106,7 +118,7 @@
   --color-green-light: var(--color-primary-light);
 
   /* Font family – as in original ERP */
-  --font-sans: var(--font-noto), var(--font-tajawal), 'Noto Sans Arabic', 'Tajawal', system-ui;
+  --font-sans: var(--font-tajawal), var(--font-noto),  'Noto Sans Arabic', system-ui, 'Tajawal';
   --font-mono: monospace;
 
   --animate-fade-in: fade-in 300ms ease-out;

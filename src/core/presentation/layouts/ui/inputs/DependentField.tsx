@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFormContext, type FieldValues } from 'react-hook-form';
-import { useFieldDependency, type FieldDependencyConfig } from '../../hooks/useFieldDependency';
+import { useFieldDependency, type FieldDependencyConfig } from '../../../hooks/useFieldDependency';
 
 interface DependentFieldProps<T extends FieldValues> {
   name: string;

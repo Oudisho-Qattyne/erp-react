@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Calendar } from 'lucide-react';
 import { CustomCalendar } from '../calendar/Calendar';
 import { CustomSelect } from './CustomSelect';
-import { useLanguage } from '../../i18n/I18nProvider';
+import { useLanguage } from '../../../context/i18n/I18nProvider';
 
 export type InputType = 'text' | 'number' | 'date' | 'textarea' | 'select' | 'file' | 'email' | 'password' | string;
 

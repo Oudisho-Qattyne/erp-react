@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fontsource/noto-sans-arabic": "^5.2.10",
+    "@fontsource/tajawal": "^5.2.7",
     "@hookform/resolvers": "^5.2.2",
     "@tailwindcss/vite": "^4.3.0",
     "lucide-react": "^1.16.0",

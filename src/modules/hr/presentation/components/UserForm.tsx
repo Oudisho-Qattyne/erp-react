@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { CreateUserInput } from '../../application/validators'
-import { useLanguage } from '../../../../core/presentation/layouts/i18n/I18nProvider'
+import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider'
 
 type UserFormProps = {
   onSubmit: (data: CreateUserInput) => void

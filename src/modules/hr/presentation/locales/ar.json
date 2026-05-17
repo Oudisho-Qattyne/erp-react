@@ -1,0 +1,11 @@
+{
+  "Users": "المستخدمين",
+  "Create User": "إنشاء مستخدم",
+  "Name": "الاسم",
+  "Email": "البريد الإلكتروني",
+  "Role": "الدور",
+  "Submit": "إرسال",
+  "User created successfully": "تم إنشاء المستخدم بنجاح",
+  "Create a new user": "إنشاء مستخدم جديد",
+  "Back to users": "العودة إلى المستخدمين"
+}

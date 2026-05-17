@@ -13,8 +13,8 @@ interface TopBarProps {
 }
 
 import { ThemeToggle } from './ThemeToggle';
-import { useSidebar } from '../../SidebarContext/SidebarContext';
-import { useLanguage } from '../../i18n/I18nProvider';
+import { useSidebar } from '../../../context/SidebarContext/SidebarContext';
+import { useLanguage } from '../../../context/i18n/I18nProvider';
 
 export function TopBar({
   title,

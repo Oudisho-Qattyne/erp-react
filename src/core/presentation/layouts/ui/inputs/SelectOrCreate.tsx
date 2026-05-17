@@ -25,7 +25,7 @@ interface SelectOrCreateProps {
 }
 
 import { CustomSelect } from './CustomSelect';
-import { useLanguage } from '../../i18n/I18nProvider';
+import { useLanguage } from '../../../context/i18n/I18nProvider';
 
 export function SelectOrCreate({
   value,

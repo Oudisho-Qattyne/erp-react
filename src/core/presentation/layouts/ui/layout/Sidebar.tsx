@@ -4,8 +4,8 @@ import { LogoutButton } from './LogoutButton';
 import { LanguageToggle } from './LanguageToggle';
 
 import { Shield } from 'lucide-react';
-import { useSidebar } from '../../SidebarContext/SidebarContext';
-import { useNavigation } from '../../hooks/useNavigation';
+import { useSidebar } from '../../../context/SidebarContext/SidebarContext';
+import { useNavigation } from '../../../hooks/useNavigation';
 
 interface SidebarProps {
   user: {
@@ -56,7 +56,7 @@ export function Sidebar({ user, unreadNotifications = 0 }: SidebarProps) {
 
       {/* Bottom Section */}
       <div className="border-t border-white/10 pt-2 pb-3 px-2 space-y-1">
-        <LanguageToggle collapsed={collapsed} />
+        {/* <LanguageToggle collapsed={collapsed} /> */}
         <LogoutButton collapsed={collapsed} />
         <CollapseButton />
       </div>

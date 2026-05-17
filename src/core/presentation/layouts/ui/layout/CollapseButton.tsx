@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useSidebar } from '../../SidebarContext/SidebarContext';
+import { useSidebar } from '../../../context/SidebarContext/SidebarContext';
 
 export function CollapseButton() {
   const { collapsed, toggleCollapsed } = useSidebar();
