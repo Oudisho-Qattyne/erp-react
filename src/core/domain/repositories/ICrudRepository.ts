@@ -1,4 +1,4 @@
-export interface ICrudRepository<T, ID> {
+export interface ICrudRepository<T, ID=number> {
   findById(id: ID): Promise<T | null>;
   findAll(): Promise<T[]>;
   create(entity: T): Promise<T>;
