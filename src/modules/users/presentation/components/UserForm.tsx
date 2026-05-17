@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useTranslation } from '../../../../core/layouts/i18n/I18nProvider'
 import type { CreateUserInput } from '../../application/validators'
+import { useLanguage } from '../../../../core/presentation/layouts/i18n/I18nProvider'
 
 type UserFormProps = {
   onSubmit: (data: CreateUserInput) => void
@@ -8,7 +8,7 @@ type UserFormProps = {
 }
 
 const UserForm = ({ onSubmit, isLoading = false }: UserFormProps) => {
-  const { t } = useTranslation('users')
+  const { t } = useLanguage()
   const [formData, setFormData] = useState<CreateUserInput>({
     name: '',
     email: '',

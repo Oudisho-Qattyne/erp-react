@@ -2,9 +2,10 @@
 import { useEffect, useState } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { autoRegisterModules, getAllRoutes } from './core/moduleRegistry'
-import LayoutSwitcher from './core/layouts/LayoutSwitcher'
-import { ThemeProvider } from './core/layouts/theme/ThemeProvider'
-import { I18nProvider } from './core/layouts/i18n/I18nProvider'
+import LayoutSwitcher from './core/presentation/layouts/LayoutSwitcher'
+import { ThemeProvider } from './core/presentation/layouts/theme/ThemeProvider'
+import { SidebarProvider } from './core/presentation/layouts/SidebarContext/SidebarContext'
+import { LanguageProvider } from './core/presentation/layouts/i18n/I18nProvider'
 
 function App() {
   const [isReady, setIsReady] = useState(false)
@@ -39,10 +40,13 @@ function App() {
   )
 
   return (
+
     <ThemeProvider>
-      <I18nProvider>
-        <RouterProvider router={router} />
-      </I18nProvider>
+      <SidebarProvider>
+        <LanguageProvider>
+          <RouterProvider router={router} />
+        </LanguageProvider>
+      </SidebarProvider>
     </ThemeProvider>
   )
 }

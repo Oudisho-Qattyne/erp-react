@@ -4,11 +4,11 @@ import { createUserUseCase } from '../../application/useCases'
 import UserForm from '../components/UserForm'
 import { ZodError } from 'zod'
 import { useState } from 'react'
-import { useTranslation } from '../../../../core/layouts/i18n/I18nProvider'
 import type { CreateUserInput } from '../../application/validators'
+import { useLanguage } from '../../../../core/presentation/layouts/i18n/I18nProvider'
 
 const CreateUserPage = () => {
-  const { t } = useTranslation('users')
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)

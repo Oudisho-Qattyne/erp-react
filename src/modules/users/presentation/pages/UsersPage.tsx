@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom'
 import { InMemoryUserRepository } from '../../infrastructure/repositories'
 import { getAllUsersUseCase } from '../../application/useCases'
 import {type User } from '../../domain'
-import { useTranslation } from '../../../../core/layouts/i18n/I18nProvider'
+import { useLanguage } from '../../../../core/presentation/layouts/i18n/I18nProvider'
 
 const UsersPage = () => {
-  const { t } = useTranslation('users')
+  const { t } = useLanguage()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
 
