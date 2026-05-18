@@ -1,6 +1,6 @@
 import { getToken } from '../auth/authStorage';
-import { createApiError } from '../../domain/errors/ApiError';
-import type { ApiClient, RequestConfig } from '../../domain/api/ApiClient';
+import { createApiError } from '../../domain/common/errors/ApiError';
+import type { ApiClient, RequestConfig } from '../../domain/common/api/ApiClient';
 
 export function createFetchApiClient(baseURL: string): ApiClient {
 

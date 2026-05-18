@@ -1,4 +1,4 @@
-import type { ApiClient } from "../../../../core/domain/api/ApiClient";
+import type { ApiClient } from "../../../../core/domain/common/api/ApiClient";
 import type { AuthResponse, LoginCredentials } from "../../domain/entities/AuthTypes";
 import type { AuthRepository } from "../../domain/repositories/AuthRepository";
 
