@@ -1,0 +1,18 @@
+<IfModule mod_rewrite.c>
+
+  RewriteEngine On
+  
+  # Set the base URL for rewrites (useful if the app is in a subdirectory)
+  RewriteBase /
+
+  # If the requested filename exists as a real file, serve it directly
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  # If the requested filename exists as a real directory, serve it directly
+  RewriteCond %{REQUEST_FILENAME} -d
+  # Skip the next rule (do not rewrite)
+  RewriteRule ^ - [L]
+
+  # Rewrite all other requests to index.html for React Router to handle
+  RewriteRule ^ index.html [L]
+
+</IfModule>
