@@ -43,6 +43,7 @@ build_project:
     VITE_PUBLIC_API_URL: "$PRODUCTION_API_URL" 
   script:
     - npm ci --prefer-offline --no-audit
+    - echo "VITE_PUBLIC_API_URL=${PRODUCTION_API_URL}" > .env
     - npm run build
   artifacts:
     name: "production-build-$CI_COMMIT_SHA"
