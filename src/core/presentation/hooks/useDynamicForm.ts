@@ -1,68 +1,22 @@
 // src/hooks/useDynamicForm.ts
-import { useForm, type FieldValues, type Path, type PathValue, type UseFormProps, } from 'react-hook-form';
+import { useForm, type UseFormReturn, type FieldValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { ZodSchema } from 'zod';
 
-export function useDynamicForm<T extends FieldValues>({
+export function useDynamicForm<TFieldValues extends FieldValues>({
   schema,
   defaultValues,
-  mode = 'onChange',
+  mode = 'onSubmit',
 }: {
-  schema: ZodSchema<T>;
-  defaultValues?: UseFormProps<T>['defaultValues'];
-  mode?: UseFormProps<T>['mode'];
-}) {
-  // Cast the resolver to 'any' to bypass the generic mismatch (safe at runtime)
-  const form = useForm<T>({
-    resolver: zodResolver(schema as any) as any,
-    defaultValues,
+  schema: ZodSchema<TFieldValues>;
+  defaultValues?: Partial<TFieldValues>;
+  mode?: 'onBlur' | 'onChange' | 'onSubmit' | 'onTouched' | 'all';
+}): UseFormReturn<TFieldValues> {
+  return useForm<TFieldValues>({
+    // Cast schema to any to bypass TypeScript strictness (safe at runtime)
+    resolver: zodResolver(schema as any),
+    // Cast defaultValues to any because UseForm expects DeepPartial<TFieldValues>
+    defaultValues: defaultValues as any,
     mode,
   });
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid, isDirty, isSubmitting },
-    reset,
-    setValue,
-    watch,
-    getValues,
-    trigger,
-  } = form;
-
-  // Get error message for a field (supports nested paths like 'user.name')
-  const getFieldError = (fieldName: Path<T>): string | undefined => {
-    const error = errors[fieldName];
-    return error?.message as string | undefined;
-  };
-
-  // Create props for your Input component – fully typed with Path<T>
-  const fieldProps = <K extends Path<T>>(
-    fieldName: K,
-    options?: { type?: string; placeholder?: string; label?: string }
-  ) => ({
-    name: fieldName,
-    value: watch(fieldName) ?? '',
-    onChange: (val: PathValue<T, K>) => setValue(fieldName, val, { shouldValidate: true }),
-    onBlur: () => trigger(fieldName),
-    error: getFieldError(fieldName),
-    ...options,
-  });
-
-  return {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    watch,
-    getValues,
-    trigger,
-    errors,
-    isValid,
-    isDirty,
-    isSubmitting,
-    getFieldError,
-    fieldProps,
-    form,
-  };
 }

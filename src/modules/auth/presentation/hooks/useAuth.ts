@@ -3,13 +3,15 @@ import { createAuthRepository } from '../../infrastructure/repositories/authRepo
 import { createLoginUseCase } from '../../application/useCases/loginUseCase';
 import { createFetchApiClient } from '../../../../core/infrastructure/api/fetchApiClient';
 import type { AuthResponse, LoginCredentials } from '../../domain/entities/AuthTypes';
+import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
 
 // Singleton instances to be reused
-const apiClient = createFetchApiClient(import.meta.env.VITE_PUBLIC_API_URL || '' );
-const authRepository = createAuthRepository(apiClient);
-const loginUseCase = createLoginUseCase(authRepository);
+
 
 export function useAuth() {
+  const apiClient = useApiClient()
+  const authRepository = createAuthRepository(apiClient);
+  const loginUseCase = createLoginUseCase(authRepository);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

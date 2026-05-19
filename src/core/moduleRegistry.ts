@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import type { LocaleDictionary } from "./presentation/context/i18n/mergeLocales"
 
 // ========== Navigation Types ==========
 export interface NavItem {
@@ -35,7 +36,7 @@ export type ModuleRoute = {
 export type Module = {
   name: string
   routes: ModuleRoute[]
-  locales: Record<string, Record<string, string>>
+  locales: Record<string, LocaleDictionary>
   navGroups?: NavGroup[]
 }
 
@@ -54,7 +55,6 @@ export const getModules = (): Module[] => {
 }
 
 export const getAllRoutes = (): ModuleRoute[] => {
-  console.log(modules);
   
   return modules.flatMap(module => module.routes)
 }

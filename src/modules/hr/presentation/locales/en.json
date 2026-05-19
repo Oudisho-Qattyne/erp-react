@@ -7,5 +7,15 @@
   "Submit": "Submit",
   "User created successfully": "User created successfully",
   "Create a new user": "Create a new user",
-  "Back to users": "Back to users"
+  "Back to users": "Back to users",
+  "employees": {
+    "internal_id": "Internal ID",
+    "national_id": "National ID",
+    "full_name": "Full Name",
+    "gender": "Gender",
+    "created_at": "Created At",
+    "search_placeholder": "Search by internal ID, national ID, or name",
+    "title": "employees",
+    "add": "Add Employee"
+  }
 }

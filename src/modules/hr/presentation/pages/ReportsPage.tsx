@@ -1,14 +1,32 @@
-'use client';
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Download, Filter, Calendar } from 'lucide-react';
 import { Badge } from '../../../../core/presentation/layouts/ui/badges/Badge';
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
 import { TrendChart } from '../../../../core/presentation/layouts/ui/statistics/TrendChart';
 import { ComparisonChart } from '../../../../core/presentation/layouts/ui/statistics/ComparisonChart';
 import { DistributionCard } from '../../../../core/presentation/layouts/ui/statistics/DistributionCard';
+import { useEntityCrud } from '../../../../core/presentation/hooks/data/useEntity';
+import type { Country } from '../../../../core/domain/entities/regions/Country';
+import type { City } from '../../../../core/domain/entities/regions/City';
+import type { OrganizationalLevels } from '../../../../core/domain/entities/organizationalLevels/organizationalLevels';
+import { TheInput } from '../../../../core/presentation/layouts/ui/inputs/TheInput';
+
 
 export function ReportsPage() {
+  const { getById , getAll:getAllCountries , entities : countries} = useEntityCrud<OrganizationalLevels>('hr/organizational-levels','hr/organizational-levels')
+  const { getAll : getAllCities , entities : cities} = useEntityCrud<City>(`shared-kernal/countries/${1}/cities` , 'shared-kernal/cities')
+  const fetchUniversities = async () => {
+    await getAllCountries()
+    await getAllCities()
+    const OL = await getById(1)
+    console.log(OL);
+    
+  }
+  console.log(countries);
+  console.log(cities);
+  useEffect(() => {
+    fetchUniversities()
+  } , [])
   const monthlyData = [
     { m: 'كانون 2', rev: 450000, exp: 320000, occ: 72 },
     { m: 'شباط', rev: 520000, exp: 340000, occ: 75 },
@@ -37,6 +55,7 @@ export function ReportsPage() {
     <div className="p-6 space-y-6 animate-fade-in pb-20">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card p-6 rounded-2xl border border-border shadow-sm">
+        <TheInput type='select-or-create' />
         <div>
           <div className="flex items-center gap-2 mb-1">
             <h1 className="text-2xl font-black text-primary tracking-tight">التقارير والتحليلات</h1>

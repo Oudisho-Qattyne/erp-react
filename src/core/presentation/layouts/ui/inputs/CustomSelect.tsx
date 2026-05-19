@@ -46,7 +46,6 @@ export function CustomSelect({
   );
 
   const selectedOption = options.find(opt => opt.value === value);
-
   const handleSelect = (val: string) => {
     onChange(val);
     setIsOpen(false);

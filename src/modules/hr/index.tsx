@@ -5,6 +5,7 @@ import { Users } from 'lucide-react'   // or any icon component
 import type { Module } from '../../core/moduleRegistry'
 // import CreateUserPage from './presentation/pages/CreateUserPage'
 import { ReportsPage } from './presentation/pages/ReportsPage'
+import { EmployeesPage } from './presentation/pages/EmployeesPage'
 
 const usersModule: Module = {
   name: 'hr',
@@ -21,16 +22,17 @@ const usersModule: Module = {
       group: 'hr',
       permission: 'hr:read',
     },
-    // {
-    //   path: '/hr/create',
-    //   element: <CreateUserPage />,
-    //   layout: 'dashboard',
-    //   label: 'Create User',
-    //   nav: true,
-    //   moduleName: 'hr',
-    //   icon: <Users className="w-5 h-5" />,   // 👈 React element
-    //   group: 'hr',
-    // },
+    {
+      path: '/hr/employees',
+      element: <EmployeesPage />,
+      layout: 'dashboard',
+      label: 'employees.title',   // translate in locale
+      nav: true,
+      order: 30,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'hr',
+    }
   ],
   locales: { en: enLocales, ar: arLocales },
   navGroups: [

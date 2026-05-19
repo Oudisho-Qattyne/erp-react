@@ -1,6 +1,10 @@
 import { getModules } from "../../../moduleRegistry"
-
-export type LocaleDictionary = Record<string, string>
+import enShared from "../../locals/en.json"
+import arShared from "../../locals/ar.json"
+export type LocaleValue = string | LocaleDictionary
+export interface LocaleDictionary {
+  [key: string]: LocaleValue
+}
 export type ModuleTranslations = Record<string, Record<string, LocaleDictionary>>
 
 export const mergeLocales = (): ModuleTranslations => {
@@ -15,9 +19,10 @@ export const mergeLocales = (): ModuleTranslations => {
     }
   }
 
-  // Ensure a 'shared' module exists for common translations (optional)
-  if (!result['shared']) {
-    result['shared'] = { en: {}, ar: {} }
+  // Add shared locale translations
+  result['shared'] = {
+    en: enShared,
+    ar: arShared,
   }
 
   return result
