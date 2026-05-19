@@ -6,6 +6,7 @@ import LayoutSwitcher from './core/presentation/layouts/LayoutSwitcher'
 import { ThemeProvider } from './core/presentation/context/theme/ThemeProvider'
 import { SidebarProvider } from './core/presentation/context/SidebarContext/SidebarContext'
 import { LanguageProvider } from './core/presentation/context/i18n/I18nProvider'
+import { ApiClientProvider } from './core/presentation/context/api/ApiClinetProvider'
 
 
 function App() {
@@ -55,7 +56,9 @@ function App() {
     <ThemeProvider>
       <SidebarProvider>
         <LanguageProvider>
+        <ApiClientProvider> 
           <RouterProvider router={router} />
+          </ApiClientProvider>
         </LanguageProvider>
       </SidebarProvider>
     </ThemeProvider>

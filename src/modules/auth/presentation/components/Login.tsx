@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 
 import { Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicForm';
+import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicForm2';
 import { Input } from '../../../../core/presentation/layouts/ui/inputs/Input';
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
 

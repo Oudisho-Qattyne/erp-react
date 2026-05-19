@@ -7,5 +7,13 @@
   "Submit": "إرسال",
   "User created successfully": "تم إنشاء المستخدم بنجاح",
   "Create a new user": "إنشاء مستخدم جديد",
-  "Back to users": "العودة إلى المستخدمين"
+  "Back to users": "العودة إلى المستخدمين",
+  "employees": {
+    "internal_id": "الرقم الداخلي",
+    "national_id": "الرقم الوطني",
+    "full_name": "الاسم الكامل",
+    "gender": "الجنس",
+    "created_at": "تاريخ الإنشاء",
+    "search_placeholder": "بحث بالرقم الداخلي، الوطني، أو الاسم"
+  }
 }

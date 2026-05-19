@@ -1,6 +1,9 @@
 import { getModules } from "../../../moduleRegistry"
 
-export type LocaleDictionary = Record<string, string>
+export type LocaleValue = string | LocaleDictionary
+export interface LocaleDictionary {
+  [key: string]: LocaleValue
+}
 export type ModuleTranslations = Record<string, Record<string, LocaleDictionary>>
 
 export const mergeLocales = (): ModuleTranslations => {

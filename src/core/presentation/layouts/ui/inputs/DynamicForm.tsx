@@ -1,101 +1,64 @@
-import { z } from 'zod';
-import { useMemo } from 'react';
-import { Button } from '../buttons/Button.js';
-import { Input,type InputType } from './Input.js';
-import { useDynamicForm } from '../../../hooks/useDynamicForm.js';
+// src/core/presentation/layouts/ui/forms/DynamicForm.tsx
+import React from 'react';
+import { FormProvider } from 'react-hook-form';
+import { FormInput, type FormInputProps } from '../inputs/FormInput';
+import { Button } from '../buttons/Button';
+import type { ZodSchema } from 'zod';
+import { useDynamicForm } from '../../../hooks/useDynamicForm';
 
-interface FieldConfig {
-  key: string;
-  label: string;
-  type?: 'text' | 'number' | 'date' | 'textarea' | 'select';
-  options?: { value: string; label: string }[];
+// Ensure name is a string key
+export interface FieldConfig<T extends Record<string, any>> extends Omit<FormInputProps<any>, 'name'> {
+  name: Extract<keyof T, string>;
 }
 
-interface DynamicFormProps<T extends z.ZodObject<any>> {
-  schema: T;
-  defaultValues?: Partial<z.infer<T>>;
-  onSubmit: (data: z.infer<T>) => void;
-  fieldsConfig?: FieldConfig[];
+interface DynamicFormProps<T extends Record<string, any>> {
+  schema: ZodSchema<T>;
+  defaultValues?: Partial<T>;
+  fields: FieldConfig<T>[];
+  onSubmit: (data: T) => void | Promise<void>;
+  submitLabel?: string;
+  cancelLabel?: string;
+  onCancel?: () => void;
+  loading?: boolean;
+  className?: string;
 }
 
-export function DynamicForm<T extends z.ZodObject<any>>({
+export function DynamicForm<T extends Record<string, any>>({
   schema,
   defaultValues,
+  fields,
   onSubmit,
-  fieldsConfig,
+  submitLabel = 'حفظ',
+  cancelLabel = 'إلغاء',
+  onCancel,
+  loading = false,
+  className = '',
 }: DynamicFormProps<T>) {
-  const { fieldProps, handleSubmit, isValid, isSubmitting } = useDynamicForm({
-    schema: schema as any,
-    defaultValues: defaultValues as any,
-    mode: 'onChange',
-  });
-
-  const shape = schema.shape;
-  const fieldNames = Object.keys(shape) as (keyof z.infer<T>)[];
-
-  const fields = useMemo((): FieldConfig[] => {
-    if (fieldsConfig) return fieldsConfig;
-    return fieldNames.map((key) => ({
-      key: key as string,
-      label: key as string,
-      type: 'text',
-      options: undefined,
-    }));
-  }, [fieldNames, fieldsConfig]);
-
-  const getInputType = (fieldKey: string): FieldConfig['type'] => {
-    const zodType = shape[fieldKey];
-    if (zodType instanceof z.ZodNumber) return 'number';
-    if (zodType instanceof z.ZodDate) return 'date';
-    if (zodType instanceof z.ZodString && fieldKey.toLowerCase().includes('textarea')) return 'textarea';
-    return 'text';
-  };
+  const methods = useDynamicForm({ schema, defaultValues });
+  const { handleSubmit, formState } = methods;
+  const { isValid, isSubmitting } = formState;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {fields.map((field) => {
-        const inputType = field.type || getInputType(field.key);
-        const props = fieldProps(field.key as any, {
-          label: field.label,
-          type: inputType,
-        });
-
-        if (inputType === 'select' && field.options) {
-          return (
-            <Input
-              key={field.key}
-              type="select"
-              label={field.label}
-              name={field.key}
-              value={props.value}
-              onChange={props.onChange}
-              onBlur={props.onBlur}
-              error={props.error}
-              options={field.options}
-              required={(shape[field.key] as any)?.isOptional === false}
-            />
-          );
-        }
-
-        return (
-          <Input
-            key={field.key}
-            name={props.name}
-            value={props.value}
-            onChange={props.onChange}
-            onBlur={props.onBlur}
-            error={props.error}
-            label={field.label}
-            type={inputType as InputType}
-            required={(shape[field.key] as any)?.isOptional === false}
+    <FormProvider {...methods}>
+      <form onSubmit={handleSubmit(onSubmit)} className={`space-y-4 ${className}`}>
+        {fields.map((field) => (
+          <FormInput
+            key={String(field.name)}
+            name={String(field.name)}
+            {...field}
           />
-        );
-      })}
-      <div className="flex gap-3">
-        <Button type="submit" variant="primary" disabled={!isValid || isSubmitting}>
-          Submit
-        </Button>
-      </div>
-    </form>
+        ))}
+        <div className="flex gap-3 mt-6">
+          <Button type="submit" variant="primary" disabled={!isValid || isSubmitting || loading}>
+            {isSubmitting || loading ? 'جاري...' : submitLabel}
+          </Button>
+          {onCancel && (
+            <Button type="button" variant="outline" onClick={onCancel}>
+              {cancelLabel}
+            </Button>
+          )}
+        </div>
+      </form>
+    </FormProvider>
   );
 }

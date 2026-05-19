@@ -1,17 +1,22 @@
-import { useState, useEffect } from 'react';
+/**
+ * @deprecated Use <TheInput type="select-or-create" name="..." dependsOn loadOptions /> instead.
+ */
 import { useFormContext } from 'react-hook-form';
-import { SelectOrCreate } from './SelectOrCreate';
+import { TheInput, type SelectOption } from './TheInput';
+import type { ReactNode } from 'react';
 
 interface DependentSelectOrCreateProps {
-  name: string;                      // field name in react-hook-form
-  dependsOn: string[];              // fields whose changes trigger reload
-  loadOptions: (formValues: Record<string, any>) => Promise<{ value: string; label: string }[]> | { value: string; label: string }[];
+  name: string;
+  dependsOn: string[];
+  loadOptions: (
+    formValues: Record<string, unknown>
+  ) => Promise<SelectOption[]> | SelectOption[];
   createTitle: string;
   renderCreateForm: (
-    onSuccess: (newValue: string, newItem: any) => void,
+    onSuccess: (newValue: string, newItem: unknown) => void,
     onCancel: () => void,
-    dependentData: Record<string, any>  // current values of dependsOn
-  ) => React.ReactNode;
+    dependentData: Record<string, unknown>
+  ) => ReactNode;
   label?: string;
   placeholder?: string;
   required?: boolean;
@@ -29,67 +34,40 @@ export function DependentSelectOrCreate({
   required,
   disabled,
 }: DependentSelectOrCreateProps) {
-  const { watch, setValue, getValues } = useFormContext();
-  const [options, setOptions] = useState<{ value: string; label: string }[]>([]);
-  const [loading, setLoading] = useState(false);
-  const currentValue = watch(name);
-
-  // Watch all dependent fields
-  const dependentValues = watch(dependsOn);
-
-  // Reload options when dependencies change
-  useEffect(() => {
-    const fetchOptions = async () => {
-      setLoading(true);
-      const formValues = getValues();
-      const result = await loadOptions(formValues);
-      setOptions(result);
-      setLoading(false);
-    };
-    fetchOptions();
-  }, [dependentValues, loadOptions, getValues]);
-
-  // If current value is no longer in options, clear it
-  useEffect(() => {
-    if (currentValue && !options.some(opt => opt.value === currentValue)) {
-      setValue(name, '', { shouldValidate: true });
-    }
-  }, [options, currentValue, name, setValue]);
-
-  const handleChange = (val: string) => {
-    setValue(name, val, { shouldValidate: true });
-  };
-
-  const handleCreateSuccess = (newValue: string, newItem: any) => {
-    setValue(name, newValue, { shouldValidate: true });
-    // Optionally, add new option to the list
-    setOptions(prev => [...prev, { value: newValue, label: newItem.label }]);
-  };
-
-  // Pass dependent values to the creation form
-  const currentFormValues = getValues();
-  const dependentData = dependsOn.reduce((acc, field) => {
-    acc[field] = currentFormValues[field];
-    return acc;
-  }, {} as Record<string, any>);
-
-  if (loading && options.length === 0) {
-    return <div className="text-sm text-text-muted">جار التحميل...</div>;
-  }
+  const { getValues } = useFormContext();
 
   return (
-    <SelectOrCreate
-      value={currentValue}
-      onChange={handleChange}
-      options={options}
+    <TheInput
+      name={name as never}
+      type="select-or-create"
+      dependsOn={dependsOn as never}
+      loadOptions={loadOptions}
       label={label}
       placeholder={placeholder}
       required={required}
-      disabled={disabled || loading}
+      disabled={disabled}
       createTitle={createTitle}
-      renderCreateForm={(onSuccess, onCancel) =>
-        renderCreateForm(onSuccess, onCancel, dependentData)
+      renderCreateForm={(onSuccess, onCancel, dependentData) =>
+        renderCreateForm(
+          onSuccess,
+          onCancel,
+          dependentData ?? getDependentSnapshot(getValues, dependsOn)
+        )
       }
     />
+  );
+}
+
+function getDependentSnapshot(
+  getValues: () => Record<string, unknown>,
+  dependsOn: string[]
+) {
+  const values = getValues();
+  return dependsOn.reduce(
+    (acc, field) => {
+      acc[field] = values[field];
+      return acc;
+    },
+    {} as Record<string, unknown>
   );
 }
