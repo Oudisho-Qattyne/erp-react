@@ -6,7 +6,7 @@ import type { ZodSchema } from 'zod';
 export function useDynamicForm<TFieldValues extends FieldValues>({
   schema,
   defaultValues,
-  mode = 'onChange',
+  mode = 'onSubmit',
 }: {
   schema: ZodSchema<TFieldValues>;
   defaultValues?: Partial<TFieldValues>;

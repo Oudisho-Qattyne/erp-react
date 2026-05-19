@@ -19,6 +19,7 @@ import { FormProvider } from 'react-hook-form';
 import type { Country } from '../../../../core/domain/entities/regions/Country';
 import { CountryFormSchema } from '../../../../core/presentation/schemas/regions/countryForm.schema';
 import { OrganizationalUnitTreeSelect } from '../components/OrganizationalUnitTreeSelect';
+import type { CreateEntityDTO } from '../../application/dtos/entityDto';
 
 // -----------------------------------------------------------------------------
 // Helper: Generic Create Form wrapper (with explicit types)
@@ -29,19 +30,24 @@ function CreateEntityForm<T>({
   onSuccess,
   onCancel,
   title,
+  defaultValues
 }: {
   schema: z.ZodSchema<any>;
   onSubmit: (data: any) => Promise<T>;
   onSuccess: (id: string, item: T) => void;
   onCancel: () => void;
   title: string;
+  defaultValues?: Record<string, any>;
 }) {
   return (
     <GenericCreateForm
+      defaultValues={defaultValues}
       schema={schema}
       onSubmit={async (data: any) => {
         const result = await onSubmit(data);
         onSuccess(String((result as any).id), result);
+        return result
+
       }}
       onSuccess={onSuccess}
       onCancel={onCancel}
@@ -62,7 +68,15 @@ function RegionCreateForm({ onSuccess, onCancel }: { onSuccess: (id: string, ite
 
 function UniversityCreateForm({ onSuccess, onCancel }: { onSuccess: (id: string, item: any) => void; onCancel: () => void }) {
   const { create: createUniversity } = useEntityCrud<University>('', '');
-  return <CreateEntityForm schema={UniversityFormSchema} onSubmit={createUniversity} onSuccess={onSuccess} onCancel={onCancel} title="جامعة" />;
+  return <CreateEntityForm defaultValues={{name:""}} schema={UniversityFormSchema} onSubmit={(data) => {
+    const payload = {
+      name: {
+        ar: data.name
+      }
+    }
+    return createUniversity(payload)
+
+  }} onSuccess={onSuccess} onCancel={onCancel} title="جامعة" />;
 }
 
 function FacultyCreateForm({ onSuccess, onCancel, universityId }: { onSuccess: (id: string, item: any) => void; onCancel: () => void; universityId?: number }) {
@@ -75,6 +89,8 @@ function FacultyCreateForm({ onSuccess, onCancel, universityId }: { onSuccess: (
       onSubmit={async (data: any) => {
         const result = await createFaculty(data);
         onSuccess(String(result.id), result);
+        return result
+
       }}
       onSuccess={onSuccess}
       onCancel={onCancel}
@@ -93,6 +109,8 @@ function SpecializationCreateForm({ onSuccess, onCancel, facultyId }: { onSucces
       onSubmit={async (data: any) => {
         const result = await createSpecialization(data);
         onSuccess(String(result.id), result);
+        return result
+
       }}
       onSuccess={onSuccess}
       onCancel={onCancel}
@@ -151,7 +169,7 @@ export function EmployeeForm({
   const { entities: specializations, getAllByFaculty: loadSpecializationsByFaculty } = useSpecializations();
   const { entities: orgUnits, getAll: loadOrgUnits } = useEntityCrud<OrganizationalLevels>('', '');
   // Country CRUD (you may need a useCountries hook)
-  
+
 
   const { entities: countries, getAll: loadCountries } = useEntityCrud<Country>('shared-kernal/countries', 'shared-kernal/countries');
 
@@ -163,7 +181,14 @@ export function EmployeeForm({
   // Create form for country (add after other create forms)
   function CountryCreateForm({ onSuccess, onCancel }: { onSuccess: (id: string, item: any) => void; onCancel: () => void }) {
     const { create: createCountry } = useEntityCrud<Country>('shared-kernal/countries', 'shared-kernal/countries');
-    return <CreateEntityForm schema={CountryFormSchema} onSubmit={createCountry} onSuccess={onSuccess} onCancel={onCancel} title="دولة" />;
+    return <CreateEntityForm defaultValues={{name:''}} schema={CountryFormSchema} onSubmit={(data) => {
+      const payload = {
+        name:{
+          ar:data.name
+        } 
+      }
+      return createCountry(payload)
+    }} onSuccess={onSuccess} onCancel={onCancel} title="دولة" />;
   }
 
   // Modify CityCreateForm to accept countryId
@@ -177,6 +202,8 @@ export function EmployeeForm({
         onSubmit={async (data) => {
           const result = await createCity(data);
           onSuccess(String(result.id), result);
+          return result
+
         }}
         onSuccess={onSuccess}
         onCancel={onCancel}
@@ -196,6 +223,7 @@ export function EmployeeForm({
         onSubmit={async (data) => {
           const result = await createRegion(data);
           onSuccess(String(result.id), result);
+          return result
         }}
         onSuccess={onSuccess}
         onCancel={onCancel}
@@ -267,12 +295,12 @@ export function EmployeeForm({
     { name: 'father_name', label: 'اسم الأب', required: true },
     { name: 'last_name', label: 'اسم العائلة', required: true },
     { name: 'mother_name', label: 'اسم الأم', required: true },
-    { name: 'gender',label: 'الجنس', type: 'select', options: [{ value: 'male', label: 'ذكر' }, { value: 'female', label: 'أنثى' }], required: true },
+    { name: 'gender', label: 'الجنس', type: 'select', options: [{ value: 'male', label: 'ذكر' }, { value: 'female', label: 'أنثى' }], required: true },
     { name: 'date_birth', type: 'date', label: 'تاريخ الميلاد', required: true },
     { name: 'place_birth', label: 'مكان الميلاد', required: true },
     {
       name: 'marital_status',
-       label: 'الحالة الاجتماعية',
+      label: 'الحالة الاجتماعية',
       type: 'select',
       options: [
         { value: 'single', label: 'أعزب' },
@@ -293,7 +321,8 @@ export function EmployeeForm({
       label: 'الدولة',
       required: true,
       createTitle: 'إضافة دولة جديدة',
-      renderCreateForm: (onSuccess, onCancel) => <CountryCreateForm onSuccess={onSuccess} onCancel={onCancel} />,
+      renderCreateForm: (onSuccess, onCancel) => <CountryCreateForm onSuccess={(v , i) => {
+        onSuccess(v , i)}} onCancel={onCancel} />,
       compute: computeCountries, // we need to define this
     },
     {
@@ -339,10 +368,10 @@ export function EmployeeForm({
 
   const EMPLOYMENT_FIELDS: FieldConfig[] = [
     { name: 'employment_details.job_title', label: 'المسمى الوظيفي', required: true },
-       {
+    {
       name: 'employment_details.status',
       type: 'select',
-       label: 'حالة الموظف',
+      label: 'حالة الموظف',
       options: [
         { value: 'active', label: 'نشط' },
         { value: 'inactive', label: 'غير نشط' },
@@ -354,7 +383,7 @@ export function EmployeeForm({
     { name: 'employment_details.appointment_date', type: 'date', label: 'تاريخ التعيين', required: true },
     {
       name: 'employment_details.contract_type',
-      label:'نوع العقد',
+      label: 'نوع العقد',
       type: 'select',
       options: [
         { value: 'full-time', label: 'دوام كامل' },
@@ -366,7 +395,7 @@ export function EmployeeForm({
     },
     {
       name: 'employment_details.contract_nature',
-      label:'طبيعة العقد',
+      label: 'طبيعة العقد',
       type: 'select',
       options: [
         { value: 'permanent', label: 'دائم' },
@@ -464,7 +493,8 @@ export function EmployeeForm({
                     renderCreateForm={(onSuccess, onCancel, deps) => (
                       <FacultyCreateForm
                         universityId={deps?.[`educations.${idx}.university_id`] as number | undefined}
-                        onSuccess={onSuccess}
+                        onSuccess={(v , i) => {
+                          onSuccess(v , i)}}
                         onCancel={onCancel}
                       />
                     )}

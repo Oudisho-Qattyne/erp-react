@@ -55,13 +55,11 @@ export function GenericCreateForm({
 
   const handleFormSubmit = async (data: any) => {
     const result = await onSubmit(data);
-    onSuccess(String(result.id), result);
+    onSuccess(String(result.data.id), result);
   };
 
   // Trigger validation on mount so isValid is correct
-  useEffect(() => {
-    methods.trigger();
-  }, [methods]);
+
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

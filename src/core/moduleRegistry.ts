@@ -55,7 +55,6 @@ export const getModules = (): Module[] => {
 }
 
 export const getAllRoutes = (): ModuleRoute[] => {
-  console.log(modules);
   
   return modules.flatMap(module => module.routes)
 }

@@ -92,6 +92,7 @@ export function FormInput<T extends FieldValues>({
   }
 
   const handleChange = (val: any) => {
+      
     setValue(name, val, { shouldValidate: true, shouldDirty: true });
   };
 
@@ -291,8 +292,11 @@ function SelectOrCreateField({
   const { t } = useLanguage();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleCreateSuccess = (newValue: string, newItem: unknown) => {
+  const handleCreateSuccess = (newValue: string, newItem: any) => {
     onChange(newValue);
+    console.log(newItem.data.name.ar );
+    
+    value = newItem.data.name.ar    
     setIsDialogOpen(false);
   };
 
@@ -330,7 +334,11 @@ function SelectOrCreateField({
         size="md"
       >
         {renderCreateForm?.(
-          handleCreateSuccess,
+        (v , i) => {handleCreateSuccess(v , i)
+          
+
+        }
+          ,
           () => setIsDialogOpen(false),
           dependentData
         ) ?? (
