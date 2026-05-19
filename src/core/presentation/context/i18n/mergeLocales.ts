@@ -1,5 +1,6 @@
 import { getModules } from "../../../moduleRegistry"
-
+import enShared from "../../locals/en.json"
+import arShared from "../../locals/ar.json"
 export type LocaleValue = string | LocaleDictionary
 export interface LocaleDictionary {
   [key: string]: LocaleValue
@@ -18,9 +19,10 @@ export const mergeLocales = (): ModuleTranslations => {
     }
   }
 
-  // Ensure a 'shared' module exists for common translations (optional)
-  if (!result['shared']) {
-    result['shared'] = { en: {}, ar: {} }
+  // Add shared locale translations
+  result['shared'] = {
+    en: enShared,
+    ar: arShared,
   }
 
   return result

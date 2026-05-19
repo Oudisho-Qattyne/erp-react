@@ -1,5 +1,5 @@
 import type { City } from '../../../../domain/entities/regions/City';
-import { useNestedEntityCrud } from '../../../../../modules/hr/presentation/hooks/useNestedEntityCrud';
+import { useNestedEntityCrud } from '../useNestedEntityCrud';
 
 export const CITY_REST_URL = 'shared-kernal/cities';
 

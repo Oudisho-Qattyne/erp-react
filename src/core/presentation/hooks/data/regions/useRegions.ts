@@ -4,7 +4,7 @@ import { useNestedEntityCrud } from '../useNestedEntityCrud';
 export const REGION_REST_URL = 'shared-kernal/regions';
 
 export const regionListUrl = (cityId: number) =>
-  `shared-kernal/cities/${cityId}/regions`;
+  `shared-kernal/countries/cities/${cityId}/regions`;
 
 export function useRegions() {
   const nested = useNestedEntityCrud<Region>({

@@ -1,0 +1,18 @@
+{
+  "common": {
+    "reset": "Reset",
+    "search": "Search",
+    "loading": "Loading...",
+    "no_data": "No data available",
+    "filter": "Filter"
+  },
+  "pagination": {
+    "showing": "Showing",
+    "of": "of",
+    "records": "records",
+    "page": "Page",
+    "previous": "Previous",
+    "next": "Next",
+    "items_per_page": "per page"
+  }
+}
