@@ -68,7 +68,7 @@ function RegionCreateForm({ onSuccess, onCancel }: { onSuccess: (id: string, ite
 
 function UniversityCreateForm({ onSuccess, onCancel }: { onSuccess: (id: string, item: any) => void; onCancel: () => void }) {
   const { create: createUniversity } = useEntityCrud<University>('', '');
-  return <CreateEntityForm defaultValues={{name:""}} schema={UniversityFormSchema} onSubmit={(data) => {
+  return <CreateEntityForm defaultValues={{ name: "" }} schema={UniversityFormSchema} onSubmit={(data) => {
     const payload = {
       name: {
         ar: data.name
@@ -181,11 +181,11 @@ export function EmployeeForm({
   // Create form for country (add after other create forms)
   function CountryCreateForm({ onSuccess, onCancel }: { onSuccess: (id: string, item: any) => void; onCancel: () => void }) {
     const { create: createCountry } = useEntityCrud<Country>('shared-kernal/countries', 'shared-kernal/countries');
-    return <CreateEntityForm defaultValues={{name:''}} schema={CountryFormSchema} onSubmit={(data) => {
+    return <CreateEntityForm defaultValues={{ name: '' }} schema={CountryFormSchema} onSubmit={(data) => {
       const payload = {
-        name:{
-          ar:data.name
-        } 
+        name: {
+          ar: data.name
+        }
       }
       return createCountry(payload)
     }} onSuccess={onSuccess} onCancel={onCancel} title="دولة" />;
@@ -310,8 +310,27 @@ export function EmployeeForm({
       ],
       required: true,
     },
-    { name: 'spouse_name', label: 'اسم الزوج/الزوجة' },
-    { name: 'spouse_workplace', label: 'جهة عمل الزوج/الزوجة' },
+    {
+      name: 'spouse_name', label: 'اسم الزوج/الزوجة',
+      dependsOn: ['marital_status']
+      ,
+      compute: (values) => {
+        if (values.marital_status != 'married')
+          return { disabled: true }
+
+        return { disabled: false }
+      }
+    },
+    {
+      name: 'spouse_workplace', label: 'جهة عمل الزوج/الزوجة',
+      dependsOn: ['marital_status']
+      , compute: (values) => {
+        if (values.marital_status != 'married')
+          return { disabled: true }
+
+        return { disabled: false }
+      }
+    },
     { name: 'blood_type', type: 'select', options: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((v) => ({ value: v, label: v })), label: 'فصيلة الدم' },
     { name: 'phone_number', label: 'رقم الهاتف', required: true },
     { name: 'sham_cash_account', label: 'حساب الشام كاش' },
@@ -321,8 +340,9 @@ export function EmployeeForm({
       label: 'الدولة',
       required: true,
       createTitle: 'إضافة دولة جديدة',
-      renderCreateForm: (onSuccess, onCancel) => <CountryCreateForm onSuccess={(v , i) => {
-        onSuccess(v , i)}} onCancel={onCancel} />,
+      renderCreateForm: (onSuccess, onCancel) => <CountryCreateForm onSuccess={(v, i) => {
+        onSuccess(v, i)
+      }} onCancel={onCancel} />,
       compute: computeCountries, // we need to define this
     },
     {
@@ -414,7 +434,14 @@ export function EmployeeForm({
       renderCreateForm: (onSuccess, onCancel) => <CityCreateForm onSuccess={onSuccess} onCancel={onCancel} />,
     },
   ];
+  const gridColsClass = {
+    1: 'grid-cols-1',
+    2: 'grid-cols-2',
+    3: 'grid-cols-3',
+    4: 'grid-cols-4',
+  }[columns] || 'grid-cols-2';
 
+  const fullWidthClass = columns === 1 ? 'col-span-1' : `col-span-${columns}`;
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
@@ -423,7 +450,7 @@ export function EmployeeForm({
         {/* Personal Section */}
         <div className="bg-card rounded-lg p-4 border border-border">
           <h3 className="text-lg font-bold mb-4">المعلومات الشخصية</h3>
-          <div className={`grid grid-cols-1 md:grid-cols-${columns} gap-4`}>
+          <div className={`grid ${gridColsClass} gap-4`}>
             {PERSONAL_FIELDS.map((field) => (
               <FormInput key={field.name} {...field} />
             ))}
@@ -433,7 +460,7 @@ export function EmployeeForm({
         {/* Employment Section */}
         <div className="bg-card rounded-lg p-4 border border-border">
           <h3 className="text-lg font-bold mb-4">المعلومات الوظيفية</h3>
-          <div className={`grid grid-cols-1 md:grid-cols-${columns} gap-4`}>
+          <div className={`grid ${gridColsClass} gap-4`}>
             {EMPLOYMENT_FIELDS.filter(f => f.name !== 'employment_details.org_unit_id').map((field) => (
               <FormInput key={field.name} {...field} />
             ))}
@@ -462,7 +489,7 @@ export function EmployeeForm({
                 <button type="button" onClick={() => removeEducation(idx)} className="absolute top-2 left-2 text-danger text-sm">
                   حذف
                 </button>
-                <div className={`grid grid-cols-1 md:grid-cols-${columns} gap-4`}>
+                <div className={`grid ${gridColsClass} gap-4`}>
                   <FormInput
                     name={`educations.${idx}.category`}
                     type="select"
@@ -493,8 +520,9 @@ export function EmployeeForm({
                     renderCreateForm={(onSuccess, onCancel, deps) => (
                       <FacultyCreateForm
                         universityId={deps?.[`educations.${idx}.university_id`] as number | undefined}
-                        onSuccess={(v , i) => {
-                          onSuccess(v , i)}}
+                        onSuccess={(v, i) => {
+                          onSuccess(v, i)
+                        }}
                         onCancel={onCancel}
                       />
                     )}

@@ -62,7 +62,7 @@ export function usePaginatedEmployees({
   }, [fetchEmployees]);
 
   const changePage = (newPage: number) => {
-    if (newPage >= 1 && newPage <= (pagination.lastPage || 1)) {
+    if (newPage >= 1 && newPage <= (pagination?.lastPage || 1)) {
       setPage(newPage);
     }
   };

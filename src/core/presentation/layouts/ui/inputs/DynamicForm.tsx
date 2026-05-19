@@ -44,7 +44,6 @@ export function DynamicForm<T extends Record<string, any>>({
         {fields.map((field) => (
           <FormInput
             key={String(field.name)}
-            name={String(field.name)}
             {...field}
           />
         ))}

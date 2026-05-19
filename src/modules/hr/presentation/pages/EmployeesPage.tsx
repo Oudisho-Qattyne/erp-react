@@ -95,7 +95,7 @@ export function EmployeesPage() {
   return (
     <div className="p-4 space-y-4">
       {/* Filters Bar - Left side filters, Right side add button */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           {/* Search input - smaller width */}
           <Input
@@ -159,11 +159,10 @@ export function EmployeesPage() {
       )}
 
       {/* Add Employee Dialog */}
-    <Dialog isOpen={isAddDialogOpen} onClose={() => setIsAddDialogOpen(false)} title="إضافة موظف جديد" size="lg">
+    <Dialog isOpen={isAddDialogOpen} onClose={() => setIsAddDialogOpen(false)} title="إضافة موظف جديد" size="2xl">
   <EmployeeForm
     onSubmit={handleCreateEmployee}
     onCancel={() => setIsAddDialogOpen(false)}
-    columns={2}
   />
 </Dialog>
     </div>

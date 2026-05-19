@@ -5,6 +5,7 @@ import { Tc } from './Tc';
 import { useLanguage } from '../../../context/i18n/I18nProvider';
 import { useColumnResize } from '../../../hooks/useColumnResize';
 import { Input } from '../inputs/TheInput';
+import { SortAsc, SortDesc } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -224,13 +225,13 @@ export function DataTable<T extends Record<string, any>>({
                     className={`py-3 px-4 ${direction === 'rtl' ? 'text-right' : 'text-left'} font-semibold text-sm text-text-muted relative select-none group/th whitespace-nowrap border-border/30 ${direction === 'rtl' ? 'border-l' : 'border-r'} ${col.sortable ? 'cursor-pointer hover:bg-primary/5' : ''} ${col.className || ''}`}
                     style={{ width: `${columnWidths[idx]}px`, minWidth: `${columnWidths[idx]}px` }}
                   >
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center justify-between gap-1">
                       {col.label}
                       {col.sortable && sortColumn === col.key && (
-                        <span className="text-xs">{sortOrder === 'asc' ? '↑' : '↓'}</span>
+                        <span className="text-xs">{sortOrder === 'asc' ? <SortAsc className=' p-1 '/> : <SortDesc className=' p-1 '/>}</span>
                       )}
                       {col.sortable && sortColumn !== col.key && (
-                        <span className="text-xs opacity-30">↕️</span>
+                        <span className=' p-1 '>↕</span>
                       )}
                     </div>
                     {/* Resize handle */}
