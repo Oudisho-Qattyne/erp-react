@@ -57,7 +57,6 @@ export function OrganizationalUnitTreeSelect({
     return allUnits.filter(u => (u.parent_id ?? 0) === parentId);
   }, [allUnits]);
 
-  // Build path from root to a given unit ID
   const getPathToId = useCallback((id?: number): OrganizationalLevels[] => {
     if (!id) return [];
     const path: OrganizationalLevels[] = [];
@@ -80,12 +79,101 @@ export function OrganizationalUnitTreeSelect({
   };
 
   const handleSelectAtLevel = (levelIndex: number, newUnitId: number) => {
-    // Truncate path at this level: the new selection becomes the unit, and we discard any deeper units
     onChange(newUnitId);
   };
 
   if (loading) {
     return <div className="animate-pulse h-10 bg-muted rounded-md" />;
+  }
+
+  // Build levels based on the selected path
+  const levels: React.ReactNode[] = [];
+  let parentId = 0;
+  for (let idx = 0; idx <= selectedPath.length; idx++) {
+    const isLast = idx === selectedPath.length;
+    const currentSelectedId = isLast ? undefined : selectedPath[idx].id;
+    const children = getChildren(parentId);
+    const levelNumber = idx + 1;
+    const selectLabel = levelNumber === 1 ? label : `المستوى ${levelNumber}`;
+
+    // If there are no children and this is not the first level (i.e., we have a parent selected),
+    // we will still show an empty select with a create button to add a child under the parent.
+    if (children.length === 0 && idx > 0) {
+      // Show an empty select (no options) + create button for the current parentId
+      levels.push(
+        <div key={`empty-${parentId}`} className="space-y-2">
+          <div className="flex gap-2 items-end">
+            <div className="flex-1">
+              <label className="block text-sm font-medium mb-1">{selectLabel}</label>
+              <CustomSelect
+                options={[]}
+                value=""
+                onChange={() => {}}
+                placeholder="لا توجد وحدات فرعية"
+                disabled={disabled}
+              />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setCreateParentId(parentId);
+                setIsCreateDialogOpen(true);
+              }}
+              disabled={disabled}
+              className="mb-0.5"
+            >
+              + جديد
+            </Button>
+          </div>
+        </div>
+      );
+      break; // Stop after adding the empty level
+    }
+
+    // Normal level with existing children
+    levels.push(
+      <div key={parentId} className="space-y-2">
+        <div className="flex gap-2 items-end">
+          <div className="flex-1">
+            <label className="block text-sm font-medium mb-1">{selectLabel}</label>
+            <CustomSelect
+              options={children.map(c => ({ value: String(c.id), label: c.name as string }))}
+              value={currentSelectedId ? String(currentSelectedId) : ''}
+              onChange={(val) => {
+                const newId = val ? Number(val) : undefined;
+                if (newId) {
+                  handleSelectAtLevel(levelNumber - 1, newId);
+                }
+              }}
+              placeholder="اختر..."
+              disabled={disabled}
+            />
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setCreateParentId(parentId);
+              setIsCreateDialogOpen(true);
+            }}
+            disabled={disabled}
+            className="mb-0.5"
+          >
+            + جديد
+          </Button>
+        </div>
+      </div>
+    );
+
+    // Move to the selected child if any
+    if (currentSelectedId) {
+      parentId = currentSelectedId;
+    } else {
+      break;
+    }
   }
 
   return (
@@ -96,65 +184,7 @@ export function OrganizationalUnitTreeSelect({
         </label>
       )}
 
-      {/* Render levels based on the selected path */}
-      {(() => {
-        const levels: React.ReactNode[] = [];
-        // For each step in the path, we need to render a select for the children of the current parent
-        // We start with root (parentId = 0)
-        let parentId = 0;
-        for (let idx = 0; idx <= selectedPath.length; idx++) {
-          const isLast = idx === selectedPath.length;
-          const currentSelectedId = isLast ? undefined : selectedPath[idx].id;
-          const children = getChildren(parentId);
-          if (children.length === 0 && !currentSelectedId) break;
-
-          const levelNumber = idx + 1;
-          const selectLabel = levelNumber === 1 ? label : `المستوى ${levelNumber}`;
-
-          levels.push(
-            <div key={parentId} className="space-y-2">
-              <div className="flex gap-2 items-end">
-                <div className="flex-1">
-                  <label className="block text-sm font-medium mb-1">{selectLabel}</label>
-                  <CustomSelect
-                    options={children.map(c => ({ value: String(c.id), label: c.name as string }))}
-                    value={currentSelectedId ? String(currentSelectedId) : ''}
-                    onChange={(val) => {
-                      const newId = val ? Number(val) : undefined;
-                      if (newId) {
-                        handleSelectAtLevel(levelNumber - 1, newId);
-                      }
-                    }}
-                    placeholder="اختر..."
-                    disabled={disabled}
-                  />
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setCreateParentId(parentId);
-                    setIsCreateDialogOpen(true);
-                  }}
-                  disabled={disabled}
-                  className="mb-0.5"
-                >
-                  + جديد
-                </Button>
-              </div>
-            </div>
-          );
-
-          // If this level has a selected unit, move to its children for next iteration
-          if (currentSelectedId) {
-            parentId = currentSelectedId;
-          } else {
-            break;
-          }
-        }
-        return levels;
-      })()}
+      {levels}
 
       {error && <p className="text-danger text-xs">{error}</p>}
 

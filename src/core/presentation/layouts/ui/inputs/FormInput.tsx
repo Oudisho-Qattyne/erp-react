@@ -9,8 +9,9 @@ import { Dialog } from '../dialog/Dialog';
 import { useLanguage } from '../../../context/i18n/I18nProvider';
 import { useDependentField, type ComputedProps } from '../../../hooks/useDependentField';
 import { inputBaseClasses, labelClasses, errorClasses, hintClasses } from './styles';
+import { DatePicker } from './DatePicker';
 
-type InputType = 'text' | 'number' | 'email' | 'password' | 'textarea' | 'date' | 'select' | 'select-or-create';
+export type InputType = 'text' | 'number' | 'email' | 'password' | 'textarea' | 'date' | 'select' | 'select-or-create';
 
 export interface FormInputProps<T extends FieldValues> {
   name: Path<T>;
@@ -34,7 +35,7 @@ export interface FormInputProps<T extends FieldValues> {
   // For select-or-create
   createTitle?: string;
   renderCreateForm?: (
-    onSuccess: (value: string, item?: unknown) => void,
+    onSuccess: (value: any, item?: unknown) => void,
     onCancel: () => void,
     dependentData?: Record<string, unknown>
   ) => React.ReactNode;
@@ -92,7 +93,7 @@ export function FormInput<T extends FieldValues>({
   }
 
   const handleChange = (val: any) => {
-      
+
     setValue(name, val, { shouldValidate: true, shouldDirty: true });
   };
 
@@ -148,8 +149,7 @@ export function FormInput<T extends FieldValues>({
             placeholder={finalPlaceholder}
             disabled={finalDisabled}
             required={finalRequired}
-            baseClasses={baseClasses}
-            direction={direction}
+            className={baseClasses}
           />
         );
       default:
@@ -196,79 +196,79 @@ export function FormInput<T extends FieldValues>({
 // -----------------------------------------------------------------------------
 // DatePicker – uses CustomCalendar
 // -----------------------------------------------------------------------------
-function DatePicker({
-  value,
-  onChange,
-  placeholder,
-  disabled,
-  required,
-  baseClasses,
-  direction,
-}: any) {
-  const [showCalendar, setShowCalendar] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+// function DatePicker({
+//   value,
+//   onChange,
+//   placeholder,
+//   disabled,
+//   required,
+//   baseClasses,
+//   direction,
+// }: any) {
+//   const [showCalendar, setShowCalendar] = useState(false);
+//   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const close = (e: Event) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setShowCalendar(false);
-      }
-    };
-    document.addEventListener('mousedown', close);
-    document.addEventListener('focusin', close);
-    return () => {
-      document.removeEventListener('mousedown', close);
-      document.removeEventListener('focusin', close);
-    };
-  }, []);
+//   useEffect(() => {
+//     const close = (e: Event) => {
+//       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+//         setShowCalendar(false);
+//       }
+//     };
+//     document.addEventListener('mousedown', close);
+//     document.addEventListener('focusin', close);
+//     return () => {
+//       document.removeEventListener('mousedown', close);
+//       document.removeEventListener('focusin', close);
+//     };
+//   }, []);
 
-  return (
-    <div className="relative" ref={containerRef}>
-      <div className="relative group/date">
-        <input
-          readOnly
-          value={value ?? ''}
-          onClick={() => !disabled && setShowCalendar(true)}
-          placeholder={placeholder}
-          disabled={disabled}
-          required={required}
-          className={`${baseClasses} cursor-pointer bg-card/50`}
-        />
-        <CalendarIcon
-          size={16}
-          className={`absolute ${direction === 'rtl' ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2 text-text-muted pointer-events-none`}
-        />
-      </div>
-      {showCalendar && (
-        <div className={`absolute z-50 mt-1 ${direction === 'rtl' ? 'right-0' : 'left-0'}`}>
-          <CustomCalendar
-            value={value}
-            onChange={(date) => {
-              onChange(date);
-              setShowCalendar(false);
-            }}
-            onClose={() => setShowCalendar(false)}
-          />
-        </div>
-      )}
-    </div>
-  );
-}
+//   return (
+//     <div className="relative" ref={containerRef}>
+//       <div className="relative group/date">
+//         <input
+//           readOnly
+//           value={value ?? ''}
+//           onClick={() => !disabled && setShowCalendar(true)}
+//           placeholder={placeholder}
+//           disabled={disabled}
+//           required={required}
+//           className={`${baseClasses} cursor-pointer bg-card/50`}
+//         />
+//         <CalendarIcon
+//           size={16}
+//           className={`absolute ${direction === 'rtl' ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2 text-text-muted pointer-events-none`}
+//         />
+//       </div>
+//       {showCalendar && (
+//         <div className={`absolute z-50 mt-1 ${direction === 'rtl' ? 'right-0' : 'left-0'}`}>
+//           <CustomCalendar
+//             value={value}
+//             onChange={(date) => {
+//               onChange(date);
+//               setShowCalendar(false);
+//             }}
+//             onClose={() => setShowCalendar(false)}
+//           />
+//         </div>
+//       )}
+//     </div>
+//   );
+// }
 
 // -----------------------------------------------------------------------------
 // SelectOrCreateField – uses CustomSelect + Dialog + creation form
 // -----------------------------------------------------------------------------
 interface SelectOrCreateFieldProps {
-  value?: string;
-  onChange: (value: string) => void;
-  options: { value: string; label: string }[];
+  value?: any;
+  onChange: (value: any) => void;
+  options: { value: any; label: string }[];
   placeholder?: string;
   disabled?: boolean;
   required?: boolean;
   searchable?: boolean;
   createTitle: string;
   renderCreateForm?: (
-    onSuccess: (newValue: string, newItem: unknown) => void,
+    onSuccess: (newValue: any, newItem: unknown) => void,
     onCancel: () => void,
     dependentData?: Record<string, unknown>
   ) => React.ReactNode;
@@ -291,12 +291,21 @@ function SelectOrCreateField({
 }: SelectOrCreateFieldProps) {
   const { t } = useLanguage();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [localOptions, setLocalOptions] = useState<{
+    value: number;
+    label: string;
+  }[]>(options)
 
-  const handleCreateSuccess = (newValue: string, newItem: any) => {
+  useEffect(() => {
+    setLocalOptions(options)
+  }, [options])
+
+  const handleCreateSuccess = (newValue: any, newItem: any) => {
     onChange(newValue);
-    console.log(newItem.data.name.ar );
-    
-    value = newItem.data.name.ar    
+    const localValue = newItem.data.name.ar as string
+    setLocalOptions(prev => [...prev, { value: newValue, label: localValue }])
+    console.log(newValue, newItem);
+
     setIsDialogOpen(false);
   };
 
@@ -306,7 +315,7 @@ function SelectOrCreateField({
     <>
       <div className="flex gap-2">
         <CustomSelect
-          options={options}
+          options={localOptions}
           value={value}
           onChange={onChange}
           placeholder={placeholder}
@@ -334,16 +343,17 @@ function SelectOrCreateField({
         size="md"
       >
         {renderCreateForm?.(
-        (v , i) => {handleCreateSuccess(v , i)
-          
+          (v, i) => {
+            handleCreateSuccess(v, i)
 
-        }
+
+          }
           ,
           () => setIsDialogOpen(false),
           dependentData
         ) ?? (
-          <div className="p-4 text-danger text-sm">يجب توفير renderCreateForm</div>
-        )}
+            <div className="p-4 text-danger text-sm">يجب توفير renderCreateForm</div>
+          )}
       </Dialog>
     </>
   );
