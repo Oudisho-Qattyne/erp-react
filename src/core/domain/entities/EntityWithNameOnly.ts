@@ -1,6 +1,6 @@
 export interface EntityWithNameOnly {
     id: number;
-    name: string | Record<string, string>;
+    name: string;
     created_at?: string;
     updated_at?: string;
 }

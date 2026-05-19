@@ -1,0 +1,18 @@
+{
+  "common": {
+    "reset": "مسح",
+    "search": "بحث",
+    "loading": "جاري التحميل...",
+    "no_data": "لا توجد بيانات",
+    "filter": "تصفية"
+  },
+  "pagination": {
+    "showing": "عرض",
+    "of": "من",
+    "records": "سجل",
+    "page": "صفحة",
+    "previous": "السابق",
+    "next": "التالي",
+    "items_per_page": "لكل صفحة"
+  }
+}
