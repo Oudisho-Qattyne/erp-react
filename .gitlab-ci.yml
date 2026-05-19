@@ -1,0 +1,87 @@
+image: node:22.14.0-alpine
+
+stages:
+  - lint
+  - build
+  - deploy
+
+variables:
+  # Cache npm packages globally to speed up pipelines
+  NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.npm"
+
+# Global Cache Policy: Scoped by package-lock.json
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - .npm/
+    - node_modules/
+
+# =========================================================================
+# STAGE 1: LINTING & CODE QUALITY
+# =========================================================================
+
+lint_check:
+  stage: lint
+  script:
+    - npm ci --prefer-offline --no-audit
+    - npm run lint
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == "main"
+  allow_failure: true # Optional: won't block the build if linting fails
+
+# =========================================================================
+# STAGE 2: BUILD PRODUCTION ARTIFACTS
+# =========================================================================
+
+build_project:
+  stage: build
+  variables:
+    # Injecting environment variables during build time for Vite
+    VITE_PUBLIC_API_URL: "$PRODUCTION_API_URL" 
+  script:
+    - npm ci --prefer-offline --no-audit
+    - echo "VITE_PUBLIC_API_URL=${PRODUCTION_API_URL}" > .env
+    - npm run build
+  artifacts:
+    name: "production-build-$CI_COMMIT_SHA"
+    paths:
+      - dist/ # Pass the compiled build folder to the deployment stage
+    expire_in: 1 day
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# =========================================================================
+# STAGE 3: DEPLOYMENT VIA RSYNC
+# =========================================================================
+
+deploy_production:
+  stage: deploy
+  image: alpine:latest
+  dependencies:
+    - build_project # Explicitly fetch the 'dist/' directory from the build job
+  before_script:
+    # Install openssh and rsync on the lightweight Alpine image
+    - apk add --no-cache openssh-client rsync
+    # Start SSH agent
+    - eval $(ssh-agent -s)
+    # Register the SSH private key
+    - echo "$SSH_PRIVATE_KEY" | base64 -d | ssh-add -
+    # Create the .ssh directory and secure it
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    # Scan and save the host key to prevent MITM prompts
+    - ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+  script:
+    - echo "Deploying compiled assets to production via RSYNC..."
+    # -a: archive mode, -v: verbose, -z: compress during transfer, --delete: remove old files not in dist/
+    - rsync -avz --delete dist/ $SSH_USER@$SSH_HOST:$SSH_PATH
+  environment:
+    name: production
+    url: https://stage-erp.marka-tech.com 
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
