@@ -3,7 +3,7 @@ import { useFormContext, type FieldValues, type Path} from 'react-hook-form';
 
 export interface ComputedProps {
   value?: any;
-  options?: { value: string; label: string }[];
+  options?: { value: number | string; label: string }[]
   disabled?: boolean;
   hidden?: boolean;
   placeholder?: string;

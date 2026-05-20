@@ -12,6 +12,7 @@ export function useDynamicForm<TFieldValues extends FieldValues>({
   defaultValues?: Partial<TFieldValues>;
   mode?: 'onBlur' | 'onChange' | 'onSubmit' | 'onTouched' | 'all';
 }): UseFormReturn<TFieldValues> {
+  
   return useForm<TFieldValues>({
     // Cast schema to any to bypass TypeScript strictness (safe at runtime)
     resolver: zodResolver(schema as any),

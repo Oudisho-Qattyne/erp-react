@@ -9,7 +9,7 @@ import { useEntityCrud } from '../../../../core/presentation/hooks/data/useEntit
 import type { Country } from '../../../../core/domain/entities/regions/Country';
 import type { City } from '../../../../core/domain/entities/regions/City';
 import type { OrganizationalLevels } from '../../../../core/domain/entities/organizationalLevels/organizationalLevels';
-import { TheInput } from '../../../../core/presentation/layouts/ui/inputs/TheInput';
+import Input from '../../../../core/presentation/layouts/ui/inputs/Input';
 
 
 export function ReportsPage() {
@@ -55,7 +55,7 @@ export function ReportsPage() {
     <div className="p-6 space-y-6 animate-fade-in pb-20">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card p-6 rounded-2xl border border-border shadow-sm">
-        <TheInput type='select-or-create' />
+        <Input onChange={() => {}} type='select-or-create' />
         <div>
           <div className="flex items-center gap-2 mb-1">
             <h1 className="text-2xl font-black text-primary tracking-tight">التقارير والتحليلات</h1>
