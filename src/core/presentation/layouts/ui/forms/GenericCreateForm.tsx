@@ -1,10 +1,11 @@
 // src/core/presentation/layouts/ui/forms/GenericCreateForm.tsx
 import React, { useRef, useEffect } from 'react';
 import { FormProvider, type FieldValues, type Path } from 'react-hook-form';
-import { useDynamicForm } from '../../../hooks/useDynamicForm';
-import { FormInput, type FormInputProps, type InputType } from '../inputs/FormInput';
+import { FormInput, type FormInputProps, } from '../inputs/FormInput';
 import { Button } from '../buttons/Button';
 import { z, type ZodSchema, type ZodObject } from 'zod';
+import { useDynamicForm } from '../../../hooks/useDynamicForm221';
+import type { InputType } from '../inputs/Input';
 
 export type FieldConfig<T extends FieldValues = any> = Omit<FormInputProps<T>, 'name'> & { name: Path<T> };
 
@@ -48,7 +49,7 @@ export function GenericCreateForm({
   onCancel,
   submitLabel = 'حفظ',
 }: GenericCreateFormProps) {
-  const methods = useDynamicForm({ schema, defaultValues });
+  const {form:methods} = useDynamicForm({ schema, defaultValues });
   const { handleSubmit, formState } = methods;
   const { isValid, isSubmitting } = formState;
   const formRef = useRef<HTMLDivElement>(null);
@@ -115,7 +116,7 @@ export function GenericCreateForm({
   const getOptions = (fieldSchema: z.ZodTypeAny) => {
     if (fieldSchema instanceof z.ZodEnum) {
       return fieldSchema.options.map((opt: any) => ({
-        value: String(opt),
+        value: opt,
         label: String(opt),
       }));
     }

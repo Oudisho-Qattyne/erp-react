@@ -3,9 +3,9 @@ import React, { useState, useMemo } from 'react';
 import { Tb } from './Tb';
 import { Tc } from './Tc';
 import { useLanguage } from '../../../context/i18n/I18nProvider';
-import { useColumnResize } from '../../../hooks/useColumnResize';
-import { Input } from '../inputs/TheInput';
+import { useColumnResize } from './hooks/useColumnResize';
 import { SortAsc, SortDesc } from 'lucide-react';
+import Input from '../inputs/Input';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

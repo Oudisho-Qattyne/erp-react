@@ -2,13 +2,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
-import { Input } from '../../../../core/presentation/layouts/ui/inputs/TheInput';
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
 import { DataTable, type ColumnDef } from '../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { Dialog } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
 import type { EmployeeListItem } from '../../domain/entities/EmployeeListItem';
 import { useManageEmployee } from '../hooks/useEmployees';
 import { EmployeeForm } from './EmployeeForm';
+import { FormInput } from '../../../../core/presentation/layouts/ui/inputs/FormInput';
+import Input from '../../../../core/presentation/layouts/ui/inputs/Input';
 
 const genderOptions = [
   { value: '', label: 'الكل' },

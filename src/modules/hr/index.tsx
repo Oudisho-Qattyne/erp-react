@@ -6,6 +6,7 @@ import type { Module } from '../../core/moduleRegistry'
 // import CreateUserPage from './presentation/pages/CreateUserPage'
 import { ReportsPage } from './presentation/pages/ReportsPage'
 import { EmployeesPage } from './presentation/pages/EmployeesPage'
+import { ShowEmployeePage } from './presentation/pages/ShowEmployeePage'
 
 const usersModule: Module = {
   name: 'hr',
@@ -32,6 +33,14 @@ const usersModule: Module = {
       moduleName: 'hr',
       icon: <Users size={18} />,
       group: 'hr',
+    },
+    {
+      path: '/hr/employees/:id',
+      element: <ShowEmployeePage />,
+      layout: 'dashboard',
+      label: 'تفاصيل الموظف',
+      nav: false,
+      moduleName: 'hr',
     }
   ],
   locales: { en: enLocales, ar: arLocales },

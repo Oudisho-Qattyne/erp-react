@@ -7,9 +7,6 @@ import { getAuthUser } from '../../infrastructure/auth/authStorage';
 
 const DefaultLayout = ({ children }: { children: ReactNode }) => {
   const user = getAuthUser()
-  console.log("Hellow");
-  console.log(user);
-  
   const mockUser = {
   full_name: user.name,
   position: user.role.display_name,

@@ -7,9 +7,10 @@ import { useAuth } from '../hooks/useAuth';
 
 import { Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicForm2';
-import { Input } from '../../../../core/presentation/layouts/ui/inputs/Input';
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
+import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicForm221';
+import { FormInput } from '../../../../core/presentation/layouts/ui/inputs/FormInput';
+import { FormProvider } from 'react-hook-form';
 
 // Validation schema
 const loginSchema = z.object({
@@ -67,32 +68,34 @@ export default function LoginPage() {
             {authError}
           </div>
         )}
+        <FormProvider {...form}>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <Input
-            {...fieldProps('email')}
-            type="email"
-            label="البريد الإلكتروني"
-            placeholder="admin@example.com"
-          />
-          <Input
-            {...fieldProps('password')}
-            type="password"
-            label="كلمة المرور"
-            placeholder="••••••••"
-          />
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <FormInput
+              {...fieldProps('email')}
+              type="email"
+              label="البريد الإلكتروني"
+              placeholder="admin@example.com"
+            />
+            <FormInput
+              {...fieldProps('password')}
+              type="password"
+              label="كلمة المرور"
+              placeholder="••••••••"
+            />
 
-          <Button
-            type="submit"
-            variant="gold"
-            fullWidth
-            size="lg"
-            isLoading={isSubmitting || isLoginLoading}
-            disabled={!isValid}
-          >
-            تسجيل الدخول
-          </Button>
-        </form>
+            <Button
+              type="submit"
+              variant="gold"
+              fullWidth
+              size="lg"
+              isLoading={isSubmitting || isLoginLoading}
+              disabled={!isValid}
+            >
+              تسجيل الدخول
+            </Button>
+          </form>
+        </FormProvider>
       </div>
     </div>
   );

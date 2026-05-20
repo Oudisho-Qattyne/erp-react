@@ -9,17 +9,15 @@ import { UniversityFormSchema } from '../../../../core/presentation/schemas/educ
 import { FacultyFormSchema } from '../../../../core/presentation/schemas/education/facultyForm.schema';
 import { SpecializationFormSchema } from '../../../../core/presentation/schemas/education/specializationForm.schema';
 import type { OrganizationalLevels } from '../../../../core/domain/entities/organizationalLevels/organizationalLevels';
-import { organizationalLevelFormSchema } from '../../../../core/presentation/schemas/organizationalLevels/organizationalLevel.Schema';
 import { FormInput, type FormInputProps } from '../../../../core/presentation/layouts/ui/inputs/FormInput';
 import { CreateEmployeeNestedSchema, type EmployeeFormValues } from '../schemas/employeeForm';
-import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicForm';
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
 import { GenericCreateForm, type FieldConfig } from '../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { FormProvider } from 'react-hook-form';
 import type { Country } from '../../../../core/domain/entities/regions/Country';
 import { CountryFormSchema } from '../../../../core/presentation/schemas/regions/countryForm.schema';
 import { OrganizationalUnitTreeSelect } from '../components/OrganizationalUnitTreeSelect';
-import type { CreateEntityDTO } from '../../application/dtos/entityDto';
+import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicForm221';
 
 // -----------------------------------------------------------------------------
 // Helper: Generic Create Form wrapper (with explicit types)
@@ -97,10 +95,10 @@ function CreateEntityForm<T>({
 }
 
 
-function RegionCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number, item: any) => void; onCancel: () => void }) {
-  const { create: createRegion } = useRegions();
-  return <CreateEntityForm schema={RegionFormSchema} onSubmit={createRegion} onSuccess={onSuccess} onCancel={onCancel} title="منطقة" />;
-}
+// function RegionCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number, item: any) => void; onCancel: () => void }) {
+//   const { create: createRegion } = useRegions();
+//   return <CreateEntityForm schema={RegionFormSchema} onSubmit={createRegion} onSuccess={onSuccess} onCancel={onCancel} title="منطقة" />;
+// }
 
 function UniversityCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number, item: any) => void; onCancel: () => void }) {
   const { create: createUniversity } = useEntityCrud<University>('shared-kernal/universities', 'shared-kernal/universities');
@@ -113,15 +111,15 @@ function UniversityCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number,
 
 function FacultyCreateForm({ onSuccess, onCancel, universityId }: { onSuccess: (id: number, item: any) => void; onCancel: () => void; universityId?: number }) {
   const { create: createFaculty } = useFaculties();
-  const schemaWithoutUni = FacultyFormSchema.omit({ university_id:true });
+  const schemaWithoutUni = FacultyFormSchema.omit({ university_id: true });
   return (
     <GenericCreateForm
-    fields={[{ name: 'name', label: 'اسم الكلية', required: true }]}
+      fields={[{ name: 'name', label: 'اسم الكلية', required: true }]}
       schema={schemaWithoutUni}
       onSubmit={async (data: any) => {
         const payload = {
-          name:{ar:data.name},
-          university_id : universityId
+          name: { ar: data.name },
+          university_id: universityId
         }
         const result = await createFaculty(payload);
         onSuccess(result.id, result);
@@ -140,7 +138,7 @@ function SpecializationCreateForm({ onSuccess, onCancel, facultyId }: { onSucces
   const schemaWithFac = SpecializationFormSchema.extend({ faculty_id: z.number().default(facultyId ?? 0) });
   return (
     <GenericCreateForm
-    fields={[{ name: 'name', label: 'اسم الاختصاص', required: true }]}
+      fields={[{ name: 'name', label: 'اسم الاختصاص', required: true }]}
       schema={schemaWithFac}
       defaultValues={{ faculty_id: facultyId }}
       onSubmit={async (data: any) => {
@@ -156,10 +154,10 @@ function SpecializationCreateForm({ onSuccess, onCancel, facultyId }: { onSucces
   );
 }
 
-function OrgUnitCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number, item: any) => void; onCancel: () => void }) {
-  const { create: createOrgUnit } = useEntityCrud<OrganizationalLevels>('', '');
-  return <CreateEntityForm schema={organizationalLevelFormSchema} onSubmit={createOrgUnit} onSuccess={onSuccess} onCancel={onCancel} title="وحدة تنظيمية" />;
-}
+// function OrgUnitCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number, item: any) => void; onCancel: () => void }) {
+//   const { create: createOrgUnit } = useEntityCrud<OrganizationalLevels>('', '');
+//   return <CreateEntityForm schema={organizationalLevelFormSchema} onSubmit={createOrgUnit} onSuccess={onSuccess} onCancel={onCancel} title="وحدة تنظيمية" />;
+// }
 
 // -----------------------------------------------------------------------------
 // Field configurations (static)
@@ -179,6 +177,19 @@ export interface EmployeeFormProps {
   loading?: boolean;
 }
 
+const getNestedValue = (obj: any, path: string): any => {
+  if (obj && obj[path] !== undefined) {
+    return obj[path];
+  }
+  return path.split('.').reduce((current, key) => {
+    const index = Number(key);
+    if (!isNaN(index) && Array.isArray(current)) {
+      return current[index];
+    }
+    return current?.[key];
+  }, obj);
+};
+
 export function EmployeeForm({
   defaultValues,
   onSubmit,
@@ -188,7 +199,7 @@ export function EmployeeForm({
   cancelLabel = 'إلغاء',
   loading = false,
 }: EmployeeFormProps) {
-  const methods = useDynamicForm({
+  const { form: methods } = useDynamicForm({
     schema: CreateEmployeeNestedSchema,
     defaultValues: EMPLOYEE_EMPTY_DEFAULTS,
     mode: 'onChange',
@@ -201,10 +212,10 @@ export function EmployeeForm({
   // Data fetching hooks
   const { entities: cities, getAllByCountry: loadCitiesByCountry } = useCities();
   const { entities: regions, getAllByCity: loadRegionsByCity } = useRegions();
-  const { entities: universities, getAll: loadUniversities } = useEntityCrud<University>('', '');
+  const { entities: universities, getAll: loadUniversities } = useEntityCrud<University>('shared-kernal/universities', 'shared-kernal/universities');
   const { entities: faculties, getAllByUniversity: loadFacultiesByUniversity } = useFaculties();
   const { entities: specializations, getAllByFaculty: loadSpecializationsByFaculty } = useSpecializations();
-  const { entities: orgUnits, getAll: loadOrgUnits } = useEntityCrud<OrganizationalLevels>('', '');
+  const { entities: orgUnits, getAll: loadOrgUnits } = useEntityCrud<OrganizationalLevels>('hr/organizational-levels', 'hr/organizational-levels');
   // Country CRUD (you may need a useCountries hook)
 
 
@@ -212,13 +223,13 @@ export function EmployeeForm({
 
   const computeCountries = async () => {
     const response = await loadCountries();
-    return { options: response.data.map((c: any) => ({ value: String(c.id), label: c.name })) };
+    return { options: response.data.map((c: any) => ({ value: c.id, label: c.name })) };
   };
 
   // Create form for country (add after other create forms)
-  function CountryCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number, item: any) => void; onCancel: () => void }) {
+  function CountryCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number | string, item: any) => void; onCancel: () => void }) {
     const { create: createCountry } = useEntityCrud<Country>('shared-kernal/countries', 'shared-kernal/countries');
-    return <CreateEntityForm fields={[{ name: 'name', label: 'اسم الجامعة', required: true }]} defaultValues={{ name: '' }} schema={CountryFormSchema} onSubmit={ async (data) => {
+    return <CreateEntityForm fields={[{ name: 'name', label: 'اسم الدولة', required: true }]} defaultValues={{ name: '' }} schema={CountryFormSchema} onSubmit={async (data) => {
       const payload = {
         name: {
           ar: data.name
@@ -235,19 +246,18 @@ export function EmployeeForm({
   function CityCreateForm({ onSuccess, onCancel, countryId }: { onSuccess: (id: number, item: any) => void; onCancel: () => void; countryId?: number }) {
     const { create: createCity } = useCities(); // assumes createCity can accept country_id
     const schemaWithoutCountry = CityFormSchema.omit({ country_id: true });
-    console.log(schemaWithoutCountry , CityFormSchema);
-    
+
     return (
       <GenericCreateForm
-      fields={[{ name: 'name', label: 'اسم المدينة', required: true }]}
+        fields={[{ name: 'name', label: 'اسم المدينة', required: true }]}
         schema={schemaWithoutCountry}
         defaultValues={{ name: '' }}
         onSubmit={async (data) => {
-          const payload ={
-            name:{
-              ar:data.name
+          const payload = {
+            name: {
+              ar: data.name
             },
-            country_id:countryId
+            country_id: countryId
           }
           const result = await createCity(payload);
           onSuccess(result.id, result);
@@ -265,18 +275,18 @@ export function EmployeeForm({
   // Modify RegionCreateForm to accept cityId
   function RegionCreateForm({ onSuccess, onCancel, cityId }: { onSuccess: (id: number, item: any) => void; onCancel: () => void; cityId?: number }) {
     const { create: createRegion } = useRegions();
-    const schemaWithoutCity = RegionFormSchema.omit({ city_id:true });
+    const schemaWithoutCity = RegionFormSchema.omit({ city_id: true });
     return (
       <GenericCreateForm
-      fields={[{ name: 'name', label: 'اسم المنطقة السكنية', required: true }]}
+        fields={[{ name: 'name', label: 'اسم المنطقة السكنية', required: true }]}
         schema={schemaWithoutCity}
         defaultValues={{ city_id: cityId }}
         onSubmit={async (data) => {
           const paload = {
-            name:{
-              ar:data.name
+            name: {
+              ar: data.name
             },
-            city_id:cityId
+            city_id: cityId
           }
           const result = await createRegion(paload);
           onSuccess(result.id, result);
@@ -293,33 +303,33 @@ export function EmployeeForm({
     const countryId = values.employment_details?.workplace_country_id;
     if (!countryId) return { options: [], disabled: true };
     const response = await loadCitiesByCountry(countryId);
-    return { options: response.data.map((c: any) => ({ value: String(c.id), label: c.name })) };
+    return { options: response.data.map((c: any) => ({ value: c.id, label: c.name })) };
   };
 
   const computeRegions = async (values: any) => {
     const cityId = values.residence_city_id;
     if (!cityId) return { options: [], disabled: true };
     const response = await loadRegionsByCity(cityId);
-    return { options: response.data.map((r: any) => ({ value: String(r.id), label: r.name })) };
+    return { options: response.data.map((r: any) => ({ value: r.id, label: r.name })) };
   };
 
   const computeUniversities = async () => {
     const response = await loadUniversities();
-    return { options: response.data.map((u: any) => ({ value: String(u.id), label: u.name })) };
+    return { options: response.data.map((u: any) => ({ value: u.id, label: u.name })) };
   };
 
   const computeFaculties = async (values: any, idx: number) => {
-    const univId = values[`educations.${idx}.university_id`];
+    const univId = getNestedValue(values, `educations.${idx}.university_id`);
     if (!univId) return { options: [], disabled: true };
-    const response = await loadFacultiesByUniversity(univId);
-    return { options: response.data.map((f: any) => ({ value: String(f.id), label: f.name })) };
+    const response = await loadFacultiesByUniversity(Number(univId));
+    return { options: response.data.map((f: any) => ({ value: f.id, label: f.name })) };
   };
 
   const computeSpecializations = async (values: any, idx: number) => {
-    const facId = values[`educations.${idx}.faculty_id`];
+    const facId = getNestedValue(values, `educations.${idx}.faculty_id`);
     if (!facId) return { options: [], disabled: true };
-    const response = await loadSpecializationsByFaculty(facId);
-    return { options: response.data.map((s: any) => ({ value: String(s.id), label: s.name })) };
+    const response = await loadSpecializationsByFaculty(Number(facId));
+    return { options: response.data.map((s: any) => ({ value: s.id, label: s.name })) };
   };
 
   const addEducation = () => {
@@ -397,10 +407,11 @@ export function EmployeeForm({
       label: 'الدولة',
       required: true,
       createTitle: 'إضافة دولة جديدة',
+      labelPath: 'data.name.ar',
       renderCreateForm: (onSuccess, onCancel) => <CountryCreateForm onSuccess={(v, i) => {
         onSuccess(v, i)
       }} onCancel={onCancel} />,
-      compute: computeCountries, // we need to define this
+      compute: computeCountries,
     },
     {
       name: 'residence_city_id',
@@ -412,9 +423,11 @@ export function EmployeeForm({
         const countryId = values.residence_country_id;
         if (!countryId) return { options: [], disabled: true };
         const response = await loadCitiesByCountry(countryId);
-        return { options: response.data.map((c: any) => ({ value: String(c.id), label: c.name })) };
+        return { options: response.data.map((c: any) => ({ value: c.id, label: c.name })) };
       },
       createTitle: 'إضافة مدينة جديدة',
+      labelPath: 'data.name.ar',
+
       renderCreateForm: (onSuccess, onCancel, deps) => (
         <CityCreateForm countryId={deps?.residence_country_id as number} onSuccess={onSuccess} onCancel={onCancel} />
       ),
@@ -432,6 +445,9 @@ export function EmployeeForm({
         return { options: response.data.map((r: any) => ({ value: r.id, label: r.name })) };
       },
       createTitle: 'إضافة منطقة جديدة',
+      labelPath: 'data.name.ar',
+
+
       renderCreateForm: (onSuccess, onCancel, deps) => (
         <RegionCreateForm cityId={deps?.residence_city_id as number} onSuccess={onSuccess} onCancel={onCancel} />
       ),
@@ -493,8 +509,10 @@ export function EmployeeForm({
         const countryId = values.residence_country_id;
         if (!countryId) return { options: [], disabled: true };
         const response = await loadCitiesByCountry(countryId);
-        return { options: response.data.map((c: any) => ({ value: String(c.id), label: c.name })) }
+        return { options: response.data.map((c: any) => ({ value: c.id, label: c.name })) }
       },
+      labelPath: 'data.name.ar',
+
       renderCreateForm: (onSuccess, onCancel) => <CityCreateForm onSuccess={onSuccess} onCancel={onCancel} />,
     },
   ];
@@ -534,8 +552,7 @@ export function EmployeeForm({
               <OrganizationalUnitTreeSelect
                 value={methods.watch('employment_details.org_unit_id')}
                 onChange={(val) => {
-                  if (val !== undefined)
-                    methods.setValue('employment_details.org_unit_id', val, { shouldValidate: true, shouldDirty: true });
+                  methods.setValue('employment_details.org_unit_id', val ?? 0, { shouldValidate: true, shouldDirty: true });
                 }}
                 label="الوحدة التنظيمية"
                 required

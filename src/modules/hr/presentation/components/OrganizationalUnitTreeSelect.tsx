@@ -7,6 +7,8 @@ import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button'
 import { Dialog } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { GenericCreateForm } from '../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { organizationalLevelFormSchema } from '../../../../core/presentation/schemas/organizationalLevels/organizationalLevel.Schema';
+import { Plus } from 'lucide-react';
+import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 
 export function OrganizationalUnitTreeSelect({
   value,
@@ -23,6 +25,9 @@ export function OrganizationalUnitTreeSelect({
   disabled?: boolean;
   error?: string;
 }) {
+  const { t } = useLanguage();
+  const newLabel = t('common.new', 'shared') !== 'common.new' ? t('common.new', 'shared') : 'جديد';
+
   const { getAll: loadOrgUnits, create } = useEntityCrud<OrganizationalLevels>(
     'hr/organizational-levels',
     'hr/organizational-levels'
@@ -108,7 +113,7 @@ export function OrganizationalUnitTreeSelect({
               <CustomSelect
                 options={[]}
                 value=""
-                onChange={() => {}}
+                onChange={() => { }}
                 placeholder="لا توجد وحدات فرعية"
                 disabled={disabled}
               />
@@ -117,14 +122,15 @@ export function OrganizationalUnitTreeSelect({
               type="button"
               variant="outline"
               size="sm"
+              leftIcon={<Plus size={14} />}
               onClick={() => {
                 setCreateParentId(parentId);
                 setIsCreateDialogOpen(true);
               }}
               disabled={disabled}
-              className="mb-0.5"
+              className="shrink-0 h-9.5"
             >
-              + جديد
+              {disabled ? '' : newLabel}
             </Button>
           </div>
         </div>
@@ -142,10 +148,8 @@ export function OrganizationalUnitTreeSelect({
               options={children.map(c => ({ value: String(c.id), label: c.name as string }))}
               value={currentSelectedId ? String(currentSelectedId) : ''}
               onChange={(val) => {
-                const newId = val ? Number(val) : undefined;
-                if (newId) {
-                  handleSelectAtLevel(levelNumber - 1, newId);
-                }
+                const newId = val ? Number(val) : (parentId === 0 ? undefined : parentId);
+                onChange(newId);
               }}
               placeholder="اختر..."
               disabled={disabled}
@@ -155,14 +159,15 @@ export function OrganizationalUnitTreeSelect({
             type="button"
             variant="outline"
             size="sm"
+            leftIcon={<Plus size={14} />}
             onClick={() => {
               setCreateParentId(parentId);
               setIsCreateDialogOpen(true);
             }}
             disabled={disabled}
-            className="mb-0.5"
+            className="shrink-0 h-9.5"
           >
-            + جديد
+            {disabled ? '' : newLabel}
           </Button>
         </div>
       </div>
@@ -193,7 +198,7 @@ export function OrganizationalUnitTreeSelect({
           schema={organizationalLevelFormSchema}
           defaultValues={{ parent_id: createParentId }}
           onSubmit={handleCreate}
-          onSuccess={() => {}}
+          onSuccess={() => { }}
           onCancel={() => setIsCreateDialogOpen(false)}
           submitLabel="إضافة"
         />

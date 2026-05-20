@@ -3,7 +3,7 @@ import { ChevronDown, Search, Check } from 'lucide-react';
 import { useLanguage } from '../../../context/i18n/I18nProvider';
 
 interface Option {
-  value: any;
+  value: number | string;
   label: string;
 }
 
@@ -40,12 +40,12 @@ export function CustomSelect({
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const filteredOptions = options.filter(opt => 
+  const filteredOptions = options.filter(opt =>
     opt.label.toLowerCase().includes(search.toLowerCase())
   );
 
   const selectedOption = options.find(opt => opt.value === value);
-  const handleSelect = (val: number) => {
+  const handleSelect = (val: number | string) => {
     onChange(val);
     setIsOpen(false);
     setSearch('');
