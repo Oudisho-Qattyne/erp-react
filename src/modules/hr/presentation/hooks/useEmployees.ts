@@ -96,7 +96,7 @@ export function useManageEmployee(params: UseManageEmployeeParams = {}): UseMana
       if (sortBy) {
         params.sort_by = { [sortBy]: sortOrder };
       }
-      const response = await apiClient.get<DomainResponse<EmployeeListItem[]>>('hr/employees', { params });
+      const response = await apiClient.get<DomainResponse<EmployeeListItem[]>>('/hr/employees', { params });
       setEmployees(response.data);
       if (response.pagination) {
         setPagination({

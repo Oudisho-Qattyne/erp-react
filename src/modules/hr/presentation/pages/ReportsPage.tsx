@@ -16,8 +16,8 @@ import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProv
 
 export function ReportsPage() {
   const { t } = useLanguage();
-  const { getById , getAll:getAllCountries , entities : countries} = useEntityCrud<OrganizationalLevels>('hr/organizational-levels','hr/organizational-levels')
-  const { getAll : getAllCities , entities : cities} = useEntityCrud<City>(`shared-kernal/countries/${1}/cities` , 'shared-kernal/cities')
+  const { getById , getAll:getAllCountries , entities : countries} = useEntityCrud<OrganizationalLevels>('/hr/organizational-levels','/hr/organizational-levels')
+  const { getAll : getAllCities , entities : cities} = useEntityCrud<City>(`/shared-kernal/countries/${1}/cities` , '/shared-kernal/cities')
   const fetchUniversities = async () => {
     await getAllCountries()
     await getAllCities()

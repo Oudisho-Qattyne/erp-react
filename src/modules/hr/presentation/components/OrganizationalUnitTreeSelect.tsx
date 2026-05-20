@@ -29,8 +29,8 @@ export function OrganizationalUnitTreeSelect({
   const newLabel = t('common.new', 'shared') !== 'common.new' ? t('common.new', 'shared') : 'جديد';
 
   const { getAll: loadOrgUnits, create } = useEntityCrud<OrganizationalLevels>(
-    'hr/organizational-levels',
-    'hr/organizational-levels'
+    '/hr/organizational-levels',
+    '/hr/organizational-levels'
   );
   const [allUnits, setAllUnits] = useState<OrganizationalLevels[]>([]);
   const [loading, setLoading] = useState(true);
