@@ -26,7 +26,7 @@ export function ShowEmployeePage() {
   const navigate = useNavigate();
   const apiClient = useApiClient();
   const { language } = useLanguage();
-  
+
   const [employee, setEmployee] = useState<EmployeeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -77,8 +77,8 @@ export function ShowEmployeePage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       {/* Header Actions */}
       <div className="flex items-center justify-between">
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={() => navigate('/hr/employees')}
           leftIcon={<ArrowRight size={18} />}
           className="text-text-muted hover:text-text"
@@ -175,7 +175,16 @@ export function ShowEmployeePage() {
                 </div>
               )}
               <div className="pt-4 mt-4 border-t border-border/50">
-                <InfoRow label="تفاصيل السكن" value={employee.residential_area_details} icon={<MapPin size={14} />} />
+                <h3 className="text-sm font-semibold text-text-muted mb-3 flex items-center gap-1.5">
+                  <MapPin size={14} className="text-primary" />
+                  العنوان بالتفصيل
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <InfoRow label="الدولة" value={employee.residence_region?.city?.country?.name?.ar || '-'} />
+                  <InfoRow label="المدينة" value={employee.residence_region?.city?.name?.ar || '-'} />
+                  <InfoRow label="المنطقة" value={employee.residence_region?.name?.ar || '-'} />
+                  <InfoRow label="تفاصيل السكن" value={employee.residential_area_details} />
+                </div>
               </div>
             </div>
           </div>
@@ -205,6 +214,7 @@ export function ShowEmployeePage() {
                 <InfoRow label="طبيعة العقد" value={getContractNature(employee.employment_details.contract_nature)} />
                 <InfoRow label="التصنيف الوظيفي" value={employee.employment_details.job_category} />
                 <InfoRow label="الرقم التعريفي للوحدة التنظيمية" value={employee.employment_details.org_unit_id} icon={<Building2 size={14} />} />
+                <InfoRow label="مدينة العمل" value={employee.employment_details.workplace_city?.name?.ar || employee.employment_details.workplace_city_id || '-'} icon={<MapPin size={14} />} />
               </div>
             ) : (
               <div className="text-center py-8 text-text-muted bg-background/30 rounded-xl border border-dashed border-border">

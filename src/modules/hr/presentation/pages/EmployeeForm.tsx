@@ -201,7 +201,7 @@ export function EmployeeForm({
 }: EmployeeFormProps) {
   const { form: methods } = useDynamicForm({
     schema: CreateEmployeeNestedSchema,
-    defaultValues: EMPLOYEE_EMPTY_DEFAULTS,
+    defaultValues: { ...EMPLOYEE_EMPTY_DEFAULTS, ...defaultValues } as EmployeeFormValues,
     mode: 'onChange',
   });
   const { handleSubmit, formState, watch, setValue } = methods;

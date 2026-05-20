@@ -7,6 +7,7 @@ import type { Module } from '../../core/moduleRegistry'
 import { ReportsPage } from './presentation/pages/ReportsPage'
 import { EmployeesPage } from './presentation/pages/EmployeesPage'
 import { ShowEmployeePage } from './presentation/pages/ShowEmployeePage'
+import { EditEmployeePage } from './presentation/pages/EditEmployeePage'
 
 const usersModule: Module = {
   name: 'hr',
@@ -39,6 +40,14 @@ const usersModule: Module = {
       element: <ShowEmployeePage />,
       layout: 'dashboard',
       label: 'تفاصيل الموظف',
+      nav: false,
+      moduleName: 'hr',
+    },
+    {
+      path: '/hr/employees/:id/edit',
+      element: <EditEmployeePage />,
+      layout: 'dashboard',
+      label: 'تعديل الموظف',
       nav: false,
       moduleName: 'hr',
     }
