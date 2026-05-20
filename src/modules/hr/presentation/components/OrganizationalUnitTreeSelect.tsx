@@ -139,7 +139,7 @@ export function OrganizationalUnitTreeSelect({
           <div className="flex-1">
             <label className="block text-sm font-medium mb-1">{selectLabel}</label>
             <CustomSelect
-              options={children.map(c => ({ value: String(c.id), label: c.name as string }))}
+              options={children.map(c => ({ value: c.id, label: c.name as string }))}
               value={currentSelectedId ? String(currentSelectedId) : ''}
               onChange={(val) => {
                 const newId = val ? Number(val) : undefined;
