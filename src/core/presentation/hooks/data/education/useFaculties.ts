@@ -1,10 +1,10 @@
 import type { Faculty } from '../../../../domain/entities/education/Faculty';
 import { useNestedEntityCrud } from '../useNestedEntityCrud';
 
-export const FACULTY_REST_URL = 'shared-kernal/faculties';
+export const FACULTY_REST_URL = '/shared-kernal/faculties';
 
 export const facultyListUrl = (universityId: number) =>
-  `shared-kernal/universities/${universityId}/faculties`;
+  `/shared-kernal/universities/${universityId}/faculties`;
 
 export function useFaculties() {
   const nested = useNestedEntityCrud<Faculty>({

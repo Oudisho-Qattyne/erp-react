@@ -101,7 +101,7 @@ function CreateEntityForm<T>({
 
 function UniversityCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number, item: any) => void; onCancel: () => void }) {
   const { t } = useLanguage();
-  const { create: createUniversity } = useEntityCrud<University>('shared-kernal/universities', 'shared-kernal/universities');
+  const { create: createUniversity } = useEntityCrud<University>('/shared-kernal/universities', '/shared-kernal/universities');
   return <CreateEntityForm defaultValues={{ name: "" }} schema={UniversityFormSchema} fields={[{ name: 'name', label: t('employees.university', 'hr') || 'اسم الجامعة', required: true }]} onSubmit={(data) => {
 
     return createUniversity(data)
@@ -119,7 +119,7 @@ function FacultyCreateForm({ onSuccess, onCancel, universityId }: { onSuccess: (
       schema={schemaWithoutUni}
       onSubmit={async (data: any) => {
         const payload = {
-          name: { ar: data.name },
+          name: data.name ,
           university_id: universityId
         }
         const result = await createFaculty(payload);
@@ -218,14 +218,14 @@ const schema = getCreateEmployeeSchema(t)
   // Data fetching hooks
   const { entities: cities, getAllByCountry: loadCitiesByCountry } = useCities();
   const { entities: regions, getAllByCity: loadRegionsByCity } = useRegions();
-  const { entities: universities, getAll: loadUniversities } = useEntityCrud<University>('shared-kernal/universities', 'shared-kernal/universities');
+  const { entities: universities, getAll: loadUniversities } = useEntityCrud<University>('/shared-kernal/universities', '/shared-kernal/universities');
   const { entities: faculties, getAllByUniversity: loadFacultiesByUniversity } = useFaculties();
   const { entities: specializations, getAllByFaculty: loadSpecializationsByFaculty } = useSpecializations();
-  const { entities: orgUnits, getAll: loadOrgUnits } = useEntityCrud<OrganizationalLevels>('hr/organizational-levels', 'hr/organizational-levels');
+  const { entities: orgUnits, getAll: loadOrgUnits } = useEntityCrud<OrganizationalLevels>('/hr/organizational-levels', '/hr/organizational-levels');
   // Country CRUD (you may need a useCountries hook)
 
 
-  const { entities: countries, getAll: loadCountries } = useEntityCrud<Country>('shared-kernal/countries', 'shared-kernal/countries');
+  const { entities: countries, getAll: loadCountries } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
 
   const computeCountries = async () => {
     const response = await loadCountries();
@@ -234,7 +234,7 @@ const schema = getCreateEmployeeSchema(t)
 
   // Create form for country (add after other create forms)
   function CountryCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number | string, item: any) => void; onCancel: () => void }) {
-    const { create: createCountry } = useEntityCrud<Country>('shared-kernal/countries', 'shared-kernal/countries');
+    const { create: createCountry } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
     return <CreateEntityForm fields={[{ name: 'name', label: t('employees.country', 'hr') || 'اسم الدولة', required: true }]} defaultValues={{ name: '' }} schema={CountryFormSchema} onSubmit={async (data) => {
       const payload = {
         name: {

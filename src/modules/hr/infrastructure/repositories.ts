@@ -12,7 +12,7 @@ import type { EmployeeData } from "../domain/entities/employee";
  */
 export const createEmployeeRepository = (apiClient: ApiClient) => {
   // Base URL for all employee-related endpoints (no trailing slash)
-  const baseUrl = 'hr/employees';
+  const baseUrl = '/hr/employees';
 
   return createCrufRepository<
     EmployeeData,

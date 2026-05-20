@@ -6,7 +6,7 @@ export function createAuthRepository(apiClient: ApiClient): AuthRepository {
   return {
     login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
       // Assuming API endpoint is /users/login as per spec
-      return apiClient.post<AuthResponse, LoginCredentials>('users/login', credentials);
+      return apiClient.post<AuthResponse, LoginCredentials>('/users/login', credentials);
     }
   };
 }
