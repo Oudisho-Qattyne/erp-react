@@ -9,7 +9,7 @@ export function createManageEntityUsecase<T,TCreate , TUpdate, ID = number>(
   validator?: EntityValidator<TCreate | TUpdate>
 ): ManageEntityUsecase<T,TCreate , TUpdate, ID> {
   return {
-    async getAll(): Promise<DomainResponse<T>> {
+    async getAll(): Promise<DomainResponse<T[]>> {
       try {
         return await repository.findAll();
       } catch (error : any) {
@@ -17,7 +17,7 @@ export function createManageEntityUsecase<T,TCreate , TUpdate, ID = number>(
       }
     },
 
-    async getById(id: ID): Promise<T | null> {
+    async getById(id: ID): Promise<DomainResponse<T> | null> {
       try {
         return await repository.findById(id);
       } catch (error : any) {
@@ -27,7 +27,7 @@ export function createManageEntityUsecase<T,TCreate , TUpdate, ID = number>(
       }
     },
 
-    async create(data: TCreate): Promise<T> {
+    async create(data: TCreate): Promise<DomainResponse<T>> {
       // Optionally validate before calling repo
       if (validator) {
         await validator(data);
@@ -39,7 +39,7 @@ export function createManageEntityUsecase<T,TCreate , TUpdate, ID = number>(
       }
     },
 
-    async update(id: ID, data: TUpdate): Promise<T> {
+    async update(id: ID, data: TUpdate): Promise<DomainResponse<T>> {
       try {
         return await repository.update(id, data);
       } catch (error : any) {

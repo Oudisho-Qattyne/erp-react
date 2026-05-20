@@ -3,12 +3,14 @@ import MainNav from './ui/navs/MainNav'
 import { Sidebar } from './ui/layout/Sidebar'
 import { TopBar } from './ui/layout/TopBar';
 import { useLanguage } from '../context/i18n/I18nProvider';
+import { getAuthUser } from '../../infrastructure/auth/authStorage';
 
 const DefaultLayout = ({ children }: { children: ReactNode }) => {
+  const user = getAuthUser()
   const mockUser = {
-  full_name: 'م. أحمد الشمري',
-  position: 'المدير العام',
-  role: 'admin',
+  full_name: user.name,
+  position: user.role.display_name,
+  role: user.role.name,
 };
 const { direction, t } = useLanguage();
 

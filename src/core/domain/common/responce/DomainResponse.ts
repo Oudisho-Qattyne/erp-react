@@ -4,5 +4,5 @@ export interface DomainResponse<T>{
   status: string,
   plan?: any,
   pagination?:DomainPagination
-  data: T[]
+  data: T
 }

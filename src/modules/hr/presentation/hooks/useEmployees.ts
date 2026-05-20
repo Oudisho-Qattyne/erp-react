@@ -44,9 +44,9 @@ export interface UseManageEmployeeReturn {
   resetFilters: () => void;
   refetch: () => Promise<void>;
   // Single entity CRUD (using repository / usecase)
-  getById: (id: number) => Promise<EmployeeData | null>;
-  create: (data: CreateEmployeeDTO) => Promise<EmployeeData>;
-  update: (id: number, data: UpdateEmployeeDTO) => Promise<EmployeeData>;
+  getById: (id: number) => Promise<DomainResponse<EmployeeData> | null>;
+  create: (data: CreateEmployeeDTO) => Promise<DomainResponse<EmployeeData>>;
+  update: (id: number, data: UpdateEmployeeDTO) => Promise<DomainResponse<EmployeeData>>;
   remove: (id: number) => Promise<void>;
   clearError: () => void;
 }
@@ -96,7 +96,7 @@ export function useManageEmployee(params: UseManageEmployeeParams = {}): UseMana
       if (sortBy) {
         params.sort_by = { [sortBy]: sortOrder };
       }
-      const response = await apiClient.get<DomainResponse<EmployeeListItem>>('hr/employees', { params });
+      const response = await apiClient.get<DomainResponse<EmployeeListItem[]>>('hr/employees', { params });
       setEmployees(response.data);
       if (response.pagination) {
         setPagination({

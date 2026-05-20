@@ -1,9 +1,13 @@
+// src/core/presentation/layouts/ui/forms/GenericCreateForm.tsx
 import React, { useRef, useEffect } from 'react';
-import { FormProvider } from 'react-hook-form';
-import { useDynamicForm } from '../../../hooks/useDynamicForm';
-import { FormInput } from '../inputs/FormInput';
+import { FormProvider, type FieldValues, type Path } from 'react-hook-form';
+import { FormInput, type FormInputProps, } from '../inputs/FormInput';
 import { Button } from '../buttons/Button';
 import { z, type ZodSchema, type ZodObject } from 'zod';
+import { useDynamicForm } from '../../../hooks/useDynamicForm221';
+import type { InputType } from '../inputs/Input';
+
+export type FieldConfig<T extends FieldValues = any> = Omit<FormInputProps<T>, 'name'> & { name: Path<T> };
 
 function isZodObject(schema: ZodSchema<any>): schema is ZodObject<any> {
   return 'shape' in schema;
@@ -28,38 +32,32 @@ function flattenSchema(
 
 interface GenericCreateFormProps {
   schema: ZodSchema<any>;
+  fields?: FieldConfig[]; // 👈 explicit field configurations
   defaultValues?: Record<string, any>;
   onSubmit: (data: any) => Promise<any>;
-  onSuccess: (id: string, item: any) => void;
+  onSuccess: (id: number, item: any) => void;
   onCancel: () => void;
   submitLabel?: string;
 }
 
 export function GenericCreateForm({
   schema,
+  fields: explicitFields,
   defaultValues,
   onSubmit,
   onSuccess,
   onCancel,
   submitLabel = 'حفظ',
 }: GenericCreateFormProps) {
-  const methods = useDynamicForm({ schema, defaultValues });
+  const {form:methods} = useDynamicForm({ schema, defaultValues });
   const { handleSubmit, formState } = methods;
   const { isValid, isSubmitting } = formState;
   const formRef = useRef<HTMLDivElement>(null);
 
-  let flattenedFields: { path: string; schema: z.ZodTypeAny }[] = [];
-  if (isZodObject(schema)) {
-    flattenedFields = flattenSchema(schema);
-  }
-
   const handleFormSubmit = async (data: any) => {
     const result = await onSubmit(data);
-    onSuccess(String(result.data.id), result);
+    onSuccess(result.data.id, result);
   };
-
-  // Trigger validation on mount so isValid is correct
-
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -74,7 +72,41 @@ export function GenericCreateForm({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isValid, isSubmitting, methods, handleFormSubmit]);
 
-  const getInputType = (fieldSchema: z.ZodTypeAny): 'text' | 'number' | 'date' | 'select' => {
+  // If explicit fields are provided, use them
+  if (explicitFields && explicitFields.length > 0) {
+    return (
+      <FormProvider {...methods}>
+        <div ref={formRef} className="space-y-4">
+          <div className="space-y-3">
+            {explicitFields.map((field) => (
+              <FormInput key={field.name as string} {...field} label={field.label}/>
+            ))}
+          </div>
+          <div className="flex justify-end gap-3 pt-2">
+            <Button type="button" variant="outline" onClick={onCancel}>
+              إلغاء
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              disabled={!isValid || isSubmitting}
+              onClick={methods.handleSubmit(handleFormSubmit)}
+            >
+              {isSubmitting ? 'جاري...' : submitLabel}
+            </Button>
+          </div>
+        </div>
+      </FormProvider>
+    );
+  }
+
+  // Fallback: generate fields from schema (original behaviour)
+  let flattenedFields: { path: string; schema: z.ZodTypeAny }[] = [];
+  if (isZodObject(schema)) {
+    flattenedFields = flattenSchema(schema);
+  }
+
+  const getInputType = (fieldSchema: z.ZodTypeAny): InputType => {
     if (fieldSchema instanceof z.ZodNumber) return 'number';
     if (fieldSchema instanceof z.ZodDate) return 'date';
     if (fieldSchema instanceof z.ZodEnum) return 'select';
@@ -84,7 +116,7 @@ export function GenericCreateForm({
   const getOptions = (fieldSchema: z.ZodTypeAny) => {
     if (fieldSchema instanceof z.ZodEnum) {
       return fieldSchema.options.map((opt: any) => ({
-        value: String(opt),
+        value: opt,
         label: String(opt),
       }));
     }

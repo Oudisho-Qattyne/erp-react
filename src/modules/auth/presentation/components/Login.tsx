@@ -1,27 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { z } from 'zod';
 
 import { useAuth } from '../hooks/useAuth';
 
 import { Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicForm2';
-import { Input } from '../../../../core/presentation/layouts/ui/inputs/Input';
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
+import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicForm221';
+import { FormInput } from '../../../../core/presentation/layouts/ui/inputs/FormInput';
+import { FormProvider } from 'react-hook-form';
+import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 
-// Validation schema
-const loginSchema = z.object({
-  email: z.string().email('البريد الإلكتروني غير صالح').min(1, 'البريد الإلكتروني مطلوب'),
-  password: z.string().min(1, 'كلمة المرور مطلوبة'),
+// Validation schema helper
+const getLoginSchema = (t: (key: string, mod?: string) => string) => z.object({
+  email: z.string().email(t('login.email_invalid', 'auth')).min(1, t('login.email_required', 'auth')),
+  password: z.string().min(1, t('login.password_required', 'auth')),
 });
 
-type LoginFormData = z.infer<typeof loginSchema>;
+type LoginFormData = {
+  email?: string;
+  password?: string;
+};
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login, isLoading: isLoginLoading, error: authError } = useAuth();
+  const { t } = useLanguage();
+
+  const loginSchema = useMemo(() => getLoginSchema(t), [t]);
 
   const { fieldProps, handleSubmit, isValid, isSubmitting, form } = useDynamicForm<LoginFormData>({
     schema: loginSchema as any,
@@ -31,7 +39,7 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await login(data);
+      await login(data as any);
       // Redirect to home or dashboard after successful login
       navigate('/hr');
     } catch (err: any) {
@@ -57,9 +65,9 @@ export default function LoginPage() {
           <div className="w-16 h-16 rounded-xl mx-auto mb-4 bg-linear-to-br from-gold to-gold-dark flex items-center justify-center text-3xl font-black text-primary-dark shadow-lg shadow-gold/30">
             <Shield size={32} fill="currentColor" />
           </div>
-          <h1 className="text-xl font-extrabold text-text ">المدينة الصناعية في حسياء</h1>
-          <p className="text-sm text-text-muted mt-1">نظام الإدارة الموحد — ERP + CRM</p>
-          <p className="text-xs text-text-light mt-1">الجمهورية العربية السورية — محافظة حمص</p>
+          <h1 className="text-xl font-extrabold text-text ">{t('login.title', 'auth')}</h1>
+          <p className="text-sm text-text-muted mt-1">{t('login.subtitle', 'auth')}</p>
+          <p className="text-xs text-text-light mt-1">{t('login.governorate', 'auth')}</p>
         </div>
 
         {authError && (
@@ -67,32 +75,34 @@ export default function LoginPage() {
             {authError}
           </div>
         )}
+        <FormProvider {...form}>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          <Input
-            {...fieldProps('email')}
-            type="email"
-            label="البريد الإلكتروني"
-            placeholder="admin@example.com"
-          />
-          <Input
-            {...fieldProps('password')}
-            type="password"
-            label="كلمة المرور"
-            placeholder="••••••••"
-          />
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            <FormInput
+              {...fieldProps('email')}
+              type="email"
+              label={t('login.email', 'auth')}
+              placeholder="admin@example.com"
+            />
+            <FormInput
+              {...fieldProps('password')}
+              type="password"
+              label={t('login.password', 'auth')}
+              placeholder="••••••••"
+            />
 
-          <Button
-            type="submit"
-            variant="gold"
-            fullWidth
-            size="lg"
-            isLoading={isSubmitting || isLoginLoading}
-            disabled={!isValid}
-          >
-            تسجيل الدخول
-          </Button>
-        </form>
+            <Button
+              type="submit"
+              variant="gold"
+              fullWidth
+              size="lg"
+              isLoading={isSubmitting || isLoginLoading}
+              disabled={!isValid}
+            >
+              {t('login.submit', 'auth')}
+            </Button>
+          </form>
+        </FormProvider>
       </div>
     </div>
   );

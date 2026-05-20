@@ -2,24 +2,25 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
-import { Input } from '../../../../core/presentation/layouts/ui/inputs/TheInput';
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
 import { DataTable, type ColumnDef } from '../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { Dialog } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
 import type { EmployeeListItem } from '../../domain/entities/EmployeeListItem';
 import { useManageEmployee } from '../hooks/useEmployees';
 import { EmployeeForm } from './EmployeeForm';
-
-const genderOptions = [
-  { value: '', label: 'الكل' },
-  { value: 'male', label: 'ذكر' },
-  { value: 'female', label: 'أنثى' },
-];
+import { FormInput } from '../../../../core/presentation/layouts/ui/inputs/FormInput';
+import Input from '../../../../core/presentation/layouts/ui/inputs/Input';
 
 export function EmployeesPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+
+  const genderOptions = [
+    { value: '', label: t('employees.gender_all', 'hr') || 'الكل' },
+    { value: 'male', label: t('employees.gender_male', 'hr') || 'ذكر' },
+    { value: 'female', label: t('employees.gender_female', 'hr') || 'أنثى' },
+  ];
 
   const {
     employees,
@@ -66,7 +67,7 @@ export function EmployeesPage() {
       key: 'gender',
       label: t('employees.gender', 'hr') || 'الجنس',
       width: 100,
-      render: (row) => (row.gender === 'male' ? 'ذكر' : 'أنثى'),
+      render: (row) => (row.gender === 'male' ? (t('employees.gender_male', 'hr') || 'ذكر') : (t('employees.gender_female', 'hr') || 'أنثى')),
     },
     {
       key: 'created_at',
@@ -95,7 +96,7 @@ export function EmployeesPage() {
   return (
     <div className="p-4 space-y-4">
       {/* Filters Bar - Left side filters, Right side add button */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           {/* Search input - smaller width */}
           <Input
@@ -159,11 +160,10 @@ export function EmployeesPage() {
       )}
 
       {/* Add Employee Dialog */}
-    <Dialog isOpen={isAddDialogOpen} onClose={() => setIsAddDialogOpen(false)} title="إضافة موظف جديد" size="lg">
+    <Dialog isOpen={isAddDialogOpen} onClose={() => setIsAddDialogOpen(false)} title={t('employees.add_title', 'hr') || "إضافة موظف جديد"} size="2xl">
   <EmployeeForm
     onSubmit={handleCreateEmployee}
     onCancel={() => setIsAddDialogOpen(false)}
-    columns={2}
   />
 </Dialog>
     </div>

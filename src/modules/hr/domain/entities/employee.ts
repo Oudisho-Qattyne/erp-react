@@ -4,6 +4,9 @@
 import type { Faculty } from "../../../../core/domain/entities/education/Faculty";
 import type { Specialization } from "../../../../core/domain/entities/education/Specialization";
 import type { University } from "../../../../core/domain/entities/education/University";
+import type { Region } from "../../../../core/domain/entities/regions/Region";
+import type { City } from "../../../../core/domain/entities/regions/City";
+import type { Country } from "../../../../core/domain/entities/regions/Country";
 import type { BloodType } from "../../../../core/domain/valueObjects/BloodType";
 import type { EducationCategory } from "../../../../core/domain/valueObjects/EducationCategory";
 import type { Gender } from "../../../../core/domain/valueObjects/Gender";
@@ -42,6 +45,7 @@ export interface EducationEntry {
     contract_nature: ContractNature;           // 'Permanent', etc.
     job_category: string;
     workplace_city_id: number;
+    workplace_city?: City;
     created_at: string;
     updated_at: string;
   }
@@ -64,6 +68,7 @@ export interface EducationEntry {
     phone_number: string;
     sham_cash_account: string;
     residence_region_id: number;
+    residence_region?: Region & { city?: City & { country?: Country } };
     residential_area_details: string;
     civil_registry_record: string;
     health_status: string;

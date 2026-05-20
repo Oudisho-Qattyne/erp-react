@@ -9,6 +9,7 @@ interface TopBarProps {
     full_name: string;
     position?: string;
     role: string;
+    photo?:string;
   };
 }
 
@@ -52,7 +53,7 @@ export function TopBar({
         <ThemeToggle />
         
         {/* Notifications button */}
-        {onNotificationClick && (
+        {/* {onNotificationClick && (
           <button
             onClick={onNotificationClick}
             className="relative p-1.5 rounded-md hover:bg-primary-light transition-colors"
@@ -65,14 +66,19 @@ export function TopBar({
               </span>
             )}
           </button>
-        )}
+        )} */}
 
         {/* User info */}
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center text-white text-sm font-bold shadow">
-            {user.full_name?.[0] === 'م'
+          <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center text-white text-sm font-bold shadow overflow-hidden">
+            {
+              user.photo ?
+              <img src={user.photo} className='relative w-full h-full'/>
+              :
+              user.full_name?.[0] === 'م'
               ? user.full_name?.[2] || user.full_name[0]
-              : user.full_name?.[0] || 'U'}
+              : user.full_name?.[0] || 'U' 
+            }
           </div>
           <div className="hidden sm:block">
             <div className="text-xs font-bold text-text">{user.full_name}</div>

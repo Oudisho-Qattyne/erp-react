@@ -6,6 +6,8 @@ import type { Module } from '../../core/moduleRegistry'
 // import CreateUserPage from './presentation/pages/CreateUserPage'
 import { ReportsPage } from './presentation/pages/ReportsPage'
 import { EmployeesPage } from './presentation/pages/EmployeesPage'
+import { ShowEmployeePage } from './presentation/pages/ShowEmployeePage'
+import { EditEmployeePage } from './presentation/pages/EditEmployeePage'
 
 const usersModule: Module = {
   name: 'hr',
@@ -14,7 +16,7 @@ const usersModule: Module = {
       path: '/hr',
       element: <ReportsPage />,
       layout: 'dashboard',
-      label: 'التقارير',
+      label: 'reports.title',
       nav: true,
       order: 10,
       moduleName: 'hr',
@@ -32,11 +34,27 @@ const usersModule: Module = {
       moduleName: 'hr',
       icon: <Users size={18} />,
       group: 'hr',
+    },
+    {
+      path: '/hr/employees/:id',
+      element: <ShowEmployeePage />,
+      layout: 'dashboard',
+      label: 'employee_details.title',
+      nav: false,
+      moduleName: 'hr',
+    },
+    {
+      path: '/hr/employees/:id/edit',
+      element: <EditEmployeePage />,
+      layout: 'dashboard',
+      label: 'edit_employee.title',
+      nav: false,
+      moduleName: 'hr',
     }
   ],
   locales: { en: enLocales, ar: arLocales },
   navGroups: [
-    { id: 'hr', label: 'الادارة', order: 10 , icon: <Users size={10} className="shrink-0" /> },
+    { id: 'hr', label: 'admin', order: 10 , icon: <Users size={10} className="shrink-0" /> },
   ],
 }
 

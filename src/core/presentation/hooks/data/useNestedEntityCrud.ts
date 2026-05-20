@@ -15,9 +15,9 @@ export interface UseNestedEntityCrudReturn<T>
   parentId: number | null;
   setParentId: (id: number | null) => void;
   /** Fetch list for a parent id (create/update/delete still use restUrl) */
-  getAllForParent: (parentId: number) => Promise<DomainResponse<T>>;
+  getAllForParent: (parentId: number) => Promise<DomainResponse<T[]>>;
   /** Pass parent id, or use parentId already set via setParentId / getAllForParent */
-  getAll: (parentId?: number) => Promise<DomainResponse<T>>;
+  getAll: (parentId?: number) => Promise<DomainResponse<T[]>>;
 }
 
 /**
