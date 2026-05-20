@@ -11,16 +11,16 @@ import { EmployeeForm } from './EmployeeForm';
 import { FormInput } from '../../../../core/presentation/layouts/ui/inputs/FormInput';
 import Input from '../../../../core/presentation/layouts/ui/inputs/Input';
 
-const genderOptions = [
-  { value: '', label: 'الكل' },
-  { value: 'male', label: 'ذكر' },
-  { value: 'female', label: 'أنثى' },
-];
-
 export function EmployeesPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+
+  const genderOptions = [
+    { value: '', label: t('employees.gender_all', 'hr') || 'الكل' },
+    { value: 'male', label: t('employees.gender_male', 'hr') || 'ذكر' },
+    { value: 'female', label: t('employees.gender_female', 'hr') || 'أنثى' },
+  ];
 
   const {
     employees,
@@ -67,7 +67,7 @@ export function EmployeesPage() {
       key: 'gender',
       label: t('employees.gender', 'hr') || 'الجنس',
       width: 100,
-      render: (row) => (row.gender === 'male' ? 'ذكر' : 'أنثى'),
+      render: (row) => (row.gender === 'male' ? (t('employees.gender_male', 'hr') || 'ذكر') : (t('employees.gender_female', 'hr') || 'أنثى')),
     },
     {
       key: 'created_at',
@@ -160,7 +160,7 @@ export function EmployeesPage() {
       )}
 
       {/* Add Employee Dialog */}
-    <Dialog isOpen={isAddDialogOpen} onClose={() => setIsAddDialogOpen(false)} title="إضافة موظف جديد" size="2xl">
+    <Dialog isOpen={isAddDialogOpen} onClose={() => setIsAddDialogOpen(false)} title={t('employees.add_title', 'hr') || "إضافة موظف جديد"} size="2xl">
   <EmployeeForm
     onSubmit={handleCreateEmployee}
     onCancel={() => setIsAddDialogOpen(false)}

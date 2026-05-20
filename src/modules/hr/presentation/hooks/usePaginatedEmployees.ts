@@ -31,7 +31,7 @@ export function usePaginatedEmployees({
   const [gender, setGender] = useState(initialGender);
   const [page, setPage] = useState(initialPage);
   const [perPage, setPerPage] = useState(initialPerPage);
-
+  
   const fetchEmployees = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -43,7 +43,7 @@ export function usePaginatedEmployees({
       if (search.trim()) params.search = search.trim();
       if (gender) params.gender = gender;
 
-      const response = await apiClient.get<DomainResponse<EmployeeListItem>>('hr/employees', {
+      const response = await apiClient.get<DomainResponse<EmployeeListItem[]>>('hr/employees', {
         params,
       });
       setEmployees(response.data);

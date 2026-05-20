@@ -14,10 +14,10 @@ export interface UseEntityCrudReturn<T> {
   pagination?: DomainResponse<T>['pagination']; // optional
   
   // Actions — pass listUrlOverride when list endpoint differs from the default getUrl
-  getAll: (listUrlOverride?: string) => Promise<DomainResponse<T>>;
-  getById: (id: number) => Promise<T | null>;
-  create: (data: CreateEntityDTO<T>) => Promise<T>;
-  update: (id: number, data: UpdateEntityDTO<T>) => Promise<T>;
+  getAll: (listUrlOverride?: string) => Promise<DomainResponse<T[]>>;
+  getById: (id: number) => Promise<DomainResponse<T> | null>;
+  create: (data: CreateEntityDTO<T>) => Promise<DomainResponse<T>>;
+  update: (id: number, data: UpdateEntityDTO<T>) => Promise<DomainResponse<T>>;
   remove: (id: number) => Promise<void>;
   
   // Helpers
@@ -105,7 +105,7 @@ export function useEntityCrud<T extends EntityWithNameOnly>(getUrl:string , rest
     setError(null);
     try {
       const newEntity = await usecase.create(data);
-      setEntities(prev => [...prev, newEntity]);
+      setEntities(prev => [...prev, newEntity.data]);
       return newEntity;
     } catch (err: any) {
       const msg = err.message || 'Failed to create entities';
@@ -121,7 +121,7 @@ export function useEntityCrud<T extends EntityWithNameOnly>(getUrl:string , rest
     setError(null);
     try {
       const updated = await usecase.update(id, data);
-      setEntities(prev => prev.map(u => u.id === id ? updated : u));
+      setEntities(prev => prev.map(u => u.id === id ? updated.data : u));
       return updated;
     } catch (err: any) {
       const msg = err.message || `Failed to update entities ${id}`;

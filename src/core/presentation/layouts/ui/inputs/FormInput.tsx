@@ -7,11 +7,11 @@ import { CustomCalendar } from '../calendar/Calendar';
 import { Button } from '../buttons/Button';
 import { Dialog } from '../dialog/Dialog';
 import { useLanguage } from '../../../context/i18n/I18nProvider';
-import { useDependentField, type ComputedProps } from './hooks/useDependentField';
 import { inputBaseClasses, labelClasses, errorClasses, hintClasses } from './styles';
 import { DatePicker } from './DatePicker';
 import { SelectOrCreate } from './SelectOrCreate';
 import Input, { type InputType } from './Input';
+import { useDependentField, type ComputedProps } from './hooks/useDependentField';
 
 
 export interface FormInputProps<T extends FieldValues> {

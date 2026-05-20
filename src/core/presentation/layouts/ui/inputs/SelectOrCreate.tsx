@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useLanguage } from "../../../context/i18n/I18nProvider";
 import { CustomSelect } from "./CustomSelect";
 import { Button } from "../buttons/Button";
@@ -41,20 +41,29 @@ export function SelectOrCreate({
 }: SelectOrCreateProps) {
   const { t } = useLanguage();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [localOptions, setLocalOptions] = useState<{
+  const [createdOptions, setCreatedOptions] = useState<{
     value: number | string;
     label: string;
-  }[]>(options);
+  }[]>([]);
 
+  // Clear locally created options when the parent's options array changes (e.g. dependency filter changed)
   useEffect(() => {
-    setLocalOptions(options);
+    setCreatedOptions([]);
   }, [options]);
 
-
+  const combinedOptions = useMemo(() => {
+    const merged = [...options];
+    for (const created of createdOptions) {
+      if (!merged.some(opt => opt.value === created.value)) {
+        merged.push(created);
+      }
+    }
+    return merged;
+  }, [options, createdOptions]);
 
   function getNestedValue(obj: any, path: string): string {
-  return path.split('.').reduce((current, key) => current?.[key], obj) ?? '';
-}
+    return path.split('.').reduce((current, key) => current?.[key], obj) ?? '';
+  }
 
   const handleCreateSuccess = (newValue: number | string, newItem: any) => {
     onChange(newValue);
@@ -64,7 +73,7 @@ export function SelectOrCreate({
     } else {
       localValue = typeof newItem === 'string' ? newItem : (newItem?.name || String(newItem));
     }
-    setLocalOptions(prev => [...prev, { value: newValue, label: localValue }]);
+    setCreatedOptions(prev => [...prev, { value: newValue, label: localValue }]);
     setIsDialogOpen(false);
   };
 
@@ -74,7 +83,7 @@ export function SelectOrCreate({
     <>
       <div className="flex gap-2">
         <CustomSelect
-          options={localOptions}
+          options={combinedOptions}
           value={value}
           onChange={onChange}
           placeholder={placeholder}

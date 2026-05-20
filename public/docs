@@ -1,0 +1,2241 @@
+openapi: 3.0.0
+info:
+  title: 'Marka-ERP API'
+  version: 1.0.0
+  description: 'Merged API Documentation for all modules'
+servers:
+  -
+    url: /api/v1/
+    description: 'Base URL'
+paths:
+  /hr/organizational-levels:
+    get:
+      summary: 'List all organizational levels'
+      tags:
+        - 'Organizational Levels'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        -
+          in: query
+          name: per_page
+          schema:
+            type: integer
+            default: 10
+        -
+          in: query
+          name: sort_by
+          description: 'Sort columns (e.g. sort_by[name]=asc)'
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+      responses:
+        200:
+          description: 'List of organizational levels'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/OrganizationalLevel' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      summary: 'Create an organizational level'
+      tags:
+        - 'Organizational Levels'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: 'Finance Department'
+                parent_id:
+                  type: integer
+                  nullable: true
+                  example: null
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/OrganizationalLevel' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/hr/organizational-levels/{id}':
+    get:
+      summary: 'Get organizational level details'
+      tags:
+        - 'Organizational Levels'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Organizational level details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/OrganizationalLevel' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Update an organizational level'
+      tags:
+        - 'Organizational Levels'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                parent_id:
+                  type: integer
+                  nullable: true
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/OrganizationalLevel' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      summary: 'Delete an organizational level'
+      tags:
+        - 'Organizational Levels'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /hr/employees:
+    get:
+      summary: 'List all employees'
+      tags:
+        - Employees
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          in: query
+          name: search
+          description: 'Search by name, internal_id, or national_id'
+          schema:
+            type: string
+        -
+          in: query
+          name: gender
+          schema:
+            type: string
+            enum:
+              - male
+              - female
+        -
+          in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        -
+          in: query
+          name: per_page
+          schema:
+            type: integer
+            default: 10
+        -
+          in: query
+          name: sort_by
+          description: 'Sort columns (e.g. sort_by[created_at]=desc)'
+          schema:
+            type: object
+            additionalProperties:
+              type: string
+      responses:
+        200:
+          description: 'Paginated list of employees'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/EmployeeSummary' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      summary: 'Create a new employee with full details'
+      description: "Creates an employee along with employment details and optional education records in a single atomic transaction.\n"
+      tags:
+        - Employees
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - internal_id
+                - national_id
+                - first_name
+                - last_name
+                - gender
+                - residence_region_id
+                - employment_details
+              properties:
+                internal_id:
+                  type: string
+                  maxLength: 50
+                  example: EMP001
+                  description: 'Unique self number'
+                national_id:
+                  type: string
+                  maxLength: 20
+                  example: '0101010101'
+                first_name:
+                  type: string
+                  example: Ahmad
+                father_name:
+                  type: string
+                  nullable: true
+                  example: Khaled
+                last_name:
+                  type: string
+                  example: Hassan
+                mother_name:
+                  type: string
+                  nullable: true
+                  example: Fatima
+                gender:
+                  type: string
+                  enum: [male, female]
+                  example: male
+                date_birth:
+                  type: string
+                  format: date
+                  nullable: true
+                  example: '1990-05-15'
+                place_birth:
+                  type: string
+                  nullable: true
+                  example: Damascus
+                marital_status:
+                  type: string
+                  enum: [single, married, divorced, widowed]
+                  nullable: true
+                  example: married
+                spouse_name:
+                  type: string
+                  nullable: true
+                  example: 'Nour Hassan'
+                spouse_workplace:
+                  type: string
+                  nullable: true
+                  example: 'Ministry of Education'
+                blood_type:
+                  type: string
+                  enum: [A+, A-, B+, B-, AB+, AB-, O+, O-]
+                  nullable: true
+                  example: O+
+                phone_number:
+                  type: string
+                  nullable: true
+                  example: '+963911234567'
+                sham_cash_account:
+                  type: string
+                  nullable: true
+                  example: SC-001234
+                residence_region_id:
+                  type: integer
+                  example: 5
+                residential_area_details:
+                  type: string
+                  nullable: true
+                  example: 'Building 12, Floor 3'
+                civil_registry_record:
+                  type: string
+                  nullable: true
+                  example: 12345/A
+                health_status:
+                  type: string
+                  nullable: true
+                  example: Healthy
+                injury_details:
+                  type: string
+                  nullable: true
+                  example: null
+                injury_date:
+                  type: string
+                  format: date
+                  nullable: true
+                  example: null
+                employment_details:
+                  type: object
+                  required: [org_unit_id, status, workplace_city_id]
+                  properties: { job_title: { type: string, nullable: true, example: 'Software Engineer' }, org_unit_id: { type: integer, example: 1 }, status: { type: string, enum: [active, inactive, suspended], example: active }, appointment_date: { type: string, format: date, nullable: true, example: '2022-03-15' }, contract_type: { type: string, nullable: true, example: Full-time }, contract_nature: { type: string, nullable: true, example: Permanent }, job_category: { type: string, nullable: true, example: Engineering }, workplace_city_id: { type: integer, example: 14 } }
+                educations:
+                  type: array
+                  nullable: true
+                  items: { type: object, required: [category], properties: { category: { type: string, enum: [initial, adjusted, latest, current], example: latest }, degree_name: { type: string, nullable: true, example: 'Bachelor of Science' }, university_id: { type: integer, nullable: true, example: 1 }, faculty_id: { type: integer, nullable: true, example: 1 }, specialization_id: { type: integer, nullable: true, example: 1 }, graduation_year: { type: integer, nullable: true, example: 2020 }, academic_stage: { type: string, nullable: true, example: null }, study_status: { type: string, nullable: true, example: null } } }
+      responses:
+        200:
+          description: 'Employee created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/EmployeeInfo' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/hr/employees/{id}':
+    get:
+      summary: 'Get full employee details'
+      description: 'Returns employee with employment details, education records, and residence region.'
+      tags:
+        - Employees
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Employee full details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/EmployeeInfo' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Update employee record'
+      description: "Updates employee fields. Nested objects (`employment_details`, `educations`) are optional.\n- Providing `employment_details` will upsert the related record.\n- Providing `educations` will **replace** all existing education records.\n"
+      tags:
+        - Employees
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                father_name:
+                  type: string
+                  nullable: true
+                last_name:
+                  type: string
+                gender:
+                  type: string
+                  enum: [male, female]
+                date_birth:
+                  type: string
+                  format: date
+                  nullable: true
+                marital_status:
+                  type: string
+                  enum: [single, married, divorced, widowed]
+                  nullable: true
+                phone_number:
+                  type: string
+                  nullable: true
+                residence_region_id:
+                  type: integer
+                employment_details:
+                  type: object
+                  properties: { job_title: { type: string, nullable: true }, org_unit_id: { type: integer }, status: { type: string, enum: [active, inactive, suspended] }, workplace_city_id: { type: integer } }
+                educations:
+                  type: array
+                  nullable: true
+                  items: { $ref: '#/components/schemas/Education' }
+      responses:
+        200:
+          description: 'Employee updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/EmployeeInfo' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      summary: 'Soft-delete an employee'
+      tags:
+        - Employees
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Employee soft-deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /users/login:
+    post:
+      summary: 'User login'
+      description: 'Authenticate user and return a Sanctum token.'
+      tags:
+        - 'Users Module'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: admin@example.com
+                password:
+                  type: string
+                  format: password
+                  example: password123
+      responses:
+        200:
+          description: 'Login successful'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: object, properties: { user: { $ref: '#/components/schemas/User' }, token: { type: string, example: 1|abcdef1234567890abcdef1234567890 } } } } }
+        422:
+          description: 'Validation error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+  /users/:
+    get:
+      summary: 'List all users'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          in: query
+          name: page
+          schema:
+            type: integer
+          description: 'Page number'
+        -
+          in: query
+          name: per_page
+          schema:
+            type: integer
+          description: 'Items per page'
+      responses:
+        200:
+          description: 'List of users'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/User' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  /users/current:
+    get:
+      summary: 'Get current authenticated user info'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'Current user info'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/User' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  '/users/{id}':
+    post:
+      summary: 'Update a user'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                mobile:
+                  type: string
+                status:
+                  type: string
+                role:
+                  type: string
+      responses:
+        200:
+          description: 'User updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/User' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        422:
+          description: 'Validation error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+  /users/signature:
+    post:
+      summary: 'Update user signature'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                signature:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: 'Signature updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/User' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  /users/reports/excel:
+    post:
+      summary: 'Export users to Excel'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'Export started'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  /users/reports/pdf:
+    post:
+      summary: 'Export users to PDF'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'Export started'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  /users/permissions:
+    get:
+      summary: 'List all permissions'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'List of permissions'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Permission' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  /users/roles:
+    get:
+      summary: 'List all roles'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'List of roles'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Role' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  /users/roles/store:
+    post:
+      summary: 'Create a new role'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - display_name
+              properties:
+                name:
+                  type: string
+                display_name:
+                  type: string
+                permissions:
+                  type: array
+                  items: { type: string }
+      responses:
+        200:
+          description: 'Role created successfully'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        422:
+          description: 'Validation error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+  '/users/roles/{id}':
+    get:
+      summary: 'Get role details'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Role details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Role' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+    post:
+      summary: 'Update a role'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                display_name:
+                  type: string
+                permissions:
+                  type: array
+                  items: { type: string }
+      responses:
+        200:
+          description: 'Role updated successfully'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        422:
+          description: 'Validation error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+    delete:
+      summary: 'Delete a role'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Role deleted successfully'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  /shared-kernal/countries:
+    get:
+      summary: 'List all countries'
+      description: 'Send the `Accept-Language` header with `en` or `ar` to control the returned translated country name.'
+      tags:
+        - Countries
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: Accept-Language
+          in: header
+          required: false
+          description: 'Response language for translated fields like `name`'
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+            example: en
+      responses:
+        200:
+          description: 'List of countries'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Country' } } } }
+    post:
+      summary: 'Create a country'
+      tags:
+        - Countries
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: object
+                  required: [en, ar]
+                  properties: { en: { type: string, example: 'country name in english' }, ar: { type: string, example: 'اسم الدولة في العربية' } }
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Country' } } }
+  '/shared-kernal/countries/{id}':
+    get:
+      summary: 'Get country details'
+      description: 'Send the `Accept-Language` header with `en` or `ar` to control the returned translated country name.'
+      tags:
+        - Countries
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: Accept-Language
+          in: header
+          required: false
+          description: 'Response language for translated fields like `name`'
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+            example: ar
+      responses:
+        200:
+          description: 'Country details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Country' } } }
+    put:
+      summary: 'Update a country'
+      tags:
+        - Countries
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: object
+                  properties: { en: { type: string, example: 'country name in english' }, ar: { type: string, example: 'اسم الدولة في العربية' } }
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Country' } } }
+    delete:
+      summary: 'Delete a country'
+      tags:
+        - Countries
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  '/shared-kernal/countries/{country}/cities':
+    get:
+      summary: 'List cities for a country'
+      description: 'Send the `Accept-Language` header with `en` or `ar` to control the returned translated city name.'
+      tags:
+        - Cities
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: country
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: Accept-Language
+          in: header
+          required: false
+          description: 'Response language for translated fields like `name`'
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+            example: en
+      responses:
+        200:
+          description: 'List of cities'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/City' } } } }
+  '/shared-kernal/countries/cities/{city}/regions':
+    get:
+      summary: 'List regions for a city'
+      description: 'Send the `Accept-Language` header with `en` or `ar` to control the returned translated region name.'
+      tags:
+        - Regions
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: city
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: Accept-Language
+          in: header
+          required: false
+          description: 'Response language for translated fields like `name`'
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+            example: ar
+      responses:
+        200:
+          description: 'List of regions'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Region' } } } }
+  /shared-kernal/cities:
+    post:
+      summary: 'Create a city'
+      tags:
+        - Cities
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - country_id
+              properties:
+                name:
+                  type: object
+                  required: [en, ar]
+                  properties: { en: { type: string, example: 'city name in english' }, ar: { type: string, example: 'اسم المدينة في العربية' } }
+                country_id:
+                  type: integer
+                  example: 1
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/City' } } }
+  '/shared-kernal/cities/{id}':
+    get:
+      summary: 'Get city details'
+      description: 'Send the `Accept-Language` header with `en` or `ar` to control the returned translated city name.'
+      tags:
+        - Cities
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: Accept-Language
+          in: header
+          required: false
+          description: 'Response language for translated fields like `name`'
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+            example: en
+      responses:
+        200:
+          description: 'City details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/City' } } }
+    put:
+      summary: 'Update a city'
+      tags:
+        - Cities
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: object
+                  properties: { en: { type: string, example: 'city name in english' }, ar: { type: string, example: 'اسم المدينة في العربية' } }
+                country_id:
+                  type: integer
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/City' } } }
+    delete:
+      summary: 'Delete a city'
+      tags:
+        - Cities
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /shared-kernal/regions:
+    post:
+      summary: 'Create a region'
+      tags:
+        - Regions
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - city_id
+              properties:
+                name:
+                  type: object
+                  required: [en, ar]
+                  properties: { en: { type: string, example: 'region name in english' }, ar: { type: string, example: 'اسم المنطقة في العربية' } }
+                city_id:
+                  type: integer
+                  example: 1
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Region' } } }
+  '/shared-kernal/regions/{id}':
+    get:
+      summary: 'Get region details'
+      description: 'Send the `Accept-Language` header with `en` or `ar` to control the returned translated region name.'
+      tags:
+        - Regions
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: Accept-Language
+          in: header
+          required: false
+          description: 'Response language for translated fields like `name`'
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+            example: ar
+      responses:
+        200:
+          description: 'Region details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Region' } } }
+    put:
+      summary: 'Update a region'
+      tags:
+        - Regions
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: object
+                  properties: { en: { type: string, example: 'region name in english' }, ar: { type: string, example: 'اسم المنطقة في العربية' } }
+                city_id:
+                  type: integer
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Region' } } }
+    delete:
+      summary: 'Delete a region'
+      tags:
+        - Regions
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /shared-kernal/universities:
+    get:
+      summary: 'List all universities'
+      tags:
+        - Universities
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'List of universities'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/University' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      summary: 'Create a university'
+      tags:
+        - Universities
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: 'Damascus University'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/University' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/shared-kernal/universities/{id}':
+    get:
+      summary: 'Get university details'
+      tags:
+        - Universities
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'University details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/University' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Update a university'
+      tags:
+        - Universities
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/University' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      summary: 'Delete a university'
+      tags:
+        - Universities
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  '/shared-kernal/universities/{id}/faculties':
+    get:
+      summary: 'List all faculties for a university'
+      tags:
+        - Faculties
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'List of faculties'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Faculty' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+  /shared-kernal/faculties:
+    post:
+      summary: 'Create a faculty'
+      tags:
+        - Faculties
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - university_id
+              properties:
+                name:
+                  type: string
+                  example: 'Faculty of Engineering'
+                university_id:
+                  type: integer
+                  example: 1
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Faculty' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/shared-kernal/faculties/{id}':
+    get:
+      summary: 'Get faculty details'
+      tags:
+        - Faculties
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Faculty details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Faculty' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Update a faculty'
+      tags:
+        - Faculties
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                university_id:
+                  type: integer
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Faculty' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      summary: 'Delete a faculty'
+      tags:
+        - Faculties
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  '/shared-kernal/faculties/{id}/specializations':
+    get:
+      summary: 'List all specializations for a faculty'
+      tags:
+        - Specializations
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'List of specializations'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Specialization' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+  /shared-kernal/specializations:
+    post:
+      summary: 'Create a specialization'
+      tags:
+        - Specializations
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - faculty_id
+              properties:
+                name:
+                  type: string
+                  example: 'Computer Engineering'
+                faculty_id:
+                  type: integer
+                  example: 1
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Specialization' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/shared-kernal/specializations/{id}':
+    get:
+      summary: 'Get specialization details'
+      tags:
+        - Specializations
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Specialization details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Specialization' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Update a specialization'
+      tags:
+        - Specializations
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                faculty_id:
+                  type: integer
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Specialization' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      summary: 'Delete a specialization'
+      tags:
+        - Specializations
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+components:
+  securitySchemes:
+    sanctumAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Success
+        data:
+          type: object
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Error
+        message:
+          type: string
+          example: 'An error occurred'
+        data:
+          type: array
+          example: {  }
+    ValidationErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Error
+        message:
+          type: string
+          example: 'validation errors'
+        validationErrors:
+          type: object
+          additionalProperties:
+            type: string
+    OrganizationalLevel:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Information Technology'
+        parent_id:
+          type: integer
+          nullable: true
+          example: null
+        created_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+    EmploymentDetails:
+      type: object
+      properties:
+        job_title:
+          type: string
+          nullable: true
+          example: 'Software Engineer'
+        org_unit_id:
+          type: integer
+          example: 1
+          description: 'FK to organizational_levels'
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+            - suspended
+          example: active
+        appointment_date:
+          type: string
+          format: date
+          nullable: true
+          example: '2022-03-15'
+        contract_type:
+          type: string
+          nullable: true
+          example: Full-time
+        contract_nature:
+          type: string
+          nullable: true
+          example: Permanent
+        job_category:
+          type: string
+          nullable: true
+          example: Engineering
+        workplace_city_id:
+          type: integer
+          example: 14
+          description: 'FK to cities'
+    Education:
+      type: object
+      properties:
+        category:
+          type: string
+          enum:
+            - initial
+            - adjusted
+            - latest
+            - current
+          example: latest
+        degree_name:
+          type: string
+          nullable: true
+          example: 'Bachelor of Science in Computer Engineering'
+        university:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: 'Damascus University'
+        faculty:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: 'Faculty of Engineering'
+        specialization:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: 'Computer Engineering'
+        graduation_year:
+          type: integer
+          nullable: true
+          example: 2020
+        academic_stage:
+          type: string
+          nullable: true
+          example: null
+        study_status:
+          type: string
+          nullable: true
+          example: null
+    EmployeeInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        internal_id:
+          type: string
+          example: EMP001
+          description: 'Self Number / internal identifier'
+        national_id:
+          type: string
+          example: '0101010101'
+        first_name:
+          type: string
+          example: Ahmad
+        father_name:
+          type: string
+          nullable: true
+          example: Khaled
+        last_name:
+          type: string
+          example: Hassan
+        mother_name:
+          type: string
+          nullable: true
+          example: Fatima
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+          example: male
+        date_birth:
+          type: string
+          format: date
+          nullable: true
+          example: '1990-05-15'
+        place_birth:
+          type: string
+          nullable: true
+          example: Damascus
+        marital_status:
+          type: string
+          enum:
+            - single
+            - married
+            - divorced
+            - widowed
+          nullable: true
+          example: married
+        spouse_name:
+          type: string
+          nullable: true
+          example: 'Nour Hassan'
+        spouse_workplace:
+          type: string
+          nullable: true
+          example: 'Ministry of Education'
+        blood_type:
+          type: string
+          enum:
+            - A+
+            - A-
+            - B+
+            - B-
+            - AB+
+            - AB-
+            - O+
+            - O-
+          nullable: true
+          example: O+
+        phone_number:
+          type: string
+          nullable: true
+          example: '+963911234567'
+        sham_cash_account:
+          type: string
+          nullable: true
+          example: SC-001234
+        residence_region_id:
+          type: integer
+          example: 5
+          description: 'FK to regions'
+        residential_area_details:
+          type: string
+          nullable: true
+          example: 'Building 12, Floor 3, Apartment 7'
+        civil_registry_record:
+          type: string
+          nullable: true
+          example: 12345/A
+        health_status:
+          type: string
+          nullable: true
+          example: Healthy
+        injury_details:
+          type: string
+          nullable: true
+          example: null
+        injury_date:
+          type: string
+          format: date
+          nullable: true
+          example: null
+        employment_details:
+          $ref: '#/components/schemas/EmploymentDetails'
+        educations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Education'
+        created_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+        updated_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+    EmployeeSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        internal_id:
+          type: string
+          example: EMP001
+        national_id:
+          type: string
+          example: '0101010101'
+        full_name:
+          type: string
+          example: 'Ahmad Khaled Hassan'
+        gender:
+          type: string
+          example: male
+        created_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+    Role:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: super_admin
+        display_name:
+          type: string
+          example: 'Super Admin'
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Admin User'
+        email:
+          type: string
+          example: admin@example.com
+        mobile:
+          type: string
+          example: '01000000000'
+        status:
+          type: string
+          example: active
+        photo:
+          type: string
+          nullable: true
+          example: null
+        signature:
+          type: string
+          nullable: true
+          example: 'http://localhost/path/to/signature.png'
+        role:
+          $ref: '#/components/schemas/Role'
+        created_at:
+          type: string
+          example: '2023-10-25 10:00:00'
+        permissions:
+          type: array
+          items:
+            type: string
+          example:
+            - create_users
+            - view_users
+            - update_users
+            - delete_users
+    Permission:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: view_users
+        display_name:
+          type: string
+          example: 'View Users'
+    Country:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Syria
+        created_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+    City:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Damascus
+        country_id:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+    Region:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Baramkeh
+        city_id:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+    University:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Damascus University'
+        created_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+    Faculty:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Faculty of Engineering'
+        university_id:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+    Specialization:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Computer Engineering'
+        faculty_id:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+tags:
+  -
+    name: 'Organizational Levels'
+    description: 'Manage organizational hierarchy units'
+  -
+    name: Employees
+    description: 'Manage employee records including personal info, employment details, and education'
+  -
+    name: Countries
+    description: 'Manage Countries'
+  -
+    name: Cities
+    description: 'Manage Cities'
+  -
+    name: Regions
+    description: 'Manage Regions'
+  -
+    name: Universities
+    description: 'Manage Universities'
+  -
+    name: Faculties
+    description: 'Manage Faculties'
+  -
+    name: Specializations
+    description: 'Manage Specializations'

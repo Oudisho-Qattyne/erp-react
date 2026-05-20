@@ -69,8 +69,9 @@ export function useEntityCrud<T, TCreate, TUpdate, ID = number>(
       const updated = await usecase.update(id, data);
       setState(prev => ({
         ...prev,
-        data: prev.data.map(item => (item as any).id === id ? updated : item),
+        data: prev.data.map(item => (item as any).id === id ? updated.data : item),
         loading: false,
+        
       }));
       return updated;
     } catch (err: any) {

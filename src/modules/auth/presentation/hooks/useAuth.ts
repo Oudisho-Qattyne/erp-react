@@ -5,10 +5,13 @@ import { createFetchApiClient } from '../../../../core/infrastructure/api/fetchA
 import type { AuthResponse, LoginCredentials } from '../../domain/entities/AuthTypes';
 import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
 
+import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
+
 // Singleton instances to be reused
 
 
 export function useAuth() {
+  const { t } = useLanguage();
   const apiClient = useApiClient()
   const authRepository = createAuthRepository(apiClient);
   const loginUseCase = createLoginUseCase(authRepository);
@@ -22,7 +25,7 @@ export function useAuth() {
       const response = await loginUseCase.execute(credentials);
       return response;
     } catch (err: any) {
-      const errorMessage = err.message || 'فشل تسجيل الدخول. يرجى التحقق من بياناتك.';
+      const errorMessage = err.message || t('login.failed_message', 'auth');
       setError(errorMessage);
       throw err;
     } finally {

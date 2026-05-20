@@ -7,5 +7,17 @@
   "Submit": "Submit",
   "User created successfully": "User created successfully",
   "Create a new user": "Create a new user",
-  "Back to users": "Back to users"
+  "Back to users": "Back to users",
+  "login": {
+    "email_invalid": "Invalid email address",
+    "email_required": "Email is required",
+    "password_required": "Password is required",
+    "title": "Industrial City of Hasya",
+    "subtitle": "Unified Management System — ERP + CRM",
+    "governorate": "Syrian Arab Republic — Homs Governorate",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Login",
+    "failed_message": "Login failed. Please check your credentials."
+  }
 }
