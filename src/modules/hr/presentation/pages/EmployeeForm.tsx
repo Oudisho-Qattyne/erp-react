@@ -122,6 +122,8 @@ function FacultyCreateForm({ onSuccess, onCancel, universityId }: { onSuccess: (
           name: data.name ,
           university_id: universityId
         }
+        console.log(payload);
+        
         const result = await createFaculty(payload);
         onSuccess(result.data.id, result);
         return result
