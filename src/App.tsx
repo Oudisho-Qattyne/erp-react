@@ -1,24 +1,24 @@
 // src/App.tsx
 import { useEffect, useState } from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import { autoRegisterModules, getAllRoutes } from './core/moduleRegistry'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
+import { autoRegisterModulesSync, getAllRoutes } from './core/moduleRegistry'
 import LayoutSwitcher from './core/presentation/layouts/LayoutSwitcher'
 import { ThemeProvider } from './core/presentation/context/theme/ThemeProvider'
 import { SidebarProvider } from './core/presentation/context/SidebarContext/SidebarContext'
 import { LanguageProvider } from './core/presentation/context/i18n/I18nProvider'
 import { ApiClientProvider } from './core/presentation/context/api/ApiClinetProvider'
-
+import { StorageProvider } from './core/registry/storage/StorageProvider'
+import { ProtectedRoute } from './core/infrastructure/auth/ProtectedRoute'
+import { AuthProvider } from './core/infrastructure/auth/AuthProvider'
+import { NotFoundPage } from './core/presentation/pages/NotFoundPage'
 
 function App() {
-  const [isReady, setIsReady] = useState(false)
-
-
+   const [isReady, setIsReady] = useState(false)
 
   useEffect(() => {
-    autoRegisterModules().then(() => {
-      setIsReady(true)
-    })
-  }, [])
+    autoRegisterModulesSync();
+    setIsReady(true);
+  }, []);
 
   if (!isReady) {
     return (
@@ -31,38 +31,67 @@ function App() {
     )
   }
 
-  const routes = getAllRoutes()
-  const router = createBrowserRouter([
-    {
-      path: '*',
-      element: (
-        <LayoutSwitcher layout="none">
-          <div />
-        </LayoutSwitcher>
-      ),
-    },
-    ...routes.map(route => ({
+  const registeredRoutes = getAllRoutes();
+
+  // Build the routes array
+  const routeConfigs = registeredRoutes.map(route => {
+    const requiresAuth = route.requiresAuth !== false;
+    const element = (
+      <LayoutSwitcher layout={route.layout}>
+        {requiresAuth ? (
+          <ProtectedRoute
+            requiredRole={route.requiredRole}
+            requiredPermission={route.requiredPermission}
+          >
+            {route.element}
+          </ProtectedRoute>
+        ) : (
+          route.element
+        )}
+      </LayoutSwitcher>
+    );
+
+    return {
       path: route.path,
-      element: (
-        <LayoutSwitcher layout={route.layout}>
-          {route.element}
-        </LayoutSwitcher>
-      ),
-    }))
-  ])
+      element,
+    };
+  });
+
+  // Add catch‑all route (404) at the end
+  routeConfigs.push({
+    path: '*',
+    element: (
+      // <LayoutSwitcher layout="default">
+        <NotFoundPage />
+      // </LayoutSwitcher>
+    ),
+  });
+
+  // Optional: add a redirect from root to dashboard or home
+  // const hasRootRoute = registeredRoutes.some(r => r.path === '/');
+  // if (!hasRootRoute) {
+  //   routeConfigs.unshift({
+  //     path: '/',
+  //     element: <Navigate to="/hr" replace />,
+  //   });
+  // }
+
+  const router = createBrowserRouter(routeConfigs);
 
   return (
-
     <ThemeProvider>
       <SidebarProvider>
         <LanguageProvider>
-        <ApiClientProvider> 
-          <RouterProvider router={router} />
+          <ApiClientProvider>
+            <AuthProvider>
+              <StorageProvider>
+                <RouterProvider router={router} />
+              </StorageProvider>
+            </AuthProvider>
           </ApiClientProvider>
         </LanguageProvider>
       </SidebarProvider>
     </ThemeProvider>
   )
 }
-
 export default App

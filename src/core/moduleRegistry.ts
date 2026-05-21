@@ -31,6 +31,9 @@ export type ModuleRoute = {
   icon?: ReactNode
   group?: string
   permission?: string
+  requiresAuth?: boolean;
+  requiredRole?: string | string[];
+  requiredPermission?: string;
 }
 
 export type Module = {
@@ -55,7 +58,7 @@ export const getModules = (): Module[] => {
 }
 
 export const getAllRoutes = (): ModuleRoute[] => {
-  
+
   return modules.flatMap(module => module.routes)
 }
 

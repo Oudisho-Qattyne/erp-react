@@ -36,3 +36,33 @@ export function removeAuthUser(): void {
     localStorage.removeItem('auth_user');
   }
 }
+
+
+
+export const isTokenValid = (): boolean => {
+  const token = getToken();
+  if (!token) return false;
+  
+  // Optional: decode JWT and check expiration
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const exp = payload.exp;
+    if (exp && Date.now() >= exp * 1000) {
+      removeToken();
+      return false;
+    }
+    return true;
+  } catch {
+    return !!token; // if not JWT, just check existence
+  }
+};
+
+export const getUserFromToken = (): any | null => {
+  const token = getToken();
+  if (!token) return null;
+  try {
+    return JSON.parse(atob(token.split('.')[1]));
+  } catch {
+    return null;
+  }
+};

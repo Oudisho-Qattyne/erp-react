@@ -1,6 +1,6 @@
 import { getModules } from "../../../moduleRegistry"
-import enShared from "../../locals/en.json"
-import arShared from "../../locals/ar.json"
+import enShared from "../../locales/en.json"
+import arShared from "../../locales/ar.json"
 export type LocaleValue = string | LocaleDictionary
 export interface LocaleDictionary {
   [key: string]: LocaleValue

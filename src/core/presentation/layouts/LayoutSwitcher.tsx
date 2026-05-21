@@ -12,18 +12,18 @@ const LayoutSwitcher = ({ layout = 'default', children }: LayoutSwitcherProps) =
   const navigate = useNavigate()
   const location = useLocation()
 
-  useEffect(() => {
-    const token = getToken()
-    if (!token) {
-      if (location.pathname !== '/auth') {
-        navigate('/auth')
-      }
-    } else {
-      if (location.pathname === '/auth' || location.pathname === '/') {
-        navigate('/hr')
-      }
-    }
-  }, [navigate, location.pathname])
+  // useEffect(() => {
+  //   const token = getToken()
+  //   if (!token) {
+  //     if (location.pathname !== '/auth') {
+  //       navigate('/auth')
+  //     }
+  //   } else {
+  //     if (location.pathname === '/auth' || location.pathname === '/') {
+  //       navigate('/hr')
+  //     }
+  //   }
+  // }, [navigate, location.pathname])
 
   switch (layout) {
     case 'none':

@@ -42,6 +42,8 @@ const usersModule: Module = {
       label: 'employee_details.title',
       nav: false,
       moduleName: 'hr',
+      requiresAuth: true,
+      requiredRole: 'admin',
     },
     {
       path: '/hr/employees/:id/edit',
@@ -50,11 +52,13 @@ const usersModule: Module = {
       label: 'edit_employee.title',
       nav: false,
       moduleName: 'hr',
+      requiresAuth: true,
+      requiredRole: 'admin',
     }
   ],
   locales: { en: enLocales, ar: arLocales },
   navGroups: [
-    { id: 'hr', label: 'admin', order: 10 , icon: <Users size={10} className="shrink-0" /> },
+    { id: 'hr', label: 'admin', order: 10, icon: <Users size={10} className="shrink-0" /> },
   ],
 }
 
