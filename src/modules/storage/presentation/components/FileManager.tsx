@@ -43,6 +43,7 @@ const rawdata: FileManagerEntity[] = [
         size: 4096,
         date: new Date(2023, 11, 1, 14, 45),
         type: "folder",
+        lazy:true
     },
     {
         id: "/Info.txt",
