@@ -1,9 +1,9 @@
 // src/modules/storage/application/usecases/createManageStorageUseCase.ts
 import type { IManageStorageRepository } from "../../domain/repository/IManageStorageRepository";
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
-import type { StorageFolder, StorageItem } from "../../domain/entities/FileSystemEntry";
+import type { StorageFile, StorageFolder, StorageItem } from "../../domain/entities/FileSystemEntry";
 import type { StorageItemDto } from "../dtos/storageItem";
-import { storageItems2StorageItemDtos } from "../mappers/StorageItem2StorageItemDto";
+import { storageItem2StorageItemDto, storageItems2StorageItemDtos } from "../mappers/StorageItem2StorageItemDto";
 
 
 export const createManageStorageUseCase = (repository: IManageStorageRepository) => {
@@ -42,9 +42,24 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
       return newRes
     },
 
-    // createFolder: async (data: CreateFolderDTO): Promise<DomainResponse<StorageItem>> => {
-    //   return(repository.createFolder(data));
-    // },
+
+    createFolder: async (parentId :string , name : string): Promise<DomainResponse<StorageItemDto>> => {
+        const res = await repository.createFolder(parentId , name)
+      let storageItemsDto : StorageItemDto
+      if(res.data)
+        storageItemsDto = storageItem2StorageItemDto(res.data)
+      const newRes = {
+        status: res.status,
+        data: storageItemsDto,
+      }
+      return(newRes);
+    },
+
+     // File operations
+     uploadFile: async (parentId : string, file : File , isSecure : boolean): Promise<DomainResponse<StorageFile>> => {
+        return(repository.uploadFile(parentId, file , isSecure));
+      },
+  
 
     // renameFolder: async (folderId: string, data: UpdateFolderDTO): Promise<StorageFolder> => {
     //   return(repository.renameFolder(folderId, data));
@@ -62,11 +77,7 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
     //   return(repository.moveFolder(folderId, dto));
     // },
 
-    // // File operations
-    // uploadFile: async (data: UploadFileDTO): Promise<StorageFile> => {
-    //   return(repository.uploadFile(data));
-    // },
-
+   
     // moveFile: async (fileId: string, newParentId: string | null): Promise<StorageFile> => {
     //   const dto: MoveItemDTO = { new_parent_id: newParentId };
     //   return(repository.moveFile(fileId, dto));

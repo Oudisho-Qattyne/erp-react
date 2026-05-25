@@ -12,9 +12,12 @@ export interface IManageStorageRepository {
   getFolderContents(folderId: string): Promise<DomainResponse<StorageFolder>>;
   getFolderContentsByPath(path: string): Promise<DomainResponse<StorageItem[]>>;
 
-  // // Create a new folder
-  // createFolder(parentId: string | null, name: string): Promise<DomainResponse<StorageFolder>>;
+  // Create a new folder
+  createFolder(parentId: string | null, name: string): Promise<DomainResponse<StorageFolder>>;
 
+  // Upload a file
+  uploadFile(parentId: string | null, file: File, isSecure?: boolean): Promise<DomainResponse<StorageFile>>;
+  
   // // Rename a folder
   // renameFolder(id: string, newName: string): Promise<DomainResponse<StorageFolder>>;
 
@@ -24,8 +27,6 @@ export interface IManageStorageRepository {
   // // Move a folder to a new parent (null = root)
   // moveFolder(id: string, newParentId: string | null): Promise<DomainResponse<StorageFolder>>;
 
-  // // Upload a file
-  // uploadFile(parentId: string | null, file: File, isSecure?: boolean): Promise<DomainResponse<StorageFile>>;
 
   // // Move a file to a new parent
   // moveFile(id: string, newParentId: string | null): Promise<DomainResponse<StorageFile>>;

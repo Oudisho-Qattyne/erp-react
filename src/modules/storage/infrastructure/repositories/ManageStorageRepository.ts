@@ -1,6 +1,6 @@
 import type { ApiClient } from '../../../../core/domain/common/api/ApiClient';
 import type { DomainResponse } from '../../../../core/domain/common/responce/DomainResponse';
-import type { StorageFolder, StorageItem } from '../../domain/entities/FileSystemEntry';
+import type { StorageFile, StorageFolder, StorageItem } from '../../domain/entities/FileSystemEntry';
 import type { IManageStorageRepository } from '../../domain/repository/IManageStorageRepository';
 
 
@@ -23,8 +23,25 @@ export const createManageStorageRepository = (
             return apiClient.get(`${baseUrl}/folders/${folderId}`);
         },
         getFolderContentsByPath: async (path: string): Promise<DomainResponse<StorageItem[]>> => {
-            return apiClient.get(`${baseUrl}/search` , {params:{path:path}});
+            return apiClient.get(`${baseUrl}/search`, { params: { path: path } });
         },
+
+        createFolder: async (parentId, name): Promise<DomainResponse<StorageFolder>> => {
+            return apiClient.post(`${baseUrl}/folders`, {
+                "parent_id": parentId,
+                "name": name
+            })
+        },
+
+        uploadFile: async (parentId , file , isSecure): Promise<DomainResponse<StorageFile>> => {
+            const formData = new FormData();
+            formData.append('file', file);
+            if (parentId) formData.append('parent_id',parentId);
+            formData.append('is_secure', String(isSecure ?? false));
+            return apiClient.post(`${baseUrl}/files/upload`, formData, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+            });
+          },
         // Folder operations
         // createFolder: async (data: CreateFolderDTO): Promise<DomainResponse<StorageFolder>> => {
         //   return apiClient.post(`${baseUrl}/folders`, data);
