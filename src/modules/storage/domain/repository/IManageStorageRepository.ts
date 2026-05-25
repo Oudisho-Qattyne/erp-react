@@ -10,6 +10,7 @@ export interface IManageStorageRepository {
 
   // Get folder contents (explicitly with children)
   getFolderContents(folderId: string): Promise<DomainResponse<StorageFolder>>;
+  getFolderContentsByPath(path: string): Promise<DomainResponse<StorageItem[]>>;
 
   // // Create a new folder
   // createFolder(parentId: string | null, name: string): Promise<DomainResponse<StorageFolder>>;

@@ -1,18 +1,45 @@
 // src/modules/storage/application/usecases/createManageStorageUseCase.ts
 import type { IManageStorageRepository } from "../../domain/repository/IManageStorageRepository";
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
-import type { StorageItem } from "../../domain/entities/FileSystemEntry";
+import type { StorageFolder, StorageItem } from "../../domain/entities/FileSystemEntry";
+import type { StorageItemDto } from "../dtos/storageItem";
+import { storageItems2StorageItemDtos } from "../mappers/StorageItem2StorageItemDto";
 
 
 export const createManageStorageUseCase = (repository: IManageStorageRepository) => {
   return {
     // Folder operations
-    listRootLevel: async (): Promise<DomainResponse<StorageItem[]>> => {
-      return(repository.getRootItems());
+    listRootLevel: async (): Promise<DomainResponse<StorageItemDto[]>> => {
+      const res = await repository.getRootItems()
+      const storageItemsDtos = storageItems2StorageItemDtos(res.data)
+      const newRes = {
+        status: res.status,
+        data: storageItemsDtos,
+      }
+      return newRes;
     },
 
-    getFolderContents: async (folderId: string):Promise<DomainResponse<StorageItem>> => {
-      return(repository.getFolderContents(folderId));
+    getFolderContents: async (folderId: string): Promise<DomainResponse<StorageItemDto[]>> => {
+      const res = await repository.getFolderContents(folderId)
+      let storageItemsDtos : StorageItemDto[] = []
+      if(res.data.children)
+        storageItemsDtos = storageItems2StorageItemDtos(res.data.children)
+       const newRes = {
+        status: res.status,
+        data: storageItemsDtos,
+      }
+      return newRes
+    },
+    getFolderContentsByPath: async (path: string): Promise<DomainResponse<StorageItemDto[]>> => {
+      const res = await repository.getFolderContentsByPath(path)
+      let storageItemsDtos : StorageItemDto[] = []
+      if(res.data)
+        storageItemsDtos = storageItems2StorageItemDtos(res.data)
+       const newRes = {
+        status: res.status,
+        data: storageItemsDtos,
+      }
+      return newRes
     },
 
     // createFolder: async (data: CreateFolderDTO): Promise<DomainResponse<StorageItem>> => {

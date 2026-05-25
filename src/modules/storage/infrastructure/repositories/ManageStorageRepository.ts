@@ -4,7 +4,7 @@ import type { StorageFolder, StorageItem } from '../../domain/entities/FileSyste
 import type { IManageStorageRepository } from '../../domain/repository/IManageStorageRepository';
 
 
-export const createSystemManagementRepository = (
+export const createManageStorageRepository = (
     apiClient: ApiClient
 ): IManageStorageRepository => {
     const baseUrl = '/storage-management';
@@ -22,7 +22,9 @@ export const createSystemManagementRepository = (
         getFolderContents: async (folderId: string): Promise<DomainResponse<StorageFolder>> => {
             return apiClient.get(`${baseUrl}/folders/${folderId}`);
         },
-
+        getFolderContentsByPath: async (path: string): Promise<DomainResponse<StorageItem[]>> => {
+            return apiClient.get(`${baseUrl}/search` , {params:{path:path}});
+        },
         // Folder operations
         // createFolder: async (data: CreateFolderDTO): Promise<DomainResponse<StorageFolder>> => {
         //   return apiClient.post(`${baseUrl}/folders`, data);
