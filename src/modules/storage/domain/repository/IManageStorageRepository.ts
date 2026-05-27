@@ -16,13 +16,13 @@ export interface IManageStorageRepository {
   createFolder(parentId: string | null, name: string): Promise<DomainResponse<StorageFolder>>;
 
   // Upload a file
-  uploadFile(parentId: string | null, file: File, isSecure?: boolean): Promise<DomainResponse<StorageFile>>;
-  
-  // // Rename a folder
-  // renameFolder(id: string, newName: string): Promise<DomainResponse<StorageFolder>>;
+  uploadFile(parentId: string | null, file: File, name :string ,  isSecure?: boolean): Promise<DomainResponse<StorageFile>>;
 
-  // // Delete a folder
-  // deleteFolder(id: string): Promise<DomainResponse<null>>;
+  // // Rename a folder
+  renameFolder(id: string, newName: string): Promise<DomainResponse<StorageFolder>>;
+
+  // Delete a folder
+  deleteFolder(id: string): Promise<DomainResponse<void>>;
 
   // // Move a folder to a new parent (null = root)
   // moveFolder(id: string, newParentId: string | null): Promise<DomainResponse<StorageFolder>>;
@@ -31,8 +31,8 @@ export interface IManageStorageRepository {
   // // Move a file to a new parent
   // moveFile(id: string, newParentId: string | null): Promise<DomainResponse<StorageFile>>;
 
-  // // Delete a file
-  // deleteFile(id: string): Promise<DomainResponse<null>>;
+  // Delete a file
+  deleteFile(id: string): Promise<DomainResponse<void>>;
 
   // // Download a file (returns blob with content disposition)
   // downloadFile(fileId: string, signedUrl?: string): Promise<Blob>;

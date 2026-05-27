@@ -5,7 +5,13 @@ import type { StorageItemDto } from "../dtos/storageItem";
 export const mapId2Path = (storageItem: StorageItem): string => {
     let path: string = ''
     if (storageItem.parents_chain.length > 0) {
-        path = storageItem.parents_chain[storageItem.parents_chain.length - 1].path + storageItem.parents_chain[storageItem.parents_chain.length - 1].name
+        const parentPath = storageItem.parents_chain[storageItem.parents_chain.length - 1]
+        if(parentPath.path == '/'){
+            path =`/${parentPath.name}`
+        }
+        else{
+            path =`${parentPath.path}/${parentPath.name}`
+        }
     }
     else {
         path = ''

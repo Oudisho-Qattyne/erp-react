@@ -11,6 +11,7 @@ import { StorageProvider } from './core/registry/storage/StorageProvider'
 import { ProtectedRoute } from './core/infrastructure/auth/ProtectedRoute'
 import { AuthProvider } from './core/infrastructure/auth/AuthProvider'
 import { NotFoundPage } from './core/presentation/pages/NotFoundPage'
+import { Toaster } from 'sonner'
 
 function App() {
    const [isReady, setIsReady] = useState(false)
@@ -85,6 +86,11 @@ function App() {
           <ApiClientProvider>
             <AuthProvider>
               <StorageProvider>
+              <Toaster
+                    position="bottom-center"
+                    dir="rtl"
+                    richColors
+                  />
                 <RouterProvider router={router} />
               </StorageProvider>
             </AuthProvider>

@@ -33,28 +33,37 @@ export const createManageStorageRepository = (
             })
         },
 
-        uploadFile: async (parentId , file , isSecure): Promise<DomainResponse<StorageFile>> => {
+        uploadFile: async (parentId, file,name ,  isSecure): Promise<DomainResponse<StorageFile>> => {
             const formData = new FormData();
             formData.append('file', file);
-            if (parentId) formData.append('parent_id',parentId);
-            formData.append('is_secure', String(isSecure ?? false));
-            return apiClient.post(`${baseUrl}/files/upload`, formData, {
-              headers: { 'Content-Type': 'multipart/form-data' },
-            });
+            formData.append('name', name);               // ✅ required by backend
+            formData.append('is_secure', isSecure ? '1' : '0'); // ✅ send as '1' or '0'
+          
+            if (parentId) {
+              formData.append('parent_id', parentId);
+            }
+
+            
+          
+            // ✅ Do NOT set Content-Type header – let the browser handle multipart boundary
+            return apiClient.post(`${baseUrl}/files/upload`, formData);
           },
+          deleteFolder: async (folderId: string): Promise<DomainResponse<void>> => {
+            return apiClient.delete(`${baseUrl}/folders/${folderId}`);
+          },
+          deleteFile: async (fileId: string): Promise<DomainResponse<void>> => {
+              return apiClient.delete(`${baseUrl}/files/${fileId}`);
+            },
         // Folder operations
         // createFolder: async (data: CreateFolderDTO): Promise<DomainResponse<StorageFolder>> => {
         //   return apiClient.post(`${baseUrl}/folders`, data);
         // },
 
-        // renameFolder: async (folderId: string, data: UpdateFolderDTO): Promise<DomainResponse<StorageFolder>> => {
-        //   return apiClient.put(`${baseUrl}/folders/${folderId}`, data);
-        // },
+        renameFolder: async (folderId: string, name:string): Promise<DomainResponse<StorageFolder>> => {
+          return apiClient.put(`${baseUrl}/folders/${folderId}`, {name});
+        },
 
-        // deleteFolder: async (folderId: string): Promise<DomainResponse<void>> => {
-        //   return apiClient.delete(`${baseUrl}/folders/${folderId}`);
-        // },
-
+     
         // moveFolder: async (folderId: string, data: MoveItemDTO): Promise<DomainResponse<StorageFolder>> => {
         //   return apiClient.put(`${baseUrl}/folders/${folderId}/move`, data);
         // },
@@ -74,9 +83,7 @@ export const createManageStorageRepository = (
         //   return apiClient.put(`${baseUrl}/files/${fileId}/move`, data);
         // },
 
-        // deleteFile: async (fileId: string): Promise<DomainResponse<void>> => {
-        //   return apiClient.delete(`${baseUrl}/files/${fileId}`);
-        // },
+      
 
         // getFileDownloadUrl: async (fileId: string): Promise<string> => {
         //   // The backend returns a signed URL; we just construct the endpoint.

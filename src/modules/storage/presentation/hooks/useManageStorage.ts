@@ -14,8 +14,11 @@ export interface UseManageStorageReturn {
     loadRoot: () => Promise<void>;
     loadFolder: (folderId: string, apiRef: any) => Promise<void>;
     loadFolderByPath: (path: string, api: any) => Promise<void>;
-    createFolder: (parentId: string, name:string , api: any) => Promise<void>;
-    uploadFile: (parentId: string,file:File , isSecure:boolean ,  name:string , api: any) => Promise<void>;
+    createFolder: (parentId: string, name: string, api: any) => Promise<void>;
+    uploadFile: (parentId: string, file: File, isSecure: boolean, name: string, api: any) => Promise<void>;
+    deleteFolder: ( id: string) => Promise<void>;
+    deleteFile: (id: string) => Promise<void>;
+    renameFolder: (id: string, name: string) => Promise<void>;
     clearError: () => void;
 }
 
@@ -95,7 +98,7 @@ export const useManageStorage = (): UseManageStorageReturn => {
             const res = await useCase.getFolderContentsByPath(path);
             //   setData(res.data);
             console.log(res.data);
-            
+
             api.exec("provide-data", { data: res.data, id: path });
         } catch (err: any) {
             switch (err.status) {
@@ -115,15 +118,49 @@ export const useManageStorage = (): UseManageStorageReturn => {
     }, [useCase]);
 
 
-    const createFolder = useCallback(async (parent: string , name:string , api: IApi) => {
+    const createFolder = useCallback(async (parent: string, name: string, api: IApi) => {
         setLoading(true);
         setError(null);
         try {
-            console.log(parent);
-            
             const storageItem = api.getFile(parent)
-            const res = await useCase.createFolder(storageItem?._id , name )
-            loadFolderByPath(storageItem.id , api)
+            // let finalName = name
+
+            // if(storageItem.data.filter(f => f.type == "folder").map(f => f.name).includes(name)){
+            //         finalName = `${name} (1)`
+            //     }
+
+            const res = await useCase.createFolder(storageItem?._id, name)
+            loadFolderByPath(storageItem.id, api)
+            // console.log(storageItem.data.filter(f => f.type == "folder").map(f => f.name).includes(name));
+            // api.exec("", { data: res.data, id:  });
+        } catch (err: any) {
+            console.log(err);
+
+            switch (err.status) {
+                case 403:
+                    setError("Forbiden")
+                    break;
+
+                default:
+                    setError(err.message || `Failed to create folder`);
+                    break;
+            }
+
+        } finally {
+            setLoading(false);
+        }
+
+    }, [useCase]);
+
+    const uploadFile = useCallback(async (parent: string, file: File, isSecure: boolean = true, name: string, api: IApi) => {
+        setLoading(true);
+        setError(null);
+        try {
+            console.log(name, "in hook");
+
+            const storageItem = api.getFile(parent)
+            const res = await useCase.uploadFile(storageItem?._id, file, name, isSecure)
+            loadFolderByPath(storageItem.id, api)
             // api.exec("", { data: res.data, id:  });
         } catch (err: any) {
             switch (err.status) {
@@ -142,14 +179,64 @@ export const useManageStorage = (): UseManageStorageReturn => {
 
     }, [useCase]);
 
-    const uploadFile = useCallback(async (parent: string , file:File, isSecure:boolean = true ,name:string, api: IApi) => {
+    const deleteFolder = useCallback(async (id: string) => {
         setLoading(true);
         setError(null);
         try {
-            const storageItem = api.getFile(parent)
-            const res = await useCase.uploadFile(storageItem?._id , file, isSecure )
-            // api.exec("", { data: res.data, id:  });
+
+            const res = await useCase.deleteFolder(id)
+
         } catch (err: any) {
+            switch (err.status) {
+                case 403:
+                    setError("Forbiden")
+                    break;
+
+                default:
+                    setError(err.message || `Failed to create folder`);
+                    break;
+            }
+
+        } finally {
+            setLoading(false);
+        }
+
+    }, [useCase]);
+
+    const deleteFile = useCallback(async (id: string) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await useCase.deleteFile(id)
+            // loadFolderByPath(storageItem.id , api)
+        } catch (err: any) {
+            console.log(err);
+
+            switch (err.status) {
+                case 403:
+                    setError("Forbiden")
+                    break;
+
+                default:
+                    setError(err.message || `Failed to create folder`);
+                    break;
+            }
+
+        } finally {
+            setLoading(false);
+        }
+
+    }, [useCase]);
+
+    const renameFolder = useCallback(async (id: string, name: string) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await useCase.renameFolder(id, name)
+            // loadFolderByPath(storageItem.id , api)
+        } catch (err: any) {
+            console.log(err);
+
             switch (err.status) {
                 case 403:
                     setError("Forbiden")
@@ -173,7 +260,10 @@ export const useManageStorage = (): UseManageStorageReturn => {
         loadFolder,
         loadFolderByPath,
         createFolder,
+        renameFolder,
         uploadFile,
+        deleteFolder,
+        deleteFile,
         clearError,
     };
 };
