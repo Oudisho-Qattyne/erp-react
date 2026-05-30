@@ -21,10 +21,10 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
 
     getFolderContents: async (folderId: string): Promise<DomainResponse<StorageItemDto[]>> => {
       const res = await repository.getFolderContents(folderId)
-      let storageItemsDtos : StorageItemDto[] = []
-      if(res.data.children)
+      let storageItemsDtos: StorageItemDto[] = []
+      if (res.data.children)
         storageItemsDtos = storageItems2StorageItemDtos(res.data.children)
-       const newRes = {
+      const newRes = {
         status: res.status,
         data: storageItemsDtos,
       }
@@ -32,10 +32,10 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
     },
     getFolderContentsByPath: async (path: string): Promise<DomainResponse<StorageItemDto[]>> => {
       const res = await repository.getFolderContentsByPath(path)
-      let storageItemsDtos : StorageItemDto[] = []
-      if(res.data)
+      let storageItemsDtos: StorageItemDto[] = []
+      if (res.data)
         storageItemsDtos = storageItems2StorageItemDtos(res.data)
-       const newRes = {
+      const newRes = {
         status: res.status,
         data: storageItemsDtos,
       }
@@ -43,33 +43,38 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
     },
 
 
-    createFolder: async (parentId :string , name : string): Promise<DomainResponse<StorageItemDto>> => {
-        const res = await repository.createFolder(parentId , name)
-      let storageItemsDto : StorageItemDto
-      if(res.data)
+    createFolder: async (parentId: string, name: string): Promise<DomainResponse<StorageItemDto>> => {
+      const res = await repository.createFolder(parentId, name)
+      let storageItemsDto: StorageItemDto
+      if (res.data) {
+
         storageItemsDto = storageItem2StorageItemDto(res.data)
-      const newRes = {
-        status: res.status,
-        data: storageItemsDto,
+        const newRes = {
+          status: res.status,
+          data: storageItemsDto,
+        }
+        return (newRes);
       }
-      return(newRes);
+      else{
+        throw Error("Faild to get storage Item")
+    }
     },
 
-     // File operations
-     uploadFile: async (parentId : string, file : File , name : string, isSecure : boolean): Promise<DomainResponse<StorageFile>> => {
-        return(repository.uploadFile(parentId, file , name ? name : file.name , isSecure));
-      },
-  
+    // File operations
+    uploadFile: async (parentId: string, file: File, name: string, isSecure: boolean): Promise<DomainResponse<StorageFile>> => {
+      return (repository.uploadFile(parentId, file, name ? name : file.name, isSecure));
+    },
 
-    renameFolder: async (folderId: string,   name:string): Promise<DomainResponse<StorageFolder>> => {
-      return(repository.renameFolder(folderId, name));
+
+    renameFolder: async (folderId: string, name: string): Promise<DomainResponse<StorageFolder>> => {
+      return (repository.renameFolder(folderId, name));
     },
 
     deleteFolder: async (folderId: string): Promise<void> => {
       const response = await repository.deleteFolder(folderId);
-    //   if (response.status !== "Success") {
-    //     throw new Error(response.message || "Failed to delete folder");
-    //   }
+      //   if (response.status !== "Success") {
+      //     throw new Error(response.message || "Failed to delete folder");
+      //   }
     },
 
     // moveFolder: async (folderId: string, newParentId: string | null): Promise<StorageFolder> => {
@@ -77,7 +82,7 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
     //   return(repository.moveFolder(folderId, dto));
     // },
 
-   
+
     // moveFile: async (fileId: string, newParentId: string | null): Promise<StorageFile> => {
     //   const dto: MoveItemDTO = { new_parent_id: newParentId };
     //   return(repository.moveFile(fileId, dto));
@@ -85,9 +90,9 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
 
     deleteFile: async (fileId: string): Promise<void> => {
       const response = await repository.deleteFile(fileId);
-    //   if (response.status !== "Success") {
-    //     throw new Error(response.message || "Failed to delete file");
-    //   }
+      //   if (response.status !== "Success") {
+      //     throw new Error(response.message || "Failed to delete file");
+      //   }
     },
 
     // getFileDownloadUrl: async (fileId: string): Promise<string> => {

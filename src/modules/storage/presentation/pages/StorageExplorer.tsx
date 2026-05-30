@@ -44,7 +44,7 @@ export function StorageExplorer() {
     const [renameConfirm, setRenameConfirm] = useState<StorageItemDto | null>()
 
     const [selectedItems, setSelectedItems] = useState<StorageItemDto[]>([]);
-    const [currentPath, setCurrentPath] = useState('root');
+    const [currentPath, setCurrentPath] = useState('/');
     const apiRef = useRef<any>(null);
     const { language } = useLanguage();
 
@@ -58,7 +58,7 @@ export function StorageExplorer() {
       ): IFileMenuOption[] => {
         // Only customise context menus for files and folders
         if (mode !== 'file' && mode !== 'folder') return [];
-      
+        
         const options: IFileMenuOption[] = [];
       
         // Rename option – only for folders (if files cannot be renamed)
@@ -91,7 +91,7 @@ export function StorageExplorer() {
         return options;
       }, []); // dependencies are stable (setRenameConfirm, setDeleteConfirm)
       function previewURL(file : FilePreview, width : number , height:number) {
-        console.log(file , width , height);
+    
         
         return ""
       }
@@ -120,7 +120,7 @@ export function StorageExplorer() {
             api.on('select-file', () => {
                 const state = api.getState();
                 const selectedSet = new Set();
-                state.panels.forEach((panel: any) => {
+                state?.panels?.forEach((panel: any) => {
                     if (panel._selected) {
                         panel._selected.forEach((item: any) => selectedSet.add(item));
                     }
@@ -133,7 +133,7 @@ export function StorageExplorer() {
             // Handle folder navigation
             api.on('set-path', async ({ id }: { id: string }) => {
                 setCurrentPath(id);
-                api.exec('provide-data', { data: null, id });
+                api.exec('provide-data', { data: [], id });
                 await loadFolderByPath(id, api);
             });
             api.intercept('delete-files', async ({ ids }) => {
@@ -176,7 +176,6 @@ export function StorageExplorer() {
         const { items } = deleteConfirm;
         try {
             for (const item of items) {
-                console.log(item.type);
                 if (item.type == 'folder') {
                     await deleteFolder(item._id);
                 }
@@ -233,7 +232,7 @@ export function StorageExplorer() {
                                 hasSelection={selectedItems.length > 0}
                                 hasRenameSelection={selectedItems.filter(i => i.type == "folder").length > 0}
                             />
-                            <Filemanager ref={apiRef} init={init} data={data} menuOptions={customMenuOptions} previews={previewURL}/>
+                            <Filemanager ref={apiRef} init={init} data={data} menuOptions={customMenuOptions} previews={previewURL} />
                             {loading && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-white/50">
                                     <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
@@ -267,7 +266,7 @@ export function StorageExplorer() {
 
             <RenameItemDialog
                 isOpen={!!renameConfirm}
-                item={renameConfirm}
+                item={renameConfirm ? renameConfirm : null} 
                 onCancel={() => setRenameConfirm(null)}
                 onConfirm={handleConfirmRename}
             />

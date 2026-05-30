@@ -28,8 +28,6 @@ export function RenameItemDialog({
       setNewName(item.name);
     }
   }, [isOpen, item]);
-console.log(newName);
-
   const handleSubmit = async () => {
     if (!newName.trim() || newName === item?.name) {
       onCancel();

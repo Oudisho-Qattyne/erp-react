@@ -12,6 +12,7 @@ import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicFo
 import { FormInput } from '../../../../core/presentation/layouts/ui/inputs/FormInput';
 import { FormProvider } from 'react-hook-form';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
+import { useAuth as useAuthProvider } from '../../../../core/infrastructure/auth/AuthProvider';
 
 // Validation schema helper
 const getLoginSchema = (t: (key: string, mod?: string) => string) => z.object({
@@ -27,6 +28,7 @@ type LoginFormData = {
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login, isLoading: isLoginLoading, error: authError } = useAuth();
+  const {login : loginLocal} = useAuthProvider()
   const { t } = useLanguage();
 
   const loginSchema = useMemo(() => getLoginSchema(t), [t]);
@@ -39,8 +41,9 @@ export default function LoginPage() {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await login(data as any);
+      const res = await login(data as any);
       // Redirect to home or dashboard after successful login
+      loginLocal(res.data.token , res.data.user)
       navigate('/hr');
     } catch (err: any) {
       console.error('Login failed:', err);

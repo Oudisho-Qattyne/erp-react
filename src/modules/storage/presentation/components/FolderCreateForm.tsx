@@ -16,8 +16,11 @@ export function FolderCreateForm({
     const handleSubmit = async () => {
       if (!name.trim()) return;
       setLoading(true);
-      await onSuccess(name);
-      setLoading(false);
+      try {
+        await onSuccess(name);
+      } finally {
+        setLoading(false);
+      }
     };
   
     return (

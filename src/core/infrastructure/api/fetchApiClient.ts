@@ -29,7 +29,6 @@ export function createFetchApiClient(
       headers.set('Authorization', `Bearer ${token}`);
     }
 
-    // Only set Content-Type to application/json if body is not FormData
     const body = config.body;
     if (!headers.has('Content-Type') && body && !(body instanceof FormData)) {
       headers.set('Content-Type', 'application/json');
@@ -38,6 +37,7 @@ export function createFetchApiClient(
     const requestUrl = buildUrl(url, config.params);
     const response = await fetch(requestUrl, { ...config, headers });
 
+    // Handle error responses (non‑2xx)
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
       const message = errorData?.message || `HTTP error! status: ${response.status}`;
@@ -45,10 +45,25 @@ export function createFetchApiClient(
       throw createApiError(message, validationErrors, response.status);
     }
 
+    // No content (204) or empty body – return null
     if (response.status === 204) {
       return null as any as T;
     }
 
+    // Check if the response actually has JSON content
+    const contentType = response.headers.get('content-type');
+    const contentLength = response.headers.get('content-length');
+
+    if (
+      (!contentType || !contentType.includes('application/json')) ||
+      (contentLength === '0')
+    ) {
+      // Not JSON or empty body – return null (or empty array if T is array)
+      return null as any as T;
+    }
+
+    // Try to parse JSON – this may still fail if body is malformed,
+    // but we assume the backend returns proper JSON.
     return response.json();
   };
 

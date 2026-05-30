@@ -37,9 +37,12 @@ export function FileUploadForm({
 
   const handleSubmit = async () => {
     setLoading(true);
-    const fullName = extension ? `${baseName}${extension}` : baseName;
-    await onSuccess(isSecure, fullName);
-    setLoading(false);
+    try {
+      const fullName = extension ? `${baseName}${extension}` : baseName;
+      await onSuccess(isSecure, fullName);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

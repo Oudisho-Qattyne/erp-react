@@ -63,7 +63,8 @@ function App() {
     path: '*',
     element: (
       // <LayoutSwitcher layout="default">
-        <NotFoundPage />
+      <Navigate to={'/hr'}/>
+        // <NotFoundPage />
       // </LayoutSwitcher>
     ),
   });
