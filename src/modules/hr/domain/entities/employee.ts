@@ -56,11 +56,13 @@ export interface EducationEntry {
     national_id: string;
     first_name: string;
     father_name: string;
+    grandfather_name:string;
     last_name: string;
     mother_name: string;
     gender: Gender;                    // 'male', 'female'
     date_birth: string;                // YYYY-MM-DD
     place_birth: string;
+    assigned_job:string;
     marital_status: MaritalStatus;            // 'married', 'single', etc.
     spouse_name: string;
     spouse_workplace: string;

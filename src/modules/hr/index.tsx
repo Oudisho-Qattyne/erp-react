@@ -8,6 +8,7 @@ import { ReportsPage } from './presentation/pages/ReportsPage'
 import { EmployeesPage } from './presentation/pages/EmployeesPage'
 import { ShowEmployeePage } from './presentation/pages/ShowEmployeePage'
 import { EditEmployeePage } from './presentation/pages/EditEmployeePage'
+import { SystemLookupsPage } from './presentation/pages/SystemLookupsPage'
 
 const usersModule: Module = {
   name: 'hr',
@@ -54,6 +55,17 @@ const usersModule: Module = {
       moduleName: 'hr',
       requiresAuth: true,
       requiredRole: 'admin',
+    },
+    {
+      path: '/hr/lookups',
+      element: <SystemLookupsPage />,
+      layout: 'dashboard',
+      label: 'lookups.title',
+      nav: true,
+      order: 40,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'hr',
     }
   ],
   locales: { en: enLocales, ar: arLocales },

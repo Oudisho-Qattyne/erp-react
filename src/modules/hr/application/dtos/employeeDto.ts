@@ -40,11 +40,13 @@ import type { EducationEntry, EmploymentDetails } from '../../domain/entities/em
     national_id: string;
     first_name: string;
     father_name: string;
+    grandfather_name: string;
     last_name: string;
     mother_name: string;
     gender: Gender;
     date_birth: string;
     place_birth: string;
+    assigned_job:string;
     marital_status: MaritalStatus;
     spouse_name: string;
     spouse_workplace: string;
