@@ -44,7 +44,7 @@ const usersModule: Module = {
       nav: false,
       moduleName: 'hr',
       requiresAuth: true,
-      requiredRole: 'admin',
+      // requiredRole: 'admin',
     },
     {
       path: '/hr/employees/:id/edit',
@@ -54,7 +54,7 @@ const usersModule: Module = {
       nav: false,
       moduleName: 'hr',
       requiresAuth: true,
-      requiredRole: 'admin',
+      // requiredRole: 'admin',
     },
     {
       path: '/hr/lookups',

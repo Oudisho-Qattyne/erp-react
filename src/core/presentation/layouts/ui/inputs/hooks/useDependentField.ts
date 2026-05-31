@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useFormContext, type FieldValues, type Path} from 'react-hook-form';
+import type { MatrixFieldConfig } from '../DataMatrixInput';
 
 export interface ComputedProps {
   value?: any;
@@ -8,6 +9,8 @@ export interface ComputedProps {
   hidden?: boolean;
   placeholder?: string;
   required?: boolean;
+  matrixFields?: MatrixFieldConfig[];
+  numberOfRows?: number;
   [key: string]: any; // allow extra data
 }
 

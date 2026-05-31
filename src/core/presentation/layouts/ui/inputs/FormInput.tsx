@@ -11,6 +11,7 @@ import { inputBaseClasses, labelClasses, errorClasses, hintClasses } from './sty
 import { DatePicker } from './DatePicker';
 import { SelectOrCreate } from './SelectOrCreate';
 import Input, { type InputType } from './Input';
+import type { MatrixFieldConfig } from './DataMatrixInput';
 import { useDependentField, type ComputedProps } from './hooks/useDependentField';
 
 
@@ -41,6 +42,13 @@ export interface FormInputProps<T extends FieldValues> {
     onCancel: () => void,
     dependentData?: Record<string, unknown>
   ) => React.ReactNode;
+  // For data-matrix
+  matrixFields?: MatrixFieldConfig[];
+  numberOfRows?: number;
+  minRows?: number;
+  maxRows?: number;
+  matrixErrors?: Record<number, Record<string, string>>;
+  rowSchema?: { safeParse: (data: any) => { success: boolean; error?: { flatten: () => { fieldErrors: Record<string, string[]> } } } };
   // Dependency
   dependsOn?: Path<T>[];
   compute?: (values: Record<Path<T>, any>) => ComputedProps | Promise<ComputedProps>;
@@ -65,6 +73,12 @@ export function FormInput<T extends FieldValues>({
   createTitle = 'إضافة جديد',
   labelPath,
   renderCreateForm,
+  matrixFields,
+  numberOfRows,
+  minRows,
+  maxRows,
+  matrixErrors,
+  rowSchema,
   dependsOn = [],
   compute,
 }: FormInputProps<T>) {
@@ -84,6 +98,8 @@ export function FormInput<T extends FieldValues>({
   const finalRequired = computed.required ?? required;
   const finalOptions = computed.options ?? options;
   const finalValue = computed.value !== undefined ? computed.value : currentValue;
+  const finalMatrixFields = computed.matrixFields ?? matrixFields;
+  const finalNumberOfRows = computed.numberOfRows ?? numberOfRows;
 
   if (finalHidden) return null;
   if (loading && hasDeps && !finalValue) {
@@ -137,6 +153,12 @@ export function FormInput<T extends FieldValues>({
         min={min}
         max={max}
         step={step}
+        matrixFields={finalMatrixFields}
+        numberOfRows={finalNumberOfRows}
+        minRows={minRows}
+        maxRows={maxRows}
+        matrixErrors={matrixErrors}
+        rowSchema={rowSchema}
         baseClasses={baseClasses}
       />
       {error && <div className={errorClasses}>{t(`validation.${error}`, 'shared') || error}</div>}

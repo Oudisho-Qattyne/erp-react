@@ -8,8 +8,19 @@
   "User created successfully": "تم إنشاء المستخدم بنجاح",
   "Create a new user": "إنشاء مستخدم جديد",
   "Back to users": "العودة إلى المستخدمين",
+  "organizational_unit": {
+    "title": "الوحدة التنظيمية",
+    "add": "إضافة",
+    "dialog_title": "إضافة وحدة تنظيمية جديدة",
+    "no_children": "لا توجد وحدات فرعية",
+    "choose": "اختر...",
+    "level": "المستوى",
+    "name": "الاسم",
+    "name_required": "الاسم مطلوب"
+  },
   "navigation": {
-    "reports": {
+  
+  "reports": {
       "title": "التقارير"
     },
     "employees": {
@@ -20,6 +31,9 @@
     },
     "edit_employee": {
       "title": "تعديل الموظف"
+    },
+    "lookups": {
+      "title": "إدارة البيانات الأساسية"
     },
     "admin": "الإدارة"
   },
@@ -50,6 +64,7 @@
     "marital_married": "متزوج",
     "marital_divorced": "مطلق",
     "marital_widowed": "أرمل",
+    "number_of_children": "عدد الأولاد",
     "spouse_name": "اسم الزوج/الزوجة",
     "spouse_workplace": "جهة عمل الزوج/الزوجة",
     "blood_type": "فصيلة الدم",
@@ -77,7 +92,9 @@
     "graduation_year": "سنة التخرج",
     "academic_stage": "المرحلة الأكاديمية",
     "study_status": "حالة الدراسة",
-    "degree_name": "اسم الشهادة"
+    "degree_name": "اسم الشهادة",
+    "children":"الاولاد",
+    "child_name": "اسم الابن"
   },
   "show_employee": {
     "personal_info": "المعلومات الشخصية",
@@ -150,6 +167,7 @@
       "date_birth_invalid": "تاريخ الميلاد بصيغة YYYY-MM-DD",
       "place_birth_required": "مكان الميلاد مطلوب",
       "marital_status_invalid": "الحالة الاجتماعية غير صالحة",
+      "number_of_children_invalid":"عدد الأولاد يجب أن يكون موجباً",
       "blood_type_invalid": "فصيلة الدم غير صالحة",
       "phone_number_invalid": "رقم الهاتف غير صالح (يجب أن يحتوي على 7-15 رقم، ويمكن أن يبدأ بـ +)",
       "residence_region_required": "رقم منطقة السكن يجب أن يكون موجباً",
@@ -160,8 +178,29 @@
       "contract_type_invalid": "نوع العقد غير صالح",
       "contract_nature_invalid": "طبيعة العقد غير صالحة",
       "job_category_required": "التصنيف الوظيفي مطلوب",
-      "workplace_city_required": "رقم مدينة العمل يجب أن يكون موجباً"
+      "workplace_city_required": "رقم مدينة العمل يجب أن يكون موجباً",
+      "name_invalid":"الاسم غير صالح",
+      "birthdate_invalid":"تاريخ الولادة غير صالح"
     }
+  },
+  "lookups": {
+    "title": "إدارة البيانات الأساسية",
+    "tabs": {
+      "countries": "الدول",
+      "cities": "المدن",
+      "regions": "المناطق",
+      "universities": "الجامعات",
+      "faculties": "الكليات",
+      "specializations": "التخصصات"
+    },
+    "select_country_first": "الرجاء اختيار دولة لعرض مدنها",
+    "select_city_first": "الرجاء اختيار مدينة أولاً",
+    "select_university_first": "الرجاء اختيار جامعة أولاً",
+    "select_faculty_first": "الرجاء اختيار كلية أولاً",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل حذف {name}"
   },
   "reports": {
     "title": "التقارير والتحليلات",

@@ -59,15 +59,15 @@ function App() {
   });
 
   // Add catch‑all route (404) at the end
-  routeConfigs.push({
-    path: '*',
-    element: (
-      // <LayoutSwitcher layout="default">
-      <Navigate to={'/hr'}/>
-        // <NotFoundPage />
-      // </LayoutSwitcher>
-    ),
-  });
+  // routeConfigs.push({
+  //   path: '*',
+  //   element: (
+  //     // <LayoutSwitcher layout="default">
+  //     <Navigate to={'/hr'}/>
+  //       // <NotFoundPage />
+  //     // </LayoutSwitcher>
+  //   ),
+  // });
 
   // Optional: add a redirect from root to dashboard or home
   // const hasRootRoute = registeredRoutes.some(r => r.path === '/');

@@ -15,6 +15,7 @@ export const createEmployeeSchema = z.object({
   place_birth: z.string().min(1),
   assigned_job:z.string().min(1),
   marital_status: z.enum(['single', 'married', 'divorced', 'widowed']),
+  number_of_children: z.number().positive(),
   spouse_name: z.string().optional().default(''),
   spouse_workplace: z.string().optional().default(''),
   blood_type: z.string().optional(),

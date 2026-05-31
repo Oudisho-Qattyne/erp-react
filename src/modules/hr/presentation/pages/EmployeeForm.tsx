@@ -38,6 +38,7 @@ export const EMPLOYEE_EMPTY_DEFAULTS: EmployeeFormValues = {
   place_birth: '',
   assigned_job: '',
   marital_status: 'single',
+  number_of_children: 0,
   spouse_name: '',
   spouse_workplace: '',
   blood_type: 'A+',
@@ -60,6 +61,7 @@ export const EMPLOYEE_EMPTY_DEFAULTS: EmployeeFormValues = {
     workplace_city_id: 0,
   },
   educations: [],
+  children: []
 };
 
 function CreateEntityForm<T>({
@@ -88,10 +90,7 @@ function CreateEntityForm<T>({
       defaultValues={defaultValues}
       schema={schema}
       onSubmit={async (data: any) => {
-        const result = await onSubmit(data);
-        onSuccess((result as any).id, result);
-        return result
-
+        return await onSubmit(data);
       }}
       onSuccess={onSuccess}
       onCancel={onCancel}
@@ -121,14 +120,10 @@ function FacultyCreateForm({ onSuccess, onCancel, universityId }: { onSuccess: (
       schema={schemaWithoutUni}
       onSubmit={async (data: any) => {
         const payload = {
-          name: data.name ,
+          name: data.name,
           university_id: universityId
         }
-        
-        const result = await createFaculty(payload);
-        onSuccess(result.data.id, result);
-        return result
-
+        return await createFaculty(payload);
       }}
       onSuccess={onSuccess}
       onCancel={onCancel}
@@ -147,10 +142,7 @@ function SpecializationCreateForm({ onSuccess, onCancel, facultyId }: { onSucces
       schema={schemaWithFac}
       defaultValues={{ faculty_id: facultyId }}
       onSubmit={async (data: any) => {
-        const result = await createSpecialization(data);
-        onSuccess(result.data.id, result);
-        return result
-
+        return await createSpecialization(data);
       }}
       onSuccess={onSuccess}
       onCancel={onCancel}
@@ -207,9 +199,9 @@ export function EmployeeForm({
   const { t } = useLanguage();
   const actualSubmitLabel = submitLabel || t('employee_form.save', 'hr') || 'حفظ الموظف';
   const actualCancelLabel = cancelLabel || t('employee_form.cancel', 'hr') || 'إلغاء';
-const schema = getCreateEmployeeSchema(t)
+  const schema = getCreateEmployeeSchema(t)
   const { form: methods } = useDynamicForm({
-    schema:schema,
+    schema: schema,
     defaultValues: { ...EMPLOYEE_EMPTY_DEFAULTS, ...defaultValues } as EmployeeFormValues,
     mode: 'onChange',
   });
@@ -244,10 +236,7 @@ const schema = getCreateEmployeeSchema(t)
           ar: data.name
         }
       }
-      const result = await createCountry(payload)
-      onSuccess(result.data.id, result);
-
-      return result
+      return await createCountry(payload)
     }} onSuccess={onSuccess} onCancel={onCancel} title={t('employees.country', 'hr') || "دولة"} submitLabel={t('employee_form.add_country', 'hr') || "إضافة دولة جديدة"} />;
   }
 
@@ -268,11 +257,7 @@ const schema = getCreateEmployeeSchema(t)
             },
             country_id: countryId
           }
-          const result = await createCity(payload);
-          onSuccess(result.data.id, result);
-
-          return result
-
+          return await createCity(payload);
         }}
         onSuccess={onSuccess}
         onCancel={onCancel}
@@ -291,15 +276,13 @@ const schema = getCreateEmployeeSchema(t)
         schema={schemaWithoutCity}
         defaultValues={{ city_id: cityId }}
         onSubmit={async (data) => {
-          const paload = {
+          const payload = {
             name: {
               ar: data.name
             },
             city_id: cityId
           }
-          const result = await createRegion(paload);
-          onSuccess(result.data.id, result);
-          return result
+          return await createRegion(payload);
         }}
         onSuccess={onSuccess}
         onCancel={onCancel}
@@ -388,6 +371,8 @@ const schema = getCreateEmployeeSchema(t)
       ],
       required: true,
     },
+
+
     {
       name: 'spouse_name', label: t('employees.spouse_name', 'hr') || 'اسم الزوج/الزوجة',
       dependsOn: ['marital_status']
@@ -409,6 +394,45 @@ const schema = getCreateEmployeeSchema(t)
         return { disabled: false }
       }
     },
+    {
+      name: 'number_of_children', label: t('employees.number_of_children', 'hr') || 'عدد الأولاد',
+      dependsOn: ['marital_status'],
+      compute: (values) => {
+        if (values.marital_status != 'married')
+          return { disabled: true }
+
+        return { disabled: false }
+      },
+      type: 'number'
+    },
+    {
+      name: 'children', label: t('employees.children', 'hr') || 'الأولاد',
+      dependsOn: ['marital_status', 'number_of_children'],
+      compute: (values) => {
+        if (values.marital_status != 'married' || values.number_of_children <= 0)
+          return { disabled: true }
+
+        return { disabled: false, numberOfRows: values.number_of_children }
+      },
+      type: 'data-matrix',
+      matrixFields: [
+        {
+          label: t('employees.child_name', 'hr') || 'عدد الأولاد',
+          name: "name",
+          type: "text"
+        },
+        {
+          label: t('employees.date_birth', 'hr') || 'تاريخ الميلاد',
+          name: "birthdate",
+          type: "date",
+          required: true
+        },
+      ],
+      rowSchema: z.object({
+        name: z.string().min(1, t('employee_form.validation.name_invalid', 'hr') || 'اسم الابن مطلوب').nullable(),
+        birthdate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, t('employee_form.validation.birthdate_invalid', 'hr') || 'تاريخ الولادة بصيغة YYYY-MM-DD'),
+      })
+    },
     { name: 'blood_type', type: 'select', options: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((v) => ({ value: v, label: v })), label: t('employees.blood_type', 'hr') || 'فصيلة الدم' },
     { name: 'phone_number', label: t('employees.phone_number', 'hr') || 'رقم الهاتف', required: true },
     { name: 'sham_cash_account', label: t('employees.sham_cash_account', 'hr') || 'حساب الشام كاش' },
@@ -418,7 +442,7 @@ const schema = getCreateEmployeeSchema(t)
       label: t('employees.country', 'hr') || 'الدولة',
       required: true,
       createTitle: t('employee_form.add_country', 'hr') || 'إضافة دولة جديدة',
-      labelPath: 'data.name.ar',
+      labelPath: 'data.name',
       renderCreateForm: (onSuccess, onCancel) => <CountryCreateForm onSuccess={(v, i) => {
         onSuccess(v, i)
       }} onCancel={onCancel} />,
@@ -437,7 +461,7 @@ const schema = getCreateEmployeeSchema(t)
         return { options: response.data.map((c: any) => ({ value: c.id, label: c.name })) };
       },
       createTitle: t('employee_form.add_city', 'hr') || 'إضافة مدينة جديدة',
-      labelPath: 'data.name.ar',
+      labelPath: 'data.name',
 
       renderCreateForm: (onSuccess, onCancel, deps) => (
         <CityCreateForm countryId={deps?.residence_country_id as number} onSuccess={onSuccess} onCancel={onCancel} />
@@ -456,8 +480,7 @@ const schema = getCreateEmployeeSchema(t)
         return { options: response.data.map((r: any) => ({ value: r.id, label: r.name })) };
       },
       createTitle: t('employee_form.add_region', 'hr') || 'إضافة منطقة جديدة',
-      labelPath: 'data.name.ar',
-
+      labelPath: 'data.name',
 
       renderCreateForm: (onSuccess, onCancel, deps) => (
         <RegionCreateForm cityId={deps?.residence_city_id as number} onSuccess={onSuccess} onCancel={onCancel} />
@@ -522,7 +545,7 @@ const schema = getCreateEmployeeSchema(t)
         const response = await loadCitiesByCountry(countryId);
         return { options: response.data.map((c: any) => ({ value: c.id, label: c.name })) }
       },
-      labelPath: 'data.name.ar',
+      labelPath: 'data.name',
 
       renderCreateForm: (onSuccess, onCancel) => <CityCreateForm onSuccess={onSuccess} onCancel={onCancel} />,
     },

@@ -11,6 +11,10 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
     academic_stage: z.string().nullable().optional(),
     study_status: z.string().nullable().optional(),
   });
+  const EmployeeChildren = z.object({
+    name:  z.string().min(1, t('employee_form.validation.name_invalid', 'hr') || 'اسم الابن مطلوب'),
+    birthdate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/,  t('employee_form.validation.birthdate_invalid', 'hr') || 'تاريخ الولادة بصيغة YYYY-MM-DD' ),
+  })
 
   return z.object({
     // Personal
@@ -27,6 +31,7 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
     place_birth: z.string().min(1,  t('employee_form.validation.place_birth_required', 'hr') || 'مكان الميلاد مطلوب' ),
     assigned_job: z.string().min(1,  t('employee_form.validation.assigned_job_required', 'hr') || 'العمل المكلف' ),
     marital_status: z.enum(['single', 'married', 'divorced', 'widowed'], t('employee_form.validation.marital_status_invalid', 'hr') || 'الحالة الاجتماعية غير صالحة' ),
+  number_of_children: z.number().positive( t('employee_form.validation.number_of_children_invalid', 'hr') || 'عدد الأولاد يجب أن يكون موجباً' ),
     spouse_name: z.string().optional().default(''),
     spouse_workplace: z.string().optional().default(''),
     blood_type: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],  t('employee_form.validation.blood_type_invalid', 'hr') || 'فصيلة الدم غير صالحة' ),
@@ -55,6 +60,7 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
 
     // Education (array)
     educations: z.array(EducationEntrySchema).default([]),
+    children: z.array(EmployeeChildren).default([])
   });
 };
 

@@ -8,8 +8,19 @@
   "User created successfully": "User created successfully",
   "Create a new user": "Create a new user",
   "Back to users": "Back to users",
+  "organizational_unit": {
+    "title": "Organizational Unit",
+    "add": "Add",
+    "dialog_title": "Add Organizational Unit",
+    "no_children": "No sub-units",
+    "choose": "Select...",
+    "level": "Level",
+    "name": "Name",
+    "name_required": "Name is required"
+  },
   "navigation": {
-    "reports": {
+  
+  "reports": {
       "title": "Reports"
     },
     "employees": {
@@ -20,6 +31,9 @@
     },
     "edit_employee": {
       "title": "Edit Employee"
+    },
+    "lookups": {
+      "title": "System Lookups"
     },
     "admin": "Administration"
   },
@@ -50,6 +64,7 @@
     "marital_married": "Married",
     "marital_divorced": "Divorced",
     "marital_widowed": "Widowed",
+    "number_of_children": "Number of children",
     "spouse_name": "Spouse Name",
     "spouse_workplace": "Spouse Workplace",
     "blood_type": "Blood Type",
@@ -77,7 +92,10 @@
     "graduation_year": "Graduation Year",
     "academic_stage": "Academic Stage",
     "study_status": "Study Status",
-    "degree_name": "Degree Name"
+    "degree_name": "Degree Name",
+    "children":"Children",
+    "child_name": "Child name"
+
   },
   "show_employee": {
     "personal_info": "Personal Information",
@@ -150,6 +168,7 @@
       "date_birth_invalid": "Date of birth must be YYYY-MM-DD",
       "place_birth_required": "Place of birth is required",
       "marital_status_invalid": "Marital status is invalid",
+      "number_of_children_invalid": "Number of children must be positive",
       "blood_type_invalid": "Blood type is invalid",
       "phone_number_invalid": "Phone number is invalid (must contain 7-15 digits, optionally starting with +)",
       "residence_region_required": "Residence region ID must be positive",
@@ -160,8 +179,29 @@
       "contract_type_invalid": "Contract type is invalid",
       "contract_nature_invalid": "Contract nature is invalid",
       "job_category_required": "Job category is required",
-      "workplace_city_required": "Workplace city ID must be positive"
+      "workplace_city_required": "Workplace city ID must be positive",
+      "name_invalid": "Name is invalid",
+      "birthdate_invalid": "Birthdate is invalid"
     }
+  },
+  "lookups": {
+    "title": "System Lookups",
+    "tabs": {
+      "countries": "Countries",
+      "cities": "Cities",
+      "regions": "Regions",
+      "universities": "Universities",
+      "faculties": "Faculties",
+      "specializations": "Specializations"
+    },
+    "select_country_first": "Please select a country first",
+    "select_city_first": "Please select a city first",
+    "select_university_first": "Please select a university first",
+    "select_faculty_first": "Please select a faculty first",
+    "created": "{name} created successfully",
+    "create_error": "Failed to create {name}",
+    "deleted": "{name} deleted successfully",
+    "delete_error": "Failed to delete {name}"
   },
   "reports": {
     "title": "Reports",

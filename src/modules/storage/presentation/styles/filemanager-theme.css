@@ -951,4 +951,5 @@
 .dark .wx-willow-theme .wx-preview .wx-icon-wrapper,
 .dark .wx-willow-dark-theme .wx-preview .wx-icon-wrapper {
     background-color: var(--color-background);
+    
 }

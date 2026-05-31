@@ -4,7 +4,9 @@
     "search": "بحث",
     "loading": "جاري التحميل...",
     "no_data": "لا توجد بيانات",
-    "filter": "تصفية"
+    "filter": "تصفية",
+    "delete": "حذف",
+    "select": "اختر"
   },
   "pagination": {
     "showing": "عرض",

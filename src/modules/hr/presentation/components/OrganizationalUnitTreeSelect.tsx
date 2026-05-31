@@ -13,7 +13,7 @@ import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProv
 export function OrganizationalUnitTreeSelect({
   value,
   onChange,
-  label = 'الوحدة التنظيمية',
+  label,
   required = false,
   disabled = false,
   error,
@@ -26,7 +26,6 @@ export function OrganizationalUnitTreeSelect({
   error?: string;
 }) {
   const { t } = useLanguage();
-  const newLabel = t('common.new', 'shared') !== 'common.new' ? t('common.new', 'shared') : 'جديد';
 
   const { getAll: loadOrgUnits, create } = useEntityCrud<OrganizationalLevels>(
     '/hr/organizational-levels',
@@ -81,6 +80,7 @@ export function OrganizationalUnitTreeSelect({
     await refreshUnits();
     onChange(result.data.id);
     setIsCreateDialogOpen(false);
+    return result
   };
 
   const handleSelectAtLevel = (levelIndex: number, newUnitId: number) => {
@@ -99,7 +99,7 @@ export function OrganizationalUnitTreeSelect({
     const currentSelectedId = isLast ? undefined : selectedPath[idx].id;
     const children = getChildren(parentId);
     const levelNumber = idx + 1;
-    const selectLabel = levelNumber === 1 ? label : `المستوى ${levelNumber}`;
+    const selectLabel = levelNumber === 1 && label ? label : `${t('organizational_unit.level', 'hr') || 'المستوى'} ${levelNumber}`;
 
     // If there are no children and this is not the first level (i.e., we have a parent selected),
     // we will still show an empty select with a create button to add a child under the parent.
@@ -114,7 +114,7 @@ export function OrganizationalUnitTreeSelect({
                 options={[]}
                 value=""
                 onChange={() => { }}
-                placeholder="لا توجد وحدات فرعية"
+                placeholder={t('organizational_unit.no_children', 'hr') || 'لا توجد وحدات فرعية'}
                 disabled={disabled}
               />
             </div>
@@ -130,7 +130,7 @@ export function OrganizationalUnitTreeSelect({
               disabled={disabled}
               className="shrink-0 h-9.5"
             >
-              {disabled ? '' : newLabel}
+              {disabled ? '' : t('organizational_unit.add', 'hr') || 'إضافة'}
             </Button>
           </div>
         </div>
@@ -146,12 +146,12 @@ export function OrganizationalUnitTreeSelect({
             <label className="block text-sm font-medium mb-1">{selectLabel}</label>
             <CustomSelect
               options={children.map(c => ({ value: c.id, label: c.name as string }))}
-              value={currentSelectedId ? String(currentSelectedId) : ''}
+              value={currentSelectedId ?? ''}
               onChange={(val) => {
                 const newId = val ? Number(val) : (parentId === 0 ? undefined : parentId);
                 onChange(newId);
               }}
-              placeholder="اختر..."
+              placeholder={t('organizational_unit.choose', 'hr') || 'اختر...'}
               disabled={disabled}
             />
           </div>
@@ -167,7 +167,7 @@ export function OrganizationalUnitTreeSelect({
             disabled={disabled}
             className="shrink-0 h-9.5"
           >
-            {disabled ? '' : newLabel}
+            {disabled ? '' : t('organizational_unit.add', 'hr') || 'إضافة'}
           </Button>
         </div>
       </div>
@@ -193,14 +193,15 @@ export function OrganizationalUnitTreeSelect({
 
       {error && <p className="text-danger text-xs">{error}</p>}
 
-      <Dialog isOpen={isCreateDialogOpen} onClose={() => setIsCreateDialogOpen(false)} title="إضافة وحدة تنظيمية جديدة" size="md">
+      <Dialog isOpen={isCreateDialogOpen} onClose={() => setIsCreateDialogOpen(false)} title={t('organizational_unit.dialog_title', 'hr') || 'إضافة وحدة تنظيمية جديدة'} size="md">
         <GenericCreateForm
           schema={organizationalLevelFormSchema}
+          fields={[{ name: 'name', label: t('organizational_unit.name', 'hr') || 'الاسم', required: true }]}
           defaultValues={{ parent_id: createParentId }}
           onSubmit={handleCreate}
           onSuccess={() => { }}
           onCancel={() => setIsCreateDialogOpen(false)}
-          submitLabel="إضافة"
+          submitLabel={t('organizational_unit.add', 'hr') || 'إضافة'}
         />
       </Dialog>
     </div>

@@ -4,7 +4,10 @@
     "search": "Search",
     "loading": "Loading...",
     "no_data": "No data available",
-    "filter": "Filter"
+    "filter": "Filter",
+    "delete": "Delete",
+    "select": "Select"
+
   },
   "pagination": {
     "showing": "Showing",
