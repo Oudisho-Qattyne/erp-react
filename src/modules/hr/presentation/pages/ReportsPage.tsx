@@ -22,11 +22,8 @@ export function ReportsPage() {
     await getAllCountries()
     await getAllCities()
     const OL = await getById(1)
-    console.log(OL);
     
   }
-  console.log(countries);
-  console.log(cities);
   useEffect(() => {
     fetchUniversities()
   } , [])

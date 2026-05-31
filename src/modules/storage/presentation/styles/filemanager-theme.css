@@ -1,0 +1,954 @@
+/* ==================== BASE CONTAINER ==================== */
+.wx-willow-theme,
+.wx-willow-dark-theme,
+.dark .wx-willow-theme {
+    --wx-fm-background: var(--color-card, #ffffff) !important;
+    --wx-fm-box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.06),
+        0px 3px 10px rgba(0, 0, 0, 0.12) !important;
+    --wx-fm-border-color: var(--color-border, #dce3dc) !important;
+    --wx-fm-text-color: var(--color-text, #1a2e1a) !important;
+    --wx-fm-muted-color: var(--color-text-muted, #5a7060) !important;
+    --wx-fm-primary: var(--color-primary, #1a6b3c) !important;
+    --wx-fm-primary-dark: var(--color-primary-dark, #0d4a28) !important;
+    --wx-fm-primary-light: var(--color-primary-light, #e8f5ec) !important;
+    --wx-fm-secondary: var(--color-gold, #c9a84c) !important;
+    --wx-fm-secondary-light: var(--color-gold-light, #faf6e8) !important;
+}
+
+/* Dark mode overrides */
+.wx-willow-dark-theme,
+.dark .wx-willow-theme {
+    --wx-fm-background: var(--color-card, #18181b) !important;
+    --wx-fm-border-color: var(--color-border, #27272a) !important;
+    --wx-fm-text-color: var(--color-text, #fafafa) !important;
+    --wx-fm-muted-color: var(--color-text-muted, #a1a1aa) !important;
+    --wx-fm-primary: var(--color-primary, #34d399) !important;
+    --wx-fm-primary-dark: var(--color-primary-dark, #065f46) !important;
+    --wx-fm-primary-light: var(--color-primary-dark, #064e3b) !important;
+    --wx-fm-secondary: var(--color-gold, #fbbf24) !important;
+    --wx-fm-secondary-light: var(--color-gold-dark, #451a03) !important;
+}
+
+.wx-willow-theme,
+.wx-willow-dark-theme,
+.dark .wx-willow-theme {
+  font-family: var(--font-sans, 'Tajawal', sans-serif) !important;
+}
+
+/* استهداف الزر مباشرة باستخدام كلاسات الحاوية الأصلية */
+.wx-filemanager .wx-sidebar .wx-button {
+    background-color: var(--wx-fm-background,#18181b) !important;
+    color: #fff !important;
+}
+.dark .wx-filemanager .wx-sidebar .wx-button {
+    background-color: var(--wx-fm-background, #34d399) !important;
+}
+/* ==================== DELETE DIALOG – CUSTOM LOOK ==================== */
+.wx-willow-theme .wx-window,
+.wx-willow-dark-theme .wx-window,
+.dark .wx-willow-theme .wx-window {
+    background-color: var(--color-card) !important;
+    border-radius: 0.75rem !important;
+    border: 1px solid var(--color-border) !important;
+    box-shadow: var(--wx-fm-box-shadow) !important;
+    color: var(--color-text) !important;
+    direction: rtl;
+    font-family: var(--font-sans, inherit) !important;
+    width: 100%;
+    max-width: 24rem;
+    margin: 0 auto;
+}
+
+/* Header – matches Dialog title */
+.wx-willow-theme .wx-window .wx-header,
+.wx-willow-dark-theme .wx-window .wx-header,
+.dark .wx-willow-theme .wx-window .wx-header {
+    border-bottom: 1px solid var(--color-border) !important;
+    padding: 1rem 1.5rem !important;
+    font-weight: 700 !important;
+    font-size: 1.125rem !important;
+    background-color: var(--color-card) !important;
+    color: var(--color-text) !important;
+}
+
+/* Body – style the list of items to look like a simple message */
+.wx-willow-theme .wx-window .wx-list,
+.wx-willow-dark-theme .wx-window .wx-list,
+.dark .wx-willow-theme .wx-window .wx-list {
+    padding: 1rem 1.5rem !important;
+    margin: 0 !important;
+    list-style: none !important;
+    font-size: 0.875rem !important;
+    color: var(--color-text) !important;
+    border-bottom: 0 !important;
+    background-color: var(--color-card) !important;
+}
+
+/* Hide the bullet points and style each list item as separate paragraph */
+.wx-willow-theme .wx-window .wx-list li,
+.wx-willow-dark-theme .wx-window .wx-list li,
+.dark .wx-willow-theme .wx-window .wx-list li {
+    padding: 0 !important;
+    margin: 0 0 0.5rem 0 !important;
+    border-bottom: none !important;
+    background: transparent !important;
+    font-family: inherit;
+}
+
+/* Footer buttons container – matches custom dialog button row */
+.wx-willow-theme .wx-window .wx-buttons,
+.wx-willow-dark-theme .wx-window .wx-buttons,
+.dark .wx-willow-theme .wx-window .wx-buttons {
+    border-top: 1px solid var(--color-border) !important;
+    padding: 0.75rem 1.5rem !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 0.5rem !important;
+    background-color: var(--color-card) !important;
+}
+
+/* Button base styling – matches Button component */
+.wx-willow-theme .wx-window .wx-button,
+.wx-willow-dark-theme .wx-window .wx-button,
+.dark .wx-willow-theme .wx-window .wx-button {
+    border-radius: 0.375rem !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    font-family: inherit !important;
+    border: none !important;
+}
+
+/* Cancel button – variant="outline" */
+.wx-willow-theme .wx-window .wx-button.wx-secondary,
+.wx-willow-dark-theme .wx-window .wx-button.wx-secondary,
+.dark .wx-willow-theme .wx-window .wx-button.wx-secondary {
+    background-color: transparent !important;
+    border: 1px solid var(--color-border) !important;
+    color: var(--color-text-muted) !important;
+}
+
+.wx-willow-theme .wx-window .wx-button.wx-secondary:hover,
+.wx-willow-dark-theme .wx-window .wx-button.wx-secondary:hover,
+.dark .wx-willow-theme .wx-window .wx-button.wx-secondary:hover {
+    background-color: var(--color-secondary-light) !important;
+    border-color: var(--color-secondary) !important;
+    color: var(--color-text) !important;
+}
+
+/* Confirm button – variant="primary" */
+.wx-willow-theme .wx-window .wx-button.wx-primary,
+.wx-willow-dark-theme .wx-window .wx-button.wx-primary,
+.dark .wx-willow-theme .wx-window .wx-button.wx-primary {
+    background-color: var(--color-primary) !important;
+    color: white !important;
+}
+
+.wx-willow-theme .wx-window .wx-button.wx-primary:hover,
+.wx-willow-dark-theme .wx-window .wx-button.wx-primary:hover,
+.dark .wx-willow-theme .wx-window .wx-button.wx-primary:hover {
+    background-color: var(--color-primary-dark) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* (Optional) !important If the library uses a danger class for delete, style it accordingly */
+.wx-willow-theme .wx-window .wx-button.wx-danger,
+.wx-willow-dark-theme .wx-window .wx-button.wx-danger,
+.dark .wx-willow-theme .wx-window .wx-button.wx-danger {
+    background-color: var(--color-danger) !important;
+    color: white !important;
+}
+
+.wx-willow-theme .wx-window .wx-button.wx-danger:hover,
+.wx-willow-dark-theme .wx-window .wx-button.wx-danger:hover,
+.dark .wx-willow-theme .wx-window .wx-button.wx-danger:hover {
+    background-color: #b91c1c !important;
+}
+
+/* filemanager-theme.css – Full SVAR File Manager theme integration */
+
+
+/* ==================== GLOBAL OVERRIDES ==================== */
+.wx-willow-theme,
+.wx-willow-dark-theme,
+.dark .wx-willow-theme {
+    font-family: var(--font-sans, inherit) !important;
+    background-color: var(--wx-fm-background) !important;
+}
+
+/* Toolbar */
+.wx-willow-theme .wx-toolbar,
+.wx-willow-dark-theme .wx-toolbar,
+.dark .wx-willow-theme .wx-toolbar {
+    background-color: var(--wx-fm-background) !important;
+    border-bottom: 1px solid var(--wx-fm-border-color) !important;
+    padding: 0.5rem;
+}
+
+/* Toolbar buttons (including segmented mode selector) !important */
+.wx-willow-theme .wx-toolbar .wx-button,
+.wx-willow-dark-theme .wx-toolbar .wx-button,
+.dark .wx-willow-theme .wx-toolbar .wx-button {
+    background: transparent;
+    color: var(--wx-fm-text-color) !important;
+    border: 1px solid var(--wx-fm-border-color) !important;
+    border-radius: 0.375rem;
+    transition: all 0.2s;
+}
+
+.wx-willow-theme .wx-toolbar .wx-button:hover,
+.wx-willow-dark-theme .wx-toolbar .wx-button:hover,
+.dark .wx-willow-theme .wx-toolbar .wx-button:hover {
+    background-color: var(--wx-fm-primary-light) !important;
+    border-color: var(--wx-fm-primary) !important;
+    color: var(--wx-fm-primary) !important;
+}
+
+/* Segmented buttons (view mode) !important */
+.wx-willow-theme .wx-segmented .wx-segment,
+.wx-willow-dark-theme .wx-segmented .wx-segment,
+.dark .wx-willow-theme .wx-segmented .wx-segment {
+    background-color: var(--wx-fm-background) !important;
+    border: 1px solid var(--wx-fm-border-color) !important;
+    color: var(--wx-fm-text-color) !important;
+}
+
+.wx-willow-theme .wx-segmented .wx-segment.wx-selected,
+.wx-willow-dark-theme .wx-segmented .wx-segment.wx-selected,
+.dark .wx-willow-theme .wx-segmented .wx-segment.wx-selected {
+    background-color: var(--wx-fm-primary) !important;
+    border-color: var(--wx-fm-primary) !important;
+    color: white;
+}
+
+.wx-willow-theme .wx-segmented .wx-segment:first-child,
+.wx-willow-dark-theme .wx-segmented .wx-segment:first-child,
+.dark .wx-willow-theme .wx-segmented .wx-segment:first-child {
+    border-radius: 0.375rem 0 0 0.375rem;
+}
+
+.wx-willow-theme .wx-segmented .wx-segment:last-child,
+.wx-willow-dark-theme .wx-segmented .wx-segment:last-child,
+.dark .wx-willow-theme .wx-segmented .wx-segment:last-child {
+    border-radius: 0 0.375rem 0.375rem 0;
+}
+
+/* Search input */
+.wx-willow-theme .wx-search-input,
+.wx-willow-dark-theme .wx-search-input,
+.dark .wx-willow-theme .wx-search-input {
+    background-color: var(--wx-fm-background) !important;
+    border: 1px solid var(--wx-fm-border-color) !important;
+    border-radius: 0.375rem;
+    color: var(--wx-fm-text-color) !important;
+}
+
+.wx-willow-theme .wx-search-input input,
+.wx-willow-dark-theme .wx-search-input input,
+.dark .wx-willow-theme .wx-search-input input {
+    background: transparent;
+    color: var(--wx-fm-text-color) !important;
+}
+
+.wx-willow-theme .wx-search-input .wx-icon,
+.wx-willow-dark-theme .wx-search-input .wx-icon,
+.dark .wx-willow-theme .wx-search-input .wx-icon {
+    color: var(--wx-fm-muted-color) !important;
+}
+
+/* ==================== SIDEBAR & TREE ==================== */
+.wx-willow-theme .wx-sidebar,
+.wx-willow-dark-theme .wx-sidebar,
+.dark .wx-willow-theme .wx-sidebar {
+    background-color: var(--wx-fm-background) !important;
+    border-right: 1px solid var(--wx-fm-border-color) !important;
+    
+}
+
+.wx-willow-theme .wx-tree ul li,
+.wx-willow-dark-theme .wx-tree ul li,
+.dark .wx-willow-theme .wx-tree ul li {
+    color: var(--wx-fm-text-color) !important;
+
+}
+
+.wx-willow-theme .wx-tree .wx-folder.wx-selected,
+.wx-willow-dark-theme .wx-tree .wx-folder.wx-selected,
+.dark .wx-willow-theme .wx-tree .wx-folder.wx-selected {
+    background-color: var(--wx-fm-primary-light) !important;
+    border-right: 2px solid var(--wx-fm-primary) !important;
+    color: var(--color-white) !important;
+
+    
+}
+
+.wx-willow-theme .wx-tree .wx-folder:hover,
+.wx-willow-dark-theme .wx-tree .wx-folder:hover,
+.dark .wx-willow-theme .wx-tree .wx-folder:hover {
+    color: var(--color-white) !important;
+    background-color: var(--wx-fm-secondary-light) !important;
+    
+}
+
+/* "Add new" button in sidebar */
+.wx-willow-theme .wx-sidebar .wx-button.wx-primary,
+.wx-willow-dark-theme .wx-sidebar .wx-button.wx-primary,
+.dark .wx-willow-theme .wx-sidebar .wx-button.wx-primary {
+    background-color: var(--wx-fm-primary) !important;
+    color: white;
+    border: none;
+    margin-bottom: 0.75rem;
+}
+
+.wx-willow-theme .wx-sidebar .wx-button.wx-primary:hover,
+.wx-willow-dark-theme .wx-sidebar .wx-button.wx-primary:hover,
+.dark .wx-willow-theme .wx-sidebar .wx-button.wx-primary:hover {
+    background-color: var(--wx-fm-primary-dark) !important;
+}
+
+
+
+/* ==================== TREE BACKGROUND FIX ==================== */
+/* تأكيد أن الشجرة بأكملها ترث الخلفية من المتغيرات */
+.wx-willow-theme .wx-tree,
+.wx-willow-dark-theme .wx-tree,
+.dark .wx-willow-theme .wx-tree {
+    background-color: var(--wx-fm-background) !important;
+}
+
+/* عناصر القائمة داخل الشجرة */
+.wx-willow-theme .wx-tree ul li,
+.wx-willow-dark-theme .wx-tree ul li,
+.dark .wx-willow-theme .wx-tree ul li {
+    background-color: transparent !important; /* خلفية شفافة لتوريث لون الشجرة */
+    color: var(--wx-fm-text-color) !important;
+}
+
+/* حالة التحديد hover/selected تبقى كما هي */
+.wx-willow-theme .wx-tree .wx-folder.wx-selected,
+.wx-willow-dark-theme .wx-tree .wx-folder.wx-selected,
+.dark .wx-willow-theme .wx-tree .wx-folder.wx-selected {
+    background-color: var(--wx-fm-primary-light) !important;
+    border-right: 2px solid var(--wx-fm-primary) !important;
+}
+
+.wx-willow-theme .wx-tree .wx-folder:hover,
+.wx-willow-dark-theme .wx-tree .wx-folder:hover,
+.dark .wx-willow-theme .wx-tree .wx-folder:hover {
+    background-color: var(--wx-fm-secondary-light) !important;
+    color: var(--color-white) !important; /* يمكن تعديله لو لم يتوفر المتغير */
+}
+
+/* ==================== BREADCRUMBS ==================== */
+.wx-willow-theme .wx-breadcrumbs,
+.wx-willow-dark-theme .wx-breadcrumbs,
+.dark .wx-willow-theme .wx-breadcrumbs {
+    background-color: var(--wx-fm-background) !important;
+    border-bottom: 1px solid var(--wx-fm-border-color) !important;
+    padding: 0.5rem 1rem;
+}
+
+.wx-willow-theme .wx-breadcrumbs .wx-item,
+.wx-willow-dark-theme .wx-breadcrumbs .wx-item,
+.dark .wx-willow-theme .wx-breadcrumbs .wx-item {
+    color: var(--wx-fm-text-color) !important;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.wx-willow-theme .wx-breadcrumbs .wx-item:not(:last-child):after,
+.wx-willow-dark-theme .wx-breadcrumbs .wx-item:not(:last-child):after,
+.dark .wx-willow-theme .wx-breadcrumbs .wx-item:not(:last-child):after {
+    color: var(--wx-fm-muted-color) !important;
+}
+
+.wx-willow-theme .wx-breadcrumbs .wx-item:hover,
+.wx-willow-dark-theme .wx-breadcrumbs .wx-item:hover,
+.dark .wx-willow-theme .wx-breadcrumbs .wx-item:hover {
+    color: var(--wx-fm-secondary) !important;
+    text-decoration: underline;
+}
+
+/* Refresh icon */
+.wx-willow-theme .wx-refresh-icon .wx-icon,
+.wx-willow-dark-theme .wx-refresh-icon .wx-icon,
+.dark .wx-willow-theme .wx-refresh-icon .wx-icon {
+    color: var(--wx-fm-text-color) !important;
+}
+
+.wx-willow-theme .wx-refresh-icon .wx-icon:hover,
+.wx-willow-dark-theme .wx-refresh-icon .wx-icon:hover,
+.dark .wx-willow-theme .wx-refresh-icon .wx-icon:hover {
+    color: var(--wx-fm-primary) !important;
+}
+
+/* ==================== FILES GRID (CARD VIEW) !important ==================== */
+.wx-willow-theme .wx-cards,
+.wx-willow-dark-theme .wx-cards,
+.dark .wx-willow-theme .wx-cards {
+    background-color: var(--wx-fm-background) !important;
+}
+
+.wx-willow-theme .wx-cards .wx-item,
+.wx-willow-dark-theme .wx-cards .wx-item,
+.dark .wx-willow-theme .wx-cards .wx-item {
+    background-color: var(--wx-fm-background) !important;
+    border: 1px solid var(--wx-fm-border-color) !important;
+    border-radius: 0.75rem;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.wx-willow-theme .wx-cards .wx-item:hover,
+.wx-willow-dark-theme .wx-cards .wx-item:hover,
+.dark .wx-willow-theme .wx-cards .wx-item:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    border-color: var(--wx-fm-primary) !important;
+    
+}
+
+.wx-willow-theme .wx-cards .wx-item.wx-selected,
+.wx-willow-dark-theme .wx-cards .wx-item.wx-selected,
+.dark .wx-willow-theme .wx-cards .wx-item.wx-selected {
+    background-color: var(--wx-fm-primary-light) !important;
+    border: 2px solid var(--wx-fm-primary) !important;
+    
+
+}
+
+.wx-willow-theme .wx-cards .wx-folder-name,
+.wx-willow-dark-theme .wx-cards .wx-folder-name,
+.dark .wx-willow-theme .wx-cards .wx-folder-name {
+    color: var(--wx-fm-text-color) !important;
+    
+}
+
+.wx-willow-theme .wx-cards .wx-type,
+.wx-willow-dark-theme .wx-cards .wx-type,
+.dark .wx-willow-theme .wx-cards .wx-type {
+    color: var(--wx-fm-muted-color) !important;
+    font-size: 0.7rem;
+}
+
+.wx-willow-theme .wx-cards .wx-name,
+.wx-willow-dark-theme .wx-cards .wx-name,
+.dark .wx-willow-theme .wx-cards .wx-name {
+    font-weight: 500;
+    color: var(--color-text-muted);
+}
+
+/* Folder / file icons */
+.wx-willow-theme .wxi-folder,
+.wx-willow-dark-theme .wxi-folder,
+.dark .wx-willow-theme .wxi-folder {
+    color: var(--wx-fm-secondary) !important
+}
+
+.wx-willow-theme .wx-file-icon,
+.wx-willow-dark-theme .wx-file-icon,
+.dark .wx-willow-theme .wx-file-icon {
+    color: var(--wx-fm-muted-color) !important;
+}
+
+/* ==================== CONTEXT MENU ==================== */
+.wx-willow-theme .wx-context-menu,
+.wx-willow-dark-theme .wx-context-menu,
+.dark .wx-willow-theme .wx-context-menu {
+    background-color: var(--wx-fm-background) !important;
+    border: 1px solid var(--wx-fm-border-color) !important;
+    border-radius: 0.5rem;
+    box-shadow: var(--wx-fm-box-shadow) !important;
+}
+
+.wx-willow-theme .wx-context-menu .wx-menu-item,
+.wx-willow-dark-theme .wx-context-menu .wx-menu-item,
+.dark .wx-willow-theme .wx-context-menu .wx-menu-item {
+    color: var(--wx-fm-text-color) !important;
+    padding: 0.5rem 1rem;
+}
+
+.wx-willow-theme .wx-context-menu .wx-menu-item:hover,
+.wx-willow-dark-theme .wx-context-menu .wx-menu-item:hover,
+.dark .wx-willow-theme .wx-context-menu .wx-menu-item:hover {
+    background-color: var(--wx-fm-primary-light) !important;
+    color: var(--wx-fm-primary) !important;
+}
+
+/* ==================== DIALOGS (delete, etc.) !important ==================== */
+.wx-willow-theme .wx-window,
+.wx-willow-dark-theme .wx-window,
+.dark .wx-willow-theme .wx-window {
+    background-color: var(--wx-fm-background) !important;
+    border-radius: 0.75rem !important;
+    border: 1px solid var(--wx-fm-border-color) !important;
+    box-shadow: var(--wx-fm-box-shadow) !important;
+    color: var(--wx-fm-text-color) !important;
+    direction: rtl;
+}
+
+.wx-willow-theme .wx-window .wx-header,
+.wx-willow-dark-theme .wx-window .wx-header,
+.dark .wx-willow-theme .wx-window .wx-header {
+    border-bottom: 1px solid var(--wx-fm-border-color) !important;
+    padding: 1rem 1.5rem !important;
+    font-weight: 700 !important;
+    font-size: 1.125rem !important;
+    background-color: var(--wx-fm-background) !important;
+    color: var(--wx-fm-text-color) !important;
+}
+
+.wx-willow-theme .wx-window .wx-list,
+.wx-willow-dark-theme .wx-window .wx-list,
+.dark .wx-willow-theme .wx-window .wx-list {
+    padding: 1rem 1.5rem !important;
+    font-size: 0.875rem !important;
+    color: var(--wx-fm-text-color) !important;
+}
+
+.wx-willow-theme .wx-window .wx-list li,
+.wx-willow-dark-theme .wx-window .wx-list li,
+.dark .wx-willow-theme .wx-window .wx-list li {
+    border-bottom: 1px solid var(--wx-fm-border-color) !important;
+    padding: 0.5rem 0 !important;
+}
+
+.wx-willow-theme .wx-window .wx-buttons,
+.wx-willow-dark-theme .wx-window .wx-buttons,
+.dark .wx-willow-theme .wx-window .wx-buttons {
+    border-top: 1px solid var(--wx-fm-border-color) !important;
+    padding: 0.75rem 1.5rem !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 0.5rem !important;
+    background-color: var(--wx-fm-background) !important;
+}
+
+.wx-willow-theme .wx-window .wx-button,
+.wx-willow-dark-theme .wx-window .wx-button,
+.dark .wx-willow-theme .wx-window .wx-button {
+    border-radius: 0.375rem !important;
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.wx-willow-theme .wx-window .wx-button.wx-secondary,
+.wx-willow-dark-theme .wx-window .wx-button.wx-secondary,
+.dark .wx-willow-theme .wx-window .wx-button.wx-secondary {
+    background-color: transparent !important;
+    border: 1px solid var(--wx-fm-border-color) !important;
+    color: var(--wx-fm-muted-color) !important;
+}
+
+.wx-willow-theme .wx-window .wx-button.wx-secondary:hover,
+.wx-willow-dark-theme .wx-window .wx-button.wx-secondary:hover,
+.dark .wx-willow-theme .wx-window .wx-button.wx-secondary:hover {
+    background-color: var(--wx-fm-secondary-light) !important;
+    border-color: var(--wx-fm-secondary) !important;
+    color: var(--wx-fm-text-color) !important;
+}
+
+.wx-willow-theme .wx-window .wx-button.wx-primary,
+.wx-willow-dark-theme .wx-window .wx-button.wx-primary,
+.dark .wx-willow-theme .wx-window .wx-button.wx-primary {
+    background-color: var(--wx-fm-primary) !important;
+    border: none !important;
+    color: white !important;
+}
+
+.wx-willow-theme .wx-window .wx-button.wx-primary:hover,
+.wx-willow-dark-theme .wx-window .wx-button.wx-primary:hover,
+.dark .wx-willow-theme .wx-window .wx-button.wx-primary:hover {
+    background-color: var(--wx-fm-primary-dark) !important;
+}
+
+/* ==================== MISC ==================== */
+/* Scrollbars */
+.wx-willow-theme ::-webkit-scrollbar,
+.wx-willow-dark-theme ::-webkit-scrollbar,
+.dark .wx-willow-theme ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.wx-willow-theme ::-webkit-scrollbar-track,
+.wx-willow-dark-theme ::-webkit-scrollbar-track,
+.dark .wx-willow-theme ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.wx-willow-theme ::-webkit-scrollbar-thumb,
+.wx-willow-dark-theme ::-webkit-scrollbar-thumb,
+.dark .wx-willow-theme ::-webkit-scrollbar-thumb {
+    background-color: var(--wx-fm-border-color) !important;
+    border-radius: 3px;
+}
+
+.wx-willow-theme ::-webkit-scrollbar-thumb:hover,
+.wx-willow-dark-theme ::-webkit-scrollbar-thumb:hover,
+.dark .wx-willow-theme ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--wx-fm-primary) !important;
+}
+
+/* Loading overlay */
+.wx-willow-theme .wx-upload-area,
+.wx-willow-dark-theme .wx-upload-area,
+.dark .wx-willow-theme .wx-upload-area {
+    background-color: var(--wx-fm-background) !important;
+}
+
+
+/* ==================== أزرار تغيير وضع العرض (Segmented) ==================== */
+/* استهداف مباشر بدون الاعتماد على wx-willow-theme */
+.wx-filemanager .wx-segmented .wx-segment {
+    background-color: var(--color-card, #ffffff) !important;
+    border: 1px solid var(--color-border, #dce3dc) !important;
+    color: var(--color-text-muted, #5a7060) !important;
+    transition: all 0.2s ease;
+}
+
+/* حالة التحديد (selected) */
+.wx-filemanager .wx-segmented .wx-segment.wx-selected {
+    background-color: var(--color-primary, #1a6b3c) !important;
+    border-color: var(--color-primary, #1a6b3c) !important;
+    color: #ffffff !important;
+}
+
+/* حالة hover */
+.wx-filemanager .wx-segmented .wx-segment:hover:not(.wx-selected) {
+    background-color: var(--color-primary-light, #e8f5ec) !important;
+    color: var(--color-primary, #1a6b3c) !important;
+}
+
+/* ==================== الوضع الداكن ==================== */
+/* عندما يضاف كلاس dark للـ body أو أي عنصر أب */
+.dark .wx-filemanager .wx-segmented .wx-segment {
+    background-color: var(--color-card, #18181b) !important;
+    border-color: var(--color-border, #27272a) !important;
+    color: var(--color-text-muted, #a1a1aa) !important;
+}
+
+.dark .wx-filemanager .wx-segmented .wx-segment.wx-selected {
+    background-color: var(--color-primary, #34d399) !important;
+    border-color: var(--color-primary, #34d399) !important;
+    color: #000000 !important;
+}
+
+.dark .wx-filemanager .wx-segmented .wx-segment:hover:not(.wx-selected) {
+    background-color: var(--color-primary-dark, #064e3b) !important;
+    color: var(--color-primary, #34d399) !important;
+}
+
+
+/* ==================== TABLE (SEQUENTIAL VIEW) – FINAL FIXED THEME ==================== */
+
+/* --- Container --- */
+.wx-filemanager .wx-table-box {
+    background-color: var(--color-card, #ffffff) !important;
+    border: 1px solid var(--color-border, #dce3dc) !important;
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+  
+  /* --- Header --- */
+  .wx-filemanager .wx-header-wrapper {
+    background-color: var(--color-background, #f2f4f3) !important;
+    border-bottom: 2px solid var(--color-border, #dce3dc) !important;
+  }
+  .wx-filemanager .wx-header .wx-h-row {
+    display: flex;
+  }
+  .wx-filemanager .wx-cell {
+    padding: 0.5rem 0.75rem !important;
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #5a7060) !important;
+    background-color: var(--color-card, #ffffff) !important;
+    border-left: 1px solid var(--color-border, #dce3dc) !important;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .wx-filemanager .wx-cell:last-child {
+    border-left: none !important;
+  }
+  
+  /* Grip & sort */
+  .wx-filemanager .wx-grip {
+    background: transparent;
+    cursor: col-resize;
+    width: 5px;
+  }
+  .wx-filemanager .wx-sort {
+    color: var(--color-text-light, #8fa898);
+    font-size: 0.7rem;
+    margin-left: 0.25rem;
+  }
+  
+  /* --- Data rows (base) --- */
+  .wx-filemanager .wx-row {
+    border-bottom: 1px solid var(--color-border, #dce3dc) !important;
+    transition: background-color 0.15s;
+    background-color: var(--color-card, #ffffff);
+  }
+  .wx-filemanager .wx-row:last-child {
+    border-bottom: none !important;
+  }
+  
+  /* ===== HOVER – now applied to cells so it’s visible ===== */
+  .wx-filemanager .wx-table-box .wx-body .wx-data .wx-row:hover {
+    background-color: var(--color-primary-light, #e8f5ec) !important;
+  }
+  .wx-filemanager .wx-table-box .wx-body .wx-data .wx-row:hover .wx-cell {
+    background-color: var(--color-primary-light, #e8f5ec) !important;
+  }
+  
+  /* --- Selected row --- */
+  .wx-filemanager .wx-row.wx-selected {
+    background-color: var(--color-primary-light, #e8f5ec) !important;
+  }
+  .wx-filemanager .wx-row.wx-selected .wx-cell {
+    background-color: var(--color-primary-light, #e8f5ec) !important;
+    color: var(--color-text, #1a2e1a) !important;
+  }
+  .wx-filemanager .wx-row.wx-selected .wxi-folder {
+    color: var(--color-gold, #c9a84c) !important;
+  }
+  
+  /* --- Name cell --- */
+  .wx-filemanager .wx-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .wx-filemanager .wx-name-cell .wxi-folder {
+    color: var(--color-gold, #c9a84c) !important;
+  }
+  .wx-filemanager .wx-name-cell img.wx-icon {
+    width: 20px;
+    height: 20px;
+  }
+  .wx-filemanager .wx-name-cell .wx-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* --- Back to parent row --- */
+  .wx-filemanager .wx-row[data-id=":/wx-filemanager-parent-link"] {
+    background-color: var(--color-card, #ffffff) !important;
+    color: var(--color-text-muted, #5a7060) !important;
+  }
+  .wx-filemanager .wx-row[data-id=":/wx-filemanager-parent-link"]:hover {
+    background-color: var(--color-primary-light, #e8f5ec) !important;
+  }
+  .wx-filemanager .wx-row[data-id=":/wx-filemanager-parent-link"]:hover .wx-cell {
+    background-color: var(--color-primary-light, #e8f5ec) !important;
+    color: var(--color-primary, #1a6b3c) !important;
+  }
+  
+  /* --- Body & scrollbar --- */
+  .wx-filemanager .wx-body {
+    background-color: var(--color-card, #ffffff) !important;
+  }
+  .wx-filemanager .wx-data {
+    background-color: transparent !important;
+  }
+  .wx-filemanager .wx-scroll::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .wx-filemanager .wx-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .wx-filemanager .wx-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--color-border, #dce3dc);
+    border-radius: 3px;
+  }
+  .wx-filemanager .wx-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-primary, #1a6b3c);
+  }
+  
+  /* ==================== DARK MODE ==================== */
+  .dark .wx-filemanager .wx-table-box {
+    background-color: var(--color-card, #18181b) !important;
+    border-color: var(--color-border, #27272a) !important;
+  }
+  .dark .wx-filemanager .wx-header-wrapper {
+    background-color: var(--color-background, #09090b) !important;
+    border-bottom-color: var(--color-border, #27272a) !important;
+  }
+  .dark .wx-filemanager .wx-cell {
+    color: var(--color-text-muted, #a1a1aa) !important;
+    background-color: var(--color-card, #18181b) !important;
+    border-left-color: var(--color-border, #27272a) !important;
+  }
+  .dark .wx-filemanager .wx-row {
+    border-bottom-color: var(--color-border, #27272a) !important;
+    background-color: var(--color-card, #18181b);
+  }
+  
+  /* Dark hover */
+  .dark .wx-filemanager .wx-table-box .wx-body .wx-data .wx-row:hover {
+    background-color: var(--color-primary-dark, #064e3b) !important;
+  }
+  .dark .wx-filemanager .wx-table-box .wx-body .wx-data .wx-row:hover .wx-cell {
+    background-color: var(--color-primary-dark, #064e3b) !important;
+  }
+  
+  /* Dark selected */
+  .dark .wx-filemanager .wx-row.wx-selected {
+    background-color: var(--color-primary-dark, #064e3b) !important;
+  }
+  .dark .wx-filemanager .wx-row.wx-selected .wx-cell {
+    background-color: var(--color-primary-dark, #064e3b) !important;
+    color: var(--color-text, #fafafa) !important;
+  }
+  .dark .wx-filemanager .wx-row.wx-selected .wxi-folder {
+    color: var(--color-gold, #fbbf24) !important;
+  }
+  
+  .dark .wx-filemanager .wx-body {
+    background-color: var(--color-card, #18181b) !important;
+  }
+  .dark .wx-filemanager .wx-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--color-border, #27272a);
+  }
+  .dark .wx-filemanager .wx-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-primary, #34d399);
+  }
+
+
+  /* ==================== INFO PANEL (RIGHT SIDEBAR) ==================== */
+.wx-willow-theme .wx-info-panel,
+.wx-willow-dark-theme .wx-info-panel,
+.dark .wx-willow-theme .wx-info-panel {
+    background-color: var(--color-card) !important;
+    border-left: 1px solid var(--color-border) !important;
+    padding: 1rem;
+    color: var(--color-text) !important;
+}
+
+.wx-willow-theme .wx-info-panel .wx-title,
+.wx-willow-dark-theme .wx-info-panel .wx-title,
+.dark .wx-willow-theme .wx-info-panel .wx-title {
+    font-weight: 700;
+    font-size: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 1rem;
+}
+
+.wx-willow-theme .wx-info-panel .wx-list,
+.wx-willow-dark-theme .wx-info-panel .wx-list,
+.dark .wx-willow-theme .wx-info-panel .wx-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.wx-willow-theme .wx-info-panel .wx-name,
+.wx-willow-dark-theme .wx-info-panel .wx-name,
+.dark .wx-willow-theme .wx-info-panel .wx-name {
+    font-weight: 600;
+    color: var(--color-text-muted);
+    display: inline-block;
+    width: 5rem;
+}
+
+.wx-willow-theme .wx-info-panel .wx-value,
+.wx-willow-dark-theme .wx-info-panel .wx-value,
+.dark .wx-willow-theme .wx-info-panel .wx-value {
+    color: var(--color-text);
+}
+
+/* ==================== PREVIEW PANEL (FILE PREVIEW) ==================== */
+.wx-willow-theme .wx-preview,
+.wx-willow-dark-theme .wx-preview,
+.dark .wx-willow-theme .wx-preview {
+    /* background-color: var(--color-card) !important; */
+    /* border: 1px solid var(--color-border) !important; */
+    border-radius: 0.5rem;
+    padding: 0;
+    overflow: hidden;
+    /* box-shadow: var(--wx-fm-box-shadow); */
+}
+
+.wx-willow-theme .wx-preview .wx-toolbar,
+.wx-willow-dark-theme .wx-preview .wx-toolbar,
+.dark .wx-willow-theme .wx-preview .wx-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: var(--color-secondary-light);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.wx-willow-theme .wx-preview .wx-name,
+.wx-willow-dark-theme .wx-preview .wx-name,
+.dark .wx-willow-theme .wx-preview .wx-name {
+    font-weight: 600;
+    color: var(--color-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wx-willow-theme .wx-preview .wx-icons,
+.wx-willow-dark-theme .wx-preview .wx-icons,
+.dark .wx-willow-theme .wx-preview .wx-icons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.wx-willow-theme .wx-preview .wx-icons .wx-icon,
+.wx-willow-dark-theme .wx-preview .wx-icons .wx-icon,
+.dark .wx-willow-theme .wx-preview .wx-icons .wx-icon {
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.wx-willow-theme .wx-preview .wx-icons .wx-icon:hover,
+.wx-willow-dark-theme .wx-preview .wx-icons .wx-icon:hover,
+.dark .wx-willow-theme .wx-preview .wx-icons .wx-icon:hover {
+    color: var(--color-primary);
+}
+
+.wx-willow-theme .wx-preview .wx-icon-wrapper,
+.wx-willow-dark-theme .wx-preview .wx-icon-wrapper,
+.dark .wx-willow-theme .wx-preview .wx-icon-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: var(--color-background);
+    min-height: 200px;
+}
+
+.wx-willow-theme .wx-preview img,
+.wx-willow-dark-theme .wx-preview img,
+.dark .wx-willow-theme .wx-preview img {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 0.25rem;
+}
+
+/* Dark mode overrides for preview */
+.dark .wx-willow-theme .wx-preview .wx-toolbar,
+.dark .wx-willow-dark-theme .wx-preview .wx-toolbar {
+    background-color: var(--color-primary-dark);
+}
+
+.dark .wx-willow-theme .wx-preview .wx-icon-wrapper,
+.dark .wx-willow-dark-theme .wx-preview .wx-icon-wrapper {
+    background-color: var(--color-background);
+}

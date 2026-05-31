@@ -14,6 +14,7 @@ const usersModule: Module = {
       label: 'Auth',
       nav: false,
       moduleName: 'auth',
+      requiresAuth:false
     },
   
   ],

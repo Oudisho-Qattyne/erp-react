@@ -270,7 +270,6 @@ export function FormInput<T extends FieldValues>({
 //     }
 //     localValue = newItem as string;
 //     setLocalOptions(prev => [...prev, { value: newValue, label: localValue }]);
-//     console.log(newValue, newItem);
 //     setIsDialogOpen(false);
 //   };
 
