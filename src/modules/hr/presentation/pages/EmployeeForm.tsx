@@ -44,6 +44,8 @@ export const EMPLOYEE_EMPTY_DEFAULTS: EmployeeFormValues = {
   blood_type: 'A+',
   phone_number: '',
   sham_cash_account: '',
+  residence_country_id: 0,
+  residence_city_id: 0,
   residence_region_id: 0,
   residential_area_details: '',
   civil_registry_record: '',

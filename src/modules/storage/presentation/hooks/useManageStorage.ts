@@ -20,6 +20,7 @@ export interface UseManageStorageReturn {
     uploadFile: (parentId: string, file: File, isSecure: boolean, name: string, api: any) => Promise<void>;
     deleteFolder: (id: string) => Promise<void>;
     deleteFile: (id: string) => Promise<void>;
+    getItemById: (id:string) => Promise<void>;
     renameFolder: (id: string, name: string) => Promise<void>;
     clearError: () => void;
 }
@@ -98,6 +99,7 @@ export const useManageStorage = (): UseManageStorageReturn => {
         try {
             const res = await useCase.getFolderContentsByPath(path);
             //   setData(res.data);
+            
 
             api.exec("provide-data", { data: res.data, id: path });
         } catch (err: any) {
@@ -310,6 +312,43 @@ export const useManageStorage = (): UseManageStorageReturn => {
             setLoading(false);
         }
     }, [useCase, language]);
+
+    const getItemById = useCallback(async (id: string) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const res = await useCase.getItemById(id);
+            // toast.success(
+            //     language === 'ar'
+            //         ? `تم تغيير الاسم إلى "${name}" بنجاح`
+            //         : `Renamed to "${name}" successfully`
+            // );
+        } catch (err: any) {
+            const errMsg = err.message || `Failed to rename`;
+            switch (err.status) {
+                case 403:
+                    setError("Forbiden");
+                    toast.error(
+                        language === 'ar'
+                            ? "غير مصرح لك بعرض هذا الملف"
+                            : "You are not authorized to rename this item"
+                    );
+                    break;
+                default:
+                    setError(errMsg);
+                    toast.error(
+                        language === 'ar'
+                            ? `فشل عرض الملف: ${errMsg}`
+                            : `Failed to rename: ${errMsg}`
+                    );
+                    break;
+            }
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    }, [useCase, language]);
+    
     return {
         data,
         loading,
@@ -322,6 +361,7 @@ export const useManageStorage = (): UseManageStorageReturn => {
         uploadFile,
         deleteFolder,
         deleteFile,
+        getItemById,
         clearError,
     };
 };

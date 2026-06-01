@@ -103,7 +103,7 @@ export function ShowEmployeePage() {
         <div className="flex-1 text-center md:text-start space-y-2 pt-2">
           <div className="flex flex-col md:flex-row md:items-center gap-3">
             <h1 className="text-2xl md:text-3xl font-bold text-text">
-              {employee.first_name} {employee.father_name ? `${employee.father_name} ` : ''}{employee.last_name}
+              {employee.first_name} {employee.father_name ? `${employee.father_name} ` : ''}{employee.grandfather_name ? `${employee.grandfather_name} ` : ''}{employee.last_name}
             </h1>
             <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full border border-primary/20 self-center md:self-auto">
               {employee.internal_id}
@@ -126,6 +126,12 @@ export function ShowEmployeePage() {
                 <span>{employee.national_id}</span>
               </div>
             )}
+            {employee.created_at && (
+              <div className="flex items-center gap-1.5 bg-background/50 px-3 py-1.5 rounded-lg border border-border/50">
+                <Calendar size={14} className="text-primary" />
+                <span>{employee.created_at}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -141,14 +147,17 @@ export function ShowEmployeePage() {
             </h2>
             <div className="space-y-4">
               <InfoRow label={t('employees.mother_name', 'hr') || 'اسم الأم'} value={employee.mother_name} />
+              <InfoRow label={t('employees.grandfather_name', 'hr') || 'اسم الجد'} value={employee.grandfather_name} />
               <InfoRow label={t('employees.gender', 'hr') || 'الجنس'} value={employee.gender === 'male' ? (t('employees.gender_male', 'hr') || 'ذكر') : employee.gender === 'female' ? (t('employees.gender_female', 'hr') || 'أنثى') : employee.gender} />
               <InfoRow label={t('employees.date_birth', 'hr') || 'تاريخ الميلاد'} value={employee.date_birth} />
               <InfoRow label={t('employees.place_birth', 'hr') || 'مكان الميلاد'} value={employee.place_birth} />
+              <InfoRow label={t('employees.assigned_job', 'hr') || 'العمل المكلف به'} value={employee.assigned_job} />
               <InfoRow label={t('employees.marital_status', 'hr') || 'الحالة الاجتماعية'} value={getMaritalStatus(employee.marital_status, t)} />
               {employee.marital_status === 'married' && (
                 <>
                   <InfoRow label={t('employees.spouse_name', 'hr') || 'اسم الزوج/الزوجة'} value={employee.spouse_name} />
                   <InfoRow label={t('employees.spouse_workplace', 'hr') || 'جهة عمل الزوج/الزوجة'} value={employee.spouse_workplace} />
+                  <InfoRow label={t('employees.number_of_children', 'hr') || 'عدد الأولاد'} value={employee.number_of_children} />
                 </>
               )}
               <InfoRow label={t('employees.sham_cash_account', 'hr') || 'حساب الشام كاش'} value={employee.sham_cash_account} icon={<CreditCard size={14} />} />
@@ -269,6 +278,26 @@ export function ShowEmployeePage() {
               </div>
             )}
           </div>
+
+          {/* Children Details */}
+          {employee.children && employee.children.length > 0 && (
+            <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border shadow-sm">
+              <h2 className="text-lg font-bold text-text flex items-center gap-2 mb-6 pb-4 border-b border-border/50">
+                <User size={20} className="text-primary" />
+                {t('employees.children', 'hr') || 'الأولاد'}
+              </h2>
+              <div className="space-y-4">
+                {employee.children.map((child, idx) => (
+                  <div key={child.id || idx} className="bg-background/50 border border-border/60 rounded-xl p-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <InfoRow label={t('employees.child_name', 'hr') || 'اسم الابن'} value={child.name} />
+                      <InfoRow label={t('employees.date_birth', 'hr') || 'تاريخ الميلاد'} value={child.birthdate} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

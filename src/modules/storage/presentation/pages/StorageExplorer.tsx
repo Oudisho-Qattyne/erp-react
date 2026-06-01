@@ -25,6 +25,7 @@ export function StorageExplorer() {
         uploadFile,
         deleteFile,
         deleteFolder,
+        getItemById,
         renameFolder,
         error,
         loading,
@@ -90,11 +91,12 @@ export function StorageExplorer() {
       
         return options;
       }, []); // dependencies are stable (setRenameConfirm, setDeleteConfirm)
-      function previewURL(file : FilePreview, width : number , height:number) {
-    
+
+    //   const previewURL = (file: FilePreview) => {
+    //     console.log(file , "preview");
         
-        return ""
-      }
+    //     return (file as any).preview || '';
+    // };
     // File manager initialisation
     const init = useCallback(
         (api: IApi) => {
@@ -218,6 +220,7 @@ export function StorageExplorer() {
 
     };
 
+
     return (
         <div className="h-full">
             <div className="wx-willow-theme">
@@ -232,7 +235,7 @@ export function StorageExplorer() {
                                 hasSelection={selectedItems.length > 0}
                                 hasRenameSelection={selectedItems.filter(i => i.type == "folder").length > 0}
                             />
-                            <Filemanager ref={apiRef} init={init} data={data} menuOptions={customMenuOptions} previews={previewURL} />
+                            <Filemanager ref={apiRef} init={init} data={data} menuOptions={customMenuOptions} />
                             {loading && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-white/50">
                                     <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />

@@ -68,7 +68,7 @@ export function DataMatrixInput({
         errs[rowIndex] = {};
         if (flat?.fieldErrors) {
 
-          for (const [field, messages] of Object.entries(flat?.fieldErrors)) {
+          for (const [field, messages] of Object.entries(flat.fieldErrors)) {
             if (messages.length > 0) {
               errs[rowIndex][field] = messages[0];
             }

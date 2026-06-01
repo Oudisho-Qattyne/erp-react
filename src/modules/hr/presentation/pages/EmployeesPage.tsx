@@ -73,7 +73,7 @@ export function EmployeesPage() {
       key: 'created_at',
       label: t('employees.created_at', 'hr') || 'تاريخ الإنشاء',
       width: 160,
-      render: (row) => new Date(row.created_at).toLocaleDateString('ar-SY'),
+      render: (row) => row.created_at,
       sortable: true,
     },
   ];

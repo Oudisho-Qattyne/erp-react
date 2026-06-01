@@ -94,6 +94,12 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
       //     throw new Error(response.message || "Failed to delete file");
       //   }
     },
+    getItemById: async (id : string) : Promise<any> => {
+      const responce = await repository.getItemById(id)
+      console.log(responce);
+      
+      return responce
+    }
 
     // getFileDownloadUrl: async (fileId: string): Promise<string> => {
     //   return repository.getFileDownloadUrl(fileId);

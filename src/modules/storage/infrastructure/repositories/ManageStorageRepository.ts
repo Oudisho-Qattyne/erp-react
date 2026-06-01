@@ -15,8 +15,11 @@ export const createManageStorageRepository = (
             return apiClient.get(`${baseUrl}`);
         },
 
-        getItemById: async (folderId: string): Promise<DomainResponse<StorageFolder>> => {
-            return apiClient.get(`${baseUrl}/folders/${folderId}`);
+        getItemById: async (storageItemId: string): Promise<DomainResponse<any>> => {
+            const res = await apiClient.get(`${baseUrl}/${storageItemId}`);
+            console.log(res);
+            
+            return  apiClient.get(`${baseUrl}/${storageItemId}`);
         },
 
         getFolderContents: async (folderId: string): Promise<DomainResponse<StorageFolder>> => {

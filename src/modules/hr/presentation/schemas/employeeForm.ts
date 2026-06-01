@@ -11,6 +11,7 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
     academic_stage: z.string().nullable().optional(),
     study_status: z.string().nullable().optional(),
   });
+
   const EmployeeChildren = z.object({
     name:  z.string().min(1, t('employee_form.validation.name_invalid', 'hr') || 'اسم الابن مطلوب'),
     birthdate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/,  t('employee_form.validation.birthdate_invalid', 'hr') || 'تاريخ الولادة بصيغة YYYY-MM-DD' ),
@@ -37,6 +38,8 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
     blood_type: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],  t('employee_form.validation.blood_type_invalid', 'hr') || 'فصيلة الدم غير صالحة' ),
     phone_number: z.string().regex(/^\+?[0-9]{7,15}$/,  t('employee_form.validation.phone_number_invalid', 'hr') || 'رقم الهاتف غير صالح (يجب أن يحتوي على 7-15 رقم، ويمكن أن يبدأ بـ +)' ),
     sham_cash_account: z.string().optional().default(''),
+    residence_country_id: z.number().optional().default(0),
+    residence_city_id: z.number().optional().default(0),
     residence_region_id: z.number().positive( t('employee_form.validation.residence_region_required', 'hr') || 'رقم منطقة السكن يجب أن يكون موجباً' ),
     residential_area_details: z.string().optional(),
     civil_registry_record: z.string().optional(),

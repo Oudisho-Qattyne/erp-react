@@ -34,26 +34,28 @@ export function EditEmployeePage() {
             national_id: emp.national_id,
             first_name: emp.first_name,
             father_name: emp.father_name || '',
+            grandfather_name: emp.grandfather_name || '',
             last_name: emp.last_name,
             mother_name: emp.mother_name || '',
             gender: emp.gender,
             date_birth: emp.date_birth || '',
             place_birth: emp.place_birth || '',
+            assigned_job: emp.assigned_job || '',
             marital_status: emp.marital_status || 'single',
+            number_of_children: emp.number_of_children || 0,
             spouse_name: emp.spouse_name || '',
             spouse_workplace: emp.spouse_workplace || '',
             blood_type: emp.blood_type || 'A+',
             phone_number: emp.phone_number || '',
             sham_cash_account: emp.sham_cash_account || '',
+            residence_country_id: emp.residence_region?.city?.country?.id || 0,
+            residence_city_id: emp.residence_region?.city?.id || 0,
             residence_region_id: emp.residence_region_id,
             residential_area_details: emp.residential_area_details || '',
             civil_registry_record: emp.civil_registry_record || '',
             health_status: emp.health_status || '',
             injury_details: emp.injury_details || null,
             injury_date: emp.injury_date || null,
-            
-            // Note: residence_country_id and residence_city_id might need manual re-selection
-            // if the API doesn't provide them, but we pass region_id directly.
 
             employment_details: emp.employment_details ? {
               job_title: emp.employment_details.job_title,
@@ -75,6 +77,11 @@ export function EditEmployeePage() {
               graduation_year: edu.graduation_year || '',
               academic_stage: edu.academic_stage || null,
               study_status: edu.study_status || null,
+            })) || [],
+
+            children: emp.children?.map((child: any) => ({
+              name: child.name || '',
+              birthdate: child.birthdate || '',
             })) || [],
           };
           setDefaultValues(mappedValues);
