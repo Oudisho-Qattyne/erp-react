@@ -6,7 +6,10 @@
     "no_data": "No data available",
     "filter": "Filter",
     "delete": "Delete",
-    "select": "Select"
+    "select": "Select",
+    "confirm_delete_title": "Delete {entity}",
+    "confirm_delete_message": "Are you sure you want to delete this {entity}? This action cannot be undone.",
+    "cancel": "Cancel"
 
   },
   "pagination": {

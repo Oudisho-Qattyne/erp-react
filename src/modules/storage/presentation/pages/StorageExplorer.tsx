@@ -15,6 +15,7 @@ import '../styles/storage-explorer.css';
 import { RenameItemDialog } from '../components/RenameItemDialog';
 import type { StorageItem } from '../../domain/entities/FileSystemEntry';
 import type { StorageItemDto } from '../../application/dtos/storageItem';
+import { FileExplorer } from '../components/FileExplorer';
 
 export function StorageExplorer() {
     const {
@@ -179,10 +180,10 @@ export function StorageExplorer() {
         try {
             for (const item of items) {
                 if (item.type == 'folder') {
-                    await deleteFolder(item._id);
+                    await deleteFolder(currentPath , item._id ,apiRef);
                 }
                 else {
-                    await deleteFile(item._id);
+                    await deleteFile(currentPath , item._id ,apiRef);
                 }
             }
             // Refresh the parent folder after deletion
@@ -202,7 +203,7 @@ export function StorageExplorer() {
     const handleConfirmRename = async (name: string) => {
         if (!renameConfirm) return;
         try {
-            await renameFolder(renameConfirm._id, name)
+            await renameFolder(currentPath,renameConfirm._id, name , apiRef )
             if (apiRef.current) {
                 const parentId = renameConfirm.parent;
                 apiRef.current.exec('provide-data', { data: null, id: parentId });

@@ -8,22 +8,72 @@ import type { StorageItemDto } from "../../application/dtos/storageItem";
 import type { IApi } from "@svar-ui/react-filemanager";
 import { toast } from "sonner";
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider";
+import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
 
 export interface UseManageStorageReturn {
     data: StorageItemDto[];
     loading: boolean;
     error: string | null;
     loadRoot: () => Promise<void>;
-    loadFolder: (folderId: string, apiRef: any) => Promise<void>;
-    loadFolderByPath: (path: string, api: any) => Promise<void>;
-    createFolder: (parentId: string, name: string, api: any) => Promise<void>;
-    uploadFile: (parentId: string, file: File, isSecure: boolean, name: string, api: any) => Promise<void>;
-    deleteFolder: (id: string) => Promise<void>;
-    deleteFile: (id: string) => Promise<void>;
-    getItemById: (id:string) => Promise<void>;
-    renameFolder: (id: string, name: string) => Promise<void>;
+    loadFolder: (folderId: string, apiRef: any , clipPath?:string) => Promise<void>;
+    loadFolderByPath: (path: string, api: any , clipPath?:string) => Promise<void>;
+    createFolder: (parentId: string, name: string, api: any, clipPath?:string) => Promise<void>;
+    uploadFile: (parentId: string, file: File, isSecure: boolean, name: string, api: any, clipPath?:string) => Promise<void>;
+    deleteFolder: (parentId: string,id: string,api: any, clipPath?:string) => Promise<void>;
+    deleteFile: (parentId: string,id: string,api: any, clipPath?:string) => Promise<void>;
+    getItemById: (id:string) => Promise<DomainResponse<StorageItem>>;
+    renameFolder: (parentId: string,id: string, name: string,api: any, clipPath?:string) => Promise<void>;
     clearError: () => void;
 }
+
+/**
+ * Removes the first segment of `path` if it equals `segmentPath`.
+ * Both inputs must start with '/'.
+ * @example removeFirstSegmentIfMatches("/root/folder/file", "/root") -> "/folder/file"
+ * @example removeFirstSegmentIfMatches("/root", "/root") -> "/"
+ * @example removeFirstSegmentIfMatches("/root/folder", "/folder") -> "/root/folder"
+ */
+function removeFirstSegmentIfMatches(path: string, segmentPath: string): string {
+    if (!path.startsWith('/') || !segmentPath.startsWith('/')) {
+      throw new Error('Both paths must start with "/"');
+    }
+    if (path === '/') return '/';
+  
+    // Find the end of the first segment (after the leading '/')
+    const nextSlash = path.indexOf('/', 1);
+    const firstSegment = nextSlash === -1 ? path.slice(1) : path.slice(1, nextSlash);
+    const targetSegment = segmentPath.slice(1); // remove leading '/'
+  
+    if (firstSegment === targetSegment) {
+      // Remove the first segment and its preceding '/'
+      const remaining = nextSlash === -1 ? '' : path.slice(nextSlash);
+      return remaining === '' ? '/' : remaining;
+    }
+    return path;
+  }
+
+
+  /**
+ * Merges two absolute paths (both starting with '/') into one normalized path.
+ * Removes redundant slashes and handles root cases.
+ * @example mergePaths("/root", "/folder") -> "/root/folder"
+ * @example mergePaths("/root/", "/folder/") -> "/root/folder"
+ * @example mergePaths("/", "/folder") -> "/folder"
+ * @example mergePaths("/", "/") -> "/"
+ */
+function mergePaths(path1: string, path2: string): string {
+    if (!path1.startsWith('/') || !path2.startsWith('/')) {
+      throw new Error('Both paths must start with "/"');
+    }
+  
+    // Clean: remove trailing slash from first path, leading slash from second
+    const cleaned1 = path1 === '/' ? '' : path1.replace(/\/+$/, '');
+    const cleaned2 = path2.replace(/^\/+/, '');
+  
+    if (cleaned1 === '' && cleaned2 === '') return '/';
+    return '/' + [cleaned1, cleaned2].filter(Boolean).join('/');
+  }
+
 
 export const useManageStorage = (): UseManageStorageReturn => {
     const apiClient = useApiClient();
@@ -59,18 +109,23 @@ export const useManageStorage = (): UseManageStorageReturn => {
         }
     }, [useCase]);
 
-    const loadFolder = useCallback(async (folderId: string, api: any) => {
+    const loadFolder = useCallback(async (folderId: string, api: any , clipPath?:string) => {
         setLoading(true);
         setError(null);
-        const ids = data.filter(i => i.id == folderId)
-
-        if (ids.length > 0) {
-
-            const id = ids[0]._id
             try {
-                const res = await useCase.getFolderContents(id);
-                //   setData(res.data);
-                api.exec("provide-data", { data: res.data, folderId });
+                const res = await useCase.getFolderContents(folderId);
+                if(clipPath){
+                    res.data.forEach(i => {
+                        i.id = removeFirstSegmentIfMatches(i.id , clipPath)
+                    })
+                }
+                console.log("loadFolder : " , res.data);
+                
+                  setData(res.data);
+                //   console.log(res.data);
+                //   if(res.data.length > 0){
+                //       api.exec("set-path", { id:res.data[0].path });
+                //   }
             } catch (err: any) {
                 switch (err.status) {
                     case 403:
@@ -85,22 +140,26 @@ export const useManageStorage = (): UseManageStorageReturn => {
             } finally {
                 setLoading(false);
             }
-        }
-        else {
+        // }
+        // else {
             setLoading(false);
-        }
+        // }
 
     }, [useCase]);
 
 
-    const loadFolderByPath = useCallback(async (path: string, api: any) => {
+    const loadFolderByPath = useCallback(async (path: string, api: any , clipPath?:string) => {
         setLoading(true);
         setError(null);
         try {
             const res = await useCase.getFolderContentsByPath(path);
+            if(clipPath){
+                console.log(res.data);
+                res.data.forEach(i => {
+                    i.id = removeFirstSegmentIfMatches(i.id , clipPath)
+                })
+            }
             //   setData(res.data);
-            
-
             api.exec("provide-data", { data: res.data, id: path });
         } catch (err: any) {
             switch (err.status) {
@@ -120,15 +179,20 @@ export const useManageStorage = (): UseManageStorageReturn => {
     }, [useCase]);
 
 
-    const createFolder = useCallback(async (parent: string, name: string, api: IApi) => {
+    const createFolder = useCallback(async (parent: string, name: string, api: IApi, clipPath?:string) => {
         setLoading(true);
         setError(null);
         try {
+            console.log(removeFirstSegmentIfMatches(parent , clipPath));
+            
             const storageItem = api.getFile(parent);
+            // console.log(mergePaths(storageItem?.id , clipPath  ));
+            
             if (storageItem) {
-
-                const res = await useCase.createFolder(storageItem?._id, name);
-                await loadFolderByPath(storageItem?.id, api);
+                console.log(storageItem?._id , parent , storageItem);
+                
+                // const res = await useCase.createFolder(storageItem?._id, name);
+                await loadFolderByPath(mergePaths(storageItem?.id , clipPath  ), api , clipPath );
                 toast.success(
                     language === 'ar'
                         ? `تم إنشاء المجلد "${name}" بنجاح`
@@ -161,15 +225,15 @@ export const useManageStorage = (): UseManageStorageReturn => {
         }
     }, [useCase, language, loadFolderByPath]);
 
-    const uploadFile = useCallback(async (parent: string, file: File, isSecure: boolean = true, name: string, api: IApi) => {
+    const uploadFile = useCallback(async (parent: string, file: File, isSecure: boolean = true, name: string, api: IApi , clipPath?:string) => {
         setLoading(true);
         setError(null);
         try {
-            const storageItem = api.getFile(parent);
+            const storageItem = api.getFile(removeFirstSegmentIfMatches(parent , clipPath));
             if (storageItem) {
 
                 const res = await useCase.uploadFile(storageItem?._id, file, name, isSecure);
-                await loadFolderByPath(storageItem?.id, api);
+                await loadFolderByPath(storageItem?.id, api , clipPath);
                 toast.success(
                     language === 'ar'
                         ? `تم رفع الملف "${name}" بنجاح`
@@ -205,16 +269,23 @@ export const useManageStorage = (): UseManageStorageReturn => {
         }
     }, [useCase, language, loadFolderByPath]);
 
-    const deleteFolder = useCallback(async (id: string) => {
+    const deleteFolder = useCallback(async (parent : string , id: string,api: any, clipPath?:string) => {
         setLoading(true);
         setError(null);
+
         try {
-            const res = await useCase.deleteFolder(id);
-            toast.success(
-                language === 'ar'
+            console.log(removeFirstSegmentIfMatches(parent , clipPath));
+            
+            const storageItem = false;
+            if (storageItem) {
+                const res = await useCase.deleteFolder(id);
+                // await loadFolderByPath(storageItem?.id, api , clipPath);
+                toast.success(
+                    language === 'ar'
                     ? 'تم حذف المجلد بنجاح'
                     : 'Folder deleted successfully'
-            );
+                );
+            }
         } catch (err: any) {
             const errMsg = err.message || `Failed to delete folder`;
             switch (err.status) {
@@ -241,16 +312,21 @@ export const useManageStorage = (): UseManageStorageReturn => {
         }
     }, [useCase, language]);
 
-    const deleteFile = useCallback(async (id: string) => {
+    const deleteFile = useCallback(async (parent:string , id: string,api: any, clipPath?:string) => {
         setLoading(true);
         setError(null);
         try {
+            const storageItem = api.getFile(removeFirstSegmentIfMatches(parent , clipPath));
+            if (storageItem) {
             const res = await useCase.deleteFile(id);
+            await loadFolderByPath(storageItem?.id, api , clipPath);
+
             toast.success(
                 language === 'ar'
                     ? 'تم حذف الملف بنجاح'
                     : 'File deleted successfully'
             );
+        }
         } catch (err: any) {
             const errMsg = err.message || `Failed to delete file`;
             switch (err.status) {
@@ -277,16 +353,21 @@ export const useManageStorage = (): UseManageStorageReturn => {
         }
     }, [useCase, language]);
 
-    const renameFolder = useCallback(async (id: string, name: string) => {
+    const renameFolder = useCallback(async (parent:string , id: string, name: string,api: any, clipPath?:string) => {
         setLoading(true);
         setError(null);
         try {
+            const storageItem = api.getFile(removeFirstSegmentIfMatches(parent , clipPath));
+            if (storageItem) {
             const res = await useCase.renameFolder(id, name);
+            await loadFolderByPath(storageItem?.id, api , clipPath);
+
             toast.success(
                 language === 'ar'
                     ? `تم تغيير الاسم إلى "${name}" بنجاح`
                     : `Renamed to "${name}" successfully`
             );
+        }
         } catch (err: any) {
             const errMsg = err.message || `Failed to rename`;
             switch (err.status) {
@@ -323,6 +404,7 @@ export const useManageStorage = (): UseManageStorageReturn => {
             //         ? `تم تغيير الاسم إلى "${name}" بنجاح`
             //         : `Renamed to "${name}" successfully`
             // );
+            return(res)
         } catch (err: any) {
             const errMsg = err.message || `Failed to rename`;
             switch (err.status) {

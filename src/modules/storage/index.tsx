@@ -5,6 +5,7 @@ import arLocales from './presentation/locales/ar.json';
 import type { StorageApi } from '../../core/registry/storage/storageRegistry';
 import { StorageExplorer } from './presentation/pages/StorageExplorer';
 import { File, FolderIcon } from 'lucide-react';
+import { FileExplorer } from './presentation/components/FileExplorer';
 
 // Implement the actual storage API (using your backend or mock)
 // const createStorageApi = (): StorageApi => {
@@ -32,10 +33,22 @@ import { File, FolderIcon } from 'lucide-react';
 // Also register as a normal module (routes, etc.)
 const storageModule: Module = {
   name: 'storage',
-  routes: [
+  routes: [            
+
     {
       path: '/storage',
       element: <StorageExplorer />,
+      layout: 'dashboard',
+      label: 'storage.title',
+      nav: true,
+      order: 40,
+      moduleName: 'storage',
+      icon: <FolderIcon size={18} />,
+      group: 'storage', // or a new group
+    },
+    {
+      path: '/storage/explorer',
+      element: <FileExplorer folderId='019ea8fd-62ca-7018-8e99-73959d7eab37'/>,
       layout: 'dashboard',
       label: 'storage.title',
       nav: true,

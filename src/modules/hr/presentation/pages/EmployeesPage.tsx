@@ -6,10 +6,12 @@ import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button'
 import { DataTable, type ColumnDef } from '../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { Dialog } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
 import type { EmployeeListItem } from '../../domain/entities/EmployeeListItem';
-import { useManageEmployee } from '../hooks/useEmployees';
 import { EmployeeForm } from './EmployeeForm';
 import { FormInput } from '../../../../core/presentation/layouts/ui/inputs/FormInput';
 import Input from '../../../../core/presentation/layouts/ui/inputs/Input';
+import { LoadingState } from '../../../../core/presentation/layouts/ui/state/LoadingState';
+import { ErrorState } from '../../../../core/presentation/layouts/ui/state/ErrorState';
+import { useManageEmployee } from '../hooks/useEmployees';
 
 export function EmployeesPage() {
   const { t } = useLanguage();
@@ -136,8 +138,8 @@ export function EmployeesPage() {
       </div>
 
       {/* Table */}
-      {loading && <div className="py-8 text-center">{t('common.loading', 'shared') || 'جاري التحميل...'}</div>}
-      {error && <div className="py-8 text-center text-danger">{error}</div>}
+      {loading && <LoadingState />}
+      {error && <ErrorState message={error} onRetry={refetch} />}
       {!loading && !error && (
         <DataTable
           columns={columns}

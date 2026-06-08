@@ -9,9 +9,10 @@ interface CreateItemDialogProps {
   parentId: string;
   file?: File;
   onClose: () => void;
-  onCreateFolder: (parentId: string, name: string, api: any) => Promise<void>;
-  onUploadFile: (parentId: string, file: File, isSecure: boolean, name: string, api: any) => Promise<void>;
+  onCreateFolder: (parentId: string, name: string, api: any, clipPath?:string) => Promise<void>;
+  onUploadFile: (parentId: string, file: File, isSecure: boolean, name: string, api: any, clipPath?:string) => Promise<void>;
   apiRef: React.MutableRefObject<any>;
+  clipPath?:string
 }
 
 export function CreateItemDialog({
@@ -23,6 +24,7 @@ export function CreateItemDialog({
   onCreateFolder,
   onUploadFile,
   apiRef,
+  clipPath
 }: CreateItemDialogProps) {
   const title = type === 'folder' ? 'إنشاء مجلد جديد' : 'رفع ملف';
 
@@ -32,7 +34,7 @@ export function CreateItemDialog({
         <FolderCreateForm
           parentId={parentId}
           onSuccess={async (name) => {
-            await onCreateFolder(parentId, name, apiRef.current);
+            await onCreateFolder(parentId, name, apiRef.current , clipPath);
             onClose();
           }}
           onCancel={onClose}
@@ -43,7 +45,7 @@ export function CreateItemDialog({
           parentId={parentId}
           file={file}
           onSuccess={async (isSecure, name) => {
-            await onUploadFile(parentId, file, isSecure, name, apiRef.current);
+            await onUploadFile(parentId, file, isSecure, name, apiRef.current,clipPath);
             onClose();
           }}
           onCancel={onClose}

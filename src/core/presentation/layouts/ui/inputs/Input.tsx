@@ -1,9 +1,10 @@
 import React from 'react';
 import { CustomSelect } from './CustomSelect';
 import { SelectOrCreate } from './SelectOrCreate';
+import { MultiSelectOrCreate } from './MultiSelectOrCreate';
 import { DatePicker } from './DatePicker';
 import { DataMatrixInput, type MatrixFieldConfig } from './DataMatrixInput';
-export type InputType = 'text' | 'number' | 'email' | 'password' | 'textarea' | 'date' | 'select' | 'select-or-create' | 'data-matrix';
+export type InputType = 'text' | 'number' | 'email' | 'password' | 'textarea' | 'date' | 'select' | 'select-or-create' | 'multi-select-or-create' | 'data-matrix' | 'checkbox';
 
 interface InputProps {
   type:InputType;
@@ -114,6 +115,24 @@ const Input: React.FC<InputProps> = ({
         />
       );
 
+    case 'multi-select-or-create':
+      return (
+        <MultiSelectOrCreate
+          value={value ?? []}
+          onChange={onChange}
+          options={finalOptions}
+          placeholder={finalPlaceholder}
+          disabled={finalDisabled}
+          required={finalRequired}
+          searchable={searchable}
+          createTitle={createTitle}
+          renderCreateForm={renderCreateForm}
+          dependentData={dependentData}
+          baseClasses={localClass}
+          labelPath={labelPath}
+        />
+      );
+
     case 'data-matrix':
       return (
         <DataMatrixInput
@@ -127,6 +146,18 @@ const Input: React.FC<InputProps> = ({
           baseClasses={localClass}
           errors={matrixErrors}
           rowSchema={rowSchema}
+        />
+      );
+
+    case 'checkbox':
+      return (
+        <input
+          type="checkbox"
+          checked={!!value}
+          onChange={(e) => onChange(e.target.checked)}
+          disabled={finalDisabled}
+          required={finalRequired}
+          className="w-4 h-4 rounded border-border text-primary focus:ring-primary cursor-pointer"
         />
       );
 

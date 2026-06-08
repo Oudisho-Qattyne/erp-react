@@ -13,8 +13,8 @@ export function NavGroupItem({ group, collapsed, unreadCount = 0 }: NavGroupItem
   const showLabel = group.label && group.id !== 'main';
   const hasIcon = !!group.icon;
 
-  // Translation logic
-  const moduleLabel = t(`navigation.${group.label}`, group.id);
+  const groupModule = group.moduleName || group.id;
+  const moduleLabel = t(`navigation.${group.label}`, groupModule);
   const sharedLabel = t(`sidebar.${group.id}`, 'shared');
   const finalGroupLabel =
     moduleLabel !== `navigation.${group.label}`
@@ -72,8 +72,8 @@ function NavItemLink({
 
   const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
 
-  // Translation fallback logic
-  const moduleLabel = item.group ? t(`navigation.${item.label}`, item.group) : item.label;
+  const itemModule = (item as any).moduleName || item.group;
+  const moduleLabel = itemModule ? t(`navigation.${item.label}`, itemModule) : item.label;
   const key = item.id.includes('-') ? item.id.split('-').pop()! : item.id;
   const sharedLabel = t(`sidebar.${key}`, 'shared');
 

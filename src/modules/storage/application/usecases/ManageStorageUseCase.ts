@@ -96,7 +96,6 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
     },
     getItemById: async (id : string) : Promise<any> => {
       const responce = await repository.getItemById(id)
-      console.log(responce);
       
       return responce
     }

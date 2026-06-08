@@ -16,7 +16,7 @@ export interface NavGroup {
   label: string
   order?: number;
   icon?: ReactNode
-
+  moduleName?: string
 }
 
 // ========== Route & Module Types ==========
@@ -49,6 +49,10 @@ let modules: Module[] = []
 export const registerModule = (module: Module): void => {
   const existing = modules.find(m => m.name === module.name)
   if (!existing) {
+    // Auto-populate moduleName on navGroups so translation can scope correctly
+    if (module.navGroups) {
+      module.navGroups = module.navGroups.map(g => ({ ...g, moduleName: g.moduleName || module.name }))
+    }
     modules.push(module)
   }
 }
@@ -99,6 +103,7 @@ export const getNavItems = (): NavItem[] => {
     group: route.group ?? "default",
     href: route.path,
     permission: route.permission,
+    moduleName: route.moduleName,
   }))
 }
 

@@ -1,0 +1,1 @@
+export { createCrudRoleRepository } from "./CrudRoleRepository";

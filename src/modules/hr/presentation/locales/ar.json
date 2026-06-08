@@ -19,8 +19,7 @@
     "name_required": "الاسم مطلوب"
   },
   "navigation": {
-  
-  "reports": {
+    "reports": {
       "title": "التقارير"
     },
     "employees": {
@@ -33,9 +32,18 @@
       "title": "تعديل الموظف"
     },
     "lookups": {
-      "title": "إدارة البيانات الأساسية"
+      "title": "إدارة البيانات الأساسية",
+      "tabs": {
+        "countries": "الدول",
+        "cities": "المدن",
+        "regions": "المناطق",
+        "universities": "الجامعات",
+        "faculties": "الكليات",
+        "specializations": "التخصصات"
+      }
     },
-    "admin": "الإدارة"
+    "admin": "الإدارة",
+    "hr": "الموارد البشرية"
   },
   "employees": {
     "internal_id": "الرقم الداخلي",
@@ -74,6 +82,7 @@
     "health_status": "الحالة الصحية",
     "injury_details": "تفاصيل الإصابة",
     "injury_date": "تاريخ الإصابة",
+    "chronic_diseases" : "الأمراض المزمنة",
     "country": "الدولة",
     "city": "المدينة",
     "region": "منطقة السكن",
@@ -93,7 +102,7 @@
     "academic_stage": "المرحلة الأكاديمية",
     "study_status": "حالة الدراسة",
     "degree_name": "اسم الشهادة",
-    "children":"الاولاد",
+    "children": "الاولاد",
     "child_name": "اسم الابن"
   },
   "show_employee": {
@@ -148,13 +157,15 @@
     "add_faculty": "إضافة كلية",
     "add_specialization": "إضافة تخصص",
     "add_org_unit": "إضافة وحدة تنظيمية",
+    "add_chronic_disease":"إضافة مرض مزمن",
+
     "saving": "جاري...",
     "validation": {
       "category_invalid": "يجب أن يكون التصنيف \"أحدث\" أو \"سابقة\"",
       "degree_name_required": "اسم الشهادة مطلوب",
-      "university_required": "رقم الجامعة يجب أن يكون موجباً",
-      "faculty_required": "رقم الكلية يجب أن يكون موجباً",
-      "specialization_required": "رقم التخصص يجب أن يكون موجباً",
+      "university_required": " الجامعة مطلوب",
+      "faculty_required": " الكلية مطلوب",
+      "specialization_required": " التخصص مطلوب",
       "graduation_year_invalid": "سنة التخرج غير صالحة (يجب أن تكون 4 أرقام)",
       "internal_id_required": "الرقم الداخلي مطلوب",
       "national_id_required": "الرقم الوطني مطلوب",
@@ -166,21 +177,22 @@
       "gender_invalid": "الجنس يجب أن يكون ذكراً أو أنثى",
       "date_birth_invalid": "تاريخ الميلاد بصيغة YYYY-MM-DD",
       "place_birth_required": "مكان الميلاد مطلوب",
+      "assigned_job_required":"العمل المكلف به مطلوب",
       "marital_status_invalid": "الحالة الاجتماعية غير صالحة",
-      "number_of_children_invalid":"عدد الأولاد يجب أن يكون موجباً",
+      "number_of_children_invalid": "عدد الأولاد مطلوب",
       "blood_type_invalid": "فصيلة الدم غير صالحة",
       "phone_number_invalid": "رقم الهاتف غير صالح (يجب أن يحتوي على 7-15 رقم، ويمكن أن يبدأ بـ +)",
-      "residence_region_required": "رقم منطقة السكن يجب أن يكون موجباً",
+      "residence_region_required": " منطقة السكن مطلوب",
       "job_title_required": "المسمى الوظيفي مطلوب",
-      "org_unit_required": "رقم الوحدة التنظيمية يجب أن يكون موجباً",
+      "org_unit_required": "الوحدة التنظيمية مطلوبة",
       "status_invalid": "الحالة الوظيفية غير صالحة",
       "appointment_date_invalid": "تاريخ التعيين بصيغة YYYY-MM-DD",
       "contract_type_invalid": "نوع العقد غير صالح",
       "contract_nature_invalid": "طبيعة العقد غير صالحة",
       "job_category_required": "التصنيف الوظيفي مطلوب",
-      "workplace_city_required": "رقم مدينة العمل يجب أن يكون موجباً",
-      "name_invalid":"الاسم غير صالح",
-      "birthdate_invalid":"تاريخ الولادة غير صالح"
+      "workplace_city_required": " مدينة العمل مطلوب",
+      "name_invalid": "الاسم غير صالح",
+      "birthdate_invalid": "تاريخ الولادة غير صالح"
     }
   },
   "lookups": {
@@ -200,7 +212,14 @@
     "created": "تم إنشاء {name} بنجاح",
     "create_error": "فشل إنشاء {name}",
     "deleted": "تم حذف {name} بنجاح",
-    "delete_error": "فشل حذف {name}"
+    "delete_error": "فشل حذف {name}",
+    "no_countries": "لا يوجد دول",
+    "no_cities": "لا يوجد مدن",
+    "no_regions": "لا يوجد مناطق",
+    "no_universities": "لا يوجد جامعات",
+    "no_faculties": "لا يوجد افرع",
+    "no_specializations": "لا يوجد اختصاصات"
+
   },
   "reports": {
     "title": "التقارير والتحليلات",

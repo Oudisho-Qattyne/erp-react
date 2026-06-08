@@ -112,11 +112,35 @@ export function FormInput<T extends FieldValues>({
   }
 
   const handleChange = (val: any) => {
-
     setValue(name, val, { shouldValidate: true, shouldDirty: true });
   };
 
   const baseClasses = `${inputBaseClasses} ${error ? 'border-danger ring-danger/10 animate-shake' : ''}`;
+
+  // Checkbox renders inline label
+  if (type === 'checkbox') {
+    return (
+      <div className={`w-full mb-4 ${className || ''}`}>
+        <label htmlFor={name} className="flex items-center gap-2 cursor-pointer">
+          <Input
+            type="checkbox"
+            value={finalValue}
+            onChange={handleChange}
+            disabled={finalDisabled}
+            required={finalRequired}
+            baseClasses=""
+          />
+          {label && (
+            <span className="text-sm font-semibold text-text">
+              {label} {finalRequired && <span className="text-danger">*</span>}
+            </span>
+          )}
+        </label>
+        {error && <div className={errorClasses}>{t(`validation.${error}`, 'shared') || error}</div>}
+        {hint && !error && <div className={hintClasses}>{hint}</div>}
+      </div>
+    );
+  }
 
 
   // Helper to collect dependent values for the create form

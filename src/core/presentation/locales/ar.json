@@ -6,7 +6,10 @@
     "no_data": "لا توجد بيانات",
     "filter": "تصفية",
     "delete": "حذف",
-    "select": "اختر"
+    "select": "اختر",
+    "confirm_delete_title": "حذف {entity}",
+    "confirm_delete_message": "هل أنت متأكد من حذف {entity}؟ لا يمكن التراجع عن هذا الإجراء.",
+    "cancel": "إلغاء"
   },
   "pagination": {
     "showing": "عرض",

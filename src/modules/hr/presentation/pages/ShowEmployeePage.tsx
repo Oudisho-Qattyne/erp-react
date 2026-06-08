@@ -21,6 +21,9 @@ import {
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import { useManageEmployee } from '../hooks/useEmployees';
 import { getLocalizedName } from '../../../../core/presentation/utils/helpes';
+import { LoadingState } from '../../../../core/presentation/layouts/ui/state/LoadingState';
+import { ErrorState } from '../../../../core/presentation/layouts/ui/state/ErrorState';
+import { EmptyState } from '../../../../core/presentation/layouts/ui/state/EmptyState';
 
 export function ShowEmployeePage() {
   const { id } = useParams<{ id: string }>();
@@ -56,22 +59,15 @@ export function ShowEmployeePage() {
     }
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />;
 
   if (error || !employee) {
     return (
-      <div className="bg-danger/10 border border-danger/20 text-danger p-6 rounded-xl flex flex-col items-center gap-4">
-        <p className="text-lg font-medium">{error || t('show_employee.not_found', 'hr') || 'الموظف غير موجود'}</p>
-        <Button onClick={() => navigate('/hr/employees')} variant="outline">
-          {t('show_employee.back_to_list', 'hr') || 'العودة للقائمة'}
-        </Button>
-      </div>
+      <ErrorState
+        message={error || t('show_employee.not_found', 'hr') || 'الموظف غير موجود'}
+        onRetry={() => navigate('/hr/employees')}
+        retryLabel={t('show_employee.back_to_list', 'hr') || 'العودة للقائمة'}
+      />
     );
   }
 
@@ -185,6 +181,21 @@ export function ShowEmployeePage() {
                   )}
                 </div>
               )}
+              {employee.chronic_diseases && employee.chronic_diseases.length > 0 && (
+                <div className="pt-4 mt-4 border-t border-border/50">
+                  <h3 className="text-sm font-semibold text-text-muted mb-3 flex items-center gap-1.5">
+                    <Activity size={14} className="text-danger" />
+                    {t('employees.chronic_diseases', 'hr') || 'الأمراض المزمنة'}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {employee.chronic_diseases.map((disease) => (
+                      <span key={disease.id} className="px-3 py-1 bg-danger/5 text-danger text-sm rounded-full border border-danger/10">
+                        {getLocalizedName(disease.name) || disease.id}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="pt-4 mt-4 border-t border-border/50">
                 <h3 className="text-sm font-semibold text-text-muted mb-3 flex items-center gap-1.5">
                   <MapPin size={14} className="text-primary" />
@@ -228,9 +239,7 @@ export function ShowEmployeePage() {
                 <InfoRow label={t('employees.workplace_city', 'hr') || 'مدينة العمل'} value={employee.employment_details.workplace_city?.name || employee.employment_details.workplace_city_id || '-'} icon={<MapPin size={14} />} />
               </div>
             ) : (
-              <div className="text-center py-8 text-text-muted bg-background/30 rounded-xl border border-dashed border-border">
-                {t('show_employee.no_employment_data', 'hr') || 'لا توجد معلومات وظيفية مسجلة'}
-              </div>
+              <EmptyState message={t('show_employee.no_employment_data', 'hr') || 'لا توجد معلومات وظيفية مسجلة'} />
             )}
           </div>
 
@@ -272,10 +281,7 @@ export function ShowEmployeePage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-text-muted bg-background/30 rounded-xl border border-dashed border-border flex flex-col items-center gap-2">
-                <GraduationCap size={24} className="opacity-50" />
-                <span>{t('show_employee.no_education_data', 'hr') || 'لا توجد مؤهلات علمية مسجلة'}</span>
-              </div>
+              <EmptyState message={t('show_employee.no_education_data', 'hr') || 'لا توجد مؤهلات علمية مسجلة'} />
             )}
           </div>
 

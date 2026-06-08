@@ -14,6 +14,7 @@ import type { MaritalStatus } from "../../../../core/domain/valueObjects/Marital
 import type { ContractNature } from "../valueObjects/ContractNature";
 import type { ContractType } from "../valueObjects/ContractType";
 import type { EmploymentStatus } from "../valueObjects/EmploymentStatus";
+import type { ChronicDiseases } from "../../../../core/domain/entities/chronicDiseases/chronicDiseases";
 
 export interface EducationEntry {
   id: number;
@@ -82,6 +83,7 @@ export interface EmployeeData {
   health_status: string;
   injury_details: string | null;
   injury_date: string | null;
+  chronic_diseases: ChronicDiseases[];
   employment_details: EmploymentDetails;
   educations: EducationEntry[];
   created_at: string;

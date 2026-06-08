@@ -76,11 +76,13 @@ export function OrganizationalUnitTreeSelect({
   const selectedPath = useMemo(() => getPathToId(value), [value, getPathToId]);
 
   const handleCreate = async (data: any) => {
-    const result = await create(data);
+    const payload = { ...data };
+    if (!payload.parent_id) delete payload.parent_id;
+    const result = await create(payload);
     await refreshUnits();
     onChange(result.data.id);
     setIsCreateDialogOpen(false);
-    return result
+    return result;
   };
 
   const handleSelectAtLevel = (levelIndex: number, newUnitId: number) => {
@@ -197,7 +199,7 @@ export function OrganizationalUnitTreeSelect({
         <GenericCreateForm
           schema={organizationalLevelFormSchema}
           fields={[{ name: 'name', label: t('organizational_unit.name', 'hr') || 'الاسم', required: true }]}
-          defaultValues={{ parent_id: createParentId }}
+          defaultValues={createParentId ? { parent_id: createParentId } : {}}
           onSubmit={handleCreate}
           onSuccess={() => { }}
           onCancel={() => setIsCreateDialogOpen(false)}

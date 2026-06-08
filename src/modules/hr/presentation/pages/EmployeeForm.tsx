@@ -19,6 +19,8 @@ import { CountryFormSchema } from '../../../../core/presentation/schemas/regions
 import { OrganizationalUnitTreeSelect } from '../components/OrganizationalUnitTreeSelect';
 import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicForm221';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
+import type { ChronicDiseases } from '../../../../core/domain/entities/chronicDiseases/chronicDiseases';
+import { EntityFormSchema } from '../../../../core/presentation/schemas/entityForm.schema copy';
 
 // -----------------------------------------------------------------------------
 // Helper: Generic Create Form wrapper (with explicit types)
@@ -52,6 +54,7 @@ export const EMPLOYEE_EMPTY_DEFAULTS: EmployeeFormValues = {
   health_status: '',
   injury_details: null,
   injury_date: null,
+  chronic_disease_ids:[],
   employment_details: {
     job_title: '',
     org_unit_id: 0,
@@ -223,9 +226,14 @@ export function EmployeeForm({
 
 
   const { entities: countries, getAll: loadCountries } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
+  const { entities: chronicDiseases, getAll: loadChronicDiseases } = useEntityCrud<Country>('/hr/chronic-diseases', '/hr/chronic-diseases');
 
   const computeCountries = async () => {
     const response = await loadCountries();
+    return { options: response.data.map((c: any) => ({ value: c.id, label: c.name })) };
+  };
+  const computeChronicDiseases = async () => {
+    const response = await loadChronicDiseases();
     return { options: response.data.map((c: any) => ({ value: c.id, label: c.name })) };
   };
 
@@ -240,6 +248,16 @@ export function EmployeeForm({
       }
       return await createCountry(payload)
     }} onSuccess={onSuccess} onCancel={onCancel} title={t('employees.country', 'hr') || "دولة"} submitLabel={t('employee_form.add_country', 'hr') || "إضافة دولة جديدة"} />;
+  }
+
+  function ChronicDiseaseCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number | string, item: any) => void; onCancel: () => void }) {
+    const { create: createChronicDisease } = useEntityCrud<ChronicDiseases>('/hr/chronic-diseases', '/hr/chronic-diseases');
+    return <CreateEntityForm fields={[{ name: 'name', label: t('employees.chronic_diseases', 'hr') || 'الأمراض المزمنة' }]} defaultValues={{ name: '' }} schema={EntityFormSchema} onSubmit={async (data) => {
+      const payload = {
+        name:data.name
+      }
+      return await createChronicDisease(payload)
+    }} onSuccess={onSuccess} onCancel={onCancel} title={t('employees.chronic_diseases', 'hr') ||'الأمراض المزمنة'} submitLabel={t('employee_form.add_chronic_disease', 'hr') || "إضافة مرض مزمن"} />;
   }
 
   // Modify CityCreateForm to accept countryId
@@ -441,6 +459,7 @@ export function EmployeeForm({
     {
       name: 'residence_country_id',
       type: 'select-or-create',
+      searchable:true,
       label: t('employees.country', 'hr') || 'الدولة',
       required: true,
       createTitle: t('employee_form.add_country', 'hr') || 'إضافة دولة جديدة',
@@ -453,6 +472,7 @@ export function EmployeeForm({
     {
       name: 'residence_city_id',
       type: 'select-or-create',
+      searchable:true,
       label: t('employees.city', 'hr') || 'المدينة',
       required: true,
       dependsOn: ['residence_country_id'],
@@ -472,6 +492,7 @@ export function EmployeeForm({
     {
       name: 'residence_region_id',
       type: 'select-or-create',
+      searchable:true,
       label: t('employees.region', 'hr') || 'منطقة السكن',
       required: true,
       dependsOn: ['residence_city_id'],
@@ -493,6 +514,12 @@ export function EmployeeForm({
     { name: 'health_status', label: t('employees.health_status', 'hr') || 'الحالة الصحية' },
     { name: 'injury_details', label: t('employees.injury_details', 'hr') || 'تفاصيل الإصابات' },
     { name: 'injury_date', type: 'date', label: t('employees.injury_date', 'hr') || 'تاريخ الإصابة' },
+    { name: 'chronic_disease_ids', type: 'multi-select-or-create',searchable:true ,  label: t('employees.chronic_diseases', 'hr') || 'تاريخ الإصابة',
+       labelPath: 'data.name',
+      renderCreateForm: (onSuccess, onCancel) => <ChronicDiseaseCreateForm onSuccess={(v, i) => {
+        onSuccess(v, i)
+      }} onCancel={onCancel} />,
+      compute: computeChronicDiseases,},
   ];
 
   const EMPLOYMENT_FIELDS: FieldConfig[] = [
@@ -537,6 +564,7 @@ export function EmployeeForm({
     {
       name: 'employment_details.workplace_city_id',
       type: 'select-or-create',
+      searchable:true,
       label: t('employees.workplace_city', 'hr') || 'مدينة العمل',
       required: true,
       createTitle: t('employee_form.add_city', 'hr') || 'إضافة مدينة جديدة',
@@ -621,6 +649,7 @@ export function EmployeeForm({
                   <FormInput
                     name={`educations.${idx}.university_id`}
                     type="select-or-create"
+                    searchable
                     label={t('employees.university', 'hr') || "الجامعة"}
                     createTitle={t('employee_form.add_university', 'hr') || "إضافة جامعة جديدة"}
                     compute={computeUniversities}
@@ -631,6 +660,8 @@ export function EmployeeForm({
                   <FormInput
                     name={`educations.${idx}.faculty_id`}
                     type="select-or-create"
+                    searchable
+
                     label={t('employees.faculty', 'hr') || "الكلية"}
                     dependsOn={[`educations.${idx}.university_id`]}
                     compute={(values) => computeFaculties(values, idx)}
@@ -648,6 +679,8 @@ export function EmployeeForm({
                   <FormInput
                     name={`educations.${idx}.specialization_id`}
                     type="select-or-create"
+                    searchable
+
                     label={t('employees.specialization', 'hr') || "التخصص"}
                     dependsOn={[`educations.${idx}.faculty_id`]}
                     compute={(values) => computeSpecializations(values, idx)}

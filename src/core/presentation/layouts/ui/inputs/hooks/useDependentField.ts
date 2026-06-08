@@ -62,10 +62,14 @@ export function useDependentField<T extends FieldValues>(
           } else if (result.options) {
             // If options changed, check if current value is still valid
             const currentVal = getValues(targetName);
-            if (currentVal) {
-              const isValid = result.options.some(opt => opt.value === currentVal);
+            if (Array.isArray(currentVal)) {
+              const validValues = currentVal.filter((v: any) => result.options?.some(opt => opt.value === v));
+              if (validValues.length !== currentVal.length) {
+                setValue(targetName, validValues, { shouldValidate: true, shouldDirty: true });
+              }
+            } else if (currentVal) {
+              const isValid = result.options?.some(opt => opt.value === currentVal) ?? false;
               if (!isValid) {
-                // Clear the field if the current value is no longer in the valid options
                 setValue(targetName, '' as any, { shouldValidate: true, shouldDirty: true });
               }
             }
