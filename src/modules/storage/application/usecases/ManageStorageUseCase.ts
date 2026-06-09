@@ -95,9 +95,20 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
       //   }
     },
     getItemById: async (id : string) : Promise<any> => {
-      const responce = await repository.getItemById(id)
-      
-      return responce
+      const res = await repository.getItemById(id)
+      let storageItemsDto: StorageItemDto
+      if (res.data) {
+
+        storageItemsDto = storageItem2StorageItemDto(res.data)
+        const newRes = {
+          status: res.status,
+          data: storageItemsDto,
+        }
+        return (newRes);
+      }
+      else{
+        throw Error("Faild to get storage Item")
+    }
     }
 
     // getFileDownloadUrl: async (fileId: string): Promise<string> => {

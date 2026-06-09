@@ -13,6 +13,7 @@ import { RenameItemDialog } from '../components/RenameItemDialog';
 import '../styles/filemanager-theme.css';
 import '../styles/storage-explorer.css';
 import type { StorageItemDto } from '../../application/dtos/storageItem';
+import { useFileExplorer } from '../hooks/useFileExplorer';
 
 interface FileExplorerProps {
     folderId?: string;
@@ -22,20 +23,23 @@ interface FileExplorerProps {
 
 export function FileExplorer({ folderId, onSelectionChange, hideToolbar }: FileExplorerProps) {
     const {
-        loadRoot,
-        data,
+
         getItemById,
-        loadFolderByPath,
         loadFolder,
-        createFolder,
-        uploadFile,
-        deleteFile,
-        deleteFolder,
         renameFolder,
         error,
         loading,
     } = useManageStorage();
-
+    
+    const {
+        // loadRoot,
+        uploadFile,
+        deleteFolder,
+        deleteFile,
+        createFolder,
+        loadFolderByPath,
+        data
+    } = useFileExplorer(folderId)
     const [createDialog, setCreateDialog] = useState<{
         type: 'file' | 'folder';
         parentId: string;
@@ -70,15 +74,15 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar }: FileE
         }
     }
     useEffect(() => {
-        const fetchContent = async () => {
-            const path = await loadRootPath()
-            loadFolder(folderId, apiRef.current, path);
-        }
-        if (!folderId) {
-            loadRoot();
-        } else if (apiReady) {
-            fetchContent()
-        }
+        // const fetchContent = async () => {
+        //     const path = await loadRootPath()
+        //     loadFolder(folderId, apiRef.current, path);
+        // }
+        // if (!folderId) {
+        //     loadRoot();
+        // } else if (apiReady) {
+        //     fetchContent()
+        // }
     }, [folderId, apiReady]);
 
     // useEffect(() => {
@@ -133,8 +137,8 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar }: FileE
             apiRef.current = api;
             setApiReady(true);
             api.intercept('create-folder', async ({ parent }) => {
-                console.log( "init create-folder: ", parent );
-                
+                // console.log( "init create-folder: ", parent );
+
                 setCreateDialog({ type: 'folder', parentId: parent });
                 return false;
             });
@@ -161,19 +165,24 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar }: FileE
                 onSelectionChange?.(selected);
             });
 
-            api.on('set-path', async ({ id }: { id: string }) => {
-                console.log("init set-path : " , id);
-                
-                setCurrentPath(id);
-                await loadFolderByPath(id, api);
-            });
-
             api.intercept('delete-files', async ({ ids }) => {
                 return false;
             });
         },
-        [loadFolderByPath, onSelectionChange]
+        [onSelectionChange]
     );
+
+    useEffect(() => {
+        const api = apiRef.current;
+        if (!api) return;
+
+        const tag = 'set-path-handler';
+        api.detach(tag);
+        api.on('set-path', async ({ id }: { id: string }) => {
+            setCurrentPath(id);
+            await loadFolderByPath(id, api);
+        }, { tag });
+    }, [loadFolderByPath]);
 
     const handleAddFolder = () => {
         setCreateDialog({ type: 'folder', parentId: currentPath });
@@ -208,9 +217,9 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar }: FileE
         try {
             for (const item of items) {
                 if (item.type == 'folder') {
-                    await deleteFolder(item.parent, item._id, apiRef, rootPath);
+                    await deleteFolder(item.parent, item.id, apiRef.current, rootPath);
                 } else {
-                    await deleteFile(item.parent, item._id, apiRef, rootPath);
+                    await deleteFile(item.parent, item.id, apiRef.current, rootPath);
                 }
             }
 
