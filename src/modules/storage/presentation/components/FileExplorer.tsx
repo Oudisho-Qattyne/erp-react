@@ -16,13 +16,15 @@ import { useFileExplorer } from '../hooks/useFileExplorer';
 
 interface FileExplorerProps {
     folderId?: string;
+    multiple?: boolean;
+
     onSelectionChange?: (items: StorageItemDto[]) => void;
     hideToolbar?: boolean;
-    fileTypes?:string[]
+    fileTypes?: string[]
 }
 
-export function FileExplorer({ folderId, onSelectionChange, hideToolbar , fileTypes }: FileExplorerProps) {
-    
+export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTypes, multiple = true }: FileExplorerProps) {
+
     const {
         // loadRoot,
         data,
@@ -36,8 +38,9 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar , fileTy
         uploadFile,
         deleteFile,
         loadFolderByPath,
-    } = useFileExplorer(folderId)
-    
+    } = useFileExplorer(folderId, fileTypes)
+    console.log("FileExplorer", fileTypes);
+
     const [createDialog, setCreateDialog] = useState<{
         type: 'file' | 'folder';
         parentId: string;
@@ -112,17 +115,62 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar , fileTy
                 return false;
             });
 
-            api.on('select-file', () => {
+            api.on('select-file', ({ id }) => {
                 const state = api.getState();
-                const selectedSet = new Set();
-                state?.panels?.forEach((panel: any) => {
-                    if (panel._selected) {
-                        panel._selected.forEach((item: any) => selectedSet.add(item));
+                if (multiple) {
+                    const selectedSet = new Set();
+                    state?.panels?.forEach((panel: any) => {
+                        if (panel._selected) {
+                            panel._selected.forEach((item: any) => {
+                                if (fileTypes && fileTypes.length > 0) {
+                                    if (item.type == "file") {
+                                        const fileType = item?.mime_type?.split('/')[0]
+                                        if (fileType) {
+                                            if (fileTypes.includes(fileType)) {
+                                                selectedSet.add(item)
+                                            }
+
+                                        }
+                                    }
+                                }
+                                else {
+                                    selectedSet.add(item)
+                                }
+                            });
+                        }
+                    });
+                    const selected = Array.from(selectedSet) as any[];
+                    setSelectedItems(selected);
+                    onSelectionChange?.(selected);
+                }
+                else {
+                    if (id) {
+                        const storageItem = api.getFile(id)
+                        if (storageItem) {
+                            if (fileTypes && fileTypes.length > 0) {
+                                if (storageItem.type == "file") {
+                                    const fileType = storageItem?.mime_type?.split('/')[0]
+                                    if (fileType) {
+                                        if (fileTypes.includes(fileType)) {
+                                            setSelectedItems([storageItem]);
+                                            onSelectionChange?.([storageItem])
+                                        } else {
+                                            setSelectedItems([]);
+                                            onSelectionChange?.([])
+                                        }
+                                    }
+                                } else {
+                                    setSelectedItems([]);
+                                    onSelectionChange?.([])
+                                }
+                            }
+                            else {
+                                setSelectedItems([storageItem]);
+                                onSelectionChange?.([storageItem])
+                            }
+                        }
                     }
-                });
-                const selected = Array.from(selectedSet) as any[];
-                setSelectedItems(selected);
-                onSelectionChange?.(selected);
+                }
             });
 
             api.intercept('delete-files', async ({ ids }) => {

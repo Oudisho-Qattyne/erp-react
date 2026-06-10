@@ -59,7 +59,7 @@ function mergePaths(path1: string, path2: string): string {
 }
 
 
-const OP_KEYS = ["init", "getItemById", "loadRoot", "loadFolderByPath", "createFolder" , "deleteFolder" , "renameFolder" , "uploadFile" , "deleteFile"] as const;
+const OP_KEYS = ["init", "getItemById", "loadRoot", "loadFolderByPath", "createFolder", "deleteFolder", "renameFolder", "uploadFile", "deleteFile"] as const;
 
 function initRecord<T>(value: T): Record<string, T> {
     return Object.fromEntries(OP_KEYS.map((k) => [k, value]));
@@ -77,14 +77,15 @@ export interface UseFileExplorerReturn {
     loadFolderByPath: (path: string, api: any) => Promise<void>;
     createFolder: (parentId: string, name: string, api: any) => Promise<void>;
     deleteFolder: (parentId: string, id: string, api: any) => Promise<void>;
-    renameFolder: (parentId: string,id: string, name: string,api: any) => Promise<void>;
+    renameFolder: (parentId: string, id: string, name: string, api: any) => Promise<void>;
     uploadFile: (parentId: string, file: File, isSecure: boolean, name: string, api: any) => Promise<void>;
     deleteFile: (parentId: string, id: string, api: any) => Promise<void>;
     clearError: () => void;
 }
 
 
-export const useFileExplorer = (folderId?: string): UseFileExplorerReturn => {
+export const useFileExplorer = (folderId?: string, fileTypes?: string[]): UseFileExplorerReturn => {
+    console.log("useFileExplorer", fileTypes);
 
     const [rootFolder, setRootFolder] = useState<StorageItemDto | null>(null)
 
@@ -146,37 +147,55 @@ export const useFileExplorer = (folderId?: string): UseFileExplorerReturn => {
         setFunctionLoading("loadFolderByPath", true);
         setFunctionError("loadFolderByPath", null);
         try {
-            console.log(rootFolder);
-
+            let data = []
             if (rootFolder) {
-                console.log("there is root folder ", rootFolder);
-
                 const res = await useCase.getFolderContentsByPath(mergePaths(rootFolder.id, path));
-
                 res.data.forEach(i => {
                     i.id = removeFirstSegmentIfMatches(i.id, rootFolder.id)
                 })
-                console.log("loadFolderByPath", res);
                 // setData(res.data);
-                api.exec("provide-data", { data: res.data, id: path });
+                data = res.data
 
             }
             else {
-                console.log("no root", path);
-
                 const res = await useCase.getFolderContentsByPath(path);
                 // setData(res.data);
-                api.exec("provide-data", { data: res.data, id: path });
+                data = res.data
 
             }
+            if (fileTypes) {
+                if (fileTypes.length > 0) {
+                    console.log("fileTypes", fileTypes);
+                    console.log("data", data);
+
+                    data = data.filter(storageItem => {
+                        console.log("storageItem", storageItem);
+
+                        if (storageItem.type == "folder")
+                            return true
+                        else {
+                            if (storageItem.type == "file") {
+                                const fileType = storageItem?.mime_type.split('/')[0]
+                                console.log(fileType);
+
+                                if (fileTypes?.includes(fileType)) {
+                                    return true
+                                }
+                                else {
+                                    return false
+                                }
+                            }
+                        }
+                    })
+                }
+            }
+            api.exec("provide-data", { data: data, id: path });
             // api.exec("provide-data", { data: res.data, id: path });
         } catch (err: any) {
             switch (err.status) {
                 case 403:
                     setFunctionError("loadFolderByPath", "Forbiden");
-
                     break;
-
                 default:
                     setFunctionError("loadFolderByPath", err.message || `Failed to load folder ${path}`);
                     break;
@@ -294,8 +313,8 @@ export const useFileExplorer = (folderId?: string): UseFileExplorerReturn => {
         try {
 
             const storageItem = api.getFile(id);
-            console.log("renameFolder" , id , storageItem);
-            
+            console.log("renameFolder", id, storageItem);
+
             if (storageItem) {
                 const res = await useCase.renameFolder(storageItem._id, name);
             }
@@ -435,17 +454,38 @@ export const useFileExplorer = (folderId?: string): UseFileExplorerReturn => {
 
         setFunctionError("getItemById", null);
         try {
+            let data = []
             if (rootFolder) {
                 const res = await useCase.getFolderContentsByPath(rootFolder.id);
                 res.data.forEach(i => {
                     i.id = removeFirstSegmentIfMatches(i.id, rootFolder.id)
                 })
-                setData(res.data);
+                data = res.data
+
             }
             else {
                 const res = await useCase.listRootLevel();
-                setData(res.data);
+                data = res.data
             }
+            data = data.filter(storageItem => {
+                console.log("storageItem", storageItem);
+
+                if (storageItem.type == "folder")
+                    return true
+                else {
+                    if (storageItem.type == "file") {
+                        const fileType = storageItem?.mime_type.split('/')[0]
+                        if (fileTypes?.includes(fileType)) {
+                            return true
+                        }
+                        else {
+                            return false
+                        }
+                    }
+                }
+            })
+            setData(data);
+
         }
         catch (err: any) {
             switch (err.status) {
@@ -485,13 +525,13 @@ export const useFileExplorer = (folderId?: string): UseFileExplorerReturn => {
         init()
     }, [])
 
-const isLoading = useCallback(() => {
-  return Object.values(loading).some(Boolean);
-}, [loading]);
+    const isLoading = useCallback(() => {
+        return Object.values(loading).some(Boolean);
+    }, [loading]);
 
-const hasErrors = useCallback(() => {
-  return Object.values(error).some(err => err !== null);
-}, [error]);
+    const hasErrors = useCallback(() => {
+        return Object.values(error).some(err => err !== null);
+    }, [error]);
 
     return ({
         // loadFolder,

@@ -13,19 +13,21 @@ interface FilePickerProps {
   fileTypes?: string[]
 }
 
-export function FilePicker({ isOpen, onClose, onSelect, folderId, multiple , fileTypes}: FilePickerProps) {
+export function FilePicker({ isOpen, onClose, onSelect, folderId, multiple, fileTypes }: FilePickerProps) {
   const [selectedItems, setSelectedItems] = useState<StorageItemDto[]>([]);
 
   const handleSelect = () => {
     onSelect(selectedItems);
     onClose();
   };
+console.log("FilePicker" , fileTypes);
 
   return (
     <Dialog isOpen={isOpen} onClose={onClose} title="اختر الملفات" size="3xl">
       <div className="h-[70vh] flex flex-col -m-4">
         <div className="flex-1 min-h-0">
           <FileExplorer
+            multiple={multiple}
             folderId={folderId}
             onSelectionChange={setSelectedItems}
             fileTypes={fileTypes}

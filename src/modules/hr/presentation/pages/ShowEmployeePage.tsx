@@ -32,13 +32,13 @@ export function ShowEmployeePage() {
   const apiClient = useApiClient();
   const { language, t } = useLanguage();
 
-  const [FileExplorerOpen , setFileExplorerOpen] = useState<boolean>(false)
-const storage = useStorage();
+  const [FileExplorerOpen, setFileExplorerOpen] = useState<boolean>(false)
+  const storage = useStorage();
 
   const [employee, setEmployee] = useState<EmployeeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const {getById} = useManageEmployee()
+  const { getById } = useManageEmployee()
   useEffect(() => {
     const fetchEmployee = async () => {
       try {
@@ -271,7 +271,7 @@ const storage = useStorage();
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                       <div className="flex flex-col gap-1">
                         <span className="text-xs text-text-muted">{t('employees.university', 'hr') || 'الجامعة'}</span>
-                        <span className="text-sm font-medium">{getLocalizedName(edu.university?.name)  || edu.university_id || '-'}</span>
+                        <span className="text-sm font-medium">{getLocalizedName(edu.university?.name) || edu.university_id || '-'}</span>
                       </div>
                       <div className="flex flex-col gap-1">
                         <span className="text-xs text-text-muted">{t('employees.faculty', 'hr') || 'الكلية'}</span>
@@ -315,11 +315,9 @@ const storage = useStorage();
           )}
         </div>
       </div>
-      {storage?.FileExplorerDialogComponent && employee?.folder &&
-      <storage.FileExplorerDialogComponent  isOpen={FileExplorerOpen} onClose={() => {setFileExplorerOpen(false)}} folderId={employee.folder} />
-      
+      {storage?.FilePickerComponent && employee?.folder &&
+        <storage.FilePickerComponent onSelect={(i) => {console.log(i);}} multiple={false} isOpen={FileExplorerOpen} onClose={() => { setFileExplorerOpen(false) }} folderId={employee.folder} fileTypes={["image"]} />
       }
-      {/* <FilePickerComponent   /> */}
     </div>
   );
 }
