@@ -84,7 +84,7 @@ export interface UseFileExplorerReturn {
 }
 
 
-export const useFileExplorer = (folderId?: string, fileTypes?: string[]): UseFileExplorerReturn => {
+export const useFileExplorer = (folderId?: string, fileTypes?: string[], previewCacheRef?: React.RefObject<Map<string, string>> | null): UseFileExplorerReturn => {
 
     const [rootFolder, setRootFolder] = useState<StorageItemDto | null>(null)
 
@@ -97,6 +97,19 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[]): UseFil
 
     const repository = createManageStorageRepository(apiClient);
     const useCase = createManageStorageUseCase(repository);
+
+    const preloadImagePreviews = (items: StorageItemDto[]) => {
+        if (!previewCacheRef) return;
+        const imageFiles = items.filter(f => f.type === 'file' && (f as any).mime_type?.startsWith('image'));
+        for (const file of imageFiles) {
+            if (previewCacheRef.current.has(file.id)) continue;
+            apiClient.get<Blob>(`/storage-management/${file._id}`, { responseType: 'blob' })
+                .then(blob => {
+                    previewCacheRef.current.set(file.id, URL.createObjectURL(blob));
+                })
+                .catch(() => { });
+        }
+    };
 
     const clearError = useCallback(() => setError(initRecord(null)), []);
 
@@ -181,6 +194,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[]): UseFil
                     })
                 }
             }
+            await preloadImagePreviews(data);
             api.exec("provide-data", { data: data, id: path });
             // api.exec("provide-data", { data: res.data, id: path });
         } catch (err: any) {
@@ -472,6 +486,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[]): UseFil
                 }
             })
             setData(data);
+            preloadImagePreviews(data);
 
         }
         catch (err: any) {

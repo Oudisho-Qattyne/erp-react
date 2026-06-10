@@ -16,6 +16,7 @@ import type { StorageItem } from '../../domain/entities/FileSystemEntry';
 import type { StorageItemDto } from '../../application/dtos/storageItem';
 import { FileExplorer } from '../components/FileExplorer';
 import { useFileExplorer } from '../hooks/useFileExplorer';
+import { Image } from '../components/Image';
 
 export function StorageExplorer() {
     const {
@@ -226,6 +227,7 @@ export function StorageExplorer() {
 
     return (
         <div className="h-full">
+            <Image id='019ea8fd-62e5-72c3-a41f-eb4b64222737'/>
             <div className="wx-willow-theme">
                 <Willow>
                     <Locale words={language === 'ar' ? ar : en} optional={true}>

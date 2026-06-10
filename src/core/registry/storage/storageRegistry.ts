@@ -39,6 +39,11 @@ export interface FileExplorerDialogProps {
   fileTypes?: string[];
 }
 
+export interface ImageComponentProps {
+  id: string;
+  className?: string;
+}
+
 export interface StorageApi {
   /** Component that renders a full file manager (browser) */
   FileExplorerComponent?: React.ComponentType<FileExplorerProps>;
@@ -46,6 +51,8 @@ export interface StorageApi {
   FilePickerComponent?: React.ComponentType<FilePickerProps>;
   /** Component that renders a file explorer dialog */
   FileExplorerDialogComponent?: React.ComponentType<FileExplorerDialogProps>;
+  /** Component that renders a storage image by id */
+  ImageComponent?: React.ComponentType<ImageComponentProps>;
 }
 let storageApi: StorageApi | null = null;
 
