@@ -90,4 +90,5 @@ export interface EmployeeData {
   updated_at: string;
   children:EmployeeChildren[];
   folder:string;
+  photo_id:string;
 }

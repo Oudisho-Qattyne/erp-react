@@ -16,7 +16,8 @@ import {
   Building2,
   Calendar,
   Contact,
-  Activity
+  Activity,
+  Pencil
 } from 'lucide-react';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import { useManageEmployee } from '../hooks/useEmployees';
@@ -33,35 +34,51 @@ export function ShowEmployeePage() {
   const { language, t } = useLanguage();
 
   const [FileExplorerOpen, setFileExplorerOpen] = useState<boolean>(false)
+  const [employeePhotoPickerOpen, setEmployeePhotoPickerOpen] = useState<boolean>(false)
   const storage = useStorage();
 
   const [employee, setEmployee] = useState<EmployeeData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [photoUpdating, setPhotoUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { getById } = useManageEmployee()
-  useEffect(() => {
-    const fetchEmployee = async () => {
-      try {
-        setLoading(true);
-        // The API endpoint according to docs is GET /hr/employees/{id}
-        const res = await getById(Number(id))
-        if (res) {
-          const emp = res.data
-          setEmployee(emp);
-        } else {
-          setError(t('show_employee.not_found', 'hr') || 'لم يتم العثور على الموظف');
-        }
-      } catch (err: any) {
-        setError(err.message || t('show_employee.load_error', 'hr') || 'حدث خطأ أثناء تحميل بيانات الموظف');
-      } finally {
-        setLoading(false);
+  const { getById , update } = useManageEmployee()
+  const fetchEmployee = async () => {
+    try {
+      setLoading(true);
+      const res = await getById(Number(id))
+      if (res) {
+        const emp = res.data
+        setEmployee(emp);
+      } else {
+        setError(t('show_employee.not_found', 'hr') || 'لم يتم العثور على الموظف');
       }
-    };
+    } catch (err: any) {
+      setError(err.message || t('show_employee.load_error', 'hr') || 'حدث خطأ أثناء تحميل بيانات الموظف');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (id) {
       fetchEmployee();
     }
   }, [id]);
+
+  const handlePhotoSelect = async (items: any[]) => {
+    if (items.length === 0) return;
+    setPhotoUpdating(true);
+    try {
+      const  { ...newData } = employee
+      await update(Number(id), { ...newData , photo_id: items[0]._id });
+      await fetchEmployee();
+      setEmployeePhotoPickerOpen(false);
+    } catch (err: any) {
+      console.error('Failed to update photo:', err);
+    } finally {
+      setPhotoUpdating(false);
+    }
+  };
 
   if (loading) return <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />;
 
@@ -102,8 +119,27 @@ export function ShowEmployeePage() {
       {/* Main Profile Header */}
       <div className="bg-card/60 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-border shadow-sm flex flex-col md:flex-row gap-6 items-center md:items-start relative overflow-hidden group">
         <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-primary via-primary-light to-primary opacity-70"></div>
-        <div className="w-24 h-24 md:w-32 md:h-32 bg-primary/10 rounded-full flex items-center justify-center border-4 border-card shadow-sm shrink-0">
-          <User size={48} className="text-primary opacity-80" />
+        <div className='relative flex justify-center items-center overflow-hidden rounded-full'>
+
+          {
+            employee.photo_id ?
+              <div className="w-24 h-24 md:w-32 md:h-32 bg-primary/10 flex items-center justify-center border-4 border-card shadow-sm shrink-0">
+                <img />
+              </div>
+              :
+
+              <div className="w-24 h-24 md:w-32 md:h-32 bg-primary/10 flex items-center justify-center border-4 border-card shadow-sm shrink-0">
+                <User size={48} className="text-primary opacity-80" />
+              </div>
+
+          }
+          <div onClick={() => { if (!photoUpdating) setEmployeePhotoPickerOpen(true) }} className='absolute w-full h-full flex cursor-pointer opacity-0 justify-center items-center hover:opacity-50 transform duration-300'>
+            {photoUpdating ? (
+              <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
+            ) : (
+              <Pencil size={48} className="text-primary opacity-80" />
+            )}
+          </div>
         </div>
         <div className="flex-1 text-center md:text-start space-y-2 pt-2">
           <div className="flex flex-col md:flex-row md:items-center gap-3">
@@ -315,8 +351,12 @@ export function ShowEmployeePage() {
           )}
         </div>
       </div>
+      {storage?.FileExplorerDialogComponent && employee?.folder &&
+        <storage.FileExplorerDialogComponent isOpen={FileExplorerOpen} onClose={() => { setFileExplorerOpen(false) }} folderId={employee.folder} />
+      }
+
       {storage?.FilePickerComponent && employee?.folder &&
-        <storage.FilePickerComponent onSelect={(i) => {console.log(i);}} multiple={false} isOpen={FileExplorerOpen} onClose={() => { setFileExplorerOpen(false) }} folderId={employee.folder} fileTypes={["image"]} />
+        <storage.FilePickerComponent onSelect={handlePhotoSelect} multiple={false} isOpen={employeePhotoPickerOpen} onClose={() => { setEmployeePhotoPickerOpen(false) }} folderId={employee.folder} fileTypes={["image"]} />
       }
     </div>
   );

@@ -85,7 +85,6 @@ export interface UseFileExplorerReturn {
 
 
 export const useFileExplorer = (folderId?: string, fileTypes?: string[]): UseFileExplorerReturn => {
-    console.log("useFileExplorer", fileTypes);
 
     const [rootFolder, setRootFolder] = useState<StorageItemDto | null>(null)
 
@@ -165,19 +164,12 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[]): UseFil
             }
             if (fileTypes) {
                 if (fileTypes.length > 0) {
-                    console.log("fileTypes", fileTypes);
-                    console.log("data", data);
-
                     data = data.filter(storageItem => {
-                        console.log("storageItem", storageItem);
-
                         if (storageItem.type == "folder")
                             return true
                         else {
                             if (storageItem.type == "file") {
                                 const fileType = storageItem?.mime_type.split('/')[0]
-                                console.log(fileType);
-
                                 if (fileTypes?.includes(fileType)) {
                                     return true
                                 }
@@ -311,10 +303,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[]): UseFil
         setFunctionLoading("renameFolder", true);
         setFunctionError("renameFolder", null);
         try {
-
             const storageItem = api.getFile(id);
-            console.log("renameFolder", id, storageItem);
-
             if (storageItem) {
                 const res = await useCase.renameFolder(storageItem._id, name);
             }
@@ -468,8 +457,6 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[]): UseFil
                 data = res.data
             }
             data = data.filter(storageItem => {
-                console.log("storageItem", storageItem);
-
                 if (storageItem.type == "folder")
                     return true
                 else {

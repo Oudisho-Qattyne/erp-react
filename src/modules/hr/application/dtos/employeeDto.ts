@@ -66,6 +66,7 @@ import type { EducationEntry, EmployeeChildren, EmploymentDetails } from '../../
     employment_details: CreateEmploymentDetailsDTO;
     educations: CreateEducationDTO[];
     childre:CreateEmployeeChildrenDTO[];
+    photo_id?:string
   }
   
   export type UpdateEmployeeDTO = Partial<CreateEmployeeDTO>;
