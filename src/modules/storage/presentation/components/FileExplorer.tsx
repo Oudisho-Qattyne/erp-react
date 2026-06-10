@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Filemanager, Willow, type IApi, type IFileMenuOption, type IParsedEntity, type TContextMenuType } from '@svar-ui/react-filemanager';
 import '@svar-ui/react-filemanager/all.css';
-import { useManageStorage } from '../hooks/useManageStorage';
 import { StorageToolbar } from '../components/StorageToolbar';
 import { Locale } from '@svar-ui/react-core';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
@@ -19,27 +18,26 @@ interface FileExplorerProps {
     folderId?: string;
     onSelectionChange?: (items: StorageItemDto[]) => void;
     hideToolbar?: boolean;
+    fileTypes?:string[]
 }
 
-export function FileExplorer({ folderId, onSelectionChange, hideToolbar }: FileExplorerProps) {
-    const {
-
-        getItemById,
-        loadFolder,
-        renameFolder,
-        error,
-        loading,
-    } = useManageStorage();
+export function FileExplorer({ folderId, onSelectionChange, hideToolbar , fileTypes }: FileExplorerProps) {
     
     const {
         // loadRoot,
-        uploadFile,
-        deleteFolder,
-        deleteFile,
+        data,
+        loading,
+        isLoading,
+        error,
+        hasErrors,
         createFolder,
+        deleteFolder,
+        renameFolder,
+        uploadFile,
+        deleteFile,
         loadFolderByPath,
-        data
     } = useFileExplorer(folderId)
+    
     const [createDialog, setCreateDialog] = useState<{
         type: 'file' | 'folder';
         parentId: string;
@@ -58,42 +56,6 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar }: FileE
     const [rootPath, setRootPath] = useState<string>("")
     const apiRef = useRef<any>(null);
     const { language } = useLanguage();
-
-    const loadRootPath = async () => {
-        const res = await getItemById(folderId)
-        if (res.data.type == 'folder') {
-            let path = ''
-            if (res.data.path == "/") {
-                path = `${res.data.path}${res.data.name}`
-            }
-            else {
-                path = `${res.data.path}/${res.data.name}`
-            }
-            setRootPath(path)
-            return path
-        }
-    }
-    useEffect(() => {
-        // const fetchContent = async () => {
-        //     const path = await loadRootPath()
-        //     loadFolder(folderId, apiRef.current, path);
-        // }
-        // if (!folderId) {
-        //     loadRoot();
-        // } else if (apiReady) {
-        //     fetchContent()
-        // }
-    }, [folderId, apiReady]);
-
-    // useEffect(() => {
-    //     const fetchContent = async () => {
-    //         const path = await loadRootPath()
-    //         loadFolder(folderId, apiRef.current, path);
-    //     }
-    //     if (folderId && apiReady) {
-    //         fetchContent()
-    //     }
-    // }, [folderId, apiReady]);
 
     const customMenuOptions = useCallback((
         mode: TContextMenuType,
@@ -137,8 +99,6 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar }: FileE
             apiRef.current = api;
             setApiReady(true);
             api.intercept('create-folder', async ({ parent }) => {
-                // console.log( "init create-folder: ", parent );
-
                 setCreateDialog({ type: 'folder', parentId: parent });
                 return false;
             });
@@ -217,9 +177,9 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar }: FileE
         try {
             for (const item of items) {
                 if (item.type == 'folder') {
-                    await deleteFolder(item.parent, item.id, apiRef.current, rootPath);
+                    await deleteFolder(item.parent, item.id, apiRef.current);
                 } else {
-                    await deleteFile(item.parent, item.id, apiRef.current, rootPath);
+                    await deleteFile(item.parent, item.id, apiRef.current);
                 }
             }
 
@@ -233,7 +193,7 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar }: FileE
     const handleConfirmRename = async (name: string) => {
         if (!renameConfirm) return;
         try {
-            await renameFolder(renameConfirm.parent, renameConfirm._id, name, apiRef, rootPath);
+            await renameFolder(renameConfirm.parent, renameConfirm.id, name, apiRef.current);
             setSelectedItems([]);
             setRenameConfirm(null);
         } catch (err) {
@@ -264,13 +224,13 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar }: FileE
                             <div className="flex-1 min-h-0">
                                 <Filemanager ref={apiRef} init={init} data={data} menuOptions={customMenuOptions} />
                             </div>
-                            {loading && (
+                            {isLoading() && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-white/50">
                                     <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
                                 </div>
                             )}
                         </div>
-                        {error && <p className="text-red-500 mt-2">{error}</p>}
+                        {hasErrors() && <p className="text-red-500 mt-2">somthing went wrong</p>}
                     </Locale>
                 </Willow>
             </div>

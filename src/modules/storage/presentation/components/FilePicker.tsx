@@ -10,9 +10,10 @@ interface FilePickerProps {
   onSelect: (items: StorageItemDto[]) => void;
   folderId?: string;
   multiple?: boolean;
+  fileTypes?: string[]
 }
 
-export function FilePicker({ isOpen, onClose, onSelect, folderId, multiple }: FilePickerProps) {
+export function FilePicker({ isOpen, onClose, onSelect, folderId, multiple , fileTypes}: FilePickerProps) {
   const [selectedItems, setSelectedItems] = useState<StorageItemDto[]>([]);
 
   const handleSelect = () => {
@@ -27,6 +28,7 @@ export function FilePicker({ isOpen, onClose, onSelect, folderId, multiple }: Fi
           <FileExplorer
             folderId={folderId}
             onSelectionChange={setSelectedItems}
+            fileTypes={fileTypes}
           />
         </div>
       </div>

@@ -8,6 +8,7 @@ import { createManageStorageUseCase } from "../../application/usecases/ManageSto
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
 import { toast } from "sonner";
 import type { IApi } from "@svar-ui/react-filemanager";
+import { object } from "zod";
 
 /**
  * Removes the first segment of `path` if it equals `segmentPath`.
@@ -58,7 +59,7 @@ function mergePaths(path1: string, path2: string): string {
 }
 
 
-const OP_KEYS = ["init", "getItemById", "loadRoot", "loadFolderByPath"] as const;
+const OP_KEYS = ["init", "getItemById", "loadRoot", "loadFolderByPath", "createFolder" , "deleteFolder" , "renameFolder" , "uploadFile" , "deleteFile"] as const;
 
 function initRecord<T>(value: T): Record<string, T> {
     return Object.fromEntries(OP_KEYS.map((k) => [k, value]));
@@ -67,16 +68,18 @@ function initRecord<T>(value: T): Record<string, T> {
 export interface UseFileExplorerReturn {
     data: StorageItemDto[];
     loading: Record<string, boolean>;
+    isLoading: () => boolean,
     error: Record<string, string | null>;
+    hasErrors: () => boolean,
     getItemById: (id: string) => Promise<DomainResponse<StorageItemDto>>;
     loadRoot: () => Promise<void>;
     // loadFolder: (folderId: string, apiRef: any ) => Promise<void>;
-    loadFolderByPath: (path: string, api: any, clipPath?: string) => Promise<void>;
+    loadFolderByPath: (path: string, api: any) => Promise<void>;
     createFolder: (parentId: string, name: string, api: any) => Promise<void>;
+    deleteFolder: (parentId: string, id: string, api: any) => Promise<void>;
+    renameFolder: (parentId: string,id: string, name: string,api: any) => Promise<void>;
     uploadFile: (parentId: string, file: File, isSecure: boolean, name: string, api: any) => Promise<void>;
-    deleteFolder: (parentId: string, id: string, api: any, clipPath?: string) => Promise<void>;
-    deleteFile: (parentId: string, id: string, api: any, clipPath?: string) => Promise<void>;
-    // renameFolder: (parentId: string,id: string, name: string,api: any) => Promise<void>;
+    deleteFile: (parentId: string, id: string, api: any) => Promise<void>;
     clearError: () => void;
 }
 
@@ -141,7 +144,7 @@ export const useFileExplorer = (folderId?: string): UseFileExplorerReturn => {
 
     const loadFolderByPath = useCallback(async (path: string, api: any) => {
         setFunctionLoading("loadFolderByPath", true);
-        setError(null);
+        setFunctionError("loadFolderByPath", null);
         try {
             console.log(rootFolder);
 
@@ -242,7 +245,7 @@ export const useFileExplorer = (folderId?: string): UseFileExplorerReturn => {
         }
     }, [useCase, language, loadFolderByPath, rootFolder]);
 
-    const deleteFolder = useCallback(async (parent: string, id: string, api: any, clipPath?: string) => {
+    const deleteFolder = useCallback(async (parent: string, id: string, api: any) => {
         setFunctionLoading("deleteFolder", true);
         setFunctionError("deleteFolder", null);
 
@@ -282,6 +285,50 @@ export const useFileExplorer = (folderId?: string): UseFileExplorerReturn => {
         } finally {
             setFunctionLoading("deleteFolder", false);
 
+        }
+    }, [useCase, language]);
+
+    const renameFolder = useCallback(async (parent: string, id: string, name: string, api: any) => {
+        setFunctionLoading("renameFolder", true);
+        setFunctionError("renameFolder", null);
+        try {
+
+            const storageItem = api.getFile(id);
+            console.log("renameFolder" , id , storageItem);
+            
+            if (storageItem) {
+                const res = await useCase.renameFolder(storageItem._id, name);
+            }
+            await loadFolderByPath(parent, api);
+
+            toast.success(
+                language === 'ar'
+                    ? `تم تغيير الاسم إلى "${name}" بنجاح`
+                    : `Renamed to "${name}" successfully`
+            );
+        } catch (err: any) {
+            const errMsg = err.message || `Failed to rename`;
+            switch (err.status) {
+                case 403:
+                    setFunctionError("renameFolder", "Forbiden");
+                    toast.error(
+                        language === 'ar'
+                            ? "غير مصرح لك بإعادة التسمية"
+                            : "You are not authorized to rename this item"
+                    );
+                    break;
+                default:
+                    setFunctionError("renameFolder", errMsg);
+                    toast.error(
+                        language === 'ar'
+                            ? `فشلت إعادة التسمية: ${errMsg}`
+                            : `Failed to rename: ${errMsg}`
+                    );
+                    break;
+            }
+            throw err;
+        } finally {
+            setFunctionLoading("renameFolder", false);
         }
     }, [useCase, language]);
 
@@ -340,7 +387,8 @@ export const useFileExplorer = (folderId?: string): UseFileExplorerReturn => {
             setFunctionLoading("uploadFile", false);
         }
     }, [useCase, language, loadFolderByPath]);
-    const deleteFile = useCallback(async (parent: string, id: string, api: any, clipPath?: string) => {
+
+    const deleteFile = useCallback(async (parent: string, id: string, api: any) => {
         setFunctionLoading("deleteFile", true);
         setFunctionError("deleteFile", null);
         try {
@@ -380,6 +428,7 @@ export const useFileExplorer = (folderId?: string): UseFileExplorerReturn => {
             setFunctionLoading("deleteFile", false);
         }
     }, [useCase, language]);
+
 
     const loadRoot = useCallback(async (rootFolder?: StorageItemDto) => {
         setFunctionLoading("loadRoot", true)
@@ -436,19 +485,28 @@ export const useFileExplorer = (folderId?: string): UseFileExplorerReturn => {
         init()
     }, [])
 
+const isLoading = useCallback(() => {
+  return Object.values(loading).some(Boolean);
+}, [loading]);
+
+const hasErrors = useCallback(() => {
+  return Object.values(error).some(err => err !== null);
+}, [error]);
 
     return ({
+        // loadFolder,
         data,
         loading,
+        isLoading,
         error,
+        hasErrors,
         getItemById,
         loadRoot,
-        // loadFolder,
         loadFolderByPath,
         createFolder,
-        // renameFolder,
-        uploadFile,
+        renameFolder,
         deleteFolder,
+        uploadFile,
         deleteFile,
         clearError,
     })

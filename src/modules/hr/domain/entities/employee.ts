@@ -88,5 +88,6 @@ export interface EmployeeData {
   educations: EducationEntry[];
   created_at: string;
   updated_at: string;
-  children:EmployeeChildren[]
+  children:EmployeeChildren[];
+  folder:string;
 }

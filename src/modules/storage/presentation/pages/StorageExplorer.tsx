@@ -2,7 +2,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Filemanager, getMenuOptions, Willow, type FilePreview, type IApi, type IFileMenuOption, type IParsedEntity, type TContextMenuType } from '@svar-ui/react-filemanager';
 import '@svar-ui/react-filemanager/all.css';
-import { useManageStorage } from '../hooks/useManageStorage';
 import { StorageToolbar } from '../components/StorageToolbar';
 import { Locale } from '@svar-ui/react-core';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
@@ -16,6 +15,7 @@ import { RenameItemDialog } from '../components/RenameItemDialog';
 import type { StorageItem } from '../../domain/entities/FileSystemEntry';
 import type { StorageItemDto } from '../../application/dtos/storageItem';
 import { FileExplorer } from '../components/FileExplorer';
+import { useFileExplorer } from '../hooks/useFileExplorer';
 
 export function StorageExplorer() {
     const {
@@ -29,8 +29,10 @@ export function StorageExplorer() {
         getItemById,
         renameFolder,
         error,
+        hasErrors,
         loading,
-    } = useManageStorage();
+        isLoading,
+    } = useFileExplorer();
 
     const [createDialog, setCreateDialog] = useState<{
         type: 'file' | 'folder';
@@ -237,13 +239,13 @@ export function StorageExplorer() {
                                 hasRenameSelection={selectedItems.filter(i => i.type == "folder").length > 0}
                             />
                             <Filemanager ref={apiRef} init={init} data={data} menuOptions={customMenuOptions} />
-                            {loading && (
+                            {isLoading() && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-white/50">
                                     <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
                                 </div>
                             )}
                         </div>
-                        {error && <p className="text-red-500 mt-2">{error}</p>}
+                        {hasErrors() && <p className="text-red-500 mt-2">something wrong</p>}
                     </Locale>
                 </Willow>
             </div>

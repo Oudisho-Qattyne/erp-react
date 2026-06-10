@@ -24,12 +24,16 @@ import { getLocalizedName } from '../../../../core/presentation/utils/helpes';
 import { LoadingState } from '../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../core/presentation/layouts/ui/state/ErrorState';
 import { EmptyState } from '../../../../core/presentation/layouts/ui/state/EmptyState';
+import { useStorage } from '../../../../core/registry/storage/StorageProvider';
 
 export function ShowEmployeePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const apiClient = useApiClient();
   const { language, t } = useLanguage();
+
+  const [FileExplorerOpen , setFileExplorerOpen] = useState<boolean>(false)
+const storage = useStorage();
 
   const [employee, setEmployee] = useState<EmployeeData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -84,6 +88,11 @@ export function ShowEmployeePage() {
           {t('show_employee.back', 'hr') || 'العودة'}
         </Button>
         <div className="flex gap-3">
+          {storage?.FileExplorerDialogComponent && employee?.folder && (
+            <Button variant="outline" onClick={() => setFileExplorerOpen(true)}>
+              {t('show_employee.folder', 'hr') || 'مجلد الموظف'}
+            </Button>
+          )}
           <Button variant="primary" onClick={() => navigate(`/hr/employees/${id}/edit`)}>
             {t('show_employee.edit', 'hr') || 'تعديل الموظف'}
           </Button>
@@ -306,6 +315,11 @@ export function ShowEmployeePage() {
           )}
         </div>
       </div>
+      {storage?.FileExplorerDialogComponent && employee?.folder &&
+      <storage.FileExplorerDialogComponent  isOpen={FileExplorerOpen} onClose={() => {setFileExplorerOpen(false)}} folderId={employee.folder} />
+      
+      }
+      {/* <FilePickerComponent   /> */}
     </div>
   );
 }
