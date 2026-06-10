@@ -1,0 +1,60 @@
+{
+  "navigation": {
+    "roles_and_permissions": "Roles & Permissions",
+    "roles": {
+      "title": "Roles"
+    },
+    "show_role": {
+      "title": "Role Details"
+    },
+    "edit_role": {
+      "title": "Edit Role"
+    }
+  },
+  "roles": {
+    "title": "Roles",
+    "add": "Add Role",
+    "search_placeholder": "Search by name or display name",
+    "no_data": "No roles found",
+    "name": "Name",
+    "display_name": "Display Name",
+    "number_of_users": "Users Count",
+    "created_at": "Created At",
+    "confirm_delete_title": "Delete Role",
+    "confirm_delete_message": "Are you sure you want to delete this role? This action cannot be undone."
+  },
+  "show_role": {
+    "title": "Role Details",
+    "not_found": "Role not found",
+    "load_error": "Error loading role data",
+    "back_to_list": "Back to List",
+    "back": "Back",
+    "edit": "Edit Role",
+    "role_info": "Role Information",
+    "permissions": "Permissions",
+    "no_permissions": "No permissions assigned"
+  },
+  "edit_role": {
+    "title": "Edit Role",
+    "not_found": "Role not found",
+    "load_error": "Error loading role data",
+    "update_error": "Failed to update role",
+    "back_to_list": "Back to List",
+    "back": "Back",
+    "submit": "Update Role"
+  },
+  "role_form": {
+    "save": "Save Role",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "name": "Name",
+    "display_name": "Display Name",
+    "permissions": "Permissions",
+    "select_permissions": "Select permissions",
+    "validation": {
+      "name_required": "Role name is required",
+      "display_name_required": "Display name is required",
+      "permissions_required": "At least one permission is required"
+    }
+  }
+}

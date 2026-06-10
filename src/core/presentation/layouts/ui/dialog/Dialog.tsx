@@ -8,6 +8,7 @@ interface DialogProps {
   children: React.ReactNode;
   actions?: React.ReactNode; // optional footer buttons
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
+  headerClassName?: string;
 }
 
 const sizeClasses = {
@@ -19,7 +20,7 @@ const sizeClasses = {
   '3xl': 'max-w-9xl',
 };
 
-export function Dialog({ isOpen, onClose, title, children, actions, size = 'md' }: DialogProps) {
+export function Dialog({ isOpen, onClose, title, children, actions, size = 'md', headerClassName }: DialogProps) {
   const [shouldRender, setShouldRender] = useState(isOpen);
   const [isClosing, setIsClosing] = useState(false);
 
@@ -64,7 +65,7 @@ export function Dialog({ isOpen, onClose, title, children, actions, size = 'md' 
         `}
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b border-border bg-primary text-white  ">
+        <div className={`flex justify-between items-center p-4 border-b border-border ${headerClassName || 'bg-primary text-white'}`}>
           <h2 className="text-lg font-bold text-white">{title}</h2>
           <button onClick={onClose} className="p-1.5 rounded-md hover:bg-danger/10 hover:text-danger transition-all duration-200 group">
             <X size={18} className="group-hover:text-danger transition-colors text-white cursor-pointer" />

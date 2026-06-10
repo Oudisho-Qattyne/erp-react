@@ -8,6 +8,12 @@ import { ReportsPage } from './presentation/pages/ReportsPage'
 import { EmployeesPage } from './presentation/pages/EmployeesPage'
 import { ShowEmployeePage } from './presentation/pages/ShowEmployeePage'
 import { EditEmployeePage } from './presentation/pages/EditEmployeePage'
+import { CountriesPage } from './presentation/pages/lookups/CountriesPage'
+import { CitiesPage } from './presentation/pages/lookups/CitiesPage'
+import { RegionsPage } from './presentation/pages/lookups/RegionsPage'
+import { UniversitiesPage } from './presentation/pages/lookups/UniversitiesPage'
+import { FacultiesPage } from './presentation/pages/lookups/FacultiesPage'
+import { SpecializationsPage } from './presentation/pages/lookups/SpecializationsPage'
 
 const usersModule: Module = {
   name: 'hr',
@@ -43,7 +49,7 @@ const usersModule: Module = {
       nav: false,
       moduleName: 'hr',
       requiresAuth: true,
-      requiredRole: 'admin',
+      // requiredRole: 'admin',
     },
     {
       path: '/hr/employees/:id/edit',
@@ -53,12 +59,79 @@ const usersModule: Module = {
       nav: false,
       moduleName: 'hr',
       requiresAuth: true,
-      requiredRole: 'admin',
+      // requiredRole: 'admin',
+    },
+    {
+      path: '/hr/lookups/countries',
+      element: <CountriesPage />,
+      layout: 'dashboard',
+      label: 'lookups.tabs.countries',
+      nav: true,
+      order: 40,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'lookups',
+    },
+    {
+      path: '/hr/lookups/cities',
+      element: <CitiesPage />,
+      layout: 'dashboard',
+      label: 'lookups.tabs.cities',
+      nav: true,
+      order: 41,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'lookups',
+    },
+    {
+      path: '/hr/lookups/regions',
+      element: <RegionsPage />,
+      layout: 'dashboard',
+      label: 'lookups.tabs.regions',
+      nav: true,
+      order: 42,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'lookups',
+    },
+    {
+      path: '/hr/lookups/universities',
+      element: <UniversitiesPage />,
+      layout: 'dashboard',
+      label: 'lookups.tabs.universities',
+      nav: true,
+      order: 43,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'lookups',
+    },
+    {
+      path: '/hr/lookups/faculties',
+      element: <FacultiesPage />,
+      layout: 'dashboard',
+      label: 'lookups.tabs.faculties',
+      nav: true,
+      order: 44,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'lookups',
+    },
+    {
+      path: '/hr/lookups/specializations',
+      element: <SpecializationsPage />,
+      layout: 'dashboard',
+      label: 'lookups.tabs.specializations',
+      nav: true,
+      order: 45,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'lookups',
     }
   ],
   locales: { en: enLocales, ar: arLocales },
   navGroups: [
-    { id: 'hr', label: 'admin', order: 10, icon: <Users size={10} className="shrink-0" /> },
+    { id: 'hr', label: 'hr', order: 10, icon: <Users size={10} className="shrink-0" /> },
+    { id: 'lookups', label: 'lookups.title', order: 10, icon: <Users size={10} className="shrink-0" /> },
   ],
 }
 

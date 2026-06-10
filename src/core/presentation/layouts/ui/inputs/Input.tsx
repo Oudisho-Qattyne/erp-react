@@ -1,8 +1,10 @@
 import React from 'react';
 import { CustomSelect } from './CustomSelect';
 import { SelectOrCreate } from './SelectOrCreate';
+import { MultiSelectOrCreate } from './MultiSelectOrCreate';
 import { DatePicker } from './DatePicker';
-export type InputType = 'text' | 'number' | 'email' | 'password' | 'textarea' | 'date' | 'select' | 'select-or-create';
+import { DataMatrixInput, type MatrixFieldConfig } from './DataMatrixInput';
+export type InputType = 'text' | 'number' | 'email' | 'password' | 'textarea' | 'date' | 'select' | 'select-or-create' | 'multi-select-or-create' | 'data-matrix' | 'checkbox';
 
 interface InputProps {
   type:InputType;
@@ -27,6 +29,13 @@ interface InputProps {
   step?: number;
   baseClasses?: string;
   className?:string;
+  // data-matrix
+  matrixFields?: MatrixFieldConfig[];
+  numberOfRows?: number;
+  minRows?: number;
+  maxRows?: number;
+  matrixErrors?: Record<number, Record<string, string>>;
+  rowSchema?: { safeParse: (data: any) => { success: boolean; error?: { flatten: () => { fieldErrors: Record<string, string[]> } } } };
 }
 
 const Input: React.FC<InputProps> = ({
@@ -47,7 +56,13 @@ const Input: React.FC<InputProps> = ({
   max,
   step,
   baseClasses = '',
-  className=""
+  className="",
+  matrixFields,
+  numberOfRows,
+  minRows,
+  maxRows,
+  matrixErrors,
+  rowSchema,
 }) => {
   const finalValue = value ?? '';
   const finalPlaceholder = placeholder ?? '';
@@ -97,6 +112,52 @@ const Input: React.FC<InputProps> = ({
           dependentData={dependentData}
           baseClasses={localClass}
           labelPath={labelPath}
+        />
+      );
+
+    case 'multi-select-or-create':
+      return (
+        <MultiSelectOrCreate
+          value={value ?? []}
+          onChange={onChange}
+          options={finalOptions}
+          placeholder={finalPlaceholder}
+          disabled={finalDisabled}
+          required={finalRequired}
+          searchable={searchable}
+          createTitle={createTitle}
+          renderCreateForm={renderCreateForm}
+          dependentData={dependentData}
+          baseClasses={localClass}
+          labelPath={labelPath}
+        />
+      );
+
+    case 'data-matrix':
+      return (
+        <DataMatrixInput
+          value={value ?? []}
+          onChange={onChange}
+          matrixFields={matrixFields ?? []}
+          numberOfRows={numberOfRows}
+          minRows={minRows}
+          maxRows={maxRows}
+          disabled={finalDisabled}
+          baseClasses={localClass}
+          errors={matrixErrors}
+          rowSchema={rowSchema}
+        />
+      );
+
+    case 'checkbox':
+      return (
+        <input
+          type="checkbox"
+          checked={!!value}
+          onChange={(e) => onChange(e.target.checked)}
+          disabled={finalDisabled}
+          required={finalRequired}
+          className="w-4 h-4 rounded border-border text-primary focus:ring-primary cursor-pointer"
         />
       );
 

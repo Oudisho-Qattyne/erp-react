@@ -63,6 +63,16 @@ function App() {
     path: '*',
     element: (
       // <LayoutSwitcher layout="default">
+      // <Navigate to={'/hr'}/>
+        <NotFoundPage />
+      // </LayoutSwitcher>
+    ),
+  });
+
+  routeConfigs.push({
+    path: '/',
+    element: (
+      // <LayoutSwitcher layout="default">
       <Navigate to={'/hr'}/>
         // <NotFoundPage />
       // </LayoutSwitcher>

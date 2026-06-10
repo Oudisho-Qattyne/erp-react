@@ -6,6 +6,8 @@ import type { EmployeeData } from '../../domain/entities/employee';
 import type { EmployeeFormValues } from '../schemas/employeeForm';
 import { EmployeeForm } from './EmployeeForm';
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
+import { LoadingState } from '../../../../core/presentation/layouts/ui/state/LoadingState';
+import { ErrorState } from '../../../../core/presentation/layouts/ui/state/ErrorState';
 import { ArrowRight } from 'lucide-react';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import { useManageEmployee } from '../hooks/useEmployees';
@@ -21,6 +23,7 @@ export function EditEmployeePage() {
   const [error, setError] = useState<string | null>(null);
   const [defaultValues, setDefaultValues] = useState<Partial<EmployeeFormValues> | null>(null);
   const {getById} = useManageEmployee();
+  
   useEffect(() => {
     const fetchEmployee = async () => {
       try {
@@ -34,26 +37,29 @@ export function EditEmployeePage() {
             national_id: emp.national_id,
             first_name: emp.first_name,
             father_name: emp.father_name || '',
+            grandfather_name: emp.grandfather_name || '',
             last_name: emp.last_name,
             mother_name: emp.mother_name || '',
             gender: emp.gender,
             date_birth: emp.date_birth || '',
             place_birth: emp.place_birth || '',
+            assigned_job: emp.assigned_job || '',
             marital_status: emp.marital_status || 'single',
+            number_of_children: emp.number_of_children || 0,
             spouse_name: emp.spouse_name || '',
             spouse_workplace: emp.spouse_workplace || '',
             blood_type: emp.blood_type || 'A+',
             phone_number: emp.phone_number || '',
             sham_cash_account: emp.sham_cash_account || '',
-            residence_region_id: emp.residence_region_id,
+            residence_country_id: emp.residence_region?.city?.country?.id || 0,
+            residence_city_id: emp.residence_region?.city?.id || 0,
+            residence_region_id: emp.residence_region?.id ?? emp.residence_region_id ?? 0,
             residential_area_details: emp.residential_area_details || '',
             civil_registry_record: emp.civil_registry_record || '',
             health_status: emp.health_status || '',
             injury_details: emp.injury_details || null,
             injury_date: emp.injury_date || null,
-            
-            // Note: residence_country_id and residence_city_id might need manual re-selection
-            // if the API doesn't provide them, but we pass region_id directly.
+            chronic_disease_ids: emp.chronic_diseases?.map((d: any) => d.id) || [],
 
             employment_details: emp.employment_details ? {
               job_title: emp.employment_details.job_title,
@@ -76,6 +82,11 @@ export function EditEmployeePage() {
               academic_stage: edu.academic_stage || null,
               study_status: edu.study_status || null,
             })) || [],
+
+            children: emp.children?.map((child: any) => ({
+              name: child.name || '',
+              birthdate: child.birthdate || '',
+            })) || [],
           };
           setDefaultValues(mappedValues);
         } else {
@@ -97,7 +108,7 @@ export function EditEmployeePage() {
     try {
       setSaving(true);
       setError(null);
-      await apiClient.put(`hr/employees/${id}`, data);
+      await apiClient.put(`/hr/employees/${id}`, data);
       navigate(`/hr/employees/${id}`);
     } catch (err: any) {
       setError(err.message || t('edit_employee.update_error', 'hr') || 'فشل في تحديث بيانات الموظف');
@@ -106,22 +117,15 @@ export function EditEmployeePage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  if (loading) return <LoadingState />;
 
   if (error && !defaultValues) {
     return (
-      <div className="bg-danger/10 border border-danger/20 text-danger p-6 rounded-xl flex flex-col items-center gap-4">
-        <p className="text-lg font-medium">{error}</p>
-        <Button onClick={() => navigate('/hr/employees')} variant="outline">
-          {t('edit_employee.back_to_list', 'hr') || 'العودة للقائمة'}
-        </Button>
-      </div>
+      <ErrorState
+        message={error}
+        onRetry={() => navigate('/hr/employees')}
+        retryLabel={t('edit_employee.back_to_list', 'hr') || 'العودة للقائمة'}
+      />
     );
   }
 

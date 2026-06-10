@@ -16,11 +16,16 @@ import {
   Building2,
   Calendar,
   Contact,
-  Activity
+  Activity,
+  Pencil
 } from 'lucide-react';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import { useManageEmployee } from '../hooks/useEmployees';
 import { getLocalizedName } from '../../../../core/presentation/utils/helpes';
+import { LoadingState } from '../../../../core/presentation/layouts/ui/state/LoadingState';
+import { ErrorState } from '../../../../core/presentation/layouts/ui/state/ErrorState';
+import { EmptyState } from '../../../../core/presentation/layouts/ui/state/EmptyState';
+import { useStorage } from '../../../../core/registry/storage/StorageProvider';
 
 export function ShowEmployeePage() {
   const { id } = useParams<{ id: string }>();
@@ -28,50 +33,62 @@ export function ShowEmployeePage() {
   const apiClient = useApiClient();
   const { language, t } = useLanguage();
 
+  const [FileExplorerOpen, setFileExplorerOpen] = useState<boolean>(false)
+  const [employeePhotoPickerOpen, setEmployeePhotoPickerOpen] = useState<boolean>(false)
+  const storage = useStorage();
+
   const [employee, setEmployee] = useState<EmployeeData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [photoUpdating, setPhotoUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const {getById} = useManageEmployee()
-  useEffect(() => {
-    const fetchEmployee = async () => {
-      try {
-        setLoading(true);
-        // The API endpoint according to docs is GET /hr/employees/{id}
-        const res = await getById(Number(id))
-        if (res) {
-          const emp = res.data
-          setEmployee(emp);
-        } else {
-          setError(t('show_employee.not_found', 'hr') || 'لم يتم العثور على الموظف');
-        }
-      } catch (err: any) {
-        setError(err.message || t('show_employee.load_error', 'hr') || 'حدث خطأ أثناء تحميل بيانات الموظف');
-      } finally {
-        setLoading(false);
+  const { getById , update } = useManageEmployee()
+  const fetchEmployee = async () => {
+    try {
+      setLoading(true);
+      const res = await getById(Number(id))
+      if (res) {
+        const emp = res.data
+        setEmployee(emp);
+      } else {
+        setError(t('show_employee.not_found', 'hr') || 'لم يتم العثور على الموظف');
       }
-    };
+    } catch (err: any) {
+      setError(err.message || t('show_employee.load_error', 'hr') || 'حدث خطأ أثناء تحميل بيانات الموظف');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (id) {
       fetchEmployee();
     }
   }, [id]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
-  }
+  const handlePhotoSelect = async (items: any[]) => {
+    if (items.length === 0) return;
+    setPhotoUpdating(true);
+    try {
+      const  { ...newData } = employee
+      await update(Number(id), { ...newData , photo_id: items[0]._id });
+      await fetchEmployee();
+      setEmployeePhotoPickerOpen(false);
+    } catch (err: any) {
+      console.error('Failed to update photo:', err);
+    } finally {
+      setPhotoUpdating(false);
+    }
+  };
+
+  if (loading) return <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />;
 
   if (error || !employee) {
     return (
-      <div className="bg-danger/10 border border-danger/20 text-danger p-6 rounded-xl flex flex-col items-center gap-4">
-        <p className="text-lg font-medium">{error || t('show_employee.not_found', 'hr') || 'الموظف غير موجود'}</p>
-        <Button onClick={() => navigate('/hr/employees')} variant="outline">
-          {t('show_employee.back_to_list', 'hr') || 'العودة للقائمة'}
-        </Button>
-      </div>
+      <ErrorState
+        message={error || t('show_employee.not_found', 'hr') || 'الموظف غير موجود'}
+        onRetry={() => navigate('/hr/employees')}
+        retryLabel={t('show_employee.back_to_list', 'hr') || 'العودة للقائمة'}
+      />
     );
   }
 
@@ -88,6 +105,11 @@ export function ShowEmployeePage() {
           {t('show_employee.back', 'hr') || 'العودة'}
         </Button>
         <div className="flex gap-3">
+          {storage?.FileExplorerDialogComponent && employee?.folder && (
+            <Button variant="outline" onClick={() => setFileExplorerOpen(true)}>
+              {t('show_employee.folder', 'hr') || 'مجلد الموظف'}
+            </Button>
+          )}
           <Button variant="primary" onClick={() => navigate(`/hr/employees/${id}/edit`)}>
             {t('show_employee.edit', 'hr') || 'تعديل الموظف'}
           </Button>
@@ -97,13 +119,32 @@ export function ShowEmployeePage() {
       {/* Main Profile Header */}
       <div className="bg-card/60 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-border shadow-sm flex flex-col md:flex-row gap-6 items-center md:items-start relative overflow-hidden group">
         <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-primary via-primary-light to-primary opacity-70"></div>
-        <div className="w-24 h-24 md:w-32 md:h-32 bg-primary/10 rounded-full flex items-center justify-center border-4 border-card shadow-sm shrink-0">
-          <User size={48} className="text-primary opacity-80" />
+        <div className='relative flex justify-center items-center overflow-hidden rounded-full'>
+
+          {
+            employee.photo_id ?
+              <div className="w-24 h-24 md:w-32 md:h-32 bg-primary/10 flex items-center justify-center border-4 border-card shadow-sm shrink-0">
+                <img />
+              </div>
+              :
+
+              <div className="w-24 h-24 md:w-32 md:h-32 bg-primary/10 flex items-center justify-center border-4 border-card shadow-sm shrink-0">
+                <User size={48} className="text-primary opacity-80" />
+              </div>
+
+          }
+          <div onClick={() => { if (!photoUpdating) setEmployeePhotoPickerOpen(true) }} className='absolute w-full h-full flex cursor-pointer opacity-0 justify-center items-center hover:opacity-50 transform duration-300'>
+            {photoUpdating ? (
+              <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
+            ) : (
+              <Pencil size={48} className="text-primary opacity-80" />
+            )}
+          </div>
         </div>
         <div className="flex-1 text-center md:text-start space-y-2 pt-2">
           <div className="flex flex-col md:flex-row md:items-center gap-3">
             <h1 className="text-2xl md:text-3xl font-bold text-text">
-              {employee.first_name} {employee.father_name ? `${employee.father_name} ` : ''}{employee.last_name}
+              {employee.first_name} {employee.father_name ? `${employee.father_name} ` : ''}{employee.grandfather_name ? `${employee.grandfather_name} ` : ''}{employee.last_name}
             </h1>
             <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full border border-primary/20 self-center md:self-auto">
               {employee.internal_id}
@@ -126,6 +167,12 @@ export function ShowEmployeePage() {
                 <span>{employee.national_id}</span>
               </div>
             )}
+            {employee.created_at && (
+              <div className="flex items-center gap-1.5 bg-background/50 px-3 py-1.5 rounded-lg border border-border/50">
+                <Calendar size={14} className="text-primary" />
+                <span>{employee.created_at}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -141,14 +188,17 @@ export function ShowEmployeePage() {
             </h2>
             <div className="space-y-4">
               <InfoRow label={t('employees.mother_name', 'hr') || 'اسم الأم'} value={employee.mother_name} />
+              <InfoRow label={t('employees.grandfather_name', 'hr') || 'اسم الجد'} value={employee.grandfather_name} />
               <InfoRow label={t('employees.gender', 'hr') || 'الجنس'} value={employee.gender === 'male' ? (t('employees.gender_male', 'hr') || 'ذكر') : employee.gender === 'female' ? (t('employees.gender_female', 'hr') || 'أنثى') : employee.gender} />
               <InfoRow label={t('employees.date_birth', 'hr') || 'تاريخ الميلاد'} value={employee.date_birth} />
               <InfoRow label={t('employees.place_birth', 'hr') || 'مكان الميلاد'} value={employee.place_birth} />
+              <InfoRow label={t('employees.assigned_job', 'hr') || 'العمل المكلف به'} value={employee.assigned_job} />
               <InfoRow label={t('employees.marital_status', 'hr') || 'الحالة الاجتماعية'} value={getMaritalStatus(employee.marital_status, t)} />
               {employee.marital_status === 'married' && (
                 <>
                   <InfoRow label={t('employees.spouse_name', 'hr') || 'اسم الزوج/الزوجة'} value={employee.spouse_name} />
                   <InfoRow label={t('employees.spouse_workplace', 'hr') || 'جهة عمل الزوج/الزوجة'} value={employee.spouse_workplace} />
+                  <InfoRow label={t('employees.number_of_children', 'hr') || 'عدد الأولاد'} value={employee.number_of_children} />
                 </>
               )}
               <InfoRow label={t('employees.sham_cash_account', 'hr') || 'حساب الشام كاش'} value={employee.sham_cash_account} icon={<CreditCard size={14} />} />
@@ -174,6 +224,21 @@ export function ShowEmployeePage() {
                       <Calendar size={12} /> {employee.injury_date}
                     </p>
                   )}
+                </div>
+              )}
+              {employee.chronic_diseases && employee.chronic_diseases.length > 0 && (
+                <div className="pt-4 mt-4 border-t border-border/50">
+                  <h3 className="text-sm font-semibold text-text-muted mb-3 flex items-center gap-1.5">
+                    <Activity size={14} className="text-danger" />
+                    {t('employees.chronic_diseases', 'hr') || 'الأمراض المزمنة'}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {employee.chronic_diseases.map((disease) => (
+                      <span key={disease.id} className="px-3 py-1 bg-danger/5 text-danger text-sm rounded-full border border-danger/10">
+                        {getLocalizedName(disease.name) || disease.id}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               )}
               <div className="pt-4 mt-4 border-t border-border/50">
@@ -219,9 +284,7 @@ export function ShowEmployeePage() {
                 <InfoRow label={t('employees.workplace_city', 'hr') || 'مدينة العمل'} value={employee.employment_details.workplace_city?.name || employee.employment_details.workplace_city_id || '-'} icon={<MapPin size={14} />} />
               </div>
             ) : (
-              <div className="text-center py-8 text-text-muted bg-background/30 rounded-xl border border-dashed border-border">
-                {t('show_employee.no_employment_data', 'hr') || 'لا توجد معلومات وظيفية مسجلة'}
-              </div>
+              <EmptyState message={t('show_employee.no_employment_data', 'hr') || 'لا توجد معلومات وظيفية مسجلة'} />
             )}
           </div>
 
@@ -244,7 +307,7 @@ export function ShowEmployeePage() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                       <div className="flex flex-col gap-1">
                         <span className="text-xs text-text-muted">{t('employees.university', 'hr') || 'الجامعة'}</span>
-                        <span className="text-sm font-medium">{getLocalizedName(edu.university?.name)  || edu.university_id || '-'}</span>
+                        <span className="text-sm font-medium">{getLocalizedName(edu.university?.name) || edu.university_id || '-'}</span>
                       </div>
                       <div className="flex flex-col gap-1">
                         <span className="text-xs text-text-muted">{t('employees.faculty', 'hr') || 'الكلية'}</span>
@@ -263,14 +326,38 @@ export function ShowEmployeePage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-text-muted bg-background/30 rounded-xl border border-dashed border-border flex flex-col items-center gap-2">
-                <GraduationCap size={24} className="opacity-50" />
-                <span>{t('show_employee.no_education_data', 'hr') || 'لا توجد مؤهلات علمية مسجلة'}</span>
-              </div>
+              <EmptyState message={t('show_employee.no_education_data', 'hr') || 'لا توجد مؤهلات علمية مسجلة'} />
             )}
           </div>
+
+          {/* Children Details */}
+          {employee.children && employee.children.length > 0 && (
+            <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border shadow-sm">
+              <h2 className="text-lg font-bold text-text flex items-center gap-2 mb-6 pb-4 border-b border-border/50">
+                <User size={20} className="text-primary" />
+                {t('employees.children', 'hr') || 'الأولاد'}
+              </h2>
+              <div className="space-y-4">
+                {employee.children.map((child, idx) => (
+                  <div key={child.id || idx} className="bg-background/50 border border-border/60 rounded-xl p-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <InfoRow label={t('employees.child_name', 'hr') || 'اسم الابن'} value={child.name} />
+                      <InfoRow label={t('employees.date_birth', 'hr') || 'تاريخ الميلاد'} value={child.birthdate} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
+      {storage?.FileExplorerDialogComponent && employee?.folder &&
+        <storage.FileExplorerDialogComponent isOpen={FileExplorerOpen} onClose={() => { setFileExplorerOpen(false) }} folderId={employee.folder} />
+      }
+
+      {storage?.FilePickerComponent && employee?.folder &&
+        <storage.FilePickerComponent onSelect={handlePhotoSelect} multiple={false} isOpen={employeePhotoPickerOpen} onClose={() => { setEmployeePhotoPickerOpen(false) }} folderId={employee.folder} fileTypes={["image"]} />
+      }
     </div>
   );
 }

@@ -2,7 +2,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Filemanager, getMenuOptions, Willow, type FilePreview, type IApi, type IFileMenuOption, type IParsedEntity, type TContextMenuType } from '@svar-ui/react-filemanager';
 import '@svar-ui/react-filemanager/all.css';
-import { useManageStorage } from '../hooks/useManageStorage';
 import { StorageToolbar } from '../components/StorageToolbar';
 import { Locale } from '@svar-ui/react-core';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
@@ -15,6 +14,8 @@ import '../styles/storage-explorer.css';
 import { RenameItemDialog } from '../components/RenameItemDialog';
 import type { StorageItem } from '../../domain/entities/FileSystemEntry';
 import type { StorageItemDto } from '../../application/dtos/storageItem';
+import { FileExplorer } from '../components/FileExplorer';
+import { useFileExplorer } from '../hooks/useFileExplorer';
 
 export function StorageExplorer() {
     const {
@@ -25,10 +26,13 @@ export function StorageExplorer() {
         uploadFile,
         deleteFile,
         deleteFolder,
+        getItemById,
         renameFolder,
         error,
+        hasErrors,
         loading,
-    } = useManageStorage();
+        isLoading,
+    } = useFileExplorer();
 
     const [createDialog, setCreateDialog] = useState<{
         type: 'file' | 'folder';
@@ -90,11 +94,12 @@ export function StorageExplorer() {
       
         return options;
       }, []); // dependencies are stable (setRenameConfirm, setDeleteConfirm)
-      function previewURL(file : FilePreview, width : number , height:number) {
-    
+
+    //   const previewURL = (file: FilePreview) => {
+    //     console.log(file , "preview");
         
-        return ""
-      }
+    //     return (file as any).preview || '';
+    // };
     // File manager initialisation
     const init = useCallback(
         (api: IApi) => {
@@ -177,10 +182,10 @@ export function StorageExplorer() {
         try {
             for (const item of items) {
                 if (item.type == 'folder') {
-                    await deleteFolder(item._id);
+                    await deleteFolder(currentPath , item._id ,apiRef);
                 }
                 else {
-                    await deleteFile(item._id);
+                    await deleteFile(currentPath , item._id ,apiRef);
                 }
             }
             // Refresh the parent folder after deletion
@@ -200,7 +205,7 @@ export function StorageExplorer() {
     const handleConfirmRename = async (name: string) => {
         if (!renameConfirm) return;
         try {
-            await renameFolder(renameConfirm._id, name)
+            await renameFolder(currentPath,renameConfirm._id, name , apiRef )
             if (apiRef.current) {
                 const parentId = renameConfirm.parent;
                 apiRef.current.exec('provide-data', { data: null, id: parentId });
@@ -218,6 +223,7 @@ export function StorageExplorer() {
 
     };
 
+
     return (
         <div className="h-full">
             <div className="wx-willow-theme">
@@ -232,14 +238,14 @@ export function StorageExplorer() {
                                 hasSelection={selectedItems.length > 0}
                                 hasRenameSelection={selectedItems.filter(i => i.type == "folder").length > 0}
                             />
-                            <Filemanager ref={apiRef} init={init} data={data} menuOptions={customMenuOptions} previews={previewURL} />
-                            {loading && (
+                            <Filemanager ref={apiRef} init={init} data={data} menuOptions={customMenuOptions} />
+                            {isLoading() && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-white/50">
                                     <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
                                 </div>
                             )}
                         </div>
-                        {error && <p className="text-red-500 mt-2">{error}</p>}
+                        {hasErrors() && <p className="text-red-500 mt-2">something wrong</p>}
                     </Locale>
                 </Willow>
             </div>

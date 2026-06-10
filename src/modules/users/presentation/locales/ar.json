@@ -1,0 +1,60 @@
+{
+  "navigation": {
+    "roles_and_permissions": "الأدوار و الصلاحيات",
+    "roles": {
+      "title": "الأدوار"
+    },
+    "show_role": {
+      "title": "تفاصيل الدور"
+    },
+    "edit_role": {
+      "title": "تعديل الدور"
+    }
+  },
+  "roles": {
+    "title": "الأدوار",
+    "add": "إضافة دور",
+    "search_placeholder": "بحث بالاسم أو الاسم المعروض",
+    "no_data": "لم يتم العثور على أدوار",
+    "name": "الاسم",
+    "display_name": "الاسم المعروض",
+    "number_of_users": "عدد المستخدمين",
+    "created_at": "تاريخ الإنشاء",
+    "confirm_delete_title": "حذف الدور",
+    "confirm_delete_message": "هل أنت متأكد من حذف هذا الدور؟ لا يمكن التراجع عن هذا الإجراء."
+  },
+  "show_role": {
+    "title": "تفاصيل الدور",
+    "not_found": "الدور غير موجود",
+    "load_error": "حدث خطأ أثناء تحميل بيانات الدور",
+    "back_to_list": "العودة للقائمة",
+    "back": "العودة",
+    "edit": "تعديل الدور",
+    "role_info": "معلومات الدور",
+    "permissions": "الصلاحيات",
+    "no_permissions": "لا توجد صلاحيات مخصصة"
+  },
+  "edit_role": {
+    "title": "تعديل الدور",
+    "not_found": "الدور غير موجود",
+    "load_error": "حدث خطأ أثناء تحميل بيانات الدور",
+    "update_error": "فشل تحديث الدور",
+    "back_to_list": "العودة للقائمة",
+    "back": "العودة",
+    "submit": "تحديث الدور"
+  },
+  "role_form": {
+    "save": "حفظ الدور",
+    "cancel": "إلغاء",
+    "saving": "جاري الحفظ...",
+    "name": "الاسم",
+    "display_name": "الاسم المعروض",
+    "permissions": "الصلاحيات",
+    "select_permissions": "اختر الصلاحيات",
+    "validation": {
+      "name_required": "اسم الدور مطلوب",
+      "display_name_required": "الاسم المعروض مطلوب",
+      "permissions_required": "يجب اختيار صلاحية واحدة على الأقل"
+    }
+  }
+}

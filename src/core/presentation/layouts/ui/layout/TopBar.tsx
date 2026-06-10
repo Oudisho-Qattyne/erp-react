@@ -72,18 +72,18 @@ export function TopBar({
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center text-white text-sm font-bold shadow overflow-hidden">
             {
-              user.photo ?
-              <img src={user.photo} className='relative w-full h-full'/>
+              user?.photo ?
+              <img src={user?.photo} className='relative w-full h-full'/>
               :
-              user.full_name?.[0] === 'م'
-              ? user.full_name?.[2] || user.full_name[0]
-              : user.full_name?.[0] || 'U' 
+              user?.full_name?.[0] === 'م'
+              ? user?.full_name?.[2] || user.full_name[0]
+              : user?.full_name?.[0] || 'U' 
             }
           </div>
           <div className="hidden sm:block">
-            <div className="text-xs font-bold text-text">{user.full_name}</div>
+            <div className="text-xs font-bold text-text">{user?.full_name}</div>
             <div className="text-[10px] text-text-muted">
-              {user.position || (user.role === 'admin' ? t('common.admin', 'shared') : t('common.user', 'shared'))}
+              {user?.position || (user?.role === 'admin' ? t('common.admin', 'shared') : t('common.user', 'shared'))}
             </div>
           </div>
         </div>

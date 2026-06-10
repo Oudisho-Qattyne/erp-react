@@ -3,7 +3,7 @@
 import type { BloodType } from '../../../../core/domain/valueObjects/BloodType';
 import type { Gender } from '../../../../core/domain/valueObjects/Gender';
 import type { MaritalStatus } from '../../../../core/domain/valueObjects/MaritalStatus';
-import type { EducationEntry, EmploymentDetails } from '../../domain/entities/employee';
+import type { EducationEntry, EmployeeChildren, EmploymentDetails } from '../../domain/entities/employee';
   
   // -----------------------------------------------------------------------------
   // Education DTOs
@@ -19,7 +19,10 @@ import type { EducationEntry, EmploymentDetails } from '../../domain/entities/em
     | 'faculty'
     | 'specialization'
   >;
+  export type CreateEmployeeChildrenDTO = Omit<EmployeeChildren,
+  | 'id'>;
   
+  export type UpdateEmployeeChildrenDTO = Partial<CreateEmployeeChildrenDTO>;
   export type UpdateEducationDTO = Partial<CreateEducationDTO>;
   
   // -----------------------------------------------------------------------------
@@ -40,12 +43,15 @@ import type { EducationEntry, EmploymentDetails } from '../../domain/entities/em
     national_id: string;
     first_name: string;
     father_name: string;
+    grandfather_name: string;
     last_name: string;
     mother_name: string;
     gender: Gender;
     date_birth: string;
     place_birth: string;
+    assigned_job:string;
     marital_status: MaritalStatus;
+    number_of_children: number;
     spouse_name: string;
     spouse_workplace: string;
     blood_type: BloodType;
@@ -59,6 +65,8 @@ import type { EducationEntry, EmploymentDetails } from '../../domain/entities/em
     injury_date: string | null;
     employment_details: CreateEmploymentDetailsDTO;
     educations: CreateEducationDTO[];
+    childre:CreateEmployeeChildrenDTO[];
+    photo_id?:string
   }
   
   export type UpdateEmployeeDTO = Partial<CreateEmployeeDTO>;

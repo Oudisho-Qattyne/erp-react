@@ -300,6 +300,7 @@
     color: white;
     border: none;
     margin-bottom: 0.75rem;
+    display: none !important;
 }
 
 .wx-willow-theme .wx-sidebar .wx-button.wx-primary:hover,
@@ -951,4 +952,10 @@
 .dark .wx-willow-theme .wx-preview .wx-icon-wrapper,
 .dark .wx-willow-dark-theme .wx-preview .wx-icon-wrapper {
     background-color: var(--color-background);
+    
 }
+
+/* Hide the "Add new" button inside the sidebar
+.wx-filemanager .wx-sidebar .wx-button.wx-primary {
+    display: none !important;
+} */

@@ -183,7 +183,7 @@ export function DatePicker({
         />
       </div>
       {showCalendar && !disabled && (
-        <div className={`absolute z-50 mt-1 ${direction === 'rtl' ? 'right-0' : 'left-0'}`}>
+        <div className="absolute z-50 mt-1 left-1/2 -translate-x-1/2 min-w-[320px]">
           <CustomCalendar
             value={value}
             onChange={handleCalendarSelect}
