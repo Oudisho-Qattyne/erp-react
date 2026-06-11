@@ -90,8 +90,6 @@ export function EmployeesPage() {
   };
 
   const handleCreateEmployee = async (data: any) => {
-    // console.log(data);
-    
     await create(data);
     setIsAddDialogOpen(false);
     refetch(); // refresh list

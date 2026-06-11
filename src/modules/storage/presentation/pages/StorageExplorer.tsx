@@ -97,7 +97,6 @@ export function StorageExplorer() {
       }, []); // dependencies are stable (setRenameConfirm, setDeleteConfirm)
 
     //   const previewURL = (file: FilePreview) => {
-    //     console.log(file , "preview");
         
     //     return (file as any).preview || '';
     // };

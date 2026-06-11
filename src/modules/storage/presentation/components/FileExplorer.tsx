@@ -42,9 +42,9 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
         renameFolder,
         uploadFile,
         deleteFile,
+        downloadFile,
         loadFolderByPath,
     } = useFileExplorer(folderId, fileTypes, previewCache)
-console.log(previewCache);
 
     const [createDialog, setCreateDialog] = useState<{
         type: 'file' | 'folder';
@@ -97,6 +97,18 @@ console.log(previewCache);
                 }
             },
         });
+        if (mode === 'file') {
+            options.push({
+                id: "custom-doqnload",
+                text: "تحميل",
+                hotkey: 'Shift+Delete',
+                handler: async () => {
+                    if (item && item._id) {
+                        await downloadFile(item.id, "", apiRef.current)
+                    }
+                }
+            })
+        }
 
         return options;
     }, []);

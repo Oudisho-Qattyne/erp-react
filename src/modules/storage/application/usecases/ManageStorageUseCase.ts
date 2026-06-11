@@ -110,11 +110,14 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
         throw Error("Faild to get storage Item")
       }
     },
-    getImage :  async (id: string): Promise<any> => {
+    getImage: async (id: string): Promise<any> => {
       const res = await repository.getItemById(id)
-        return (res);
-      }
+      return (res);
+    },
 
+    downloadFile: async (fileId: string, signedUrl?: string): Promise<any> => {
+      return await repository.downloadFile(fileId, signedUrl)
+    }
     // getFileDownloadUrl: async (fileId: string): Promise<string> => {
     //   return repository.getFileDownloadUrl(fileId);
     // },
