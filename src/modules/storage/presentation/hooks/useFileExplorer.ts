@@ -98,16 +98,17 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
     const repository = createManageStorageRepository(apiClient);
     const useCase = createManageStorageUseCase(repository);
 
-    const preloadImagePreviews = (items: StorageItemDto[]) => {
+    const preloadImagePreviews = async (items: StorageItemDto[]) => {
         if (!previewCacheRef) return;
         const imageFiles = items.filter(f => f.type === 'file' && (f as any).mime_type?.startsWith('image'));
         for (const file of imageFiles) {
             if (previewCacheRef.current.has(file.id)) continue;
-            apiClient.get<Blob>(`/storage-management/${file._id}`, { responseType: 'blob' })
-                .then(blob => {
-                    previewCacheRef.current.set(file.id, URL.createObjectURL(blob));
-                })
-                .catch(() => { });
+            try {
+                const blob = await apiClient.get<Blob>(`/storage-management/${file._id}`, { responseType: 'blob' })
+                previewCacheRef.current.set(file.id, URL.createObjectURL(blob));
+            } catch (error) {
+                
+            }
         }
     };
 
@@ -470,23 +471,26 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                 const res = await useCase.listRootLevel();
                 data = res.data
             }
-            data = data.filter(storageItem => {
-                if (storageItem.type == "folder")
-                    return true
-                else {
-                    if (storageItem.type == "file") {
-                        const fileType = storageItem?.mime_type.split('/')[0]
-                        if (fileTypes?.includes(fileType)) {
-                            return true
-                        }
-                        else {
-                            return false
+            if (fileTypes && fileTypes.length > 0) {
+
+                data = data.filter(storageItem => {
+                    if (storageItem.type == "folder")
+                        return true
+                    else {
+                        if (storageItem.type == "file") {
+                            const fileType = storageItem?.mime_type.split('/')[0]
+                            if (fileTypes?.includes(fileType)) {
+                                return true
+                            }
+                            else {
+                                return false
+                            }
                         }
                     }
-                }
-            })
+                })
+            }
+            await preloadImagePreviews(data);
             setData(data);
-            preloadImagePreviews(data);
 
         }
         catch (err: any) {
