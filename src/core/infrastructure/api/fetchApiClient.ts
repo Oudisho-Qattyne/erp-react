@@ -50,6 +50,12 @@ export function createFetchApiClient(
       return null as any as T;
     }
 
+    const responseType = config.responseType || 'json';
+
+    if (responseType !== 'json') {
+      return response[responseType]() as any;
+    }
+
     // Check if the response actually has JSON content
     const contentType = response.headers.get('content-type');
     const contentLength = response.headers.get('content-length');

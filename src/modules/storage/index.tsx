@@ -7,12 +7,14 @@ import { File, FolderIcon } from 'lucide-react';
 import { FileExplorer } from './presentation/components/FileExplorer';
 import { FilePicker } from './presentation/components/FilePicker';
 import { FileExplorerDialog } from './presentation/components/FileExplorerDialog';
+import { Image } from './presentation/components/Image';
 
 const createStorageApi = (): StorageApi => {
   return {
     FilePickerComponent: FilePicker,
     FileExplorerComponent: FileExplorer,
     FileExplorerDialogComponent: FileExplorerDialog,
+    ImageComponent: Image,
   };
 };
 

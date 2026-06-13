@@ -1,5 +1,6 @@
 export interface RequestConfig extends RequestInit {
   params?: Record<string, string>;
+  responseType?: 'json' | 'blob' | 'text' | 'arrayBuffer';
 }
 
 export interface ApiClient {

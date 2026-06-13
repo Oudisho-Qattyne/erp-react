@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Filemanager, Willow, type IApi, type IFileMenuOption, type IParsedEntity, type TContextMenuType } from '@svar-ui/react-filemanager';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { Filemanager, Willow, type FilePreview, type IApi, type IFileMenuOption, type IParsedEntity, type TContextMenuType } from '@svar-ui/react-filemanager';
 import '@svar-ui/react-filemanager/all.css';
 import { StorageToolbar } from '../components/StorageToolbar';
 import { Locale } from '@svar-ui/react-core';
@@ -13,6 +13,7 @@ import '../styles/filemanager-theme.css';
 import '../styles/storage-explorer.css';
 import type { StorageItemDto } from '../../application/dtos/storageItem';
 import { useFileExplorer } from '../hooks/useFileExplorer';
+import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
 
 interface FileExplorerProps {
     folderId?: string;
@@ -24,6 +25,10 @@ interface FileExplorerProps {
 }
 
 export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTypes, multiple = true }: FileExplorerProps) {
+
+    const apiClient = useApiClient();
+    const previewCache = useRef<Map<string, string>>(new Map());
+    const [, forceRender] = useReducer(x => x + 1, 0);
 
     const {
         // loadRoot,
@@ -38,8 +43,8 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
         uploadFile,
         deleteFile,
         loadFolderByPath,
-    } = useFileExplorer(folderId, fileTypes)
-    console.log("FileExplorer", fileTypes);
+    } = useFileExplorer(folderId, fileTypes, previewCache)
+console.log(previewCache);
 
     const [createDialog, setCreateDialog] = useState<{
         type: 'file' | 'folder';
@@ -253,6 +258,24 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
         setCreateDialog(null);
     };
 
+    const previews = (file: FilePreview, width: number, height: number): string | null => {
+        if (file.type !== 'file') return null;
+        const mimeType = (file as any).mime_type;
+        if (!mimeType?.startsWith('image')) return null;
+        const cached = previewCache.current.get(file.id);
+        if (cached) return cached;
+        apiClient.get<Blob>(`/storage-management/${file._id || file.id}`, { responseType: 'blob' })
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                previewCache.current.set(file.id, url);
+                forceRender();
+            })
+            .catch(() => { });
+        return null;
+    }
+
+
+
     return (
         <div className="h-full relative">
             <div className="wx-willow-theme">
@@ -270,7 +293,7 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
                                 />
                             )}
                             <div className="flex-1 min-h-0">
-                                <Filemanager ref={apiRef} init={init} data={data} menuOptions={customMenuOptions} />
+                                <Filemanager ref={apiRef} init={init} data={data} menuOptions={customMenuOptions} previews={previews} />
                             </div>
                             {isLoading() && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-white/50">

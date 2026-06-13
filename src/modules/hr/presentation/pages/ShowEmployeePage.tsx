@@ -122,9 +122,9 @@ export function ShowEmployeePage() {
         <div className='relative flex justify-center items-center overflow-hidden rounded-full'>
 
           {
-            employee.photo_id ?
+            employee.photo_id && storage?.ImageComponent ?
               <div className="w-24 h-24 md:w-32 md:h-32 bg-primary/10 flex items-center justify-center border-4 border-card shadow-sm shrink-0">
-                <img />
+                <storage.ImageComponent id={employee.photo_id} />
               </div>
               :
 

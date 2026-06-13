@@ -55,9 +55,9 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
         }
         return (newRes);
       }
-      else{
+      else {
         throw Error("Faild to get storage Item")
-    }
+      }
     },
 
     // File operations
@@ -94,7 +94,7 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
       //     throw new Error(response.message || "Failed to delete file");
       //   }
     },
-    getItemById: async (id : string) : Promise<any> => {
+    getItemById: async (id: string): Promise<any> => {
       const res = await repository.getItemById(id)
       let storageItemsDto: StorageItemDto
       if (res.data) {
@@ -106,10 +106,14 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
         }
         return (newRes);
       }
-      else{
+      else {
         throw Error("Faild to get storage Item")
-    }
-    }
+      }
+    },
+    getImage :  async (id: string): Promise<any> => {
+      const res = await repository.getItemById(id)
+        return (res);
+      }
 
     // getFileDownloadUrl: async (fileId: string): Promise<string> => {
     //   return repository.getFileDownloadUrl(fileId);
