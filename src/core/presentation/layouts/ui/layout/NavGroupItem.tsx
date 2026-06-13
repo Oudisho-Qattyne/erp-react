@@ -70,7 +70,7 @@ function NavItemLink({
   const pathname = location.pathname;
   const { t } = useLanguage();
 
-  const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+  const isActive = pathname === item.href;
 
   const itemModule = (item as any).moduleName || item.group;
   const moduleLabel = itemModule ? t(`navigation.${item.label}`, itemModule) : item.label;
