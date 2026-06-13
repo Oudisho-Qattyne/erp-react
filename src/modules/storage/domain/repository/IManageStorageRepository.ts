@@ -23,11 +23,13 @@ export interface IManageStorageRepository {
 
   // Delete a folder
   deleteFolder(id: string): Promise<DomainResponse<void>>;
+
   // // Move a folder to a new parent (null = root)
   // moveFolder(id: string, newParentId: string | null): Promise<DomainResponse<StorageFolder>>;
-  
-  
+  moveFolder (folderId: string, newParentId:string | null): Promise<DomainResponse<StorageFolder>>
   // // Move a file to a new parent
+  moveFile (fileId: string, newParentId:string | null): Promise<DomainResponse<StorageFile>> 
+  
   // moveFile(id: string, newParentId: string | null): Promise<DomainResponse<StorageFile>>;
   
   // Delete a file

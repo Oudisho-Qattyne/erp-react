@@ -50,7 +50,6 @@ function mergePaths(path1: string, path2: string): string {
         throw new Error('Both paths must start with "/"');
     }
 
-    // Split both paths, filter out empty strings, then join
     const segments = [...path1.split('/'), ...path2.split('/')];
     const filtered = segments.filter(seg => seg !== '');
 
@@ -80,7 +79,8 @@ export interface UseFileExplorerReturn {
     renameFolder: (parentId: string, id: string, name: string, api: any) => Promise<void>;
     uploadFile: (parentId: string, file: File, isSecure: boolean, name: string, api: any) => Promise<void>;
     deleteFile: (parentId: string, id: string, api: any) => Promise<void>;
-    downloadFile: (id: string, signedUrl: string, api: any) => Promise<void>
+    downloadFile: (id: string, signedUrl: string, api: any) => Promise<void>;
+    moveStorageItem: (itemPath: string, newParentPath: string | null, api: IApi) => Promise<void>
     clearError: () => void;
 }
 
@@ -98,6 +98,29 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
 
     const repository = createManageStorageRepository(apiClient);
     const useCase = createManageStorageUseCase(repository);
+
+    const filterStorageItems = (data: StorageItem[], fileTypes: string[]): StorageItem[] => {
+        if (fileTypes) {
+            return data.filter(storageItem => {
+                if (storageItem.type == "folder")
+                    return true
+                else {
+                    if (storageItem.type == "file") {
+                        const fileType = storageItem?.mime_type.split('/')[0]
+                        if (fileTypes?.includes(fileType)) {
+                            return true
+                        }
+                        else {
+                            return false
+                        }
+                    }
+                }
+            })
+        }
+        else {
+            return data
+        }
+    }
 
     const preloadImagePreviews = async (items: StorageItemDto[]) => {
         if (!previewCacheRef) return;
@@ -122,8 +145,6 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         setError((prev) => ({ ...prev, [functionName]: error }));
 
     }
-
-
 
     const getItemById = useCallback(async (id: string) => {
         setFunctionLoading("getItemById", true)
@@ -153,7 +174,6 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             throw err;
         } finally {
             setFunctionLoading("getItemById", false)
-
         }
     }, [useCase, language]);
 
@@ -167,38 +187,17 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                 res.data.forEach(i => {
                     i.id = removeFirstSegmentIfMatches(i.id, rootFolder.id)
                 })
-                // setData(res.data);
                 data = res.data
 
             }
             else {
                 const res = await useCase.getFolderContentsByPath(path);
-                // setData(res.data);
                 data = res.data
 
             }
-            if (fileTypes) {
-                if (fileTypes.length > 0) {
-                    data = data.filter(storageItem => {
-                        if (storageItem.type == "folder")
-                            return true
-                        else {
-                            if (storageItem.type == "file") {
-                                const fileType = storageItem?.mime_type.split('/')[0]
-                                if (fileTypes?.includes(fileType)) {
-                                    return true
-                                }
-                                else {
-                                    return false
-                                }
-                            }
-                        }
-                    })
-                }
-            }
+            data = filterStorageItems(data, fileTypes)
             await preloadImagePreviews(data);
             api.exec("provide-data", { data: data, id: path });
-            // api.exec("provide-data", { data: res.data, id: path });
         } catch (err: any) {
             switch (err.status) {
                 case 403:
@@ -208,12 +207,9 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                     setFunctionError("loadFolderByPath", err.message || `Failed to load folder ${path}`);
                     break;
             }
-
         } finally {
             setFunctionLoading("loadFolderByPath", false);
-
         }
-
     }, [useCase, rootFolder]);
 
     const createFolder = useCallback(async (parent: string, name: string, api: IApi) => {
@@ -228,7 +224,6 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                     const storageItem = api.getFile(parent);
                     if (storageItem) {
                         const res = await useCase.createFolder(storageItem?._id, name);
-
                     }
                 }
             }
@@ -236,7 +231,6 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                 const storageItem = api.getFile(parent);
                 if (storageItem) {
                     const res = await useCase.createFolder(storageItem?._id, name);
-
                 }
             }
             await loadFolderByPath(parent, api);
@@ -461,20 +455,13 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             if (storageItem) {
                 const blob = await useCase.downloadFile(storageItem?._id);
                 const url = URL.createObjectURL(blob);
-
-                // Create an invisible anchor element
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = storageItem.name;   // sets the suggested filename
+                a.download = storageItem.name;
                 document.body.appendChild(a);
-
-                // Programmatically click the anchor to start download
                 a.click();
-
-                // Clean up: remove the anchor and release the object URL
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-
             }
             toast.success(
                 language === 'ar'
@@ -488,7 +475,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                     setFunctionError("downloadFile", "Forbiden");
                     toast.error(
                         language === 'ar'
-                            ? "غير مصرح لك بحذف هذا الملف"
+                            ? "غير مصرح لك بتحميل هذا الملف"
                             : "You are not authorized to download this file"
                     );
                     break;
@@ -507,10 +494,86 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         }
     }, [useCase, language]);
 
+    const moveStorageItem = useCallback(async (itemPath: string, newParentPath: string | null, api: IApi) => {
+        setFunctionLoading("moveStorageItem", true);
+        setFunctionError("moveStorageItem", null);
+        try {
+          
+            let parentItem : StorageItemDto
+            const storageItem = api.getFile(itemPath);
+            if (newParentPath != '/') {
+                parentItem = api.getFile(newParentPath);
+            }
+            console.log(rootFolder);
+            if (rootFolder) {
+
+                if (storageItem) {
+                    if (storageItem.type == "file") {
+                        const res = await useCase.moveFile(storageItem?._id, parentItem ? parentItem?._id : rootFolder._id)
+                        console.log(res);
+
+                    }
+                    else if (storageItem.type == "folder") {
+                        const res = await useCase.moveFolder(storageItem?._id, parentItem ? parentItem?._id : rootFolder._id)
+                        console.log(res);
+
+                    }
+                }
+            }
+            else {
+
+                if (storageItem) {
+                    if (storageItem.type == "file") {
+                        const res = await useCase.moveFile(storageItem?._id, parentItem ? parentItem?._id : null)
+                        console.log(res);
+
+                    }
+                    else if (storageItem.type == "folder") {
+                        const res = await useCase.moveFolder(storageItem?._id,  parentItem ? parentItem?._id : null)
+                        console.log(res);
+
+                    }
+                }
+            }
+            toast.success(
+                language === 'ar'
+                    ? 'تم نقل العنصر بنجاح'
+                    : 'Item moved successfully'
+            );
+            await loadFolderByPath(newParentPath, api)
+        } catch (err: any) {
+            const errMsg = err.message || `Failed to move item  `;
+            switch (err.status) {
+                case 403:
+                    setFunctionError("moveStorageItem", "Forbiden");
+                    toast.error(
+                        language === 'ar'
+                            ? "غير مصرح لك بنقل هذا العنصر"
+                            : "You are not authorized to move this item"
+                    );
+                    break;
+                default:
+                    setFunctionError("moveStorageItem", errMsg);
+                    toast.error(
+                        language === 'ar'
+                            ? `فشل نقل العنصر: ${errMsg}`
+                            : `Failed to move Item: ${errMsg}`
+                    );
+                    break;
+            }
+            throw err;
+        } finally {
+            setFunctionLoading("moveStorageItem", false);
+        }
+    }
+
+        , [rootFolder]
+    )
+
     const loadRoot = useCallback(async (rootFolder?: StorageItemDto) => {
         setFunctionLoading("loadRoot", true)
 
-        setFunctionError("getItemById", null);
+        setFunctionError("loadRoot", null);
         try {
             let data = []
             if (rootFolder) {
@@ -525,35 +588,17 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                 const res = await useCase.listRootLevel();
                 data = res.data
             }
-            if (fileTypes && fileTypes.length > 0) {
-
-                data = data.filter(storageItem => {
-                    if (storageItem.type == "folder")
-                        return true
-                    else {
-                        if (storageItem.type == "file") {
-                            const fileType = storageItem?.mime_type.split('/')[0]
-                            if (fileTypes?.includes(fileType)) {
-                                return true
-                            }
-                            else {
-                                return false
-                            }
-                        }
-                    }
-                })
-            }
+            data = filterStorageItems(data, fileTypes)
             await preloadImagePreviews(data);
             setData(data);
-
         }
         catch (err: any) {
             switch (err.status) {
                 case 403:
-                    setFunctionError("getItemById", "Forbiden");
+                    setFunctionError("loadRoot", "Forbiden");
                     break;
                 default:
-                    setFunctionError("getItemById", err.message || "Failed to load root items");
+                    setFunctionError("loadRoot", err.message || "Failed to load root items");
                     break;
             }
 
@@ -564,19 +609,20 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
     }, [useCase, rootFolder, setRootFolder]);
 
     const init = useCallback(async () => {
-        if (folderId) {
-            setFunctionLoading("init", true)
-            setFunctionError("init", null)
-            try {
-                const res = await getItemById(folderId)
+        setFunctionLoading("init", true)
+        setFunctionError("init", null)
+        try {
+            let res : StorageItemDto
+            if (folderId) {
+                res = await getItemById(folderId)
                 setRootFolder(res.data)
-                await loadRoot(res.data)
-            } catch (error) {
-                setFunctionError("init", "Faild to load folder")
             }
-            finally {
-                setFunctionLoading("init", false)
-            }
+            await loadRoot(res?.data)
+        } catch (error) {
+            setFunctionError("init", "Faild to load folder")
+        }
+        finally {
+            setFunctionLoading("init", false)
         }
     }, [folderId]
     )
@@ -609,6 +655,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         uploadFile,
         deleteFile,
         downloadFile,
+        moveStorageItem,
         clearError,
     })
 }
