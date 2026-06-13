@@ -14,6 +14,7 @@ import '../styles/storage-explorer.css';
 import type { StorageItemDto } from '../../application/dtos/storageItem';
 import { useFileExplorer } from '../hooks/useFileExplorer';
 import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
+import type { StorageItem } from '../../domain/entities/FileSystemEntry';
 
 interface FileExplorerProps {
     folderId?: string;
@@ -44,6 +45,7 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
         deleteFile,
         downloadFile,
         loadFolderByPath,
+        moveStorageItem,
     } = useFileExplorer(folderId, fileTypes, previewCache)
 
     const [createDialog, setCreateDialog] = useState<{
@@ -62,56 +64,10 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
     const [currentPath, setCurrentPath] = useState('/');
     const [apiReady, setApiReady] = useState(false);
     const [rootPath, setRootPath] = useState<string>("")
+    const [copidItems, setCopiedItems] = useState<StorageItemDto[]>([])
     const apiRef = useRef<any>(null);
     const { language } = useLanguage();
 
-    const customMenuOptions = useCallback((
-        mode: TContextMenuType,
-        item?: IParsedEntity
-    ): IFileMenuOption[] => {
-        if (mode !== 'file' && mode !== 'folder') return [];
-
-        const options: IFileMenuOption[] = [];
-
-        if (mode === 'folder') {
-            options.push({
-                id: 'rename-custom',
-                text: 'إعادة تسمية',
-                hotkey: 'F2',
-                handler: () => {
-                    if (item && item._id) {
-                        setRenameConfirm(item);
-                    }
-                },
-            });
-        }
-
-        options.push({
-            id: 'delete-custom',
-            text: 'حذف',
-            hotkey: 'Shift+Delete',
-            handler: () => {
-                if (item && item._id) {
-                    const deleteItems: StorageItemDto[] = [item];
-                    setDeleteConfirm({ items: deleteItems });
-                }
-            },
-        });
-        if (mode === 'file') {
-            options.push({
-                id: "custom-doqnload",
-                text: "تحميل",
-                hotkey: 'Shift+Delete',
-                handler: async () => {
-                    if (item && item._id) {
-                        await downloadFile(item.id, "", apiRef.current)
-                    }
-                }
-            })
-        }
-
-        return options;
-    }, []);
 
 
     const init = useCallback(
@@ -120,6 +76,12 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
             setApiReady(true);
             api.intercept('create-folder', async ({ parent }) => {
                 setCreateDialog({ type: 'folder', parentId: parent });
+                return false;
+            });
+            api.intercept('copy-files', async ({ parent }) => {
+                return false;
+            });
+            api.intercept('move-files', async ({ parent }) => {
                 return false;
             });
 
@@ -254,6 +216,15 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
             console.error('Delete failed:', err);
         }
     };
+console.log(selectedItems);
+
+    const handleMoveSelected = () => {
+        console.log(selectedItems);
+        
+        console.log("handleMoveSelected");
+        
+        setCopiedItems(selectedItems)
+    }
 
     const handleConfirmRename = async (name: string) => {
         if (!renameConfirm) return;
@@ -286,8 +257,89 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
         return null;
     }
 
+    const onPaste = async () => {
+        console.log("onPaste");
+
+        await copidItems.forEach(async ci => {
+            try {
+                const res = await moveStorageItem(ci.id, currentPath, apiRef.current)
+
+            } catch (error) {
+                console.log(error);
+
+            }
+        })
+        setCopiedItems([])
+
+    }
 
 
+    const customMenuOptions = useCallback((
+        mode: TContextMenuType,
+        item?: IParsedEntity
+    ): IFileMenuOption[] => {
+        if (mode !== 'file' && mode !== 'folder') return [];
+
+        const options: IFileMenuOption[] = [];
+
+        if (mode === 'folder') {
+            options.push({
+                id: 'rename-custom',
+                text: 'إعادة تسمية',
+                hotkey: 'F2',
+                handler: () => {
+                    if (item && item._id) {
+                        setRenameConfirm(item);
+                    }
+                },
+            });
+        }
+
+        options.push({
+            id: 'delete-custom',
+            text: 'حذف',
+            hotkey: 'Shift+Delete',
+            handler: () => {
+                if (item && item._id) {
+                    const deleteItems: StorageItemDto[] = [item];
+                    setDeleteConfirm({ items: deleteItems });
+                }
+            },
+        });
+        if (mode === 'file') {
+            options.push({
+                id: "custom-download",
+                text: "تحميل",
+                hotkey: 'd',
+                handler: async () => {
+                    if (item && item._id) {
+                        await downloadFile(item.id, "", apiRef.current)
+                    }
+                }
+                
+            })
+            
+        }
+            options.push({
+                id: "custom-cut",
+                text: "قص",
+                hotkey: '',
+                handler: async () => {
+                    handleMoveSelected()
+                }
+            })
+            options.push({
+                id: "custom-paste",
+                text: "لصق",
+                hotkey: '',
+                handler: async () => {
+                    onPaste()
+                }
+            })
+            
+
+        return options;
+    }, [selectedItems , onPaste , handleMoveSelected , copidItems]);
     return (
         <div className="h-full relative">
             <div className="wx-willow-theme">
@@ -300,6 +352,9 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
                                     onUpload={handleUpload}
                                     onDeleteSelected={handleDeleteSelected}
                                     onRenameSelected={handleRenameSelected}
+                                    onMoveSelected={handleMoveSelected}
+                                    hasCopiedItems={copidItems.length > 0}
+                                    onPaste={onPaste}
                                     hasSelection={selectedItems.length > 0}
                                     hasRenameSelection={selectedItems.filter(i => i.type == "folder").length > 0}
                                 />

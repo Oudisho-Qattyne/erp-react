@@ -62,13 +62,16 @@ export const createManageStorageRepository = (
         renameFolder: async (folderId: string, name: string): Promise<DomainResponse<StorageFolder>> => {
             return apiClient.put(`${baseUrl}/folders/${folderId}`, { name });
         },
-        downloadFile: async (fileId: string , signedUrl?: string): Promise<DomainResponse<Blob>> => {
-            return apiClient.get(`/storage-management/files/${fileId}/download` ,  { responseType: 'blob' })
-        }
+        downloadFile: async (fileId: string, signedUrl?: string): Promise<DomainResponse<Blob>> => {
+            return apiClient.get(`/storage-management/files/${fileId}/download`, { responseType: 'blob' })
+        },
 
-        // moveFolder: async (folderId: string, data: MoveItemDTO): Promise<DomainResponse<StorageFolder>> => {
-        //   return apiClient.put(`${baseUrl}/folders/${folderId}/move`, data);
-        // },
+        moveFolder: async (folderId: string, newParentId: string | null): Promise<DomainResponse<StorageFolder>> => {
+            return apiClient.put(`${baseUrl}/folders/${folderId}/move`, { new_parent_id : newParentId });
+        },
+        moveFile: async (fileId: string, newParentId: string | null): Promise<DomainResponse<StorageFile>> => {
+            return apiClient.put(`${baseUrl}/files/${fileId}/move`, { new_parent_id : newParentId });
+        },
 
         // // File operations
         // uploadFile: async (data: UploadFileDTO): Promise<DomainResponse<StorageFile>> => {

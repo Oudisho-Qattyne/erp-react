@@ -77,16 +77,14 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
       //   }
     },
 
-    // moveFolder: async (folderId: string, newParentId: string | null): Promise<StorageFolder> => {
-    //   const dto: MoveItemDTO = { new_parent_id: newParentId };
-    //   return(repository.moveFolder(folderId, dto));
-    // },
+    moveFolder: async (folderId: string, newParentId: string | null): Promise<DomainResponse<StorageFolder>> => {
+      return(repository.moveFolder(folderId, newParentId));
+    },
 
 
-    // moveFile: async (fileId: string, newParentId: string | null): Promise<StorageFile> => {
-    //   const dto: MoveItemDTO = { new_parent_id: newParentId };
-    //   return(repository.moveFile(fileId, dto));
-    // },
+    moveFile: async (fileId: string, newParentId: string | null): Promise<DomainResponse<StorageFile>> => {
+      return(repository.moveFile(fileId, newParentId));
+    },
 
     deleteFile: async (fileId: string): Promise<void> => {
       const response = await repository.deleteFile(fileId);
