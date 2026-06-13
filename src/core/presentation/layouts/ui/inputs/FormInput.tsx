@@ -136,7 +136,7 @@ export function FormInput<T extends FieldValues>({
             </span>
           )}
         </label>
-        {error && <div className={errorClasses}>{t(`validation.${error}`, 'shared') || error}</div>}
+        {error && <div className={errorClasses}>{t(`${error}`, 'shared') || error}</div>}
         {hint && !error && <div className={hintClasses}>{hint}</div>}
       </div>
     );

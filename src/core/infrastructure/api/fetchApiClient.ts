@@ -25,6 +25,9 @@ export function createFetchApiClient(
     if (language) {
       headers.set('Accept-Language', language);
     }
+    if (!headers.has('Accept')) {
+      headers.set('Accept', 'application/json');
+    }
     if (token) {
       headers.set('Authorization', `Bearer ${token}`);
     }

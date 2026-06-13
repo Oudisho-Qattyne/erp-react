@@ -47,13 +47,13 @@ export default function LoginPage() {
       navigate('/hr');
     } catch (err: any) {
       console.error('Login failed:', err);
-      if (err.validationErrors) {
-        Object.keys(err.validationErrors).forEach((key) => {
-          const messages = err.validationErrors[key];
-          const message = Array.isArray(messages) ? messages[0] : messages;
-          form.setError(key as keyof LoginFormData, { type: 'server', message });
-        });
-      }
+      // if (err.validationErrors) {
+      //   Object.keys(err.validationErrors).forEach((key) => {
+      //     const messages = err.validationErrors[key];
+      //     const message = Array.isArray(messages) ? messages[0] : messages;
+      //     form.setError(key as keyof LoginFormData, { type: 'server', message });
+      //   });
+      // }
     }
   };
 
@@ -75,7 +75,7 @@ export default function LoginPage() {
 
         {authError && (
           <div className="mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-lg text-center">
-            {authError}
+            {t('login.failed_message', 'auth')}
           </div>
         )}
         <FormProvider {...form}>
