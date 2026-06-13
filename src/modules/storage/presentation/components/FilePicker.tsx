@@ -20,8 +20,6 @@ export function FilePicker({ isOpen, onClose, onSelect, folderId, multiple, file
     onSelect(selectedItems);
     onClose();
   };
-console.log("FilePicker" , fileTypes);
-
   return (
     <Dialog isOpen={isOpen} onClose={onClose} title="اختر الملفات" size="3xl">
       <div className="h-[70vh] flex flex-col -m-4">

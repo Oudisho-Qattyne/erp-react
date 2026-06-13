@@ -59,7 +59,7 @@ function mergePaths(path1: string, path2: string): string {
 }
 
 
-const OP_KEYS = ["init", "getItemById", "loadRoot", "loadFolderByPath", "createFolder", "deleteFolder", "renameFolder", "uploadFile", "deleteFile"] as const;
+const OP_KEYS = ["init", "getItemById", "loadRoot", "loadFolderByPath", "createFolder", "deleteFolder", "renameFolder", "uploadFile", "deleteFile", "downloadFile"] as const;
 
 function initRecord<T>(value: T): Record<string, T> {
     return Object.fromEntries(OP_KEYS.map((k) => [k, value]));
@@ -80,6 +80,7 @@ export interface UseFileExplorerReturn {
     renameFolder: (parentId: string, id: string, name: string, api: any) => Promise<void>;
     uploadFile: (parentId: string, file: File, isSecure: boolean, name: string, api: any) => Promise<void>;
     deleteFile: (parentId: string, id: string, api: any) => Promise<void>;
+    downloadFile: (id: string, signedUrl: string, api: any) => Promise<void>
     clearError: () => void;
 }
 
@@ -107,7 +108,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                 const blob = await apiClient.get<Blob>(`/storage-management/${file._id}`, { responseType: 'blob' })
                 previewCacheRef.current.set(file.id, URL.createObjectURL(blob));
             } catch (error) {
-                
+
             }
         }
     };
@@ -452,6 +453,59 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         }
     }, [useCase, language]);
 
+    const downloadFile = useCallback(async (id: string, signedUrl: string, api: any) => {
+        setFunctionLoading("downloadFile", true);
+        setFunctionError("downloadFile", null);
+        try {
+            const storageItem = api.getFile(id);
+            if (storageItem) {
+                const blob = await useCase.downloadFile(storageItem?._id);
+                const url = URL.createObjectURL(blob);
+
+                // Create an invisible anchor element
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = storageItem.name;   // sets the suggested filename
+                document.body.appendChild(a);
+
+                // Programmatically click the anchor to start download
+                a.click();
+
+                // Clean up: remove the anchor and release the object URL
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+            }
+            toast.success(
+                language === 'ar'
+                    ? 'تم تحميل الملف بنجاح'
+                    : 'File download successfully'
+            );
+        } catch (err: any) {
+            const errMsg = err.message || `Failed to download file`;
+            switch (err.status) {
+                case 403:
+                    setFunctionError("downloadFile", "Forbiden");
+                    toast.error(
+                        language === 'ar'
+                            ? "غير مصرح لك بحذف هذا الملف"
+                            : "You are not authorized to download this file"
+                    );
+                    break;
+                default:
+                    setFunctionError("downloadFile", errMsg);
+                    toast.error(
+                        language === 'ar'
+                            ? `فشل تحميل الملف: ${errMsg}`
+                            : `Failed to download file: ${errMsg}`
+                    );
+                    break;
+            }
+            throw err;
+        } finally {
+            setFunctionLoading("downloadFile", false);
+        }
+    }, [useCase, language]);
 
     const loadRoot = useCallback(async (rootFolder?: StorageItemDto) => {
         setFunctionLoading("loadRoot", true)
@@ -554,6 +608,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         deleteFolder,
         uploadFile,
         deleteFile,
+        downloadFile,
         clearError,
     })
 }
