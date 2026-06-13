@@ -80,7 +80,7 @@ export interface UseFileExplorerReturn {
     uploadFile: (parentId: string, file: File, isSecure: boolean, name: string, api: any) => Promise<void>;
     deleteFile: (parentId: string, id: string, api: any) => Promise<void>;
     downloadFile: (id: string, signedUrl: string, api: any) => Promise<void>;
-    moveStorageItem: (itemPath: string, newParentPath: string | null, api: IApi) => Promise<void>
+    moveStorageItem: (itemPath: string, newParentPath: string , api: IApi) => Promise<void>
     clearError: () => void;
 }
 
@@ -99,14 +99,14 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
     const repository = createManageStorageRepository(apiClient);
     const useCase = createManageStorageUseCase(repository);
 
-    const filterStorageItems = (data: StorageItem[], fileTypes: string[]): StorageItem[] => {
+    const filterStorageItems = (data: StorageItemDto[], fileTypes?: string[]): StorageItemDto[] => {
         if (fileTypes) {
             return data.filter(storageItem => {
                 if (storageItem.type == "folder")
                     return true
                 else {
                     if (storageItem.type == "file") {
-                        const fileType = storageItem?.mime_type.split('/')[0]
+                        const fileType = storageItem?.mime_type?.split('/')[0]
                         if (fileTypes?.includes(fileType)) {
                             return true
                         }
@@ -494,14 +494,14 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         }
     }, [useCase, language]);
 
-    const moveStorageItem = useCallback(async (itemPath: string, newParentPath: string | null, api: IApi) => {
+    const moveStorageItem = useCallback(async (itemPath: string, newParentPath: string, api: IApi) => {
         setFunctionLoading("moveStorageItem", true);
         setFunctionError("moveStorageItem", null);
         try {
           
-            let parentItem : StorageItemDto
+            let parentItem : StorageItemDto | null = null
             const storageItem = api.getFile(itemPath);
-            if (newParentPath != '/') {
+            if (newParentPath != '/' && newParentPath) {
                 parentItem = api.getFile(newParentPath);
             }
             console.log(rootFolder);
@@ -612,10 +612,10 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         setFunctionLoading("init", true)
         setFunctionError("init", null)
         try {
-            let res : StorageItemDto
+            let res : StorageItemDto | null = null
             if (folderId) {
                 res = await getItemById(folderId)
-                setRootFolder(res.data)
+                setRootFolder(res?.data)
             }
             await loadRoot(res?.data)
         } catch (error) {
