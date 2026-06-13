@@ -147,8 +147,21 @@ export function FormInput<T extends FieldValues>({
   const getDependentData = () => {
     if (!dependsOn.length) return undefined;
     const values = getValues();
+    console.log(values);
+    
+    const deepGet = (obj: any, path: string) => {
+      return path.split('.').reduce((current, key) => {
+        if (current == null) return undefined;
+        const arrMatch = key.match(/^(\w+)\[(\d+)\]$/);
+        if (arrMatch) {
+          return current[arrMatch[1]]?.[Number(arrMatch[2])];
+        }
+        return current[key];
+      }, obj);
+    };
+
     return dependsOn.reduce((acc, field) => {
-      acc[field] = values[field];
+      acc[field] = deepGet(values, field);
       return acc;
     }, {} as Record<string, unknown>);
   };

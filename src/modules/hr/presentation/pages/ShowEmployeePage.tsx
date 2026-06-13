@@ -192,7 +192,6 @@ export function ShowEmployeePage() {
               <InfoRow label={t('employees.gender', 'hr') || 'الجنس'} value={employee.gender === 'male' ? (t('employees.gender_male', 'hr') || 'ذكر') : employee.gender === 'female' ? (t('employees.gender_female', 'hr') || 'أنثى') : employee.gender} />
               <InfoRow label={t('employees.date_birth', 'hr') || 'تاريخ الميلاد'} value={employee.date_birth} />
               <InfoRow label={t('employees.place_birth', 'hr') || 'مكان الميلاد'} value={employee.place_birth} />
-              <InfoRow label={t('employees.assigned_job', 'hr') || 'العمل المكلف به'} value={employee.assigned_job} />
               <InfoRow label={t('employees.marital_status', 'hr') || 'الحالة الاجتماعية'} value={getMaritalStatus(employee.marital_status, t)} />
               {employee.marital_status === 'married' && (
                 <>
@@ -268,6 +267,8 @@ export function ShowEmployeePage() {
             {employee.employment_details ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <InfoRow label={t('employees.job_title', 'hr') || 'المسمى الوظيفي'} value={employee.employment_details.job_title} />
+              <InfoRow label={t('employees.assigned_job', 'hr') || 'العمل المكلف به'} value={employee.assigned_job} />
+
                 <div className="flex flex-col gap-1.5">
                   <span className="text-sm text-text-muted">{t('employees.status', 'hr') || 'حالة الموظف'}</span>
                   <div>

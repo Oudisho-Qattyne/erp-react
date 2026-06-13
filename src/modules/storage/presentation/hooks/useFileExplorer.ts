@@ -23,15 +23,9 @@ function removeFirstSegmentIfMatches(path: string, segmentPath: string): string 
     }
     if (path === '/') return '/';
 
-    // Find the end of the first segment (after the leading '/')
-    const nextSlash = path.indexOf('/', 1);
-    const firstSegment = nextSlash === -1 ? path.slice(1) : path.slice(1, nextSlash);
-    const targetSegment = segmentPath.slice(1); // remove leading '/'
-
-    if (firstSegment === targetSegment) {
-        // Remove the first segment and its preceding '/'
-        const remaining = nextSlash === -1 ? '' : path.slice(nextSlash);
-        return remaining === '' ? '/' : remaining;
+    if (path === segmentPath) return '/';
+    if (path.startsWith(segmentPath + '/')) {
+        return path.slice(segmentPath.length) || '/';
     }
     return path;
 }
@@ -185,6 +179,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             if (rootFolder) {
                 const res = await useCase.getFolderContentsByPath(mergePaths(rootFolder.id, path));
                 res.data.forEach(i => {
+                    
                     i.id = removeFirstSegmentIfMatches(i.id, rootFolder.id)
                 })
                 data = res.data
@@ -504,19 +499,14 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             if (newParentPath != '/' && newParentPath) {
                 parentItem = api.getFile(newParentPath);
             }
-            console.log(rootFolder);
             if (rootFolder) {
 
                 if (storageItem) {
                     if (storageItem.type == "file") {
                         const res = await useCase.moveFile(storageItem?._id, parentItem ? parentItem?._id : rootFolder._id)
-                        console.log(res);
-
                     }
                     else if (storageItem.type == "folder") {
                         const res = await useCase.moveFolder(storageItem?._id, parentItem ? parentItem?._id : rootFolder._id)
-                        console.log(res);
-
                     }
                 }
             }
@@ -525,13 +515,9 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                 if (storageItem) {
                     if (storageItem.type == "file") {
                         const res = await useCase.moveFile(storageItem?._id, parentItem ? parentItem?._id : null)
-                        console.log(res);
-
                     }
                     else if (storageItem.type == "folder") {
                         const res = await useCase.moveFolder(storageItem?._id,  parentItem ? parentItem?._id : null)
-                        console.log(res);
-
                     }
                 }
             }
@@ -582,13 +568,13 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                     i.id = removeFirstSegmentIfMatches(i.id, rootFolder.id)
                 })
                 data = res.data
-
             }
             else {
                 const res = await useCase.listRootLevel();
                 data = res.data
             }
             data = filterStorageItems(data, fileTypes)
+            
             await preloadImagePreviews(data);
             setData(data);
         }

@@ -216,13 +216,8 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
             console.error('Delete failed:', err);
         }
     };
-console.log(selectedItems);
 
     const handleMoveSelected = () => {
-        console.log(selectedItems);
-        
-        console.log("handleMoveSelected");
-        
         setCopiedItems(selectedItems)
     }
 
@@ -258,20 +253,18 @@ console.log(selectedItems);
     }
 
     const onPaste = async () => {
-        console.log("onPaste");
-
         await copidItems.forEach(async ci => {
             try {
                 const res = await moveStorageItem(ci.id, currentPath, apiRef.current)
 
             } catch (error) {
                 console.log(error);
-
             }
         })
         setCopiedItems([])
 
     }
+console.log("data in fileexplorer" , data);
 
 
     const customMenuOptions = useCallback((
@@ -316,30 +309,31 @@ console.log(selectedItems);
                         await downloadFile(item.id, "", apiRef.current)
                     }
                 }
-                
+
             })
-            
+
         }
-            options.push({
-                id: "custom-cut",
-                text: "قص",
-                hotkey: '',
-                handler: async () => {
-                    handleMoveSelected()
-                }
-            })
-            options.push({
-                id: "custom-paste",
-                text: "لصق",
-                hotkey: '',
-                handler: async () => {
-                    onPaste()
-                }
-            })
-            
+        options.push({
+            id: "custom-cut",
+            text: "قص",
+            hotkey: '',
+            handler: async () => {
+                handleMoveSelected()
+            }
+        })
+        options.push({
+            id: "custom-paste",
+            text: "لصق",
+            hotkey: '',
+            handler: async () => {
+                onPaste()
+            }
+        })
+
 
         return options;
-    }, [selectedItems , onPaste , handleMoveSelected , copidItems]);
+    }, [selectedItems, onPaste, handleMoveSelected, copidItems]);
+
     return (
         <div className="h-full relative">
             <div className="wx-willow-theme">

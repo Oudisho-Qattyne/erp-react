@@ -54,7 +54,7 @@ export const EMPLOYEE_EMPTY_DEFAULTS: EmployeeFormValues = {
   health_status: '',
   injury_details: null,
   injury_date: null,
-  chronic_disease_ids:[],
+  chronic_disease_ids: [],
   employment_details: {
     job_title: '',
     org_unit_id: 0,
@@ -108,11 +108,12 @@ function CreateEntityForm<T>({
 function UniversityCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number, item: any) => void; onCancel: () => void }) {
   const { t } = useLanguage();
   const { create: createUniversity } = useEntityCrud<University>('/shared-kernal/universities', '/shared-kernal/universities');
-  return <CreateEntityForm defaultValues={{ name: "" }} schema={UniversityFormSchema} fields={[{ name: 'name', label: t('employees.university', 'hr') || 'اسم الجامعة', required: true }]} onSubmit={(data) => {
+  return <CreateEntityForm defaultValues={{ name: "" }} schema={UniversityFormSchema} fields={[{ name: 'name', label: t('employees.university', 'hr') || 'اسم الجامعة', required: true }]}
+    onSubmit={async (data) => {
 
-    return createUniversity(data)
+      return await createUniversity(data)
 
-  }} onSuccess={onSuccess} onCancel={onCancel} title={t('employees.university', 'hr') || "جامعة"} submitLabel={t('employee_form.add_university', 'hr') || "إضافة جامعة"} />;
+    }} onSuccess={onSuccess} onCancel={onCancel} title={t('employees.university', 'hr') || "جامعة"} submitLabel={t('employee_form.add_university', 'hr') || "إضافة جامعة"} />;
 }
 
 function FacultyCreateForm({ onSuccess, onCancel, universityId }: { onSuccess: (id: number, item: any) => void; onCancel: () => void; universityId?: number }) {
@@ -124,6 +125,8 @@ function FacultyCreateForm({ onSuccess, onCancel, universityId }: { onSuccess: (
       fields={[{ name: 'name', label: t('employees.faculty', 'hr') || 'اسم الكلية', required: true }]}
       schema={schemaWithoutUni}
       onSubmit={async (data: any) => {
+        console.log(universityId);
+        
         const payload = {
           name: data.name,
           university_id: universityId
@@ -140,14 +143,18 @@ function FacultyCreateForm({ onSuccess, onCancel, universityId }: { onSuccess: (
 function SpecializationCreateForm({ onSuccess, onCancel, facultyId }: { onSuccess: (id: number, item: any) => void; onCancel: () => void; facultyId?: number }) {
   const { t } = useLanguage();
   const { create: createSpecialization } = useSpecializations();
-  const schemaWithFac = SpecializationFormSchema.extend({ faculty_id: z.number().default(facultyId ?? 0) });
+  const SpecializationSchema = SpecializationFormSchema.omit({Faculty_id:true})
   return (
     <GenericCreateForm
       fields={[{ name: 'name', label: t('employees.specialization', 'hr') || 'اسم الاختصاص', required: true }]}
-      schema={schemaWithFac}
+      schema={SpecializationSchema}
       defaultValues={{ faculty_id: facultyId }}
       onSubmit={async (data: any) => {
-        return await createSpecialization(data);
+        const payload = {
+          name: data.name,
+          faculty_id: facultyId
+        }
+        return await createSpecialization(payload);
       }}
       onSuccess={onSuccess}
       onCancel={onCancel}
@@ -240,24 +247,25 @@ export function EmployeeForm({
   // Create form for country (add after other create forms)
   function CountryCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number | string, item: any) => void; onCancel: () => void }) {
     const { create: createCountry } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
-    return <CreateEntityForm fields={[{ name: 'name', label: t('employees.country', 'hr') || 'اسم الدولة', required: true }]} defaultValues={{ name: '' }} schema={CountryFormSchema} onSubmit={async (data) => {
-      const payload = {
-        name: {
-          ar: data.name
+    return <CreateEntityForm fields={[{ name: 'name', label: t('employees.country', 'hr') || 'اسم الدولة', required: true }]} defaultValues={{ name: '' }} schema={CountryFormSchema}
+      onSubmit={async (data) => {
+        const payload = {
+          name: {
+            ar: data.name
+          }
         }
-      }
-      return await createCountry(payload)
-    }} onSuccess={onSuccess} onCancel={onCancel} title={t('employees.country', 'hr') || "دولة"} submitLabel={t('employee_form.add_country', 'hr') || "إضافة دولة جديدة"} />;
+        return await createCountry(payload)
+      }} onSuccess={onSuccess} onCancel={onCancel} title={t('employees.country', 'hr') || "دولة"} submitLabel={t('employee_form.add_country', 'hr') || "إضافة دولة جديدة"} />;
   }
 
   function ChronicDiseaseCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number | string, item: any) => void; onCancel: () => void }) {
     const { create: createChronicDisease } = useEntityCrud<ChronicDiseases>('/hr/chronic-diseases', '/hr/chronic-diseases');
     return <CreateEntityForm fields={[{ name: 'name', label: t('employees.chronic_diseases', 'hr') || 'الأمراض المزمنة' }]} defaultValues={{ name: '' }} schema={EntityFormSchema} onSubmit={async (data) => {
       const payload = {
-        name:data.name
+        name: data.name
       }
       return await createChronicDisease(payload)
-    }} onSuccess={onSuccess} onCancel={onCancel} title={t('employees.chronic_diseases', 'hr') ||'الأمراض المزمنة'} submitLabel={t('employee_form.add_chronic_disease', 'hr') || "إضافة مرض مزمن"} />;
+    }} onSuccess={onSuccess} onCancel={onCancel} title={t('employees.chronic_diseases', 'hr') || 'الأمراض المزمنة'} submitLabel={t('employee_form.add_chronic_disease', 'hr') || "إضافة مرض مزمن"} />;
   }
 
   // Modify CityCreateForm to accept countryId
@@ -378,7 +386,6 @@ export function EmployeeForm({
     { name: 'gender', label: t('employees.gender', 'hr') || 'الجنس', type: 'select', options: [{ value: 'male', label: t('employees.gender_male', 'hr') || 'ذكر' }, { value: 'female', label: t('employees.gender_female', 'hr') || 'أنثى' }], required: true },
     { name: 'date_birth', type: 'date', label: t('employees.date_birth', 'hr') || 'تاريخ الميلاد', required: true },
     { name: 'place_birth', label: t('employees.place_birth', 'hr') || 'مكان الميلاد', required: true },
-    { name: 'assigned_job', label: t('employees.assigned_job', 'hr') || 'العمل المكلف به', required: true },
     {
       name: 'marital_status',
       label: t('employees.marital_status', 'hr') || 'الحالة الاجتماعية',
@@ -459,7 +466,7 @@ export function EmployeeForm({
     {
       name: 'residence_country_id',
       type: 'select-or-create',
-      searchable:true,
+      searchable: true,
       label: t('employees.country', 'hr') || 'الدولة',
       required: true,
       createTitle: t('employee_form.add_country', 'hr') || 'إضافة دولة جديدة',
@@ -472,7 +479,7 @@ export function EmployeeForm({
     {
       name: 'residence_city_id',
       type: 'select-or-create',
-      searchable:true,
+      searchable: true,
       label: t('employees.city', 'hr') || 'المدينة',
       required: true,
       dependsOn: ['residence_country_id'],
@@ -492,7 +499,7 @@ export function EmployeeForm({
     {
       name: 'residence_region_id',
       type: 'select-or-create',
-      searchable:true,
+      searchable: true,
       label: t('employees.region', 'hr') || 'منطقة السكن',
       required: true,
       dependsOn: ['residence_city_id'],
@@ -514,16 +521,19 @@ export function EmployeeForm({
     { name: 'health_status', label: t('employees.health_status', 'hr') || 'الحالة الصحية' },
     { name: 'injury_details', label: t('employees.injury_details', 'hr') || 'تفاصيل الإصابات' },
     { name: 'injury_date', type: 'date', label: t('employees.injury_date', 'hr') || 'تاريخ الإصابة' },
-    { name: 'chronic_disease_ids', type: 'multi-select-or-create',searchable:true ,  label: t('employees.chronic_diseases', 'hr') || 'تاريخ الإصابة',
-       labelPath: 'data.name',
+    {
+      name: 'chronic_disease_ids', type: 'multi-select-or-create', searchable: true, label: t('employees.chronic_diseases', 'hr') || 'تاريخ الإصابة',
+      labelPath: 'data.name',
       renderCreateForm: (onSuccess, onCancel) => <ChronicDiseaseCreateForm onSuccess={(v, i) => {
         onSuccess(v, i)
       }} onCancel={onCancel} />,
-      compute: computeChronicDiseases,},
+      compute: computeChronicDiseases,
+    },
   ];
 
   const EMPLOYMENT_FIELDS: FieldConfig[] = [
     { name: 'employment_details.job_title', label: t('employees.job_title', 'hr') || 'المسمى الوظيفي', required: true },
+    { name: 'assigned_job', label: t('employees.assigned_job', 'hr') || 'العمل المكلف به', required: true },
     {
       name: 'employment_details.status',
       type: 'select',
@@ -564,7 +574,7 @@ export function EmployeeForm({
     {
       name: 'employment_details.workplace_city_id',
       type: 'select-or-create',
-      searchable:true,
+      searchable: true,
       label: t('employees.workplace_city', 'hr') || 'مدينة العمل',
       required: true,
       createTitle: t('employee_form.add_city', 'hr') || 'إضافة مدينة جديدة',
@@ -653,6 +663,7 @@ export function EmployeeForm({
                     label={t('employees.university', 'hr') || "الجامعة"}
                     createTitle={t('employee_form.add_university', 'hr') || "إضافة جامعة جديدة"}
                     compute={computeUniversities}
+                    labelPath='data.name'
                     renderCreateForm={(onSuccess, onCancel) => (
                       <UniversityCreateForm onSuccess={onSuccess} onCancel={onCancel} />
                     )}
@@ -661,12 +672,16 @@ export function EmployeeForm({
                     name={`educations.${idx}.faculty_id`}
                     type="select-or-create"
                     searchable
+                    labelPath='data.name'
 
                     label={t('employees.faculty', 'hr') || "الكلية"}
                     dependsOn={[`educations.${idx}.university_id`]}
                     compute={(values) => computeFaculties(values, idx)}
                     createTitle={t('employee_form.add_faculty', 'hr') || "إضافة كلية جديدة"}
-                    renderCreateForm={(onSuccess, onCancel, deps) => (
+                    renderCreateForm={(onSuccess, onCancel, deps) => {
+                      console.log(deps);
+                      
+                      return(
                       <FacultyCreateForm
                         universityId={deps?.[`educations.${idx}.university_id`] as number | undefined}
                         onSuccess={(v, i) => {
@@ -674,7 +689,7 @@ export function EmployeeForm({
                         }}
                         onCancel={onCancel}
                       />
-                    )}
+                    )}}
                   />
                   <FormInput
                     name={`educations.${idx}.specialization_id`}
@@ -685,6 +700,7 @@ export function EmployeeForm({
                     dependsOn={[`educations.${idx}.faculty_id`]}
                     compute={(values) => computeSpecializations(values, idx)}
                     createTitle={t('employee_form.add_specialization', 'hr') || "إضافة تخصص جديد"}
+                    labelPath='data.name'
                     renderCreateForm={(onSuccess, onCancel, deps) => (
                       <SpecializationCreateForm
                         facultyId={deps?.[`educations.${idx}.faculty_id`] as number | undefined}
@@ -693,7 +709,7 @@ export function EmployeeForm({
                       />
                     )}
                   />
-                  <FormInput name={`educations.${idx}.graduation_year`} label={t('employees.graduation_year', 'hr') || "سنة التخرج"} required />
+                  <FormInput name={`educations.${idx}.graduation_year`} label={t('employees.graduation_year', 'hr') || "سنة التخرج"} required type='number'/>
                   <FormInput name={`educations.${idx}.academic_stage`} label={t('employees.academic_stage', 'hr') || "المرحلة الأكاديمية"} />
                   <FormInput name={`educations.${idx}.study_status`} label={t('employees.study_status', 'hr') || "حالة الدراسة"} />
                 </div>
