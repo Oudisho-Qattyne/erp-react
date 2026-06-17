@@ -4,6 +4,7 @@ import '@svar-ui/react-filemanager/all.css';
 import { StorageToolbar } from '../components/StorageToolbar';
 import { Locale } from '@svar-ui/react-core';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
+import { Spinner } from '../../../../core/presentation/layouts/ui/state/Spinner';
 import { ar } from '../locales/fileManagerComponentLocales/ar';
 import { en } from '../locales/fileManagerComponentLocales/en';
 import { CreateItemDialog } from '../components/CreateItemDialog';
@@ -358,7 +359,7 @@ console.log("data in fileexplorer" , data);
                             </div>
                             {isLoading() && (
                                 <div className="absolute inset-0 flex items-center justify-center bg-white/50">
-                                    <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
+                                    <Spinner size="lg" />
                                 </div>
                             )}
                         </div>

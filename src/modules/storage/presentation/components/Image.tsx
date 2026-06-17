@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"
 import { useApiClient } from "../../../../core/presentation/context/api/ApiClinetProvider"
+import { Spinner } from "../../../../core/presentation/layouts/ui/state/Spinner"
 
 export interface ImageProps {
     id: string
@@ -47,7 +48,7 @@ export const Image = ({ id, className }: ImageProps) => {
         }
     }, [imageUrl])
 
-    if (loadingImage) return <div className="flex items-center justify-center"><div className="animate-spin rounded-full h-5 w-5 border-2 border-primary border-t-transparent" /></div>
+    if (loadingImage) return <div className="flex items-center justify-center"><Spinner size="md" /></div>
     if (imageError) return <>{imageError}</>
 
     return <img src={imageUrl!} className={className} />

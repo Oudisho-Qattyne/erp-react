@@ -6,6 +6,7 @@ import { useLanguage } from '../../../context/i18n/I18nProvider';
 import { useColumnResize } from './hooks/useColumnResize';
 import { SortAsc, SortDesc } from 'lucide-react';
 import Input from '../inputs/Input';
+import { Spinner } from '../state/Spinner';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -294,7 +295,7 @@ export function DataTable<T extends Record<string, any>>({
                 <tr>
                   <td colSpan={columns.length + (selectable ? 1 : 0)} className="py-8 text-center">
                     <div className="flex justify-center items-center gap-2">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                      <Spinner size="md" />
                       <span>{t('common.loading', 'shared') || 'جاري التحميل...'}</span>
                     </div>
                   </td>

@@ -10,6 +10,7 @@ import { ApiClientProvider } from './core/presentation/context/api/ApiClinetProv
 import { StorageProvider } from './core/registry/storage/StorageProvider'
 import { ProtectedRoute } from './core/infrastructure/auth/ProtectedRoute'
 import { AuthProvider } from './core/infrastructure/auth/AuthProvider'
+import { Spinner } from './core/presentation/layouts/ui/state/Spinner'
 import { NotFoundPage } from './core/presentation/pages/NotFoundPage'
 import { Toaster } from 'sonner'
 
@@ -25,7 +26,7 @@ function App() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <Spinner size="xl" className="mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading modules...</p>
         </div>
       </div>

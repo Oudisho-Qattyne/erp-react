@@ -147,8 +147,6 @@ export function FormInput<T extends FieldValues>({
   const getDependentData = () => {
     if (!dependsOn.length) return undefined;
     const values = getValues();
-    console.log(values);
-    
     const deepGet = (obj: any, path: string) => {
       return path.split('.').reduce((current, key) => {
         if (current == null) return undefined;

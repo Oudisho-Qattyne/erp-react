@@ -23,7 +23,7 @@
       "title": "Reports"
     },
     "employees": {
-      "title": "Employees"
+      "title": "Employees Management"
     },
     "employee_details": {
       "title": "Employee Details"
@@ -43,7 +43,10 @@
       }
     },
     "admin": "Admin",
-    "hr": "Human Resources"
+    "hr": "Human Resources Management",
+    "leave_types":{
+      "title":"Leave types Management"
+    }
   },
   "employees": {
     "internal_id": "Internal ID",
@@ -254,6 +257,133 @@
       "chemical": "Chemical Sector",
       "engineering": "Engineering Sector",
       "textile": "Textile Sector"
+    }
+  },
+  "rules": {
+    "operator": "Operator:",
+    "add_condition": "Add Condition",
+    "add_group": "Add Group",
+    "value_placeholder": "Enter value",
+    "value_placeholder_multi": "value1,value2",
+    "op_equals": "=",
+    "op_not_equals": "!=",
+    "op_greater": ">",
+    "op_greater_or_equal": ">=",
+    "op_less": "<",
+    "op_less_or_equal": "<=",
+    "op_in": "in",
+    "op_between": "between",
+    "op_contains": "contains",
+    "group_and": "AND",
+    "group_or": "OR",
+    "fields": {
+      "employee_age": "Employee Age",
+      "employee_gender": "Employee Gender",
+      "employee_number_of_children": "Number of Children",
+      "employee_years_of_service": "Years of Service",
+      "employee_marital_status": "Marital Status",
+      "employee_job_title": "Job Title",
+      "employee_contract_type": "Contract Type",
+      "opt_permanent": "Permanent",
+      "opt_contract": "Contract",
+      "opt_part_time": "Part‑Time",
+      "opt_male": "Male",
+      "opt_female": "Female",
+      "opt_single": "Single",
+      "opt_married": "Married",
+      "opt_divorced": "Divorced",
+      "opt_widowed": "Widowed"
+    }
+  },
+  "leave": {
+    "add":"Add leave type",
+    "general": "General",
+    "request_limits": "Request Limits",
+    "toggles": "Settings",
+    "balance": "Balance",
+    "carry_forward": "Carry Forward",
+    "eligibility_rules": "Eligibility Rules",
+    "entitlement_rules": "Entitlement Rules",
+    "proration_rules": "Proration Rules",
+    "name": "Leave Name",
+    "description": "Description",
+    "unit": "Unit",
+    "unit_day": "Day",
+    "unit_hour": "Hour",
+    "min_request_units": "Min Request Units",
+    "max_request_units": "Max Request Units",
+    "is_paid": "Is Paid",
+    "requires_attachment": "Requires Attachment",
+    "requires_approval": "Requires Approval",
+    "allow_half_day": "Allow Half Day",
+    "allow_hourly": "Allow Hourly",
+    "allow_split": "Allow Split",
+    "is_active": "Active",
+    "balance_mode": "Balance Mode",
+    "balance_accrual": "Accrual",
+    "balance_fixed_grant": "Fixed Grant",
+    "balance_once_per_life": "Once Per Life",
+    "balance_once_per_service": "Once Per Service",
+    "balance_none": "None",
+    "accrual_period": "Accrual Period",
+    "accrual_yearly": "Yearly",
+    "accrual_monthly": "Monthly",
+    "accrual_none": "None",
+    "allow_carry_forward": "Allow Carry Forward",
+    "carry_forward_limit": "Carry Forward Limit",
+    "entitlement_type": "Entitlement Type",
+    "entitlement_fixed": "Fixed",
+    "entitlement_band": "Band",
+    "grant_value": "Grant Value",
+    "grant_unit": "Grant Unit",
+    "band": "Band",
+    "band_rule": "Band Rule",
+    "add_band": "Add Band",
+    "proration_basis": "Proration Basis",
+    "proration_hire_date": "Hire Date",
+    "proration_custom_date": "Custom Date",
+    "proration_calculation": "Proration Calculation",
+    "proration_monthly_started": "Monthly Started",
+    "proration_monthly_completed": "Monthly Completed",
+    "proration_daily": "Daily",
+    "proration_rounding": "Proration Rounding",
+    "proration_rounding_none": "None",
+    "proration_rounding_floor": "Floor",
+    "proration_rounding_ceil": "Ceil",
+    "proration_rounding_half": "Half",
+    "validation": {
+      "name_required": "Leave name is required",
+      "description_required": "Description is required",
+      "unit_invalid": "Unit must be day or hour",
+      "min_request_units_min": "Min request units must be 0 or more",
+      "max_request_units_min": "Max request units must be 0 or more",
+      "balance_mode_invalid": "Balance mode is invalid",
+      "grant_value_min": "Grant value must be 0 or more",
+      "grant_unit_invalid": "Grant unit must be day or hour",
+      "rule_field_required": "Rule field is required",
+      "rule_operator_invalid": "Rule operator is invalid",
+      "rule_group_operator_invalid": "Group operator is invalid",
+      "bands_min": "At least one band is required",
+      "proportion_basis_invalid": "Proration basis is invalid",
+      "proportion_calculation_invalid": "Proration calculation is invalid",
+      "proportion_rounding_invalid": "Proration rounding is invalid"
+    },
+    "show_leave": {
+      "title": "Leave Details",
+      "back": "Back",
+      "edit": "Edit",
+      "not_found": "Leave type not found",
+      "back_to_list": "Back to list",
+      "archived": "Archived"
+    },
+    "archive_title": "Archive Leave Type",
+    "archive_message": "Are you sure you want to archive this leave type?",
+    "archive": "Archive",
+    "edit_leave": {
+      "title": "Edit Leave Type",
+      "back": "Back",
+      "back_to_list": "Back to list",
+      "update_error": "Failed to update leave type"
     }
   }
 }

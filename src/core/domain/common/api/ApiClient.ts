@@ -1,5 +1,5 @@
 export interface RequestConfig extends RequestInit {
-  params?: Record<string, string>;
+  params?: Record<string, string | boolean | number>;
   responseType?: 'json' | 'blob' | 'text' | 'arrayBuffer';
 }
 

@@ -7,11 +7,11 @@ export function createFetchApiClient(
   baseURL: string,
   getLanguage: () => string
 ): ApiClient {
-  const buildUrl = (url: string, params?: Record<string, string>): string => {
+  const buildUrl = (url: string, params?: Record<string, string | boolean | number>): string => {
     const fullUrl = new URL(baseURL + url);
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
-        fullUrl.searchParams.append(key, value);
+        fullUrl.searchParams.append(key, String(value));
       });
     }
     return fullUrl.toString();
