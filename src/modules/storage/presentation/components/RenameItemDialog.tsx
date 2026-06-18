@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Dialog } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
+import { Spinner } from '../../../../core/presentation/layouts/ui/state/Spinner';
 import { inputBaseClasses } from '../../../../core/presentation/layouts/ui/inputs/styles';
 import Input from '../../../../core/presentation/layouts/ui/inputs/Input';
 import type { StorageItemDto } from '../../application/dtos/storageItem';
@@ -74,7 +75,7 @@ export function RenameItemDialog({
           >
             {isLoading ? (
               <div className="flex items-center gap-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                <Spinner size="sm" className="border-white" />
                 <span>جاري التحديث...</span>
               </div>
             ) : (

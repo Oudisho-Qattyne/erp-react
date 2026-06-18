@@ -23,6 +23,7 @@ import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProv
 import { useManageEmployee } from '../hooks/useEmployees';
 import { getLocalizedName } from '../../../../core/presentation/utils/helpes';
 import { LoadingState } from '../../../../core/presentation/layouts/ui/state/LoadingState';
+import { Spinner } from '../../../../core/presentation/layouts/ui/state/Spinner';
 import { ErrorState } from '../../../../core/presentation/layouts/ui/state/ErrorState';
 import { EmptyState } from '../../../../core/presentation/layouts/ui/state/EmptyState';
 import { useStorage } from '../../../../core/registry/storage/StorageProvider';
@@ -135,7 +136,7 @@ export function ShowEmployeePage() {
           }
           <div onClick={() => { if (!photoUpdating) setEmployeePhotoPickerOpen(true) }} className='absolute w-full h-full flex cursor-pointer opacity-0 justify-center items-center hover:opacity-50 transform duration-300'>
             {photoUpdating ? (
-              <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
+              <Spinner size="lg" />
             ) : (
               <Pencil size={48} className="text-primary opacity-80" />
             )}

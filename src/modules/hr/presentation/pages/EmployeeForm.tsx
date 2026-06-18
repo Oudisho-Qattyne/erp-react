@@ -1,5 +1,5 @@
 // src/modules/hr/presentation/components/EmployeeForm.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { z } from 'zod';
 import { useCities, useEntityCrud, useFaculties, useRegions, useSpecializations } from '../hooks';
 import { CityFormSchema } from '../../../../core/presentation/schemas/regions/cityForm.schema';
@@ -218,7 +218,17 @@ export function EmployeeForm({
     mode: 'onChange',
   });
   const { handleSubmit, formState, watch, setValue } = methods;
-  const { isValid, isSubmitting } = formState;
+  const { isValid, isSubmitting, errors } = formState;
+
+  const prevErrorCount = useRef(0)
+  useEffect(() => {
+    const keys = Object.keys(errors)
+    if (keys.length > 0 && keys.length !== prevErrorCount.current) {
+      const el = document.querySelector(`[for="${keys[0]}"]`)
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" })
+    }
+    prevErrorCount.current = keys.length
+  }, [errors])
 
   const educations = watch('educations') || [];
 
@@ -601,9 +611,19 @@ export function EmployeeForm({
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
-
-        {/* <form onSubmit={handleSubmit(onSubmit)} className="space-y-6"> */}
+      <form onSubmit={methods.handleSubmit(async (data) => {
+        try {
+          await onSubmit(data)
+        } catch (err: any) {
+          if (err?.fieldErrors) {
+            Object.entries(err.fieldErrors).forEach(([field, msgs]) => {
+              const msg = Array.isArray(msgs) ? msgs[0] : String(msgs)
+              methods.setError(field as any, { message: msg })
+            })
+          }
+          throw err
+        }
+      })} className="space-y-6">
         {/* Personal Section */}
         <div className="bg-card rounded-lg p-4 border border-border">
           <h3 className="text-lg font-bold mb-4">{t('show_employee.personal_info', 'hr') || 'المعلومات الشخصية'}</h3>
@@ -728,7 +748,7 @@ export function EmployeeForm({
               {actualCancelLabel}
             </Button>
           )}
-          <Button type="submit" variant="primary" disabled={!isValid || isSubmitting || loading}>
+          <Button type="submit" variant="primary" disabled={isSubmitting || loading}>
             {isSubmitting || loading ? (t('employee_form.saving', 'hr') || 'جاري...') : actualSubmitLabel}
           </Button>
         </div>

@@ -1,5 +1,6 @@
 {
   "common": {
+    "actions":"العمليات",
     "reset": "مسح",
     "search": "بحث",
     "loading": "جاري التحميل...",
@@ -7,8 +8,15 @@
     "filter": "تصفية",
     "delete": "حذف",
     "select": "اختر",
-    "confirm_delete_title": "حذف {entity}",
-    "confirm_delete_message": "هل أنت متأكد من حذف {entity}؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirm_delete_title": "حذف العنصر",
+    "confirm_delete_message": "هل أنت متأكد من حذف العنصر؟ لا يمكن التراجع عن هذا الإجراء.",
+    "all":"الكل",
+    "apply":"تأكيد",
+    "back": "العودة",
+    "edit":"تعديل",
+    "view":"عرض",
+    "archive": "أرشفة",
+    "save":"حفظ",
     "cancel": "إلغاء"
   },
   "pagination": {

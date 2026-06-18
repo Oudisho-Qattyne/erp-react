@@ -1,3 +1,5 @@
+import { Spinner } from './Spinner';
+
 interface LoadingStateProps {
   message?: string;
   className?: string;
@@ -7,7 +9,7 @@ interface LoadingStateProps {
 export function LoadingState({ message, className = '', fullPage = false }: LoadingStateProps) {
   const content = (
     <div className={`flex flex-col items-center justify-center gap-3 ${fullPage ? 'min-h-screen' : 'py-8'} ${className}`}>
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      <Spinner size="xl" />
       {message && <span className="text-text-muted">{message}</span>}
     </div>
   );

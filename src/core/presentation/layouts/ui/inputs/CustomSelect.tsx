@@ -143,7 +143,7 @@ export function CustomSelect({
       {/* Dropdown */}
       {isOpen && (
         <div className={`
-          absolute z-110 mt-1 w-full  border border-border rounded-md shadow-2xl overflow-hidden
+          absolute z-110 mt-1 w-fit  border border-border rounded-md shadow-2xl overflow-hidden
           animate-slide-up backdrop-blur-md bg-card/95
         `}>
           {/* Search bar */}

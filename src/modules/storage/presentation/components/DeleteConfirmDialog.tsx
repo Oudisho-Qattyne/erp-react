@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Dialog } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
+import { Spinner } from '../../../../core/presentation/layouts/ui/state/Spinner';
 import type { StorageItemDto } from '../../application/dtos/storageItem';
 
 interface DeleteConfirmDialogProps {
@@ -43,7 +44,7 @@ export function DeleteConfirmDialog({
           <Button variant="primary" onClick={handleConfirm} disabled={isLoading}>
             {isLoading ? (
               <div className="flex items-center gap-2">
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                <Spinner size="sm" className="border-white" />
                 <span>جاري الحذف...</span>
               </div>
             ) : (

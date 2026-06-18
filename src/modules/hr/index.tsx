@@ -14,6 +14,11 @@ import { RegionsPage } from './presentation/pages/lookups/RegionsPage'
 import { UniversitiesPage } from './presentation/pages/lookups/UniversitiesPage'
 import { FacultiesPage } from './presentation/pages/lookups/FacultiesPage'
 import { SpecializationsPage } from './presentation/pages/lookups/SpecializationsPage'
+import { Rules } from './presentation/pages/Rules'
+import LeaveForm from './presentation/pages/leaves/LeaveForm'
+import LeavesTypesPage from './presentation/pages/leaves/LeavesTypesPage'
+import { ShowLeaveTypePage } from './presentation/pages/leaves/ShowLeaveTypePage'
+import { EditLeaveTypePage } from './presentation/pages/leaves/EditLeaveTypePage'
 
 const usersModule: Module = {
   name: 'hr',
@@ -29,6 +34,37 @@ const usersModule: Module = {
       icon: <Users className="w-5 h-5" />,   // 👈 React element
       group: 'hr',
       permission: 'hr:read',
+    },
+    {
+      path: '/hr/leaves',
+      element: <LeavesTypesPage  />,
+      layout: 'dashboard',
+      label: 'leave_types.title',
+      nav: true,
+      order: 10,
+      icon: <Users className="w-5 h-5" />,
+      moduleName: 'hr',
+      group: 'hr',
+      requiresAuth: true,
+      // requiredRole: 'admin',
+    },
+    {
+      path: '/hr/leaves/:id',
+      element: <ShowLeaveTypePage />,
+      layout: 'dashboard',
+      label: 'show_leave.title',
+      nav: false,
+      moduleName: 'hr',
+      requiresAuth: true,
+    },
+    {
+      path: '/hr/leaves/:id/edit',
+      element: <EditLeaveTypePage />,
+      layout: 'dashboard',
+      label: 'edit_leave.title',
+      nav: false,
+      moduleName: 'hr',
+      requiresAuth: true,
     },
     {
       path: '/hr/employees',
@@ -61,6 +97,7 @@ const usersModule: Module = {
       requiresAuth: true,
       // requiredRole: 'admin',
     },
+
     {
       path: '/hr/lookups/countries',
       element: <CountriesPage />,

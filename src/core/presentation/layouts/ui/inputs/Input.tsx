@@ -178,7 +178,7 @@ const Input: React.FC<InputProps> = ({
       return (
         <input
           type={type}
-          value={finalValue}
+          value={type === 'number' ? Number(finalValue) :finalValue}
           onChange={(e) =>
             onChange(type === 'number' ? Number(e.target.value) : e.target.value)
           }

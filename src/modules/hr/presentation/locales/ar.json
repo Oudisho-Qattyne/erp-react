@@ -23,7 +23,7 @@
       "title": "التقارير"
     },
     "employees": {
-      "title": "الموظفين"
+      "title": " إدارة الموظفين"
     },
     "employee_details": {
       "title": "تفاصيل الموظف"
@@ -42,8 +42,11 @@
         "specializations": "التخصصات"
       }
     },
-    "admin": "الإدارة",
-    "hr": "الموارد البشرية"
+    "admin": "الإدارة العامة",
+    "hr": " إدارة الموارد البشرية",
+    "leave_types":{
+      "title":"إدارة أنواع الإجازات"
+    }
   },
   "employees": {
     "internal_id": "الرقم الداخلي",
@@ -256,6 +259,133 @@
       "chemical": "القطاع الكيميائي",
       "engineering": "القطاع الهندسي",
       "textile": "القطاع النسيجي"
+    }
+  },
+  "rules": {
+    "operator": "العامل:",
+    "add_condition": "إضافة شرط",
+    "add_group": "إضافة مجموعة",
+    "value_placeholder": "أدخل القيمة",
+    "value_placeholder_multi": "قيمة1,قيمة2",
+    "op_equals": "=",
+    "op_not_equals": "≠",
+    "op_greater": ">",
+    "op_greater_or_equal": "≥",
+    "op_less": "<",
+    "op_less_or_equal": "≤",
+    "op_in": "ضمن",
+    "op_between": "بين",
+    "op_contains": "يحتوي",
+    "group_and": "و",
+    "group_or": "أو",
+    "fields": {
+      "employee_age": "عمر الموظف",
+      "employee_gender": "جنس الموظف",
+      "employee_number_of_children": "عدد الأولاد",
+      "employee_years_of_service": "سنوات الخدمة",
+      "employee_marital_status": "الحالة الاجتماعية",
+      "employee_job_title": "المسمى الوظيفي",
+      "employee_contract_type": "نوع العقد",
+      "opt_permanent": "دائم",
+      "opt_contract": "عقد",
+      "opt_part_time": "دوام جزئي",
+      "opt_male": "ذكر",
+      "opt_female": "أنثى",
+      "opt_single": "أعزب",
+      "opt_married": "متزوج",
+      "opt_divorced": "مطلق",
+      "opt_widowed": "أرمل"
+    }
+  },
+  "leave": {
+    "add":"إضافة نوع إجازة",
+    "general": "عام",
+    "request_limits": "حدود الطلب",
+    "toggles": "إعدادات",
+    "balance": "الرصيد",
+    "carry_forward": "الترحيل",
+    "eligibility_rules": "قواعد الأهلية",
+    "entitlement_rules": "قواعد الاستحقاق",
+    "proration_rules": "قواعد التناسب",
+    "name": "اسم الإجازة",
+    "description": "الوصف",
+    "unit": "الوحدة",
+    "unit_day": "يوم",
+    "unit_hour": "ساعة",
+    "min_request_units": "الحد الأدنى لوحدات الطلب",
+    "max_request_units": "الحد الأقصى لوحدات الطلب",
+    "is_paid": "إجازة مدفوعة",
+    "requires_attachment": "يتطلب مرفق",
+    "requires_approval": "يتطلب موافقة",
+    "allow_half_day": "يسمح بنصف يوم",
+    "allow_hourly": "يسمح بالساعة",
+    "allow_split": "يسمح بالتجزئة",
+    "is_active": "مفعل",
+    "balance_mode": "نمط الرصيد",
+    "balance_accrual": "استحقاق",
+    "balance_fixed_grant": "منحة ثابتة",
+    "balance_once_per_life": "مرة واحدة في الحياة",
+    "balance_once_per_service": "مرة واحدة في الخدمة",
+    "balance_none": "بدون",
+    "accrual_period": "فترة الاستحقاق",
+    "accrual_yearly": "سنوي",
+    "accrual_monthly": "شهري",
+    "accrual_none": "بدون",
+    "allow_carry_forward": "يسمح بالترحيل",
+    "carry_forward_limit": "حد الترحيل",
+    "entitlement_type": "النوع",
+    "entitlement_fixed": "ثابت",
+    "entitlement_band": "نطاق",
+    "grant_value": "قيمة المنحة",
+    "grant_unit": "وحدة المنحة",
+    "band": "نطاق",
+    "band_rule": "قاعدة النطاق",
+    "add_band": "إضافة نطاق",
+    "proration_basis": "أساس التناسب",
+    "proration_hire_date": "تاريخ التعيين",
+    "proration_custom_date": "تاريخ مخصص",
+    "proration_calculation": "حساب التناسب",
+    "proration_monthly_started": "شهري بدأ",
+    "proration_monthly_completed": "شهري مكتمل",
+    "proration_daily": "يومي",
+    "proration_rounding": "تقريب التناسب",
+    "proration_rounding_none": "بدون",
+    "proration_rounding_floor": "تقريب لأسفل",
+    "proration_rounding_ceil": "تقريب لأعلى",
+    "proration_rounding_half": "نصف",
+    "validation": {
+      "name_required": "اسم الإجازة مطلوب",
+      "description_required": "الوصف مطلوب",
+      "unit_invalid": "يجب أن تكون الوحدة يوم أو ساعة",
+      "min_request_units_min": "الحد الأدنى لوحدات الطلب يجب أن يكون 0 أو أكثر",
+      "max_request_units_min": "الحد الأقصى لوحدات الطلب يجب أن يكون 0 أو أكثر",
+      "balance_mode_invalid": "نمط الرصيد غير صالح",
+      "grant_value_min": "يجب أن تكون قيمة المنحة 0 أو أكثر",
+      "grant_unit_invalid": "يجب أن تكون وحدة المنحة يوم أو ساعة",
+      "rule_field_required": "حقل الشرط مطلوب",
+      "rule_operator_invalid": "عامل المقارنة غير صالح",
+      "rule_group_operator_invalid": "عامل المجموعة غير صالح",
+      "bands_min": "يجب وجود نطاق واحد على الأقل",
+      "proportion_basis_invalid": "أساس التناسب غير صالح",
+      "proportion_calculation_invalid": "حساب التناسب غير صالح",
+      "proportion_rounding_invalid": "تقريب التناسب غير صالح"
+    },
+    "show_leave": {
+      "title": "تفاصيل الإجازة",
+      "back": "عودة",
+      "edit": "تعديل",
+      "not_found": "نوع الإجازة غير موجود",
+      "back_to_list": "العودة للقائمة",
+      "archived": "مؤرشف"
+    },
+    "archive_title": "أرشفة نوع الإجازة",
+    "archive_message": "هل أنت متأكد من أرشفة نوع الإجازة هذا؟",
+    "archive": "أرشفة",
+    "edit_leave": {
+      "title": "تعديل نوع الإجازة",
+      "back": "عودة",
+      "back_to_list": "العودة للقائمة",
+      "update_error": "فشل تحديث نوع الإجازة"
     }
   }
 }
