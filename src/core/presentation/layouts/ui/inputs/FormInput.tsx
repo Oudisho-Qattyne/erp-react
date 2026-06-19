@@ -85,7 +85,18 @@ export function FormInput<T extends FieldValues>({
   const { t, direction } = useLanguage();
   const { setValue, watch, getValues, control } = useFormContext<T>();
   const { errors } = useFormState({ control, name });
-  const error = errors[name]?.message as string | undefined;
+
+  const getFieldError = (obj: any, path: string): string | undefined => {
+    const parts = path.split(/\.(?=\w+)/)
+    let curr = obj
+    for (const part of parts) {
+      if (curr == null || typeof curr !== "object") return undefined
+      curr = curr[part]
+    }
+    return curr?.message as string | undefined
+  }
+
+  const error = getFieldError(errors, name);
   const currentValue = watch(name);
 
   // Handle dynamic props from dependencies

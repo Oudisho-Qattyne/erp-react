@@ -14,6 +14,8 @@ import { getCreateEmployeeSchema, type EmployeeFormValues } from '../schemas/emp
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
 import { GenericCreateForm, type FieldConfig } from '../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { FormProvider } from 'react-hook-form';
+import { useUnsavedChanges } from '../../../../core/presentation/hooks/useUnsavedChanges';
+import { ConfirmDialog } from '../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import type { Country } from '../../../../core/domain/entities/regions/Country';
 import { CountryFormSchema } from '../../../../core/presentation/schemas/regions/countryForm.schema';
 import { OrganizationalUnitTreeSelect } from '../components/OrganizationalUnitTreeSelect';
@@ -27,43 +29,43 @@ import { EntityFormSchema } from '../../../../core/presentation/schemas/entityFo
 // -----------------------------------------------------------------------------
 
 
-export const EMPLOYEE_EMPTY_DEFAULTS: EmployeeFormValues = {
-  internal_id: '',
-  national_id: '',
-  first_name: '',
-  father_name: '',
-  grandfather_name: '',
-  last_name: '',
-  mother_name: '',
+export const EMPLOYEE_EMPTY_DEFAULTS = {
+  internal_id: null,
+  national_id: null,
+  first_name: null,
+  father_name: null,
+  grandfather_name: null,
+  last_name: null,
+  mother_name: null,
   gender: 'male',
-  date_birth: '',
-  place_birth: '',
-  assigned_job: '',
+  date_birth: null,
+  place_birth: null,
+  assigned_job: null,
   marital_status: 'single',
-  number_of_children: 0,
-  spouse_name: '',
-  spouse_workplace: '',
-  blood_type: 'A+',
-  phone_number: '',
-  sham_cash_account: '',
-  residence_country_id: 0,
-  residence_city_id: 0,
-  residence_region_id: 0,
-  residential_area_details: '',
-  civil_registry_record: '',
-  health_status: '',
+  number_of_children: null,
+  spouse_name: null,
+  spouse_workplace: null,
+  blood_type: null,
+  phone_number: null,
+  sham_cash_account: null,
+  residence_country_id: null,
+  residence_city_id: null,
+  residence_region_id: null,
+  residential_area_details: null,
+  civil_registry_record: null,
+  health_status: null,
   injury_details: null,
   injury_date: null,
   chronic_disease_ids: [],
   employment_details: {
-    job_title: '',
-    org_unit_id: 0,
+    job_title: null,
+    org_unit_id: null,
     status: 'active',
-    appointment_date: '',
-    contract_type: 'full-time',
-    contract_nature: 'permanent',
-    job_category: '',
-    workplace_city_id: 0,
+    appointment_date: null,
+    contract_type: null,
+    contract_nature: null,
+    job_category: null,
+    workplace_city_id: null,
   },
   educations: [],
   children: []
@@ -218,7 +220,9 @@ export function EmployeeForm({
     mode: 'onChange',
   });
   const { handleSubmit, formState, watch, setValue } = methods;
-  const { isValid, isSubmitting, errors } = formState;
+  const { isValid, isSubmitting, errors, isDirty } = formState;
+
+  const { showConfirm, confirmNavigation, cancelNavigation, attemptNavigation } = useUnsavedChanges(isDirty)
 
   const prevErrorCount = useRef(0)
   useEffect(() => {
@@ -367,11 +371,11 @@ export function EmployeeForm({
       ...educations,
       {
         category: 'latest',
-        degree_name: '',
-        university_id: 0,
-        faculty_id: 0,
-        specialization_id: 0,
-        graduation_year: '',
+        degree_name: null,
+        university_id: null,
+        faculty_id: null,
+        specialization_id: null,
+        graduation_year:null,
         academic_stage: null,
         study_status: null,
       },
@@ -389,13 +393,13 @@ export function EmployeeForm({
     { name: 'internal_id', label: t('employees.internal_id', 'hr') || 'الرقم الداخلي', required: true },
     { name: 'national_id', label: t('employees.national_id', 'hr') || 'الرقم الوطني', required: true },
     { name: 'first_name', label: t('employees.first_name', 'hr') || 'الاسم الأول', required: true },
-    { name: 'father_name', label: t('employees.father_name', 'hr') || 'اسم الأب', required: true },
-    { name: 'grandfather_name', label: t('employees.grandfather_name', 'hr') || 'اسم الجد', required: true },
+    { name: 'father_name', label: t('employees.father_name', 'hr') || 'اسم الأب' },
+    { name: 'grandfather_name', label: t('employees.grandfather_name', 'hr') || 'اسم الجد' },
     { name: 'last_name', label: t('employees.last_name', 'hr') || 'اسم العائلة', required: true },
-    { name: 'mother_name', label: t('employees.mother_name', 'hr') || 'اسم الأم', required: true },
+    { name: 'mother_name', label: t('employees.mother_name', 'hr') || 'اسم الأم'},
     { name: 'gender', label: t('employees.gender', 'hr') || 'الجنس', type: 'select', options: [{ value: 'male', label: t('employees.gender_male', 'hr') || 'ذكر' }, { value: 'female', label: t('employees.gender_female', 'hr') || 'أنثى' }], required: true },
-    { name: 'date_birth', type: 'date', label: t('employees.date_birth', 'hr') || 'تاريخ الميلاد', required: true },
-    { name: 'place_birth', label: t('employees.place_birth', 'hr') || 'مكان الميلاد', required: true },
+    { name: 'date_birth', type: 'date', label: t('employees.date_birth', 'hr') || 'تاريخ الميلاد' },
+    { name: 'place_birth', label: t('employees.place_birth', 'hr') || 'مكان الميلاد'},
     {
       name: 'marital_status',
       label: t('employees.marital_status', 'hr') || 'الحالة الاجتماعية',
@@ -471,7 +475,7 @@ export function EmployeeForm({
       })
     },
     { name: 'blood_type', type: 'select', options: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((v) => ({ value: v, label: v })), label: t('employees.blood_type', 'hr') || 'فصيلة الدم' },
-    { name: 'phone_number', label: t('employees.phone_number', 'hr') || 'رقم الهاتف', required: true },
+    { name: 'phone_number', label: t('employees.phone_number', 'hr') || 'رقم الهاتف' },
     { name: 'sham_cash_account', label: t('employees.sham_cash_account', 'hr') || 'حساب الشام كاش' },
     {
       name: 'residence_country_id',
@@ -542,8 +546,8 @@ export function EmployeeForm({
   ];
 
   const EMPLOYMENT_FIELDS: FieldConfig[] = [
-    { name: 'employment_details.job_title', label: t('employees.job_title', 'hr') || 'المسمى الوظيفي', required: true },
-    { name: 'assigned_job', label: t('employees.assigned_job', 'hr') || 'العمل المكلف به', required: true },
+    { name: 'employment_details.job_title', label: t('employees.job_title', 'hr') || 'المسمى الوظيفي'},
+    { name: 'assigned_job', label: t('employees.assigned_job', 'hr') || 'العمل المكلف به', required:true },
     {
       name: 'employment_details.status',
       type: 'select',
@@ -556,7 +560,7 @@ export function EmployeeForm({
       ],
       required: true,
     },
-    { name: 'employment_details.appointment_date', type: 'date', label: t('employees.appointment_date', 'hr') || 'تاريخ التعيين', required: true },
+    { name: 'employment_details.appointment_date', type: 'date', label: t('employees.appointment_date', 'hr') || 'تاريخ التعيين' },
     {
       name: 'employment_details.contract_type',
       label: t('employees.contract_type', 'hr') || 'نوع العقد',
@@ -567,7 +571,6 @@ export function EmployeeForm({
         { value: 'temporary', label: t('show_employee.contract_temporary', 'hr') || 'مؤقت' },
         { value: 'contract', label: t('show_employee.contract_contract', 'hr') || 'عقد' },
       ],
-      required: true,
     },
     {
       name: 'employment_details.contract_nature',
@@ -578,9 +581,8 @@ export function EmployeeForm({
         { value: 'temporary', label: t('show_employee.nature_temporary', 'hr') || 'مؤقت' },
         { value: 'internship', label: t('show_employee.nature_internship', 'hr') || 'تدريب' },
       ],
-      required: true,
     },
-    { name: 'employment_details.job_category', label: t('employees.job_category', 'hr') || 'التصنيف الوظيفي', required: true },
+    { name: 'employment_details.job_category', label: t('employees.job_category', 'hr') || 'التصنيف الوظيفي' },
     {
       name: 'employment_details.workplace_city_id',
       type: 'select-or-create',
@@ -615,11 +617,15 @@ export function EmployeeForm({
         try {
           await onSubmit(data)
         } catch (err: any) {
-          if (err?.fieldErrors) {
-            Object.entries(err.fieldErrors).forEach(([field, msgs]) => {
+          if (err.validationErrors) {
+            const entries = Object.entries(err.validationErrors)
+            entries.forEach(([field, msgs]) => {
               const msg = Array.isArray(msgs) ? msgs[0] : String(msgs)
               methods.setError(field as any, { message: msg })
             })
+            const firstField = entries[0][0]
+            const el = document.querySelector(`[for="${firstField}"]`)
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" })
           }
           throw err
         }
@@ -669,13 +675,16 @@ export function EmployeeForm({
                   <FormInput
                     name={`educations.${idx}.category`}
                     type="select"
+                    required
                     options={[
+                      { value: 'initial', label: t('show_employee.edu_category_initial', 'hr') || 'أولي' },
+                      { value: 'adjusted', label: t('show_employee.edu_category_adjusted', 'hr') || 'معدل' },
                       { value: 'latest', label: t('show_employee.edu_category_latest', 'hr') || 'أحدث' },
-                      { value: 'previous', label: t('show_employee.edu_category_previous', 'hr') || 'سابقة' },
+                      { value: 'current', label: t('show_employee.edu_category_current', 'hr') || 'حالي' },
                     ]}
                     label={t('employee_form.category', 'hr') || 'التصنيف'}
                   />
-                  <FormInput name={`educations.${idx}.degree_name`} label={t('employees.degree_name', 'hr') || "اسم الشهادة"} required />
+                  <FormInput name={`educations.${idx}.degree_name`} label={t('employees.degree_name', 'hr') || "اسم الشهادة"} />
                   <FormInput
                     name={`educations.${idx}.university_id`}
                     type="select-or-create"
@@ -729,7 +738,7 @@ export function EmployeeForm({
                       />
                     )}
                   />
-                  <FormInput name={`educations.${idx}.graduation_year`} label={t('employees.graduation_year', 'hr') || "سنة التخرج"} required type='number'/>
+                  <FormInput name={`educations.${idx}.graduation_year`} label={t('employees.graduation_year', 'hr') || "سنة التخرج"} type='number'/>
                   <FormInput name={`educations.${idx}.academic_stage`} label={t('employees.academic_stage', 'hr') || "المرحلة الأكاديمية"} />
                   <FormInput name={`educations.${idx}.study_status`} label={t('employees.study_status', 'hr') || "حالة الدراسة"} />
                 </div>
@@ -744,7 +753,7 @@ export function EmployeeForm({
         {/* Form Actions */}
         <div className="flex justify-end gap-3">
           {onCancel && (
-            <Button type="button" variant="outline" onClick={onCancel}>
+            <Button type="button" variant="outline" onClick={() => attemptNavigation(() => onCancel?.())}>
               {actualCancelLabel}
             </Button>
           )}
@@ -752,6 +761,16 @@ export function EmployeeForm({
             {isSubmitting || loading ? (t('employee_form.saving', 'hr') || 'جاري...') : actualSubmitLabel}
           </Button>
         </div>
+        <ConfirmDialog
+          isOpen={showConfirm}
+          title={t('employee_form.unsaved_title', 'hr') || 'Unsaved Changes'}
+          message={t('employee_form.unsaved_message', 'hr') || 'You have unsaved changes. Are you sure you want to leave?'}
+          type="alert"
+          confirmLabel={t('employee_form.unsaved_leave', 'hr') || 'Leave'}
+          cancelLabel={t('employee_form.unsaved_stay', 'hr') || 'Stay'}
+          onConfirm={confirmNavigation}
+          onCancel={cancelNavigation}
+        />
       </form>
     </FormProvider>
   );
