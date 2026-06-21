@@ -231,7 +231,11 @@
     "no_regions": "No regions",
     "no_universities": "No universities",
     "no_faculties": "No faculties",
-    "no_specializations": "No specializations"
+    "no_specializations": "No specializations",
+    "updated": "{name} updated successfully",
+    "update_error": "Failed to update {name}",
+    "set_default_success": "{name} set as default successfully",
+    "set_default_error": "Failed to set {name} as default"
   },
   "reports": {
     "title": "Reports & Analytics",

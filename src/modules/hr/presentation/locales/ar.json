@@ -232,8 +232,11 @@
     "no_regions": "لا يوجد مناطق",
     "no_universities": "لا يوجد جامعات",
     "no_faculties": "لا يوجد افرع",
-    "no_specializations": "لا يوجد اختصاصات"
-
+    "no_specializations": "لا يوجد اختصاصات",
+    "updated": "تم تحديث {name} بنجاح",
+    "update_error": "فشل تحديث {name}",
+    "set_default_success": "تم تعيين {name} كافتراضي بنجاح",
+    "set_default_error": "فشل تعيين {name} كافتراضي"
   },
   "reports": {
     "title": "التقارير والتحليلات",

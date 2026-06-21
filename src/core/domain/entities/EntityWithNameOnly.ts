@@ -8,4 +8,5 @@ export interface EntityWithNameOnly {
     name: string | MultiLanguage;
     created_at?: string;
     updated_at?: string;
+    is_default?:boolean;
 }
