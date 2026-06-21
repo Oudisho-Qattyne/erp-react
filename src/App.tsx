@@ -13,6 +13,7 @@ import { AuthProvider } from './core/infrastructure/auth/AuthProvider'
 import { Spinner } from './core/presentation/layouts/ui/state/Spinner'
 import { NotFoundPage } from './core/presentation/pages/NotFoundPage'
 import { Toaster } from 'sonner'
+import { Sandbox } from './Sabdbox'
 
 function App() {
    const [isReady, setIsReady] = useState(false)
@@ -75,6 +76,15 @@ function App() {
     element: (
       // <LayoutSwitcher layout="default">
       <Navigate to={'/hr'}/>
+        // <NotFoundPage />
+      // </LayoutSwitcher>
+    ),
+  });
+  routeConfigs.push({
+    path: '/my-sandbox',
+    element: (
+      // <LayoutSwitcher layout="default">
+      <Sandbox />
         // <NotFoundPage />
       // </LayoutSwitcher>
     ),
