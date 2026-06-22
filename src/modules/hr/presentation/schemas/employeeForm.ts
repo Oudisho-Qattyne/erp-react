@@ -55,12 +55,14 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
       status: z.enum(['active', 'inactive', 'terminated', 'on_leave'],  t('employee_form.validation.status_invalid', 'hr') || 'الحالة الوظيفية غير صالحة' ),
       appointment_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/,  t('employee_form.validation.appointment_date_invalid', 'hr') || 'تاريخ التعيين بصيغة YYYY-MM-DD' ).nullable(),
       contract_type: z.enum(['full-time', 'part-time', 'temporary', 'contract'], t('employee_form.validation.contract_type_invalid', 'hr') || 'نوع العقد غير صالح' ).nullable(),
-
+      job_status_id:z.number("required").min(1,"invalid"),
+      job_status_note:z.string("required").min(1 , "invalid"),
       contract_nature: z.enum(['permanent', 'temporary', 'internship'], t('employee_form.validation.contract_nature_invalid', 'hr') || 'طبيعة العقد غير صالحة' ).nullable(),
 
       job_category: z.string().nullable(),
       workplace_city_id: z.number( t('employee_form.validation.workplace_city_required', 'hr') || 'مدينة العمل مطلوبة').min(1),
     }),
+  employee_status_id:z.number(t('employee_form.validation.employee_status_id_required', 'hr') || 'حالة الموظف مطلوبة').min(1, t('employee_form.validation.employee_status_id_required', 'hr') || 'حالة الموظف مطلوبة'),
 
     // Education (array)
     educations: z.array(EducationEntrySchema).default([]),

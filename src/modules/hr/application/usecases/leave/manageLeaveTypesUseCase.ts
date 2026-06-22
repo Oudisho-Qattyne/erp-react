@@ -22,5 +22,8 @@ export const createManageLeaveTypesUseCase = (repository: ILeaveTypeRepository) 
     deleteLeaveType: (id: number) => {
       return repository.deleteLeaveType(id)
     },
+    findUserEligibleLeaveTypes: () => {
+      return repository.getUserEligibleLeaveTypes()
+    }
   }
 }

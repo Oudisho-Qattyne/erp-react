@@ -1,4 +1,5 @@
 import type { ApiClient } from "../../../../core/domain/common/api/ApiClient";
+import {type DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
 import type { EntityWithNameOnly } from "../../../../core/domain/entities/EntityWithNameOnly";
 import {type DpomainResponsePaginated } from "../../domain/entities/common/DomainResponsePaginated";
 import { type Leave } from "../../domain/entities/leave/leave";
@@ -26,6 +27,9 @@ export const createLeaveTypeRepository = (apiClient: ApiClient): ILeaveTypeRepos
     deleteLeaveType(id: number) {
       return apiClient.delete<DpomainResponsePaginated<Leave>> (`${baseUrl}/${id}`)
     },
+    getUserEligibleLeaveTypes() {
+      return apiClient.get<DomainResponse<EntityWithNameOnly[]>>(`/hr/employees/eligible-leave-types`)
+    }
   };
 };
 

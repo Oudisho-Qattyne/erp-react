@@ -86,6 +86,10 @@
     "injury_details": "تفاصيل الإصابة",
     "injury_date": "تاريخ الإصابة",
     "chronic_diseases" : "الأمراض المزمنة",
+    "job_status": "الحالة الوظيفية",
+    "job_status_note": "ملاحظات الحالة الوظيفية",
+    "employee_status": "حالة الموظف",
+    "employee_status_id": "حالة الموظف",
     "country": "الدولة",
     "city": "المدينة",
     "region": "منطقة السكن",
@@ -163,6 +167,10 @@
     "add_university": "إضافة جامعة جديدة",
     "add_faculty": "إضافة كلية",
     "add_specialization": "إضافة تخصص",
+    "add_job_status": "إضافة حالة وظيفية",
+    "job_status": "الحالة الوظيفية",
+    "add_employee_status": "إضافة حالة موظف",
+    "employee_status": "حالة الموظف",
     "add_org_unit": "إضافة وحدة تنظيمية",
     "add_chronic_disease":"إضافة مرض مزمن",
 
@@ -193,6 +201,7 @@
       "job_title_required": "المسمى الوظيفي مطلوب",
       "org_unit_required": "الوحدة التنظيمية مطلوبة",
       "status_invalid": "الحالة الوظيفية غير صالحة",
+      "employee_status_id_required": "حالة الموظف مطلوبة",
       "appointment_date_invalid": "تاريخ التعيين بصيغة YYYY-MM-DD",
       "contract_type_invalid": "نوع العقد غير صالح",
       "contract_nature_invalid": "طبيعة العقد غير صالحة",
@@ -217,7 +226,9 @@
       "regions": "المناطق",
       "universities": "الجامعات",
       "faculties": "الكليات",
-      "specializations": "التخصصات"
+      "specializations": "التخصصات",
+      "job_statuses": "الحالة الوظيفية",
+      "employee_statuses": "حالة الموظف"
     },
     "select_country_first": "الرجاء اختيار دولة لعرض مدنها",
     "select_city_first": "الرجاء اختيار مدينة أولاً",
@@ -233,6 +244,8 @@
     "no_universities": "لا يوجد جامعات",
     "no_faculties": "لا يوجد افرع",
     "no_specializations": "لا يوجد اختصاصات",
+    "no_job_statuses": "لا يوجد حالات وظيفية",
+    "no_employee_statuses": "لا يوجد حالات موظف",
     "updated": "تم تحديث {name} بنجاح",
     "update_error": "فشل تحديث {name}",
     "set_default_success": "تم تعيين {name} كافتراضي بنجاح",
@@ -383,6 +396,8 @@
       "proportion_calculation_invalid": "حساب التناسب غير صالح",
       "proportion_rounding_invalid": "تقريب التناسب غير صالح"
     },
+    "user_eligible_leave_types": "أنواع الإجازات المستحقة",
+    "no_eligible_leave_types": "لا توجد إجازات مستحقة",
     "show_leave": {
       "title": "تفاصيل الإجازة",
       "back": "عودة",

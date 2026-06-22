@@ -60,22 +60,22 @@ export function CountriesPage() {
       render: (row: any) => row.is_default
         ? <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full"><Star size={12} /> {t('common.yes', 'shared') || 'Yes'}</span>
         : <span className="text-xs text-text-muted">—</span> },
-    { key: 'actions', label: t('common.actions', 'shared') || 'Actions', width: 220, align: 'right' as const,
+    { key: 'actions', label: t('common.actions', 'shared') || 'Actions', width: 200,
       render: (row: any) => (
-        <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
           {!row.is_default && (
-            <Button variant="outline" size="sm" onClick={() => setConfirmSetDefault(row)}
+            <Button variant="ghost" size="sm" onClick={() => setConfirmSetDefault(row)}
               title={t('common.set_default', 'shared') || 'Set as default'}>
-              <Star size={14} />
+              <Star size={16} />
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={() => setEditItem(row)}
+          <Button variant="ghost" size="sm" onClick={() => setEditItem(row)}
             title={t('common.edit', 'shared') || 'Edit'}>
-            <Pencil size={14} />
+            <Pencil size={16} />
           </Button>
-          <Button variant="danger" size="sm" onClick={() => setConfirmDelete(row)}
+          <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)}
             title={t('common.delete', 'shared') || 'Delete'}>
-            <Trash2 size={14} />
+            <Trash2 size={16} className="text-danger" />
           </Button>
         </div>
       ) },
