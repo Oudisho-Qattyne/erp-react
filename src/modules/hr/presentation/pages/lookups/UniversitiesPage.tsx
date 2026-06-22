@@ -24,6 +24,7 @@ export function UniversitiesPage() {
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<any>(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
   const filtered = universities.filter((u: any) =>
     (typeof u.name === 'string' ? u.name : u.name?.ar || u.name?.en || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -32,25 +33,29 @@ export function UniversitiesPage() {
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
+    setConfirmLoading(true);
     try {
       await remove(confirmDelete.id);
       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
+      setConfirmDelete(null);
     } catch {
       toast.error(t('lookups.delete_error', 'hr').replace('{name}', entity));
     }
-    setConfirmDelete(null);
+    setConfirmLoading(false);
   };
 
   const handleSetDefaultConfirm = async () => {
     if (!confirmSetDefault) return;
+    setConfirmLoading(true);
     try {
       await update(confirmSetDefault.id, { is_default: true });
       toast.success(t('lookups.set_default_success', 'hr').replace('{name}', entity));
       getAll();
+      setConfirmSetDefault(null);
     } catch {
       toast.error(t('lookups.set_default_error', 'hr').replace('{name}', entity));
     }
-    setConfirmSetDefault(null);
+    setConfirmLoading(false);
   };
 
   const columns = [
@@ -130,6 +135,7 @@ export function UniversitiesPage() {
         message={t('common.confirm_delete_message', 'shared').replace('{entity}', entity)}
         confirmLabel={t('common.delete', 'shared') || 'Delete'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
+        confirmLoading={confirmLoading}
         onConfirm={handleDeleteConfirm} onCancel={() => setConfirmDelete(null)} />
 
       <ConfirmDialog isOpen={!!confirmSetDefault}
@@ -137,6 +143,7 @@ export function UniversitiesPage() {
         message={t('common.set_default_message', 'shared')?.replace('{entity}', entity) || `Are you sure you want to set this ${entity} as default?`}
         confirmLabel={t('common.set_default', 'shared') || 'Set as default'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
+        confirmLoading={confirmLoading}
         onConfirm={handleSetDefaultConfirm} onCancel={() => setConfirmSetDefault(null)} />
     </div>
   );

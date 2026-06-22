@@ -50,7 +50,6 @@ export interface EmploymentDetails {
   contract_type: ContractType;             // 'Full-time', etc.
   contract_nature: ContractNature;           // 'Permanent', etc.
   job_category: string;
-  job_status_id:number;
   workplace_city_id: number;
   workplace_city?: City;
   created_at: string;
@@ -86,11 +85,16 @@ export interface EmployeeData {
   injury_date: string | null;
   chronic_diseases: ChronicDiseases[];
   employment_details: EmploymentDetails;
-  employee_status_id:number;
+
   educations: EducationEntry[];
   created_at: string;
   updated_at: string;
   children:EmployeeChildren[];
   folder:string;
   photo_id:string;
+
+  employee_status_id:number;
+  employee_status_note:string;
+  job_status_id:number;
+  job_status_note:string;
 }

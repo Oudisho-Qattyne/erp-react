@@ -25,7 +25,7 @@ import type { ChronicDiseases } from '../../../../core/domain/entities/chronicDi
 import { EntityFormSchema } from '../../../../core/presentation/schemas/entityForm.schema copy';
 import type { JobStatus } from '../../domain/entities/jobStatus/jobStatus';
 import type { EmployeeStatus } from '../../domain/entities/employeeStatus/employeeStatus';
-import { EmployeeStatusFormSchema } from '../schemas/employeeStatus/EmployeeStatus';
+import { EmployeeStatusFormSchema } from '../schemas/employeeStatus/employeeStatus';
 
 // -----------------------------------------------------------------------------
 // Helper: Generic Create Form wrapper (with explicit types)
@@ -68,11 +68,13 @@ export const EMPLOYEE_EMPTY_DEFAULTS = {
     contract_type: null,
     contract_nature: null,
     job_category: null,
-    job_status_id: null,
-    job_status_note: null,
+   
     workplace_city_id: null,
   },
+  job_status_id: null,
+  job_status_note: null,
   employee_status_id: null,
+  employee_status_note: null,
   educations: [],
   children: []
 };
@@ -268,6 +270,7 @@ export function EmployeeForm({
 
   const { entities: countries, getAll: loadCountries } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
   const { entities: chronicDiseases, getAll: loadChronicDiseases } = useEntityCrud<Country>('/hr/chronic-diseases', '/hr/chronic-diseases');
+  const { getAll: loadEmployeeStatuses } = useEntityCrud<EmployeeStatus>('/hr/employee-statuses', '/hr/employee-statuses');
 
   const computeCountries = async () => {
     const response = await loadCountries();
@@ -279,8 +282,8 @@ export function EmployeeForm({
   };
 
   const computeEmployeeStatuses = async () => {
-    const { getAll: loadEmployeeStatuses } = useEntityCrud<EmployeeStatus>('/hr/employee_statuses', '/hr/employee_statuses');
     const response = await loadEmployeeStatuses();
+    console.log(response);
     return { options: response.data.map((es: any) => ({ value: es.id, label: es.name, is_default: es.is_default })) };
   };
 
@@ -318,8 +321,8 @@ export function EmployeeForm({
     />;
   }
   function EmployeeStatusCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number | string, item: any) => void; onCancel: () => void }) {
-    const { create: createEmployeeStatus } = useEntityCrud<EmployeeStatus>('/hr/employee_statuses', '/hr/employee_statuses');
-    return <CreateEntityForm fields={[{ name: 'name', label: t('employees.employee_status', 'hr') || 'حالة الموظف' }, , { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]} defaultValues={{ name: '' }} schema={EmployeeStatusFormSchema} onSubmit={async (data) => {
+    const { create: createEmployeeStatus } = useEntityCrud<EmployeeStatus>('/hr/employee-statuses', '/hr/employee-statuses');
+    return <CreateEntityForm fields={[{ name: 'name', label: t('employees.employee_status', 'hr') || 'حالة الموظف' }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]} defaultValues={{ name: '' }} schema={EmployeeStatusFormSchema} onSubmit={async (data) => {
       const payload = {
         ...data,
         name: data.name,
@@ -595,15 +598,25 @@ export function EmployeeForm({
       compute: computeChronicDiseases,
     },
     {
-      name: 'employee_status_id', type: 'multi-select-or-create', searchable: true, label: t('employees.employee_status_id', 'hr') || 'Employee Status',
+      name: 'employee_status_id', type: 'select-or-create', searchable: true, label: t('employees.employee_status_id', 'hr') || 'Employee Status',
       labelPath: 'data.name',
       renderCreateForm: (onSuccess, onCancel) => <EmployeeStatusCreateForm onSuccess={(v, i) => {
         onSuccess(v, i)
       }} onCancel={onCancel} />,
+      required:true,
       compute: computeEmployeeStatuses,
     },
+    {name:'employee_status_note' , type:'text' , label:t('employees.employee_status_note' , 'hr') || 'ملاحظة حالة الموظف' ,required:true ,  dependsOn: ['employee_status_id'], compute: async (values) => {
+      if (!values.employee_status_id) {
+        return ({ disabled: true })
+      }
+      else{
+        return ({ disabled: false })
+      }
+    }}
 
   ];
+console.log(errors);
 
   const EMPLOYMENT_FIELDS: FieldConfig[] = [
     { name: 'employment_details.job_title', label: t('employees.job_title', 'hr') || 'المسمى الوظيفي' },
@@ -644,7 +657,7 @@ export function EmployeeForm({
     },
     { name: 'employment_details.job_category', label: t('employees.job_category', 'hr') || 'التصنيف الوظيفي' },
     {
-      name: 'employment_details.job_status_id', label: t('employees.job_status', 'hr') || 'الحالة الوظيفية',
+      name: 'job_status_id', label: t('employees.job_status', 'hr') || 'الحالة الوظيفية',
       required: true,
       searchable: true,
       labelPath: 'data.name',
@@ -656,9 +669,12 @@ export function EmployeeForm({
       }
     },
     {
-      name: 'employment_details.job_status_note', label: t('employees.job_status_note', 'hr') || 'ملاحظات الحالة الوظيفية', dependsOn: ['job_status_id'], compute: async (values) => {
+      name: 'job_status_note', label: t('employees.job_status_note', 'hr') || 'ملاحظات الحالة الوظيفية', dependsOn: ['job_status_id'],required:true, compute: async (values) => {
         if (!values.job_status_id) {
           return ({ disabled: true })
+        }
+        else{
+          return ({ disabled: false })
         }
       }
     },

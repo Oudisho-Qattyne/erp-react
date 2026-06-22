@@ -13,7 +13,7 @@ import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/Er
 import { toast } from 'sonner';
 import { Pencil, Trash2, Star } from 'lucide-react';
 import type { EmployeeStatus } from '../../../domain/entities/employeeStatus/employeeStatus';
-import { EmployeeStatusFormSchema } from '../../schemas/employeeStatus/EmployeeStatus';
+import { EmployeeStatusFormSchema } from '../../schemas/employeeStatus/employeeStatus';
 
 export function EmployeeStatusesPage() {
   const { t } = useLanguage();
@@ -24,6 +24,7 @@ export function EmployeeStatusesPage() {
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<any>(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
   const filtered = items.filter((item: any) =>
     (typeof item.name === 'string' ? item.name : item.name?.ar || item.name?.en || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -32,25 +33,29 @@ export function EmployeeStatusesPage() {
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
+    setConfirmLoading(true);
     try {
       await remove(confirmDelete.id);
       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
+      setConfirmDelete(null);
     } catch {
       toast.error(t('lookups.delete_error', 'hr').replace('{name}', entity));
     }
-    setConfirmDelete(null);
+    setConfirmLoading(false);
   };
 
   const handleSetDefaultConfirm = async () => {
     if (!confirmSetDefault) return;
+    setConfirmLoading(true);
     try {
       await update(confirmSetDefault.id, { is_default: true });
       toast.success(t('lookups.set_default_success', 'hr').replace('{name}', entity));
       getAll();
+      setConfirmSetDefault(null);
     } catch {
       toast.error(t('lookups.set_default_error', 'hr').replace('{name}', entity));
     }
-    setConfirmSetDefault(null);
+    setConfirmLoading(false);
   };
 
   const columns = [
@@ -98,7 +103,7 @@ export function EmployeeStatusesPage() {
         <GenericCreateForm
           fields={[{ name: 'name', label: t('employee_form.employee_status', 'hr') || 'Employee Status', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
           schema={EmployeeStatusFormSchema}
-          onSubmit={async (data) => { try { return await create({ ...data, name: { ar: data.name } }); } catch { toast.error(t('lookups.create_error', 'hr').replace('{name}', entity)); throw {}; } }}
+          onSubmit={async (data) => { try { return await create({ ...data, name: data.name}); } catch { toast.error(t('lookups.create_error', 'hr').replace('{name}', entity)); throw {}; } }}
           onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAll(); setIsCreateOpen(false); }}
           onCancel={() => setIsCreateOpen(false)}
           submitLabel={t('employee_form.add_employee_status', 'hr') || 'Add Employee Status'}
@@ -111,7 +116,7 @@ export function EmployeeStatusesPage() {
           fields={[{ name: 'name', label: t('employee_form.employee_status', 'hr') || 'Employee Status', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
           schema={EmployeeStatusFormSchema}
           defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), is_default: editItem.is_default } : undefined}
-          onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: { ar: data.name } }); } catch { toast.error(t('lookups.update_error', 'hr').replace('{name}', entity)); throw {}; } }}
+          onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: data.name }); } catch { toast.error(t('lookups.update_error', 'hr').replace('{name}', entity)); throw {}; } }}
           onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); getAll(); setEditItem(null); }}
           onCancel={() => setEditItem(null)}
           submitLabel={t('common.save', 'shared') || 'Save'}
@@ -130,6 +135,7 @@ export function EmployeeStatusesPage() {
         message={t('common.confirm_delete_message', 'shared').replace('{entity}', entity)}
         confirmLabel={t('common.delete', 'shared') || 'Delete'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
+        confirmLoading={confirmLoading}
         onConfirm={handleDeleteConfirm} onCancel={() => setConfirmDelete(null)} />
 
       <ConfirmDialog isOpen={!!confirmSetDefault}
@@ -137,6 +143,7 @@ export function EmployeeStatusesPage() {
         message={t('common.set_default_message', 'shared')?.replace('{entity}', entity) || `Are you sure you want to set this ${entity} as default?`}
         confirmLabel={t('common.set_default', 'shared') || 'Set as default'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
+        confirmLoading={confirmLoading}
         onConfirm={handleSetDefaultConfirm} onCancel={() => setConfirmSetDefault(null)} />
     </div>
   );

@@ -39,13 +39,18 @@
         "regions": "المناطق",
         "universities": "الجامعات",
         "faculties": "الكليات",
-        "specializations": "التخصصات"
+        "specializations": "التخصصات",
+        "job_statuses": "الحالة الوظيفية",
+        "employee_statuses": "حالة الموظف"
       }
     },
     "admin": "الإدارة العامة",
     "hr": " إدارة الموارد البشرية",
     "leave_types":{
       "title":"إدارة أنواع الإجازات"
+    },
+    "leave": {
+      "user_eligible_leave_types": "أنواع الإجازات المستحقة"
     }
   },
   "employees": {
@@ -90,6 +95,7 @@
     "job_status_note": "ملاحظات الحالة الوظيفية",
     "employee_status": "حالة الموظف",
     "employee_status_id": "حالة الموظف",
+    "employee_status_note" : "ملاحظة حالة الموظف",
     "country": "الدولة",
     "city": "المدينة",
     "region": "منطقة السكن",
@@ -201,7 +207,11 @@
       "job_title_required": "المسمى الوظيفي مطلوب",
       "org_unit_required": "الوحدة التنظيمية مطلوبة",
       "status_invalid": "الحالة الوظيفية غير صالحة",
+      "job_status_id_required": "الحالة الوظيفية مطلوبة",
+      "job_status_note_required": "ملاحظات الحالة الوظيفية مطلوبة",
       "employee_status_id_required": "حالة الموظف مطلوبة",
+      "employee_status_note_required": "ملاحظات حالة الموظف مطلوبة",
+
       "appointment_date_invalid": "تاريخ التعيين بصيغة YYYY-MM-DD",
       "contract_type_invalid": "نوع العقد غير صالح",
       "contract_nature_invalid": "طبيعة العقد غير صالحة",

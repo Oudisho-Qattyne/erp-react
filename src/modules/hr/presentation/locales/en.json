@@ -39,13 +39,18 @@
         "regions": "Regions",
         "universities": "Universities",
         "faculties": "Faculties",
-        "specializations": "Specializations"
+        "specializations": "Specializations",
+        "job_statuses": "Job Statuses",
+        "employee_statuses": "Employee Statuses"
       }
     },
     "admin": "Admin",
     "hr": "Human Resources Management",
     "leave_types":{
       "title":"Leave types Management"
+    },
+    "leave": {
+      "user_eligible_leave_types": "User Eligible Leave Types"
     }
   },
   "employees": {
@@ -90,6 +95,7 @@
     "job_status_note": "Job Status Note",
     "employee_status": "Employee Status",
     "employee_status_id": "Employee Status",
+    "employee_status_note" : "ملاحظة حالة الموظف",
     "country": "Country",
     "city": "City",
     "region": "Residential Region",
@@ -200,7 +206,11 @@
       "job_title_required": "Job title is required",
       "org_unit_required": "Organizational unit Required",
       "status_invalid": "Invalid employment status",
+      "job_status_id_required": "Job status is required",
+      "job_status_note_required": "Job status note is required",
       "employee_status_id_required": "Employee status is required",
+      "employee_status_note_required": "Employee status note is required",
+    "employee_status_note_required" : "Employee status note is required",
       "appointment_date_invalid": "Appointment date must be in YYYY-MM-DD format",
       "contract_type_invalid": "Invalid contract type",
       "contract_nature_invalid": "Invalid contract nature",

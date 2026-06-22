@@ -69,8 +69,7 @@ export function EditEmployeePage() {
               contract_type: emp.employment_details.contract_type,
               contract_nature: emp.employment_details.contract_nature,
               job_category: emp.employment_details.job_category,
-              job_status_id:null,
-              job_status_note:null,
+
               workplace_city_id: emp.employment_details.workplace_city_id,
             } : undefined,
 
@@ -84,7 +83,10 @@ export function EditEmployeePage() {
               academic_stage: edu.academic_stage || null,
               study_status: edu.study_status || null,
             })) || [],
-
+            job_status_id:  emp.job_status_id || undefined,
+            job_status_note: emp.job_status_note || undefined,
+            employee_status_id: emp.employee_status_id || undefined,
+            employee_status_note: emp.employee_status_note || undefined,
             children: emp.children?.map((child: any) => ({
               name: child.name,
               birthdate: child.birthdate ,
