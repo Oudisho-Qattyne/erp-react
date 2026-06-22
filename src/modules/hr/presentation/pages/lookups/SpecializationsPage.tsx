@@ -29,6 +29,7 @@ export function SpecializationsPage() {
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<any>(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   useEffect(() => { loadUniversities(); }, []);
   useEffect(() => { if (selectedUniversity) { getAllByUniversity(selectedUniversity); setSelectedFaculty(null); } }, [selectedUniversity]);
@@ -36,25 +37,29 @@ export function SpecializationsPage() {
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
+    setConfirmLoading(true);
     try {
       await remove(confirmDelete.id);
       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
+      setConfirmDelete(null);
     } catch {
       toast.error(t('lookups.delete_error', 'hr').replace('{name}', entity));
     }
-    setConfirmDelete(null);
+    setConfirmLoading(false);
   };
 
   const handleSetDefaultConfirm = async () => {
     if (!confirmSetDefault) return;
+    setConfirmLoading(true);
     try {
       await update(confirmSetDefault.id, { is_default: true });
       toast.success(t('lookups.set_default_success', 'hr').replace('{name}', entity));
       selectedFaculty && getAllByFaculty(selectedFaculty);
+      setConfirmSetDefault(null);
     } catch {
       toast.error(t('lookups.set_default_error', 'hr').replace('{name}', entity));
     }
-    setConfirmSetDefault(null);
+    setConfirmLoading(false);
   };
 
   const filtered = specializations.filter((s: any) =>
@@ -68,22 +73,22 @@ export function SpecializationsPage() {
       render: (row: any) => row.is_default
         ? <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full"><Star size={12} /> {t('common.yes', 'shared') || 'Yes'}</span>
         : <span className="text-xs text-text-muted">—</span> },
-    { key: 'actions', label: t('common.actions', 'shared') || 'Actions', width: 220, align: 'right' as const,
+    { key: 'actions', label: t('common.actions', 'shared') || 'Actions', width: 200,
       render: (row: any) => (
-        <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
           {!row.is_default && (
-            <Button variant="outline" size="sm" onClick={() => setConfirmSetDefault(row)}
+            <Button variant="ghost" size="sm" onClick={() => setConfirmSetDefault(row)}
               title={t('common.set_default', 'shared') || 'Set as default'}>
-              <Star size={14} />
+              <Star size={16} />
             </Button>
           )}
-          <Button variant="outline" size="sm" onClick={() => setEditItem(row)}
+          <Button variant="ghost" size="sm" onClick={() => setEditItem(row)}
             title={t('common.edit', 'shared') || 'Edit'}>
-            <Pencil size={14} />
+            <Pencil size={16} />
           </Button>
-          <Button variant="danger" size="sm" onClick={() => setConfirmDelete(row)}
+          <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)}
             title={t('common.delete', 'shared') || 'Delete'}>
-            <Trash2 size={14} />
+            <Trash2 size={16} className="text-danger" />
           </Button>
         </div>
       ) },
@@ -99,13 +104,13 @@ export function SpecializationsPage() {
         <div>
           <label className="block text-sm font-medium mb-1">{t('employees.university', 'hr') || 'University'}</label>
           <Input type="select" value={selectedUniversity || ''} onChange={(v) => setSelectedUniversity(Number(v))}
-            options={universities.map((u: any) => ({ value: u.id, label: typeof u.name === 'string' ? u.name : (u.name?.ar || u.name?.en || '') }))}
+            options={universities.map((u: any) => ({ value: u.id, label: typeof u.name === 'string' ? u.name : (u.name?.ar || u.name?.en || ''), is_default:u.is_default }))}
             placeholder={t('common.select', 'shared') || 'Select...'} baseClasses={inputBaseClasses} searchable />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">{t('employees.faculty', 'hr') || 'Faculty'}</label>
           <Input type="select" value={selectedFaculty || ''} onChange={(v) => setSelectedFaculty(Number(v))}
-            options={faculties.map((f: any) => ({ value: f.id, label: typeof f.name === 'string' ? f.name : (f.name?.ar || f.name?.en || '') }))}
+            options={faculties.map((f: any) => ({ value: f.id, label: typeof f.name === 'string' ? f.name : (f.name?.ar || f.name?.en || '') , is_default:f.is_default}))}
             placeholder={t('common.select', 'shared') || 'Select...'} disabled={!selectedUniversity} baseClasses={inputBaseClasses} searchable />
         </div>
       </div>
@@ -163,6 +168,7 @@ export function SpecializationsPage() {
         message={t('common.confirm_delete_message', 'shared').replace('{entity}', entity)}
         confirmLabel={t('common.delete', 'shared') || 'Delete'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
+        confirmLoading={confirmLoading}
         onConfirm={handleDeleteConfirm} onCancel={() => setConfirmDelete(null)} />
 
       <ConfirmDialog isOpen={!!confirmSetDefault}
@@ -170,6 +176,7 @@ export function SpecializationsPage() {
         message={t('common.set_default_message', 'shared')?.replace('{entity}', entity) || `Are you sure you want to set this ${entity} as default?`}
         confirmLabel={t('common.set_default', 'shared') || 'Set as default'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
+        confirmLoading={confirmLoading}
         onConfirm={handleSetDefaultConfirm} onCancel={() => setConfirmSetDefault(null)} />
     </div>
   );

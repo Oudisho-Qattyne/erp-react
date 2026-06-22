@@ -85,10 +85,16 @@ export interface EmployeeData {
   injury_date: string | null;
   chronic_diseases: ChronicDiseases[];
   employment_details: EmploymentDetails;
+
   educations: EducationEntry[];
   created_at: string;
   updated_at: string;
   children:EmployeeChildren[];
   folder:string;
   photo_id:string;
+
+  employee_status_id:number;
+  employee_status_note:string;
+  job_status_id:number;
+  job_status_note:string;
 }

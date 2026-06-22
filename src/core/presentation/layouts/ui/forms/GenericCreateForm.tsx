@@ -56,7 +56,7 @@ export function GenericCreateForm({
 
   const handleFormSubmit = async (data: any) => {
     const result = await onSubmit(data);
-    onSuccess(result.data.id, result);
+    onSuccess(result?.data?.id, result);
     methods.reset();
   };
 

@@ -23,6 +23,9 @@ import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicFo
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import type { ChronicDiseases } from '../../../../core/domain/entities/chronicDiseases/chronicDiseases';
 import { EntityFormSchema } from '../../../../core/presentation/schemas/entityForm.schema copy';
+import type { JobStatus } from '../../domain/entities/jobStatus/jobStatus';
+import type { EmployeeStatus } from '../../domain/entities/employeeStatus/employeeStatus';
+import { EmployeeStatusFormSchema } from '../schemas/employeeStatus/employeeStatus';
 
 // -----------------------------------------------------------------------------
 // Helper: Generic Create Form wrapper (with explicit types)
@@ -65,8 +68,13 @@ export const EMPLOYEE_EMPTY_DEFAULTS = {
     contract_type: null,
     contract_nature: null,
     job_category: null,
+   
     workplace_city_id: null,
   },
+  job_status_id: null,
+  job_status_note: null,
+  employee_status_id: null,
+  employee_status_note: null,
   educations: [],
   children: []
 };
@@ -110,7 +118,7 @@ function CreateEntityForm<T>({
 function UniversityCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number, item: any) => void; onCancel: () => void }) {
   const { t } = useLanguage();
   const { create: createUniversity } = useEntityCrud<University>('/shared-kernal/universities', '/shared-kernal/universities');
-  return <CreateEntityForm defaultValues={{ name: "" }} schema={UniversityFormSchema} fields={[{ name: 'name', label: t('employees.university', 'hr') || 'اسم الجامعة', required: true },{ name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false , type:'checkbox' }]}
+  return <CreateEntityForm defaultValues={{ name: "" }} schema={UniversityFormSchema} fields={[{ name: 'name', label: t('employees.university', 'hr') || 'اسم الجامعة', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
     onSubmit={async (data) => {
 
       return await createUniversity(data)
@@ -124,11 +132,11 @@ function FacultyCreateForm({ onSuccess, onCancel, universityId }: { onSuccess: (
   const schemaWithoutUni = FacultyFormSchema.omit({ university_id: true });
   return (
     <GenericCreateForm
-      fields={[{ name: 'name', label: t('employees.faculty', 'hr') || 'اسم الكلية', required: true } , { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false , type:'checkbox' }]}
+      fields={[{ name: 'name', label: t('employees.faculty', 'hr') || 'اسم الكلية', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
       schema={schemaWithoutUni}
       onSubmit={async (data: any) => {
         console.log(universityId);
-        
+
         const payload = {
           ...data,
           name: data.name,
@@ -146,10 +154,10 @@ function FacultyCreateForm({ onSuccess, onCancel, universityId }: { onSuccess: (
 function SpecializationCreateForm({ onSuccess, onCancel, facultyId }: { onSuccess: (id: number, item: any) => void; onCancel: () => void; facultyId?: number }) {
   const { t } = useLanguage();
   const { create: createSpecialization } = useSpecializations();
-  const SpecializationSchema = SpecializationFormSchema.omit({Faculty_id:true})
+  const SpecializationSchema = SpecializationFormSchema.omit({ Faculty_id: true })
   return (
     <GenericCreateForm
-      fields={[{ name: 'name', label: t('employees.specialization', 'hr') || 'اسم الاختصاص', required: true } , { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false , type:'checkbox' }]}
+      fields={[{ name: 'name', label: t('employees.specialization', 'hr') || 'اسم الاختصاص', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
       schema={SpecializationSchema}
       defaultValues={{ faculty_id: facultyId }}
       onSubmit={async (data: any) => {
@@ -167,6 +175,16 @@ function SpecializationCreateForm({ onSuccess, onCancel, facultyId }: { onSucces
   );
 }
 
+function JobStatusCreateForm({ onSuccess, onCancel, facultyId }: { onSuccess: (id: number, item: any) => void; onCancel: () => void; facultyId?: number }) {
+  const { t } = useLanguage();
+
+  const { entities: items, getAll, create: createJobStatus, update, remove, loading, error } = useEntityCrud<JobStatus>('/hr/job-statuses', '/hr/job-statuses');
+  return <CreateEntityForm defaultValues={{ name: "" }} schema={UniversityFormSchema} fields={[{ name: 'name', label: t('employee_form.job_status', 'hr') || 'الحالة الوظيفية', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
+    onSubmit={async (data) => {
+      return await createJobStatus(data)
+
+    }} onSuccess={onSuccess} onCancel={onCancel} title={t('employee_form.job_status', 'hr') || "الحالة الوظيفية"} submitLabel={t('employee_form.add_job_status', 'hr') || "إضافة حالة وظيفية"} />;
+}
 // function OrgUnitCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number, item: any) => void; onCancel: () => void }) {
 //   const { create: createOrgUnit } = useEntityCrud<OrganizationalLevels>('', '');
 //   return <CreateEntityForm schema={organizationalLevelFormSchema} onSubmit={createOrgUnit} onSuccess={onSuccess} onCancel={onCancel} title="وحدة تنظيمية" />;
@@ -245,32 +263,41 @@ export function EmployeeForm({
   const { entities: faculties, getAllByUniversity: loadFacultiesByUniversity } = useFaculties();
   const { entities: specializations, getAllByFaculty: loadSpecializationsByFaculty } = useSpecializations();
   const { entities: orgUnits, getAll: loadOrgUnits } = useEntityCrud<OrganizationalLevels>('/hr/organizational-levels', '/hr/organizational-levels');
+  const { entities: jobStatus, getAll: loadJobStatus, error } = useEntityCrud<JobStatus>('/hr/job-statuses', '/hr/job-statuses');
+
   // Country CRUD (you may need a useCountries hook)
 
 
   const { entities: countries, getAll: loadCountries } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
   const { entities: chronicDiseases, getAll: loadChronicDiseases } = useEntityCrud<Country>('/hr/chronic-diseases', '/hr/chronic-diseases');
+  const { getAll: loadEmployeeStatuses } = useEntityCrud<EmployeeStatus>('/hr/employee-statuses', '/hr/employee-statuses');
 
   const computeCountries = async () => {
     const response = await loadCountries();
-    return { options: response.data.map((c: any) => ({ value: c.id, label: c.name , is_default:c.is_default })) };
+    return { options: response.data.map((c: any) => ({ value: c.id, label: c.name, is_default: c.is_default })) };
   };
   const computeChronicDiseases = async () => {
     const response = await loadChronicDiseases();
     return { options: response.data.map((c: any) => ({ value: c.id, label: c.name })) };
   };
 
+  const computeEmployeeStatuses = async () => {
+    const response = await loadEmployeeStatuses();
+    console.log(response);
+    return { options: response.data.map((es: any) => ({ value: es.id, label: es.name, is_default: es.is_default })) };
+  };
+
   // Create form for country (add after other create forms)
   function CountryCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number | string, item: any) => void; onCancel: () => void }) {
     const { create: createCountry } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
-    return <CreateEntityForm fields={[{ name: 'name', label: t('employees.country', 'hr') || 'اسم الدولة', required: true } , { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false , type:'checkbox' }]} defaultValues={{ name: '' }} schema={CountryFormSchema}
+    return <CreateEntityForm fields={[{ name: 'name', label: t('employees.country', 'hr') || 'اسم الدولة', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]} defaultValues={{ name: '' }} schema={CountryFormSchema}
       onSubmit={async (data) => {
         const payload = {
           ...data,
           name: {
             ar: data.name
           },
-          
+
         }
         return await createCountry(payload)
       }} onSuccess={onSuccess} onCancel={onCancel} title={t('employees.country', 'hr') || "دولة"} submitLabel={t('employee_form.add_country', 'hr') || "إضافة دولة جديدة"} />;
@@ -278,13 +305,33 @@ export function EmployeeForm({
 
   function ChronicDiseaseCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number | string, item: any) => void; onCancel: () => void }) {
     const { create: createChronicDisease } = useEntityCrud<ChronicDiseases>('/hr/chronic-diseases', '/hr/chronic-diseases');
-    return <CreateEntityForm fields={[{ name: 'name', label: t('employees.chronic_diseases', 'hr') || 'الأمراض المزمنة' }]} defaultValues={{ name: '' }} schema={EntityFormSchema} onSubmit={async (data) => {
+    return <CreateEntityForm
+      fields={[{ name: 'name', label: t('employees.chronic_diseases', 'hr') || 'الأمراض المزمنة' }]}
+      defaultValues={{ name: '' }}
+      schema={EntityFormSchema}
+      onSubmit={async (data) => {
+        const payload = {
+          name: data.name,
+          // is_default : data.is_default
+        }
+        return await createChronicDisease(payload)
+      }} onSuccess={onSuccess} onCancel={onCancel}
+      title={t('employees.chronic_diseases', 'hr') || 'الأمراض المزمنة'}
+      submitLabel={t('employee_form.add_chronic_disease', 'hr') || "إضافة مرض مزمن"}
+    />;
+  }
+  function EmployeeStatusCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number | string, item: any) => void; onCancel: () => void }) {
+    const { create: createEmployeeStatus } = useEntityCrud<EmployeeStatus>('/hr/employee-statuses', '/hr/employee-statuses');
+    return <CreateEntityForm fields={[{ name: 'name', label: t('employees.employee_status', 'hr') || 'حالة الموظف' }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]} defaultValues={{ name: '' }} schema={EmployeeStatusFormSchema} onSubmit={async (data) => {
       const payload = {
+        ...data,
         name: data.name,
         // is_default : data.is_default
       }
-      return await createChronicDisease(payload)
-    }} onSuccess={onSuccess} onCancel={onCancel} title={t('employees.chronic_diseases', 'hr') || 'الأمراض المزمنة'} submitLabel={t('employee_form.add_chronic_disease', 'hr') || "إضافة مرض مزمن"} />;
+      return await createEmployeeStatus(payload)
+    }} onSuccess={onSuccess} onCancel={onCancel} title={t('employees.employee_statuses', 'hr') || 'حالات الموظف'}
+      submitLabel={t('employee_form.add_employee_status', 'hr') || "إضافة حالة موظف"}
+    />;
   }
 
   // Modify CityCreateForm to accept countryId
@@ -294,7 +341,7 @@ export function EmployeeForm({
 
     return (
       <GenericCreateForm
-        fields={[{ name: 'name', label: t('employees.city', 'hr') || 'اسم المدينة', required: true } , { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false , type:'checkbox' }]}
+        fields={[{ name: 'name', label: t('employees.city', 'hr') || 'اسم المدينة', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
         schema={schemaWithoutCountry}
         defaultValues={{ name: '' }}
         onSubmit={async (data) => {
@@ -320,7 +367,7 @@ export function EmployeeForm({
     const schemaWithoutCity = RegionFormSchema.omit({ city_id: true });
     return (
       <GenericCreateForm
-        fields={[{ name: 'name', label: t('employees.region', 'hr') || 'اسم المنطقة السكنية', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false , type:'checkbox' }]}
+        fields={[{ name: 'name', label: t('employees.region', 'hr') || 'اسم المنطقة السكنية', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
         schema={schemaWithoutCity}
         defaultValues={{ city_id: cityId }}
         onSubmit={async (data) => {
@@ -344,33 +391,33 @@ export function EmployeeForm({
     const countryId = values.employment_details?.workplace_country_id;
     if (!countryId) return { options: [], disabled: true };
     const response = await loadCitiesByCountry(countryId);
-    return { options: response.data.map((c: any) => ({ value: c.id, label: c.name , is_default:c.is_default})) };
+    return { options: response.data.map((c: any) => ({ value: c.id, label: c.name, is_default: c.is_default })) };
   };
 
   const computeRegions = async (values: any) => {
     const cityId = values.residence_city_id;
     if (!cityId) return { options: [], disabled: true };
     const response = await loadRegionsByCity(cityId);
-    return { options: response.data.map((r: any) => ({ value: r.id, label: r.name , is_default:r.is_default })) };
+    return { options: response.data.map((r: any) => ({ value: r.id, label: r.name, is_default: r.is_default })) };
   };
 
   const computeUniversities = async () => {
     const response = await loadUniversities();
-    return { options: response.data.map((u: any) => ({ value: u.id, label: u.name , is_default:u.is_default})) };
+    return { options: response.data.map((u: any) => ({ value: u.id, label: u.name, is_default: u.is_default })) };
   };
 
   const computeFaculties = async (values: any, idx: number) => {
     const univId = getNestedValue(values, `educations.${idx}.university_id`);
     if (!univId) return { options: [], disabled: true };
     const response = await loadFacultiesByUniversity(Number(univId));
-    return { options: response.data.map((f: any) => ({ value: f.id, label: f.name , is_default:f.is_default})) };
+    return { options: response.data.map((f: any) => ({ value: f.id, label: f.name, is_default: f.is_default })) };
   };
 
   const computeSpecializations = async (values: any, idx: number) => {
     const facId = getNestedValue(values, `educations.${idx}.faculty_id`);
     if (!facId) return { options: [], disabled: true };
     const response = await loadSpecializationsByFaculty(Number(facId));
-    return { options: response.data.map((s: any) => ({ value: s.id, label: s.name , is_default:s.is_default})) };
+    return { options: response.data.map((s: any) => ({ value: s.id, label: s.name, is_default: s.is_default })) };
   };
 
   const addEducation = () => {
@@ -382,7 +429,7 @@ export function EmployeeForm({
         university_id: null,
         faculty_id: null,
         specialization_id: null,
-        graduation_year:null,
+        graduation_year: null,
         academic_stage: null,
         study_status: null,
       },
@@ -403,10 +450,10 @@ export function EmployeeForm({
     { name: 'father_name', label: t('employees.father_name', 'hr') || 'اسم الأب' },
     { name: 'grandfather_name', label: t('employees.grandfather_name', 'hr') || 'اسم الجد' },
     { name: 'last_name', label: t('employees.last_name', 'hr') || 'اسم العائلة', required: true },
-    { name: 'mother_name', label: t('employees.mother_name', 'hr') || 'اسم الأم'},
+    { name: 'mother_name', label: t('employees.mother_name', 'hr') || 'اسم الأم' },
     { name: 'gender', label: t('employees.gender', 'hr') || 'الجنس', type: 'select', options: [{ value: 'male', label: t('employees.gender_male', 'hr') || 'ذكر' }, { value: 'female', label: t('employees.gender_female', 'hr') || 'أنثى' }], required: true },
     { name: 'date_birth', type: 'date', label: t('employees.date_birth', 'hr') || 'تاريخ الميلاد' },
-    { name: 'place_birth', label: t('employees.place_birth', 'hr') || 'مكان الميلاد'},
+    { name: 'place_birth', label: t('employees.place_birth', 'hr') || 'مكان الميلاد' },
     {
       name: 'marital_status',
       label: t('employees.marital_status', 'hr') || 'الحالة الاجتماعية',
@@ -508,7 +555,7 @@ export function EmployeeForm({
         const countryId = values.residence_country_id;
         if (!countryId) return { options: [], disabled: true };
         const response = await loadCitiesByCountry(countryId);
-        return { options: response.data.map((c: any) => ({ value: c.id, label: c.name , is_default:c.is_default })) };
+        return { options: response.data.map((c: any) => ({ value: c.id, label: c.name, is_default: c.is_default })) };
       },
       createTitle: t('employee_form.add_city', 'hr') || 'إضافة مدينة جديدة',
       labelPath: 'data.name',
@@ -528,7 +575,7 @@ export function EmployeeForm({
         const cityId = values.residence_city_id;
         if (!cityId) return { options: [], disabled: true };
         const response = await loadRegionsByCity(cityId);
-        return { options: response.data.map((r: any) => ({ value: r.id, label: r.name , is_default:r.is_default})) };
+        return { options: response.data.map((r: any) => ({ value: r.id, label: r.name, is_default: r.is_default })) };
       },
       createTitle: t('employee_form.add_region', 'hr') || 'إضافة منطقة جديدة',
       labelPath: 'data.name',
@@ -550,11 +597,30 @@ export function EmployeeForm({
       }} onCancel={onCancel} />,
       compute: computeChronicDiseases,
     },
+    {
+      name: 'employee_status_id', type: 'select-or-create', searchable: true, label: t('employees.employee_status_id', 'hr') || 'Employee Status',
+      labelPath: 'data.name',
+      renderCreateForm: (onSuccess, onCancel) => <EmployeeStatusCreateForm onSuccess={(v, i) => {
+        onSuccess(v, i)
+      }} onCancel={onCancel} />,
+      required:true,
+      compute: computeEmployeeStatuses,
+    },
+    {name:'employee_status_note' , type:'text' , label:t('employees.employee_status_note' , 'hr') || 'ملاحظة حالة الموظف' ,required:true ,  dependsOn: ['employee_status_id'], compute: async (values) => {
+      if (!values.employee_status_id) {
+        return ({ disabled: true })
+      }
+      else{
+        return ({ disabled: false })
+      }
+    }}
+
   ];
+console.log(errors);
 
   const EMPLOYMENT_FIELDS: FieldConfig[] = [
-    { name: 'employment_details.job_title', label: t('employees.job_title', 'hr') || 'المسمى الوظيفي'},
-    { name: 'assigned_job', label: t('employees.assigned_job', 'hr') || 'العمل المكلف به', required:true },
+    { name: 'employment_details.job_title', label: t('employees.job_title', 'hr') || 'المسمى الوظيفي' },
+    { name: 'assigned_job', label: t('employees.assigned_job', 'hr') || 'العمل المكلف به', required: true },
     {
       name: 'employment_details.status',
       type: 'select',
@@ -591,6 +657,28 @@ export function EmployeeForm({
     },
     { name: 'employment_details.job_category', label: t('employees.job_category', 'hr') || 'التصنيف الوظيفي' },
     {
+      name: 'job_status_id', label: t('employees.job_status', 'hr') || 'الحالة الوظيفية',
+      required: true,
+      searchable: true,
+      labelPath: 'data.name',
+      type: 'select-or-create',
+      renderCreateForm: (onSuccess, onCancel) => <JobStatusCreateForm onSuccess={onSuccess} onCancel={onCancel} />,
+      compute: async (values) => {
+        const response = await loadJobStatus();
+        return { options: response.data.map((j: any) => ({ value: j.id, label: j.name, is_default: j.is_default })) }
+      }
+    },
+    {
+      name: 'job_status_note', label: t('employees.job_status_note', 'hr') || 'ملاحظات الحالة الوظيفية', dependsOn: ['job_status_id'],required:true, compute: async (values) => {
+        if (!values.job_status_id) {
+          return ({ disabled: true })
+        }
+        else{
+          return ({ disabled: false })
+        }
+      }
+    },
+    {
       name: 'employment_details.workplace_city_id',
       type: 'select-or-create',
       searchable: true,
@@ -602,7 +690,7 @@ export function EmployeeForm({
         const countryId = values.residence_country_id;
         if (!countryId) return { options: [], disabled: true };
         const response = await loadCitiesByCountry(countryId);
-        return { options: response.data.map((c: any) => ({ value: c.id, label: c.name })) }
+        return { options: response.data.map((c: any) => ({ value: c.id, label: c.name, is_default: c.is_default })) }
       },
       labelPath: 'data.name',
 
@@ -716,16 +804,17 @@ export function EmployeeForm({
                     createTitle={t('employee_form.add_faculty', 'hr') || "إضافة كلية جديدة"}
                     renderCreateForm={(onSuccess, onCancel, deps) => {
                       console.log(deps);
-                      
-                      return(
-                      <FacultyCreateForm
-                        universityId={deps?.[`educations.${idx}.university_id`] as number | undefined}
-                        onSuccess={(v, i) => {
-                          onSuccess(v, i)
-                        }}
-                        onCancel={onCancel}
-                      />
-                    )}}
+
+                      return (
+                        <FacultyCreateForm
+                          universityId={deps?.[`educations.${idx}.university_id`] as number | undefined}
+                          onSuccess={(v, i) => {
+                            onSuccess(v, i)
+                          }}
+                          onCancel={onCancel}
+                        />
+                      )
+                    }}
                   />
                   <FormInput
                     name={`educations.${idx}.specialization_id`}
@@ -745,7 +834,7 @@ export function EmployeeForm({
                       />
                     )}
                   />
-                  <FormInput name={`educations.${idx}.graduation_year`} label={t('employees.graduation_year', 'hr') || "سنة التخرج"} type='number'/>
+                  <FormInput name={`educations.${idx}.graduation_year`} label={t('employees.graduation_year', 'hr') || "سنة التخرج"} type='number' />
                   <FormInput name={`educations.${idx}.academic_stage`} label={t('employees.academic_stage', 'hr') || "المرحلة الأكاديمية"} />
                   <FormInput name={`educations.${idx}.study_status`} label={t('employees.study_status', 'hr') || "حالة الدراسة"} />
                 </div>

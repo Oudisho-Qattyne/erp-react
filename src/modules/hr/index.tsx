@@ -14,11 +14,14 @@ import { RegionsPage } from './presentation/pages/lookups/RegionsPage'
 import { UniversitiesPage } from './presentation/pages/lookups/UniversitiesPage'
 import { FacultiesPage } from './presentation/pages/lookups/FacultiesPage'
 import { SpecializationsPage } from './presentation/pages/lookups/SpecializationsPage'
+import { JobStatusesPage } from './presentation/pages/lookups/JobStatusesPage'
+import { EmployeeStatusesPage } from './presentation/pages/lookups/EmployeeStatusesPage'
 import { Rules } from './presentation/pages/Rules'
 import LeaveForm from './presentation/pages/leaves/LeaveForm'
 import LeavesTypesPage from './presentation/pages/leaves/LeavesTypesPage'
 import { ShowLeaveTypePage } from './presentation/pages/leaves/ShowLeaveTypePage'
 import { EditLeaveTypePage } from './presentation/pages/leaves/EditLeaveTypePage'
+import { UserEligibleLeaveTypes } from './presentation/pages/leaves/UserEligibleLeaveTypes'
 
 const usersModule: Module = {
   name: 'hr',
@@ -55,6 +58,18 @@ const usersModule: Module = {
       label: 'show_leave.title',
       nav: false,
       moduleName: 'hr',
+      requiresAuth: true,
+    },
+    {
+      path: '/hr/user-eligible-leave-types',
+      element: <UserEligibleLeaveTypes />,
+      layout: 'dashboard',
+      label: 'leave.user_eligible_leave_types',
+      nav: true,
+      order: 20,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'hr',
       requiresAuth: true,
     },
     // {
@@ -160,6 +175,28 @@ const usersModule: Module = {
       label: 'lookups.tabs.specializations',
       nav: true,
       order: 45,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'lookups',
+    },
+    {
+      path: '/hr/lookups/job-statuses',
+      element: <JobStatusesPage />,
+      layout: 'dashboard',
+      label: 'lookups.tabs.job_statuses',
+      nav: true,
+      order: 46,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'lookups',
+    },
+    {
+      path: '/hr/lookups/employee-statuses',
+      element: <EmployeeStatusesPage />,
+      layout: 'dashboard',
+      label: 'lookups.tabs.employee_statuses',
+      nav: true,
+      order: 47,
       moduleName: 'hr',
       icon: <Users size={18} />,
       group: 'lookups',

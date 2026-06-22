@@ -39,13 +39,18 @@
         "regions": "Regions",
         "universities": "Universities",
         "faculties": "Faculties",
-        "specializations": "Specializations"
+        "specializations": "Specializations",
+        "job_statuses": "Job Statuses",
+        "employee_statuses": "Employee Statuses"
       }
     },
     "admin": "Admin",
     "hr": "Human Resources Management",
     "leave_types":{
       "title":"Leave types Management"
+    },
+    "leave": {
+      "user_eligible_leave_types": "User Eligible Leave Types"
     }
   },
   "employees": {
@@ -86,6 +91,11 @@
     "injury_details": "Injury Details",
     "injury_date": "Injury Date",
     "chronic_diseases" : "Chronic Diseases",
+    "job_status": "Job Status",
+    "job_status_note": "Job Status Note",
+    "employee_status": "Employee Status",
+    "employee_status_id": "Employee Status",
+    "employee_status_note" : "ملاحظة حالة الموظف",
     "country": "Country",
     "city": "City",
     "region": "Residential Region",
@@ -163,6 +173,10 @@
     "add_university": "Add New University",
     "add_faculty": "Add Faculty",
     "add_specialization": "Add Specialization",
+    "add_job_status": "Add Job Status",
+    "job_status": "Job Status",
+    "add_employee_status": "Add Employee Status",
+    "employee_status": "Employee Status",
     "add_org_unit": "Add Organizational Unit",
     "add_chronic_disease":"Add chronic Disease",
     "saving": "Saving...",
@@ -192,6 +206,11 @@
       "job_title_required": "Job title is required",
       "org_unit_required": "Organizational unit Required",
       "status_invalid": "Invalid employment status",
+      "job_status_id_required": "Job status is required",
+      "job_status_note_required": "Job status note is required",
+      "employee_status_id_required": "Employee status is required",
+      "employee_status_note_required": "Employee status note is required",
+    "employee_status_note_required" : "Employee status note is required",
       "appointment_date_invalid": "Appointment date must be in YYYY-MM-DD format",
       "contract_type_invalid": "Invalid contract type",
       "contract_nature_invalid": "Invalid contract nature",
@@ -216,7 +235,9 @@
       "regions": "Regions",
       "universities": "Universities",
       "faculties": "Faculties",
-      "specializations": "Specializations"
+      "specializations": "Specializations",
+      "job_statuses": "Job Statuses",
+      "employee_statuses": "Employee Statuses"
     },
     "select_country_first": "Please select a country to view its cities",
     "select_city_first": "Please select a city first",
@@ -232,6 +253,8 @@
     "no_universities": "No universities",
     "no_faculties": "No faculties",
     "no_specializations": "No specializations",
+    "no_job_statuses": "No job statuses",
+    "no_employee_statuses": "No employee statuses",
     "updated": "{name} updated successfully",
     "update_error": "Failed to update {name}",
     "set_default_success": "{name} set as default successfully",
@@ -382,6 +405,8 @@
       "proportion_calculation_invalid": "Proration calculation is invalid",
       "proportion_rounding_invalid": "Proration rounding is invalid"
     },
+    "user_eligible_leave_types": "User Eligible Leave Types",
+    "no_eligible_leave_types": "No eligible leave types found",
     "show_leave": {
       "title": "Leave Details",
       "back": "Back",

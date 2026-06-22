@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../hooks';
-import { CountryFormSchema } from '../../../../../core/presentation/schemas/regions/countryForm.schema';
-import type { Country } from '../../../../../core/domain/entities/regions/Country';
+import { JobStatusFormSchema } from '../../schemas/jobStatus/jobStatus.schema';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { Dialog } from '../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { GenericCreateForm } from '../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
@@ -14,19 +13,20 @@ import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { toast } from 'sonner';
 import { Pencil, Trash2, Star } from 'lucide-react';
+import type { JobStatus } from '../../../domain/entities/jobStatus/jobStatus';
 
-export function CountriesPage() {
+export function JobStatusesPage() {
   const { t } = useLanguage();
-  const { entities: countries, getAll, create, update, remove, loading, error } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
-  const entity = t('lookups.tabs.countries', 'hr') || 'Country';
+  const { entities: items, getAll, create, update, remove, loading, error } = useEntityCrud<JobStatus>('/hr/job-statuses', '/hr/job-statuses');
+  const entity = t('lookups.tabs.job_statuses', 'hr') || 'Job Status';
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<any>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const filtered = countries.filter((c: any) =>
-    (typeof c.name === 'string' ? c.name : c.name?.ar || c.name?.en || '').toLowerCase().includes(searchQuery.toLowerCase())
+  const filtered = items.filter((item: any) =>
+    (typeof item.name === 'string' ? item.name : item.name?.ar || item.name?.en || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   useEffect(() => { getAll(); }, []);
@@ -59,7 +59,7 @@ export function CountriesPage() {
   };
 
   const columns = [
-    { key: 'name', label: t('employees.country', 'hr') || 'Country', width: 300,
+    { key: 'name', label: t('employee_form.job_status', 'hr') || 'Job Status', width: 300,
       render: (row: any) => typeof row.name === 'string' ? row.name : (row.name?.ar || row.name?.en || '') },
     { key: 'is_default', label: t('common.is_default', 'shared') || 'Default', width: 120,
       render: (row: any) => row.is_default
@@ -85,38 +85,38 @@ export function CountriesPage() {
         </div>
       ) },
   ];
-console.log(editItem);
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold">{t('lookups.tabs.countries', 'hr') || 'Countries'}</h1>
+        <h1 className="text-2xl font-bold">{t('lookups.tabs.job_statuses', 'hr') || 'Job Statuses'}</h1>
         <div className="w-full flex gap-2">
           <Input type="text" value={searchQuery} onChange={setSearchQuery}
             placeholder={t('common.search', 'shared') || 'Search...'}
             baseClasses={inputBaseClasses} className="w-60" />
-          <Button onClick={() => setIsCreateOpen(true)}>{t('employee_form.add_country', 'hr') || 'Add Country'}</Button>
+          <Button onClick={() => setIsCreateOpen(true)}>{t('employee_form.add_job_status', 'hr') || 'Add Job Status'}</Button>
         </div>
       </div>
 
       <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)}
-        title={t('employee_form.add_country', 'hr') || 'Add Country'}>
+        title={t('employee_form.add_job_status', 'hr') || 'Add Job Status'}>
         <GenericCreateForm
-          fields={[{ name: 'name', label: t('employees.country', 'hr') || 'Country name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
-          schema={CountryFormSchema}
-          onSubmit={async (data) => { try { return await create({ ...data, name: { ar: data.name } }); } catch { toast.error(t('lookups.create_error', 'hr').replace('{name}', entity)); throw {}; } }}
+          fields={[{ name: 'name', label: t('employee_form.job_status', 'hr') || 'Job Status', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
+          schema={JobStatusFormSchema}
+          onSubmit={async (data) => { try { return await create({ ...data, name: data.name }); } catch { toast.error(t('lookups.create_error', 'hr').replace('{name}', entity)); throw {}; } }}
           onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAll(); setIsCreateOpen(false); }}
           onCancel={() => setIsCreateOpen(false)}
-          submitLabel={t('employee_form.add_country', 'hr') || 'Add Country'}
+          submitLabel={t('employee_form.add_job_status', 'hr') || 'Add Job Status'}
         />
       </Dialog>
+
       <Dialog isOpen={!!editItem} onClose={() => setEditItem(null)}
         title={t('common.edit', 'shared') + ' ' + entity}>
         <GenericCreateForm
-          fields={[{ name: 'name', label: t('employees.country', 'hr') || 'Country name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
-          schema={CountryFormSchema}
+          fields={[{ name: 'name', label: t('employee_form.job_status', 'hr') || 'Job Status', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
+          schema={JobStatusFormSchema}
           defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), is_default: editItem.is_default } : undefined}
-          onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: { ar: data.name } }); } catch { toast.error(t('lookups.update_error', 'hr').replace('{name}', entity)); throw {}; } }}
+          onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: data.name }); } catch { toast.error(t('lookups.update_error', 'hr').replace('{name}', entity)); throw {}; } }}
           onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); getAll(); setEditItem(null); }}
           onCancel={() => setEditItem(null)}
           submitLabel={t('common.save', 'shared') || 'Save'}
@@ -127,7 +127,7 @@ console.log(editItem);
       {error && <ErrorState message={error} onRetry={getAll} />}
       {!loading && !error && (
         <DataTable columns={columns} data={filtered} rowKey="id" loading={false}
-          emptyMessage={t('lookups.no_countries', 'hr') || 'No countries found'} />
+          emptyMessage={t('lookups.no_job_statuses', 'hr') || 'No job statuses found'} />
       )}
 
       <ConfirmDialog isOpen={!!confirmDelete} type="danger"
@@ -138,7 +138,7 @@ console.log(editItem);
         confirmLoading={confirmLoading}
         onConfirm={handleDeleteConfirm} onCancel={() => setConfirmDelete(null)} />
 
-      <ConfirmDialog isOpen={!!confirmSetDefault} 
+      <ConfirmDialog isOpen={!!confirmSetDefault}
         title={t('common.set_default_title', 'shared')?.replace('{entity}', entity) || 'Set as default'}
         message={t('common.set_default_message', 'shared')?.replace('{entity}', entity) || `Are you sure you want to set this ${entity} as default?`}
         confirmLabel={t('common.set_default', 'shared') || 'Set as default'}
