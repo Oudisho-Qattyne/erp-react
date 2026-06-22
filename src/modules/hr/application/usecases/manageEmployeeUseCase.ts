@@ -19,9 +19,8 @@ export const createManageEmployeeUseCase = (
     UpdateEmployeeDTO,
     number
   >(
-    repository,
-    createEmployeeValidator // optional: runs before create/update
-  );
+    repository
+    );
 
   // You can extend or override methods here if needed
   return {
@@ -29,13 +28,8 @@ export const createManageEmployeeUseCase = (
 
     // Example: add a custom method that is not in the generic interface
     async getByInternalId(internalId: string): Promise<EmployeeData | null> {
-      try {
-        // This would require a custom repository method; for now we rely on findAll and filter
-        const { data } = await baseUsecase.getAll();
-        return data.find(emp => emp.internal_id === internalId) || null;
-      } catch (error: any) {
-        throw new Error(`Failed to fetch employee by internal ID: ${error.message}`);
-      }
+      const { data } = await baseUsecase.getAll();
+      return data.find(emp => emp.internal_id === internalId) || null;
     },
   };
 };

@@ -97,9 +97,9 @@ export default function LeavesTypesPage() {
           <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/hr/leaves/${row.id}`) }} title={t("common.view", "shared") || "عرض"}>
             <Eye size={16} />
           </Button>
-          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/hr/leaves/${row.id}/edit`) }} title={t("common.edit", "shared") || "تعديل"}>
+          {/* <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/hr/leaves/${row.id}/edit`) }} title={t("common.edit", "shared") || "تعديل"}>
             <Edit size={16} />
-          </Button>
+          </Button> */}
           <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedId(row.id); setConfirmAction("archive") }} title={t("common.archive", "shared") || "أرشفة"}>
             <Archive size={16} />
           </Button>

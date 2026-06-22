@@ -1,0 +1,4317 @@
+openapi: 3.0.0
+info:
+  title: 'Marka-ERP API'
+  version: 1.0.0
+  description: 'Merged API Documentation for all modules'
+servers:
+  -
+    url: /api/v1/
+    description: 'Base URL'
+paths:
+  /shared-kernal/countries:
+    get:
+      summary: 'List all countries'
+      description: "Send the `Accept-Language` header with `en` or `ar` for translated `name`.\n\nFilter via `search` (name). **Sort (`sort_by[column]=asc|desc`):** `name`, `code`, `created_at` — default `created_at` desc if omitted.\n"
+      tags:
+        - Countries
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          $ref: '#/components/parameters/AcceptLanguage'
+        -
+          $ref: '#/components/parameters/SearchQuery'
+        -
+          $ref: '#/components/parameters/SortByName'
+        -
+          $ref: '#/components/parameters/SortByCode'
+        -
+          $ref: '#/components/parameters/SortByCreatedAt'
+      responses:
+        200:
+          description: 'List of countries'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Country' } } } }
+    post:
+      summary: 'Create a country'
+      tags:
+        - Countries
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: object
+                  required: [en, ar]
+                  properties: { en: { type: string, example: 'country name in english' }, ar: { type: string, example: 'اسم الدولة في العربية' } }
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Country' } } }
+  '/shared-kernal/countries/{id}':
+    get:
+      summary: 'Get country details'
+      description: 'Send the `Accept-Language` header with `en` or `ar` to control the returned translated country name.'
+      tags:
+        - Countries
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: Accept-Language
+          in: header
+          required: false
+          description: 'Response language for translated fields like `name`'
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+            example: ar
+      responses:
+        200:
+          description: 'Country details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Country' } } }
+    put:
+      summary: 'Update a country'
+      tags:
+        - Countries
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: object
+                  properties: { en: { type: string, example: 'country name in english' }, ar: { type: string, example: 'اسم الدولة في العربية' } }
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Country' } } }
+    delete:
+      summary: 'Delete a country'
+      tags:
+        - Countries
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  '/shared-kernal/countries/{country}/cities':
+    get:
+      summary: 'List cities for a country'
+      description: "Send the `Accept-Language` header with `en` or `ar` for translated `name`. Scoped by path `country`.\n\nFilter via `search` (name). **Sort:** `name`, `created_at` — default `created_at` desc if omitted.\n"
+      tags:
+        - Cities
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: country
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          $ref: '#/components/parameters/AcceptLanguage'
+        -
+          $ref: '#/components/parameters/SearchQuery'
+        -
+          $ref: '#/components/parameters/SortByName'
+        -
+          $ref: '#/components/parameters/SortByCreatedAt'
+      responses:
+        200:
+          description: 'List of cities'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/City' } } } }
+  '/shared-kernal/countries/cities/{city}/regions':
+    get:
+      summary: 'List regions for a city'
+      description: "Send the `Accept-Language` header with `en` or `ar` for translated `name`. Scoped by path `city`.\n\nFilter via `search` (name). **Sort:** `name`, `created_at` — default `created_at` desc if omitted.\n"
+      tags:
+        - Regions
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: city
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          $ref: '#/components/parameters/AcceptLanguage'
+        -
+          $ref: '#/components/parameters/SearchQuery'
+        -
+          $ref: '#/components/parameters/SortByName'
+        -
+          $ref: '#/components/parameters/SortByCreatedAt'
+      responses:
+        200:
+          description: 'List of regions'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Region' } } } }
+  /shared-kernal/cities:
+    post:
+      summary: 'Create a city'
+      tags:
+        - Cities
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - country_id
+              properties:
+                name:
+                  type: object
+                  required: [en, ar]
+                  properties: { en: { type: string, example: 'city name in english' }, ar: { type: string, example: 'اسم المدينة في العربية' } }
+                country_id:
+                  type: integer
+                  example: 1
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/City' } } }
+  '/shared-kernal/cities/{id}':
+    get:
+      summary: 'Get city details'
+      description: 'Send the `Accept-Language` header with `en` or `ar` to control the returned translated city name.'
+      tags:
+        - Cities
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: Accept-Language
+          in: header
+          required: false
+          description: 'Response language for translated fields like `name`'
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+            example: en
+      responses:
+        200:
+          description: 'City details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/City' } } }
+    put:
+      summary: 'Update a city'
+      tags:
+        - Cities
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: object
+                  properties: { en: { type: string, example: 'city name in english' }, ar: { type: string, example: 'اسم المدينة في العربية' } }
+                country_id:
+                  type: integer
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/City' } } }
+    delete:
+      summary: 'Delete a city'
+      tags:
+        - Cities
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /shared-kernal/regions:
+    post:
+      summary: 'Create a region'
+      tags:
+        - Regions
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - city_id
+              properties:
+                name:
+                  type: object
+                  required: [en, ar]
+                  properties: { en: { type: string, example: 'region name in english' }, ar: { type: string, example: 'اسم المنطقة في العربية' } }
+                city_id:
+                  type: integer
+                  example: 1
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Region' } } }
+  '/shared-kernal/regions/{id}':
+    get:
+      summary: 'Get region details'
+      description: 'Send the `Accept-Language` header with `en` or `ar` to control the returned translated region name.'
+      tags:
+        - Regions
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: Accept-Language
+          in: header
+          required: false
+          description: 'Response language for translated fields like `name`'
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+            example: ar
+      responses:
+        200:
+          description: 'Region details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Region' } } }
+    put:
+      summary: 'Update a region'
+      tags:
+        - Regions
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: object
+                  properties: { en: { type: string, example: 'region name in english' }, ar: { type: string, example: 'اسم المنطقة في العربية' } }
+                city_id:
+                  type: integer
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Region' } } }
+    delete:
+      summary: 'Delete a region'
+      tags:
+        - Regions
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+  /shared-kernal/universities:
+    get:
+      summary: 'List all universities'
+      description: "Filter via `search` (name). **Sort (`sort_by[column]=asc|desc`):** `name`, `created_at` — default `created_at` desc if omitted.\n"
+      tags:
+        - Universities
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          $ref: '#/components/parameters/SearchQuery'
+        -
+          $ref: '#/components/parameters/SortByName'
+        -
+          $ref: '#/components/parameters/SortByCreatedAt'
+      responses:
+        200:
+          description: 'List of universities'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/University' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      summary: 'Create a university'
+      tags:
+        - Universities
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: 'Damascus University'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/University' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/shared-kernal/universities/{id}':
+    get:
+      summary: 'Get university details'
+      tags:
+        - Universities
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'University details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/University' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Update a university'
+      tags:
+        - Universities
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/University' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      summary: 'Delete a university'
+      tags:
+        - Universities
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  '/shared-kernal/universities/{id}/faculties':
+    get:
+      summary: 'List all faculties for a university'
+      description: "Scoped by path `id` (university). Optional filter `university_id`, `search` (name).\n\n**Sort:** `name`, `created_at` — default `created_at` desc if omitted.\n"
+      tags:
+        - Faculties
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          $ref: '#/components/parameters/SearchQuery'
+        -
+          $ref: '#/components/parameters/UniversityIdQuery'
+        -
+          $ref: '#/components/parameters/SortByName'
+        -
+          $ref: '#/components/parameters/SortByCreatedAt'
+      responses:
+        200:
+          description: 'List of faculties'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Faculty' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+  /shared-kernal/faculties:
+    post:
+      summary: 'Create a faculty'
+      tags:
+        - Faculties
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - university_id
+              properties:
+                name:
+                  type: string
+                  example: 'Faculty of Engineering'
+                university_id:
+                  type: integer
+                  example: 1
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Faculty' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/shared-kernal/faculties/{id}':
+    get:
+      summary: 'Get faculty details'
+      tags:
+        - Faculties
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Faculty details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Faculty' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Update a faculty'
+      tags:
+        - Faculties
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                university_id:
+                  type: integer
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Faculty' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      summary: 'Delete a faculty'
+      tags:
+        - Faculties
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  '/shared-kernal/faculties/{id}/specializations':
+    get:
+      summary: 'List all specializations for a faculty'
+      description: "Scoped by path `id` (faculty). Optional filter `faculty_id`, `search` (name).\n\n**Sort:** `name`, `created_at` — default `created_at` desc if omitted.\n"
+      tags:
+        - Specializations
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          $ref: '#/components/parameters/SearchQuery'
+        -
+          $ref: '#/components/parameters/FacultyIdQuery'
+        -
+          $ref: '#/components/parameters/SortByName'
+        -
+          $ref: '#/components/parameters/SortByCreatedAt'
+      responses:
+        200:
+          description: 'List of specializations'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Specialization' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+  /shared-kernal/specializations:
+    post:
+      summary: 'Create a specialization'
+      tags:
+        - Specializations
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - faculty_id
+              properties:
+                name:
+                  type: string
+                  example: 'Computer Engineering'
+                faculty_id:
+                  type: integer
+                  example: 1
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Specialization' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/shared-kernal/specializations/{id}':
+    get:
+      summary: 'Get specialization details'
+      tags:
+        - Specializations
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Specialization details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Specialization' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Update a specialization'
+      tags:
+        - Specializations
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                faculty_id:
+                  type: integer
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Specialization' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      summary: 'Delete a specialization'
+      tags:
+        - Specializations
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /hr/organizational-levels:
+    get:
+      summary: 'List all organizational levels'
+      tags:
+        - 'Organizational Levels'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          $ref: '#/components/parameters/HrOrgLevelSearch'
+        -
+          $ref: '#/components/parameters/HrSortByName'
+        -
+          $ref: '#/components/parameters/HrSortByCreatedAt'
+      responses:
+        200:
+          description: 'List of organizational levels'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/OrganizationalLevel' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      summary: 'Create an organizational level'
+      tags:
+        - 'Organizational Levels'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: 'Finance Department'
+                parent_id:
+                  type: integer
+                  nullable: true
+                  example: null
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/OrganizationalLevel' } } }
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/hr/organizational-levels/{id}':
+    get:
+      summary: 'Get organizational level details'
+      tags:
+        - 'Organizational Levels'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Organizational level details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/OrganizationalLevel' } } }
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Update an organizational level'
+      tags:
+        - 'Organizational Levels'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                parent_id:
+                  type: integer
+                  nullable: true
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/OrganizationalLevel' } } }
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      summary: 'Delete an organizational level'
+      tags:
+        - 'Organizational Levels'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /hr/employees:
+    get:
+      summary: 'List all employees'
+      tags:
+        - Employees
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          $ref: '#/components/parameters/HrPage'
+        -
+          $ref: '#/components/parameters/HrPerPage'
+        -
+          $ref: '#/components/parameters/HrEmployeeSearch'
+        -
+          $ref: '#/components/parameters/HrGenderFilter'
+        -
+          $ref: '#/components/parameters/HrMaritalStatusFilter'
+        -
+          $ref: '#/components/parameters/HrBloodTypeFilter'
+        -
+          $ref: '#/components/parameters/HrDateBirthFilter'
+        -
+          $ref: '#/components/parameters/HrHasShamCashAccountFilter'
+        -
+          $ref: '#/components/parameters/HrResidenceRegionIdFilter'
+        -
+          $ref: '#/components/parameters/HrUniversityIdFilter'
+        -
+          $ref: '#/components/parameters/HrFacultyIdFilter'
+        -
+          $ref: '#/components/parameters/HrSpecializationIdFilter'
+        -
+          $ref: '#/components/parameters/HrOrganizationalUnitFilter'
+        -
+          $ref: '#/components/parameters/HrWorkPlaceCityFilter'
+        -
+          $ref: '#/components/parameters/HrSortByFirstName'
+        -
+          $ref: '#/components/parameters/HrSortByLastName'
+        -
+          $ref: '#/components/parameters/HrSortByCreatedAt'
+      responses:
+        200:
+          description: 'Paginated list of employees'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/EmployeeSummary' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      summary: 'Create a new employee with full details'
+      tags:
+        - Employees
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeCreateRequest'
+      responses:
+        200:
+          description: 'Employee created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/EmployeeInfo' } } }
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/hr/employees/{id}':
+    get:
+      summary: 'Get full employee details'
+      tags:
+        - Employees
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Employee full details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/EmployeeInfo' } } }
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Update employee record'
+      description: "Updates employee fields. Nested objects (`employment_details`, `educations`, `children`) are optional.\nProviding `educations` replaces all existing education records.\nProviding `children` replaces all existing child records.\n"
+      tags:
+        - Employees
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeUpdateRequest'
+      responses:
+        200:
+          description: 'Employee updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/EmployeeInfo' } } }
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      summary: 'Soft-delete an employee'
+      tags:
+        - Employees
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Employee soft-deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /hr/employees/eligible-leave-types:
+    get:
+      summary: 'Get leave types the authenticated employee is eligible for'
+      description: "Evaluates the active, non-archived leave types against the authenticated employee's\neligibility rules using the Rule Evaluator Service. Returns only leave types the\nemployee passes.\n"
+      tags:
+        - Employees
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'List of eligible leave types (id and name only)'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/LeaveTypeSummary' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /hr/chronic-diseases:
+    get:
+      summary: 'List chronic diseases'
+      tags:
+        - 'Chronic Diseases'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          $ref: '#/components/parameters/HrPage'
+        -
+          $ref: '#/components/parameters/HrPerPage'
+        -
+          $ref: '#/components/parameters/HrDiseaseSearch'
+        -
+          $ref: '#/components/parameters/HrSortByName'
+        -
+          $ref: '#/components/parameters/HrSortByCreatedAt'
+      responses:
+        200:
+          description: 'Paginated list of chronic disease records'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/ChronicDisease' } } } }
+    post:
+      summary: 'Create chronic disease'
+      tags:
+        - 'Chronic Diseases'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChronicDiseaseInput'
+      responses:
+        200:
+          description: 'Chronic disease created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ChronicDisease' } } }
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/hr/chronic-diseases/{id}':
+    get:
+      summary: 'Get chronic disease details'
+      tags:
+        - 'Chronic Diseases'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Chronic disease details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ChronicDisease' } } }
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Update chronic disease'
+      tags:
+        - 'Chronic Diseases'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChronicDiseaseUpdateInput'
+      responses:
+        200:
+          description: 'Chronic disease updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ChronicDisease' } } }
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      summary: 'Delete chronic disease'
+      tags:
+        - 'Chronic Diseases'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Chronic disease deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /hr/leave-types:
+    get:
+      summary: 'List all leave types'
+      tags:
+        - 'Leave Types'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          $ref: '#/components/parameters/HrPage'
+        -
+          $ref: '#/components/parameters/HrPerPage'
+        -
+          $ref: '#/components/parameters/HrLeaveTypeSearch'
+        -
+          $ref: '#/components/parameters/HrLeaveTypeUnitFilter'
+        -
+          $ref: '#/components/parameters/HrLeaveTypeBalanceModeFilter'
+        -
+          $ref: '#/components/parameters/HrLeaveTypeAccrualPeriodFilter'
+        -
+          $ref: '#/components/parameters/HrLeaveTypeIsPaidFilter'
+        -
+          $ref: '#/components/parameters/HrLeaveTypeIsActiveFilter'
+        -
+          $ref: '#/components/parameters/HrLeaveTypeRequiresApprovalFilter'
+        -
+          $ref: '#/components/parameters/HrLeaveTypeAllowHalfDayFilter'
+        -
+          $ref: '#/components/parameters/HrLeaveTypeAllowHourlyFilter'
+        -
+          $ref: '#/components/parameters/HrLeaveTypeAllowSplitFilter'
+        -
+          $ref: '#/components/parameters/HrSortByName'
+        -
+          $ref: '#/components/parameters/HrSortByCreatedAt'
+      responses:
+        200:
+          description: 'Paginated list of leave types'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/LeaveTypeSummary' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      summary: 'Create a new leave type'
+      tags:
+        - 'Leave Types'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveTypeCreateRequest'
+      responses:
+        200:
+          description: 'Leave type created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/LeaveTypeInfo' } } }
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/hr/leave-types/{id}':
+    get:
+      summary: 'Get leave type details'
+      tags:
+        - 'Leave Types'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Leave type details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/LeaveTypeInfo' } } }
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Update a leave type'
+      tags:
+        - 'Leave Types'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveTypeUpdateRequest'
+      responses:
+        200:
+          description: 'Leave type updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/LeaveTypeInfo' } } }
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    patch:
+      summary: 'Archive a leave type'
+      tags:
+        - 'Leave Types'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Leave type archived successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/LeaveTypeInfo' } } }
+        400:
+          $ref: '#/components/responses/ValidationError'
+        404:
+          $ref: '#/components/responses/NotFound'
+    delete:
+      summary: 'Delete a leave type'
+      tags:
+        - 'Leave Types'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Leave type deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /hr/resolvers:
+    get:
+      summary: 'List all available resolvers for rule evaluation'
+      tags:
+        - 'Leave Types'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: Accept-Language
+          in: header
+          required: false
+          description: 'Response language for translated resolver names'
+          schema:
+            type: string
+            enum:
+              - en
+              - ar
+            example: en
+      responses:
+        200:
+          description: 'List of resolvers with translated names'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/ResolverInfo' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+  /storage-management:
+    get:
+      summary: 'List root-level storage items'
+      description: "Returns all storage items whose `parent_id` is null (root level) as a JSON array.\n\nThis route does **not** require authentication (`auth:sanctum` is disabled).\n"
+      tags:
+        - Storage
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'Root-level storage items'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/StorageItemList' } } }
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /storage-management/search:
+    get:
+      summary: 'Get a storage item by logical path'
+      description: "Returns the first storage item that matches the provided `path` query parameter.\n\nThis route does **not** require authentication (`auth:sanctum` is disabled).\n"
+      tags:
+        - Storage
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: path
+          in: query
+          required: true
+          schema:
+            type: string
+          description: 'Logical storage path to search by.'
+          example: /Projects
+      responses:
+        200:
+          description: 'Storage item returned successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/StorageItem' } } }
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  '/storage-management/{id}':
+    get:
+      summary: 'Get storage item by ID (folder JSON or file stream)'
+      description: "Same behavior as `GET /storage-management` but with a required path `id`.\n\n- **Folder:** JSON response with `children`.\n- **File:** binary inline response.\n\nDoes **not** require authentication.\n"
+      tags:
+        - Storage
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+      responses:
+        200:
+          description: 'Folder metadata (JSON) or file content (binary inline)'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/StorageFolder' } } }
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  '/storage-management/folders/{id}':
+    get:
+      summary: 'Get folder contents'
+      description: 'Returns a folder and its direct `children`.'
+      tags:
+        - 'Storage Folders'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+      responses:
+        200:
+          description: 'Folder returned successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/StorageFolder' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: 'Rename a folder'
+      tags:
+        - 'Storage Folders'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFolderRequest'
+      responses:
+        200:
+          description: 'Folder renamed successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/StorageFolder' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: 'Delete a folder'
+      description: 'Soft-deletes the folder record. Returns an empty `data` array on success.'
+      tags:
+        - 'Storage Folders'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+      responses:
+        200:
+          description: 'Folder deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponseEmptyData'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /storage-management/folders:
+    post:
+      summary: 'Create a new folder'
+      tags:
+        - 'Storage Folders'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFolderRequest'
+      responses:
+        200:
+          description: 'Folder created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/StorageFolder' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  '/storage-management/folders/{id}/move':
+    put:
+      summary: 'Move a folder (and descendants) to another parent'
+      tags:
+        - 'Storage Folders'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoveItemRequest'
+      responses:
+        200:
+          description: 'Folder moved successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/StorageFolder' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /storage-management/files/upload:
+    post:
+      summary: 'Upload a file to a folder'
+      tags:
+        - 'Storage Files'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadFileRequest'
+      responses:
+        200:
+          description: 'File uploaded successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/StorageFile' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  '/storage-management/files/{file}/download':
+    get:
+      summary: 'Download a file'
+      description: "Returns the file as an attachment (`Content-Disposition: attachment`).\n\nAuthentication is **not** required when the request uses a valid temporary signed URL\n(see `download_url` on file resources). Query parameters `expires` and `signature` are\nvalidated by Laravel's signed-route middleware.\n"
+      tags:
+        - 'Storage Files'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: file
+          in: path
+          required: true
+          description: 'File UUID'
+          schema:
+            type: string
+            format: uuid
+          example: 9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+        -
+          name: expires
+          in: query
+          required: false
+          description: 'Unix timestamp expiry (required for signed URLs)'
+          schema:
+            type: integer
+            example: 1716123456
+        -
+          name: signature
+          in: query
+          required: false
+          description: 'URL signature (required for signed URLs)'
+          schema:
+            type: string
+            example: a1b2c3d4e5f6...
+      responses:
+        200:
+          description: 'File binary content'
+          headers:
+            Content-Type:
+              schema:
+                type: string
+              description: 'MIME type of the stored file'
+              example: application/pdf
+            Content-Disposition:
+              schema:
+                type: string
+              description: 'Attachment header with original filename'
+              example: 'attachment; filename="report.pdf"'
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        403:
+          description: 'Invalid or expired signed URL'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  '/storage-management/files/{id}':
+    put:
+      summary: 'Rename a file'
+      tags:
+        - 'Storage Files'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFileRequest'
+      responses:
+        200:
+          description: 'File renamed successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/StorageFile' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: 'Delete a file'
+      description: "Soft-deletes the file record. On success the controller currently does not return a JSON body;\nclients should treat a `200` with an empty body as success until a consistent envelope is added.\n"
+      tags:
+        - 'Storage Files'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+      responses:
+        200:
+          description: 'File deleted (may return empty body)'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  '/storage-management/files/{id}/move':
+    put:
+      summary: 'Move a file to another folder'
+      tags:
+        - 'Storage Files'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: 9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MoveItemRequest'
+      responses:
+        200:
+          description: 'File moved successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/StorageFile' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /users/login:
+    post:
+      summary: 'User login'
+      description: 'Authenticate user and return a Sanctum token.'
+      tags:
+        - 'Users Module'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: admin@example.com
+                password:
+                  type: string
+                  format: password
+                  example: password123
+      responses:
+        200:
+          description: 'Login successful'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: object, properties: { user: { $ref: '#/components/schemas/User' }, token: { type: string, example: 1|abcdef1234567890abcdef1234567890 } } } } }
+        422:
+          description: 'Validation error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+  /users/:
+    get:
+      summary: 'List all users'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          in: query
+          name: page
+          schema:
+            type: integer
+          description: 'Page number'
+        -
+          in: query
+          name: per_page
+          schema:
+            type: integer
+          description: 'Items per page'
+      responses:
+        200:
+          description: 'List of users'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/User' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  /users/current:
+    get:
+      summary: 'Get current authenticated user info'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'Current user info'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/User' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  '/users/{id}':
+    post:
+      summary: 'Update a user'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                mobile:
+                  type: string
+                status:
+                  type: string
+                role:
+                  type: string
+      responses:
+        200:
+          description: 'User updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/User' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        422:
+          description: 'Validation error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+  /users/signature:
+    post:
+      summary: 'Update user signature'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                signature:
+                  type: string
+                  format: binary
+      responses:
+        200:
+          description: 'Signature updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/User' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  /users/reports/excel:
+    post:
+      summary: 'Export users to Excel'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'Export started'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  /users/reports/pdf:
+    post:
+      summary: 'Export users to PDF'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'Export started'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  /users/permissions:
+    get:
+      summary: 'List all permissions'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'List of permissions'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Permission' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  /users/roles:
+    get:
+      summary: 'List all roles'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'List of roles'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Role' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  /users/roles/store:
+    post:
+      summary: 'Create a new role'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - display_name
+              properties:
+                name:
+                  type: string
+                display_name:
+                  type: string
+                permissions:
+                  type: array
+                  items: { type: string }
+      responses:
+        200:
+          description: 'Role created successfully'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        422:
+          description: 'Validation error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+  '/users/roles/{id}':
+    get:
+      summary: 'Get role details'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Role details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/Role' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+    post:
+      summary: 'Update a role'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                display_name:
+                  type: string
+                permissions:
+                  type: array
+                  items: { type: string }
+      responses:
+        200:
+          description: 'Role updated successfully'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        422:
+          description: 'Validation error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+    delete:
+      summary: 'Delete a role'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Role deleted successfully'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+components:
+  securitySchemes:
+    sanctumAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Success
+        plan:
+          type: string
+          nullable: true
+          example: null
+        data:
+          type: object
+    SuccessResponseEmptyData:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Success
+        plan:
+          type: string
+          nullable: true
+          example: null
+        data:
+          type: array
+          example: {  }
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Error
+        message:
+          type: string
+          example: 'An error occurred'
+        data:
+          type: array
+          example: {  }
+    ValidationErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Error
+        message:
+          type: string
+          example: 'validation errors'
+        data:
+          type: string
+          nullable: true
+          example: null
+        validationErrors:
+          type: object
+          additionalProperties:
+            type: string
+    Country:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Syria
+        created_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+    City:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Damascus
+        country_id:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+    Region:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Baramkeh
+        city_id:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+    University:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Damascus University'
+        created_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+    Faculty:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Faculty of Engineering'
+        university_id:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+    Specialization:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Computer Engineering'
+        faculty_id:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          example: '2024-01-01 10:00:00'
+    OrganizationalLevel:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Information Technology'
+        parent_id:
+          type: integer
+          nullable: true
+          example: null
+        created_at:
+          type: string
+          example: 1602288000
+    EmploymentDetails:
+      type: object
+      properties:
+        job_title:
+          type: string
+          nullable: true
+          example: 'Software Engineer'
+        org_unit_id:
+          type: integer
+          example: 1
+        status:
+          type: string
+          enum:
+            - active
+            - inactive
+            - suspended
+          example: active
+        appointment_date:
+          type: string
+          format: date
+          nullable: true
+          example: 1602288000
+        contract_type:
+          type: string
+          nullable: true
+          example: Full-time
+        contract_nature:
+          type: string
+          nullable: true
+          example: Permanent
+        job_category:
+          type: string
+          nullable: true
+          example: Engineering
+        workplace_city_id:
+          type: integer
+          example: 14
+    Education:
+      type: object
+      properties:
+        category:
+          type: string
+          enum:
+            - initial
+            - adjusted
+            - latest
+            - current
+          example: latest
+        degree_name:
+          type: string
+          nullable: true
+          example: 'Bachelor of Science'
+        university_id:
+          type: integer
+          nullable: true
+          example: 1
+        faculty_id:
+          type: integer
+          nullable: true
+          example: 1
+        specialization_id:
+          type: integer
+          nullable: true
+          example: 1
+        graduation_year:
+          type: integer
+          nullable: true
+          example: 2020
+        academic_stage:
+          type: string
+          nullable: true
+          example: null
+        study_status:
+          type: string
+          nullable: true
+          example: null
+    EmployeeChild:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          nullable: true
+          example: 'Adam Doe'
+        birthdate:
+          type: string
+          format: date
+          example: 1602288000
+    EmployeeChildInput:
+      type: object
+      required:
+        - birthdate
+      properties:
+        name:
+          type: string
+          nullable: true
+          example: 'Adam Doe'
+        birthdate:
+          type: string
+          format: date
+          example: 1602288000
+    ChronicDisease:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Diabetes
+        created_at:
+          type: string
+          example: 1602288000
+    ChronicDiseaseInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 150
+          example: Diabetes
+    ChronicDiseaseUpdateInput:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 150
+          example: Diabetes
+    EmployeeInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        internal_id:
+          type: string
+          example: EMP001
+        national_id:
+          type: string
+          example: '0101010101'
+        first_name:
+          type: string
+          example: Ahmad
+        father_name:
+          type: string
+          nullable: true
+          example: Khaled
+        grandfather_name:
+          type: string
+          nullable: true
+          example: Mahmoud
+        last_name:
+          type: string
+          example: Hassan
+        mother_name:
+          type: string
+          nullable: true
+          example: Fatima
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+          example: male
+        date_birth:
+          type: string
+          format: date
+          nullable: true
+          example: 1602288000
+        place_birth:
+          type: string
+          nullable: true
+          example: Damascus
+        assigned_job:
+          type: string
+          example: 'Backend Developer'
+        marital_status:
+          type: string
+          enum:
+            - single
+            - married
+            - divorced
+            - widowed
+          nullable: true
+          example: married
+        number_of_children:
+          type: integer
+          nullable: true
+          example: 2
+        spouse_name:
+          type: string
+          nullable: true
+          example: 'Nour Hassan'
+        spouse_workplace:
+          type: string
+          nullable: true
+          example: 'Ministry of Education'
+        blood_type:
+          type: string
+          enum:
+            - A+
+            - A-
+            - B+
+            - B-
+            - AB+
+            - AB-
+            - O+
+            - O-
+          nullable: true
+          example: O+
+        phone_number:
+          type: string
+          nullable: true
+          example: '+963911234567'
+        sham_cash_account:
+          type: string
+          nullable: true
+          example: SC-001234
+        residential_area_details:
+          type: string
+          nullable: true
+          example: 'Building 12, Floor 3, Apartment 7'
+        civil_registry_record:
+          type: string
+          nullable: true
+          example: 12345/A
+        health_status:
+          type: string
+          nullable: true
+          example: Healthy
+        injury_details:
+          type: string
+          nullable: true
+          example: null
+        injury_date:
+          type: string
+          format: date
+          nullable: true
+          example: null
+        chronic_disease_ids:
+          type: array
+          nullable: true
+          items:
+            type: integer
+          example:
+            - 1
+            - 2
+            - 3
+        employment_details:
+          $ref: '#/components/schemas/EmploymentDetails'
+        educations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Education'
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeChild'
+        chronic_diseases:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChronicDisease'
+        folder:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: EMP001-Ahmad_Khaled_Hassan
+            path:
+              type: string
+              example: private/employees/EMP001-Ahmad_Khaled_Hassan
+        created_at:
+          type: string
+          example: 1602288000
+    EmployeeSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        internal_id:
+          type: string
+          example: EMP001
+        national_id:
+          type: string
+          example: '0101010101'
+        full_name:
+          type: string
+          example: 'Ahmad Khaled Hassan'
+        assigned_job:
+          type: string
+          example: 'Backend Developer'
+        gender:
+          type: string
+          example: male
+        created_at:
+          type: string
+          example: 1602288000
+    EmployeeCreateRequest:
+      type: object
+      required:
+        - internal_id
+        - national_id
+        - first_name
+        - last_name
+        - gender
+        - assigned_job
+        - residence_region_id
+        - employment_details
+      properties:
+        internal_id:
+          type: string
+          maxLength: 50
+          example: EMP001
+        national_id:
+          type: string
+          maxLength: 20
+          example: '0101010101'
+        first_name:
+          type: string
+          example: Ahmad
+        father_name:
+          type: string
+          nullable: true
+          example: Khaled
+        grandfather_name:
+          type: string
+          nullable: true
+          example: Mahmoud
+        last_name:
+          type: string
+          example: Hassan
+        mother_name:
+          type: string
+          nullable: true
+          example: Fatima
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+          example: male
+        date_birth:
+          type: string
+          format: date
+          nullable: true
+          example: 1602288000
+        place_birth:
+          type: string
+          nullable: true
+          example: Damascus
+        assigned_job:
+          type: string
+          maxLength: 150
+          example: 'Backend Developer'
+        marital_status:
+          type: string
+          enum:
+            - single
+            - married
+            - divorced
+            - widowed
+          nullable: true
+          example: married
+        number_of_children:
+          type: integer
+          nullable: true
+          example: 2
+          description: 'Required when `marital_status` is `married`.'
+        spouse_name:
+          type: string
+          nullable: true
+          example: 'Nour Hassan'
+        spouse_workplace:
+          type: string
+          nullable: true
+          example: 'Ministry of Education'
+        blood_type:
+          type: string
+          enum:
+            - A+
+            - A-
+            - B+
+            - B-
+            - AB+
+            - AB-
+            - O+
+            - O-
+          nullable: true
+          example: O+
+        phone_number:
+          type: string
+          nullable: true
+          example: '+963911234567'
+        sham_cash_account:
+          type: string
+          nullable: true
+          example: SC-001234
+        residence_region_id:
+          type: integer
+          example: 5
+        residential_area_details:
+          type: string
+          nullable: true
+          example: 'Building 12, Floor 3'
+        civil_registry_record:
+          type: string
+          nullable: true
+          example: 12345/A
+        health_status:
+          type: string
+          nullable: true
+          example: Healthy
+        injury_details:
+          type: string
+          nullable: true
+          example: null
+        injury_date:
+          type: string
+          format: date
+          nullable: true
+          example: null
+        chronic_disease_ids:
+          type: array
+          nullable: true
+          items:
+            type: integer
+          example:
+            - 1
+            - 2
+        employment_details:
+          $ref: '#/components/schemas/EmploymentDetails'
+        educations:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Education'
+        children:
+          type: array
+          nullable: true
+          description: 'Required when `marital_status` is `married` and `number_of_children` is greater than 0. The array length must match `number_of_children`.'
+          items:
+            $ref: '#/components/schemas/EmployeeChildInput'
+    EmployeeUpdateRequest:
+      type: object
+      properties:
+        internal_id:
+          type: string
+        national_id:
+          type: string
+        first_name:
+          type: string
+        father_name:
+          type: string
+          nullable: true
+        grandfather_name:
+          type: string
+          nullable: true
+        last_name:
+          type: string
+        mother_name:
+          type: string
+          nullable: true
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+        date_birth:
+          type: string
+          format: date
+          nullable: true
+        place_birth:
+          type: string
+          nullable: true
+        assigned_job:
+          type: string
+          maxLength: 150
+        marital_status:
+          type: string
+          enum:
+            - single
+            - married
+            - divorced
+            - widowed
+          nullable: true
+        number_of_children:
+          type: integer
+          nullable: true
+        spouse_name:
+          type: string
+          nullable: true
+        spouse_workplace:
+          type: string
+          nullable: true
+        blood_type:
+          type: string
+          enum:
+            - A+
+            - A-
+            - B+
+            - B-
+            - AB+
+            - AB-
+            - O+
+            - O-
+          nullable: true
+        phone_number:
+          type: string
+          nullable: true
+        sham_cash_account:
+          type: string
+          nullable: true
+        residence_region_id:
+          type: integer
+        residential_area_details:
+          type: string
+          nullable: true
+        civil_registry_record:
+          type: string
+          nullable: true
+        health_status:
+          type: string
+          nullable: true
+        injury_details:
+          type: string
+          nullable: true
+        injury_date:
+          type: string
+          format: date
+          nullable: true
+        chronic_disease_ids:
+          type: array
+          nullable: true
+          items:
+            type: integer
+          example:
+            - 1
+            - 2
+            - 3
+        employment_details:
+          $ref: '#/components/schemas/EmploymentDetails'
+        educations:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/Education'
+        children:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/EmployeeChildInput'
+    RuleCondition:
+      type: object
+      description: 'A single leaf condition comparing a field against a value'
+      required:
+        - field
+        - operator
+        - value
+      properties:
+        field:
+          type: string
+          example: employment_type
+        operator:
+          type: string
+          enum:
+            - '='
+            - '!='
+            - '>'
+            - '>='
+            - '<'
+            - '<='
+            - in
+            - between
+            - contains
+          example: '='
+        value:
+          description: 'The value to compare against (type depends on the field)'
+    RuleGroup:
+      type: object
+      description: 'A recursive group of conditions joined by AND/OR'
+      required:
+        - type
+        - operator
+        - conditions
+      properties:
+        type:
+          type: string
+          enum:
+            - group
+          example: group
+        operator:
+          type: string
+          enum:
+            - AND
+            - OR
+          example: AND
+        conditions:
+          type: array
+          items:
+            oneOf:
+              -
+                $ref: '#/components/schemas/RuleCondition'
+              -
+                $ref: '#/components/schemas/RuleGroup'
+    eligibility_rules_example:
+      type: object
+      description: 'Example structure for leave type eligibility rules'
+      properties:
+        rule:
+          $ref: '#/components/schemas/RuleGroup'
+      example:
+        rule:
+          type: group
+          operator: AND
+          conditions:
+            -
+              type: condition
+              field: employment_type
+              operator: '='
+              value: permanent
+            -
+              type: group
+              operator: OR
+              conditions:
+                -
+                  type: condition
+                  field: service_years
+                  operator: '>='
+                  value: 5
+                -
+                  type: condition
+                  field: job_grade
+                  operator: '>='
+                  value: 8
+    entitlement_rules:
+      type: object
+      description: "Entitlement rule definitions.\nAccepts one of two structures: `bands` (tiered bands with rule-based matching) or `fixed` (flat grant).\nFor now only the `bands` structure is used.\n"
+      oneOf:
+        -
+          $ref: '#/components/schemas/entitlement_rules.bands_case'
+        -
+          $ref: '#/components/schemas/entitlement_rules.fixed_grant_case'
+    entitlement_rules.bands_case:
+      type: object
+      description: "Tiered bands — the first band whose rule matches determines the grant.\n"
+      properties:
+        type:
+          type: string
+          enum:
+            - bands
+          example: bands
+        bands:
+          type: array
+          items:
+            type: object
+            properties:
+              rule:
+                $ref: '#/components/schemas/RuleGroup'
+              grant:
+                type: object
+                properties:
+                  value: { type: number, example: 21 }
+                  unit: { type: string, enum: [day, hour], example: day }
+      example:
+        type: bands
+        bands:
+          -
+            rule:
+              type: group
+              operator: AND
+              conditions:
+                -
+                  type: condition
+                  field: service_years
+                  operator: '<'
+                  value: 5
+            grant:
+              value: 15
+              unit: day
+          -
+            rule:
+              type: group
+              operator: AND
+              conditions:
+                -
+                  type: condition
+                  field: service_years
+                  operator: '>='
+                  value: 5
+                -
+                  type: condition
+                  field: service_years
+                  operator: '<'
+                  value: 10
+            grant:
+              value: 21
+              unit: day
+          -
+            rule:
+              type: group
+              operator: AND
+              conditions:
+                -
+                  type: condition
+                  field: service_years
+                  operator: '>='
+                  value: 10
+            grant:
+              value: 30
+              unit: day
+    entitlement_rules.fixed_grant_case:
+      type: object
+      description: 'Fixed grant for all employees who meet eligibility criteria'
+      properties:
+        type:
+          type: string
+          enum:
+            - fixed
+          example: fixed
+        grant:
+          type: object
+          properties:
+            value:
+              type: number
+              example: 90
+            unit:
+              type: string
+              enum:
+                - day
+                - hour
+              example: day
+      example:
+        type: fixed
+        grant:
+          value: 90
+          unit: day
+    proration_scheme:
+      type: object
+      description: 'Leave proration calculation rules'
+      properties:
+        basis:
+          type: string
+          description: 'The date used as the starting point for proration'
+          enum:
+            - hire_date
+            - custom_date
+          example: hire_date
+        calculation:
+          type: string
+          description: 'The calculation method'
+          enum:
+            - monthly_started
+            - monthly_completed
+            - daily
+          example: monthly_started
+        rounding:
+          type: string
+          description: 'Rounding behavior'
+          enum:
+            - none
+            - floor
+            - ceil
+            - half
+          example: half
+      example:
+        basis: hire_date
+        calculation: monthly_started
+        rounding: half
+    LeaveTypeSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Annual Leave'
+    LeaveTypeInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Annual Leave'
+        description:
+          type: string
+          nullable: true
+          example: 'Regular annual leave with full benefits'
+        unit:
+          type: string
+          enum:
+            - day
+            - hour
+          example: day
+        is_paid:
+          type: boolean
+          example: true
+        requires_attachment:
+          type: boolean
+          example: false
+        requires_approval:
+          type: boolean
+          example: true
+        allow_half_day:
+          type: boolean
+          example: true
+        allow_hourly:
+          type: boolean
+          example: false
+        allow_split:
+          type: boolean
+          description: 'If true, employees can split the leave balance across multiple requests. If false, the entire balance must be taken as a single continuous block.'
+          example: true
+        min_request_units:
+          type: number
+          nullable: true
+          example: 0.5
+        max_request_units:
+          type: number
+          nullable: true
+          example: 30
+        balance_mode:
+          type: string
+          enum:
+            - accrual
+            - fixed_grant
+            - once_per_life
+            - once_per_service
+            - none
+          example: accrual
+        accrual_period:
+          type: string
+          nullable: true
+          enum:
+            - yearly
+            - monthly
+            - none
+          example: yearly
+        allow_carry_forward:
+          type: boolean
+          example: true
+        carry_forward_limit:
+          type: number
+          nullable: true
+          example: 10
+        eligibility_rules:
+          $ref: '#/components/schemas/eligibility_rules_example'
+        entitlement_rules:
+          $ref: '#/components/schemas/entitlement_rules'
+        proration_rules:
+          $ref: '#/components/schemas/proration_scheme'
+        is_active:
+          type: boolean
+          example: true
+        archived_at:
+          type: string
+          nullable: true
+          example: 09-06-2026
+        created_at:
+          type: string
+          example: 07-06-2026
+        updated_at:
+          type: string
+          example: 07-06-2026
+    ResolverInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'Employee Age'
+        value:
+          type: string
+          example: employee_age
+    LeaveTypeCreateRequest:
+      type: object
+      required:
+        - name
+        - balance_mode
+        - allow_split
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          example: 'Annual Leave'
+        description:
+          type: string
+          nullable: true
+          example: 'Regular annual leave with full benefits'
+        unit:
+          type: string
+          enum:
+            - day
+            - hour
+          default: day
+          example: day
+        is_paid:
+          type: boolean
+          default: true
+          example: true
+        requires_attachment:
+          type: boolean
+          default: false
+          example: false
+        requires_approval:
+          type: boolean
+          default: true
+          example: true
+        allow_half_day:
+          type: boolean
+          default: false
+          example: false
+        allow_hourly:
+          type: boolean
+          default: false
+          example: false
+        allow_split:
+          type: boolean
+          description: 'If true, employees can split the leave balance across multiple requests. If false, the entire balance must be taken as a single continuous block.'
+          default: true
+          example: true
+        min_request_units:
+          type: number
+          nullable: true
+          example: 0.5
+        max_request_units:
+          type: number
+          nullable: true
+          example: 30
+        balance_mode:
+          type: string
+          enum:
+            - accrual
+            - fixed_grant
+            - once_per_life
+            - once_per_service
+            - none
+          example: accrual
+        accrual_period:
+          type: string
+          nullable: true
+          enum:
+            - yearly
+            - monthly
+            - none
+          example: yearly
+        allow_carry_forward:
+          type: boolean
+          default: false
+          example: false
+        carry_forward_limit:
+          type: number
+          nullable: true
+          example: 10
+        eligibility_rules:
+          $ref: '#/components/schemas/eligibility_rules_example'
+        entitlement_rules:
+          $ref: '#/components/schemas/entitlement_rules'
+        proration_rules:
+          $ref: '#/components/schemas/proration_scheme'
+        is_active:
+          type: boolean
+          default: true
+          example: true
+    LeaveTypeUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          example: 'Annual Leave'
+        description:
+          type: string
+          nullable: true
+        unit:
+          type: string
+          enum:
+            - day
+            - hour
+        is_paid:
+          type: boolean
+        requires_attachment:
+          type: boolean
+        requires_approval:
+          type: boolean
+        allow_half_day:
+          type: boolean
+        allow_hourly:
+          type: boolean
+        allow_split:
+          type: boolean
+          description: 'If true, employees can split the leave balance across multiple requests. If false, the entire balance must be taken as a single continuous block.'
+        min_request_units:
+          type: number
+          nullable: true
+        max_request_units:
+          type: number
+          nullable: true
+        balance_mode:
+          type: string
+          enum:
+            - accrual
+            - fixed_grant
+            - once_per_life
+            - once_per_service
+            - none
+        accrual_period:
+          type: string
+          nullable: true
+          enum:
+            - yearly
+            - monthly
+            - none
+        allow_carry_forward:
+          type: boolean
+        carry_forward_limit:
+          type: number
+          nullable: true
+        eligibility_rules:
+          $ref: '#/components/schemas/eligibility_rules_example'
+        entitlement_rules:
+          $ref: '#/components/schemas/entitlement_rules'
+        proration_rules:
+          $ref: '#/components/schemas/proration_scheme'
+        is_active:
+          type: boolean
+    StorageItemBase:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+        owner_id:
+          type: integer
+          example: 15
+        parent_id:
+          type: string
+          format: uuid
+          nullable: true
+          example: null
+        type:
+          type: string
+          enum:
+            - file
+            - folder
+          example: folder
+        name:
+          type: string
+          example: Documents
+        path:
+          type: string
+          description: 'User-facing logical path segment for this item'
+          example: Documents/
+        parents_chain:
+          type: array
+          description: 'Ordered list of parent folders from storage root to the direct parent of this item.'
+          items:
+            $ref: '#/components/schemas/ParentChainItem'
+          example:
+            -
+              id: 9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+              name: Projects
+              path: /
+            -
+              id: 2a1b9f3c-5e4d-7a6f-8b9c-0d1e2f3a4b5d
+              name: Backend
+              path: /Projects
+        created_at:
+          type: string
+          format: date-time
+          example: '2026-05-18T09:30:00.000000Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2026-05-18T09:30:00.000000Z'
+    ParentChainItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+        name:
+          type: string
+          example: Projects
+        path:
+          type: string
+          example: /
+    StorageItemSummary:
+      description: 'Storage item without nested folder children (avoids circular schema refs in Swagger UI)'
+      oneOf:
+        -
+          $ref: '#/components/schemas/StorageFolderSummary'
+        -
+          $ref: '#/components/schemas/StorageFile'
+    StorageFolderSummary:
+      allOf:
+        -
+          $ref: '#/components/schemas/StorageItemBase'
+        -
+          type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - folder
+              example: folder
+    StorageFolder:
+      allOf:
+        -
+          $ref: '#/components/schemas/StorageItemBase'
+        -
+          type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - folder
+              example: folder
+            children:
+              type: array
+              description: 'Direct child items (present when the `children` relation is loaded)'
+              items:
+                $ref: '#/components/schemas/StorageItemSummary'
+    StorageFile:
+      allOf:
+        -
+          $ref: '#/components/schemas/StorageItemBase'
+        -
+          type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - file
+              example: file
+            mime_type:
+              type: string
+              nullable: true
+              example: application/pdf
+            extension:
+              type: string
+              nullable: true
+              example: pdf
+            size:
+              type: integer
+              nullable: true
+              description: 'File size in bytes'
+              example: 102400
+            is_secure:
+              type: boolean
+              example: false
+            download_url:
+              type: string
+              format: uri
+              nullable: true
+              description: 'Temporary signed URL for downloading the file (expires in 30 minutes by default)'
+              example: 'https://api.example.com/api/v1/storage-management/files/9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c/download?expires=1716123456&signature=abc123'
+    StorageItem:
+      oneOf:
+        -
+          $ref: '#/components/schemas/StorageFolder'
+        -
+          $ref: '#/components/schemas/StorageFile'
+      discriminator:
+        propertyName: type
+        mapping:
+          folder: '#/components/schemas/StorageFolder'
+          file: '#/components/schemas/StorageFile'
+    StorageItemList:
+      type: array
+      items:
+        $ref: '#/components/schemas/StorageItem'
+    CreateFolderRequest:
+      type: object
+      required:
+        - name
+      properties:
+        parent_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'Parent folder UUID. Omit or set null to create at storage root.'
+          example: 9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+        name:
+          type: string
+          maxLength: 255
+          example: 'My Folder'
+    UpdateFolderRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          example: 'Renamed Folder'
+    UpdateFileRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          example: 'Renamed File'
+    MoveItemRequest:
+      type: object
+      properties:
+        new_parent_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'Target parent folder UUID. Omit or set null to move to storage root.'
+          example: 9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+    UploadFileRequest:
+      type: object
+      required:
+        - name
+        - is_secure
+        - file
+      properties:
+        name:
+          type: string
+          description: 'Uploaded file name'
+        parent_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'Parent folder UUID. Omit or set null to upload at storage root.'
+          example: 9f3c2a1b-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+        is_secure:
+          type: integer
+          description: 'When 1 (true), file content is encrypted before being stored on disk.'
+          default: 0
+          example: 0
+        file:
+          type: string
+          format: binary
+          description: 'The file to upload (max 100MB)'
+    Role:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: super_admin
+        display_name:
+          type: string
+          example: 'Super Admin'
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Admin User'
+        email:
+          type: string
+          example: admin@example.com
+        mobile:
+          type: string
+          example: '01000000000'
+        status:
+          type: string
+          example: active
+        photo:
+          type: string
+          nullable: true
+          example: null
+        signature:
+          type: string
+          nullable: true
+          example: 'http://localhost/path/to/signature.png'
+        role:
+          $ref: '#/components/schemas/Role'
+        created_at:
+          type: string
+          example: '2023-10-25 10:00:00'
+        permissions:
+          type: array
+          items:
+            type: string
+          example:
+            - create_users
+            - view_users
+            - update_users
+            - delete_users
+    Permission:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: view_users
+        display_name:
+          type: string
+          example: 'View Users'
+  parameters:
+    AcceptLanguage:
+      name: Accept-Language
+      in: header
+      required: false
+      description: 'Response language for translated fields like `name`'
+      schema:
+        type: string
+        enum:
+          - en
+          - ar
+        example: en
+    SearchQuery:
+      name: search
+      in: query
+      required: false
+      description: 'Partial match (LIKE) on `name`'
+      schema:
+        type: string
+        example: damascus
+    SortByName:
+      name: 'sort_by[name]'
+      in: query
+      required: false
+      description: "Sort by `name`.\nAllowed on: countries, cities, regions, universities, faculties, specializations.\n"
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: asc
+    SortByCode:
+      name: 'sort_by[code]'
+      in: query
+      required: false
+      description: "Sort countries by `code`.\nAllowed on: `GET /shared-kernal/countries` only (with `name`, `created_at`).\n"
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: asc
+    SortByCreatedAt:
+      name: 'sort_by[created_at]'
+      in: query
+      required: false
+      description: "Sort by `created_at`. Default sort direction is `desc` when no `sort_by` is sent.\nAllowed on all Shared Kernel list endpoints (see module description table per resource).\n"
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: desc
+    UniversityIdQuery:
+      name: university_id
+      in: query
+      required: false
+      description: 'Filter faculties by university ID (optional when not scoped by path)'
+      schema:
+        type: integer
+        example: 1
+    FacultyIdQuery:
+      name: faculty_id
+      in: query
+      required: false
+      description: 'Filter specializations by faculty ID (optional when not scoped by path)'
+      schema:
+        type: integer
+        example: 1
+    HrPage:
+      name: page
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+    HrPerPage:
+      name: per_page
+      in: query
+      required: false
+      schema:
+        type: integer
+        default: 10
+        minimum: 1
+    HrOrgLevelSearch:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+        example: finance
+    HrEmployeeSearch:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+        example: ahmad
+    HrDiseaseSearch:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+        example: diabetes
+    HrSortByName:
+      name: 'sort_by[name]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: asc
+    HrSortByFirstName:
+      name: 'sort_by[first_name]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: asc
+    HrSortByLastName:
+      name: 'sort_by[last_name]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: asc
+    HrSortByCreatedAt:
+      name: 'sort_by[created_at]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: desc
+    HrGenderFilter:
+      name: gender
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - male
+          - female
+        example: male
+    HrMaritalStatusFilter:
+      name: marital_status
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - single
+          - married
+          - divorced
+          - widowed
+        example: married
+    HrBloodTypeFilter:
+      name: blood_type
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - A+
+          - A-
+          - B+
+          - B-
+          - AB+
+          - AB-
+          - O+
+          - O-
+        example: O+
+    HrDateBirthFilter:
+      name: date_birth
+      in: query
+      required: false
+      schema:
+        type: string
+        format: date
+        example: 1602288000
+    HrHasShamCashAccountFilter:
+      name: has_sham_cash_account
+      in: query
+      required: false
+      schema:
+        type: boolean
+        example: true
+    HrResidenceRegionIdFilter:
+      name: residence_region_id
+      in: query
+      required: false
+      schema:
+        type: integer
+        example: 5
+    HrUniversityIdFilter:
+      name: university_id
+      in: query
+      required: false
+      schema:
+        type: integer
+        example: 1
+    HrFacultyIdFilter:
+      name: faculty_id
+      in: query
+      required: false
+      schema:
+        type: integer
+        example: 1
+    HrSpecializationIdFilter:
+      name: specialization_id
+      in: query
+      required: false
+      schema:
+        type: integer
+        example: 1
+    HrOrganizationalUnitFilter:
+      name: organizational_unit
+      in: query
+      required: false
+      schema:
+        type: integer
+        example: 3
+    HrWorkPlaceCityFilter:
+      name: work_place_city
+      in: query
+      required: false
+      schema:
+        type: integer
+        example: 14
+    HrEmployeeIdFilter:
+      name: employee_id
+      in: query
+      required: false
+      schema:
+        type: integer
+        example: 10
+    HrLeaveTypeSearch:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+        example: annual
+    HrLeaveTypeUnitFilter:
+      name: unit
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - day
+          - hour
+    HrLeaveTypeBalanceModeFilter:
+      name: balance_mode
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - accrual
+          - fixed_grant
+          - once_per_life
+          - once_per_service
+          - none
+    HrLeaveTypeAccrualPeriodFilter:
+      name: accrual_period
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - yearly
+          - monthly
+          - none
+    HrLeaveTypeIsPaidFilter:
+      name: is_paid
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - 'true'
+          - 'false'
+    HrLeaveTypeIsActiveFilter:
+      name: is_active
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - 'true'
+          - 'false'
+    HrLeaveTypeRequiresApprovalFilter:
+      name: requires_approval
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - 'true'
+          - 'false'
+    HrLeaveTypeAllowHalfDayFilter:
+      name: allow_half_day
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - 'true'
+          - 'false'
+    HrLeaveTypeAllowHourlyFilter:
+      name: allow_hourly
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - 'true'
+          - 'false'
+    HrLeaveTypeAllowSplitFilter:
+      name: allow_split
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - 'true'
+          - 'false'
+  responses:
+    Unauthenticated:
+      description: Unauthenticated
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: 'Resource not found'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ValidationError:
+      description: 'Validation failed'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+    InternalServerError:
+      description: 'Server error'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+tags:
+  -
+    name: Countries
+    description: 'Manage Countries'
+  -
+    name: Cities
+    description: 'Manage Cities'
+  -
+    name: Regions
+    description: 'Manage Regions'
+  -
+    name: Universities
+    description: 'Manage Universities'
+  -
+    name: Faculties
+    description: 'Manage Faculties'
+  -
+    name: Specializations
+    description: 'Manage Specializations'
+  -
+    name: 'Organizational Levels'
+    description: 'Manage organizational hierarchy units'
+  -
+    name: Employees
+    description: 'Manage employee records and nested related data'
+  -
+    name: 'Chronic Diseases'
+    description: 'Manage chronic disease records (many-to-many with employees)'
+  -
+    name: 'Leave Types'
+    description: 'Manage leave type definitions with eligibility, entitlement, and proration rules'
+  -
+    name: Storage
+    description: 'Resolve storage items by ID or list root-level items'
+  -
+    name: 'Storage Folders'
+    description: 'Create, read, update, move, and delete folders'
+  -
+    name: 'Storage Files'
+    description: 'Upload, download, rename, move, and delete files'

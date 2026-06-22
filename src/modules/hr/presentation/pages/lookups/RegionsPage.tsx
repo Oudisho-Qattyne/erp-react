@@ -8,24 +8,27 @@ import { Dialog } from '../../../../../core/presentation/layouts/ui/dialog/Dialo
 import { GenericCreateForm } from '../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import Input from '../../../../../core/presentation/layouts/ui/inputs/Input';
 import { inputBaseClasses } from '../../../../../core/presentation/layouts/ui/inputs/styles';
+import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
+import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { EmptyState } from '../../../../../core/presentation/layouts/ui/state/EmptyState';
-import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
-import { MapPin } from 'lucide-react';
+import { MapPin, Pencil, Trash2, Star } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function RegionsPage() {
   const { t } = useLanguage();
   const { entities: countries, getAll: loadCountries } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
   const { entities: cities, getAllByCountry } = useCities();
-  const { entities: regions, getAllByCity, create, remove, loading, error } = useRegions();
+  const { entities: regions, getAllByCity, create, update, remove, loading, error } = useRegions();
   const entity = t('lookups.tabs.regions', 'hr') || 'Region';
   const [searchQuery, setSearchQuery] = useState('');
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<number | null>(null);
   const [selectedCity, setSelectedCity] = useState<number | null>(null);
+  const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
+  const [confirmSetDefault, setConfirmSetDefault] = useState<any>(null);
 
   useEffect(() => { loadCountries(); }, []);
   useEffect(() => { if (selectedCountry) { getAllByCountry(selectedCountry); setSelectedCity(null); } }, [selectedCountry]);
@@ -42,73 +45,133 @@ export function RegionsPage() {
     setConfirmDelete(null);
   };
 
-  const filtered = regions.filter((r: any) => r.name?.toLowerCase().includes(searchQuery.toLowerCase()));
+  const handleSetDefaultConfirm = async () => {
+    if (!confirmSetDefault) return;
+    try {
+      await update(confirmSetDefault.id, { is_default: true });
+      toast.success(t('lookups.set_default_success', 'hr').replace('{name}', entity));
+      selectedCity && getAllByCity(selectedCity);
+    } catch {
+      toast.error(t('lookups.set_default_error', 'hr').replace('{name}', entity));
+    }
+    setConfirmSetDefault(null);
+  };
+
+  const filtered = regions.filter((r: any) =>
+    (typeof r.name === 'string' ? r.name : r.name?.ar || r.name?.en || '').toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const columns = [
+    { key: 'name', label: t('employees.region', 'hr') || 'Region', width: 300,
+      render: (row: any) => typeof row.name === 'string' ? row.name : (row.name?.ar || row.name?.en || '') },
+    { key: 'is_default', label: t('common.is_default', 'shared') || 'Default', width: 120,
+      render: (row: any) => row.is_default
+        ? <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full"><Star size={12} /> {t('common.yes', 'shared') || 'Yes'}</span>
+        : <span className="text-xs text-text-muted">—</span> },
+    { key: 'actions', label: t('common.actions', 'shared') || 'Actions', width: 220, align: 'right' as const,
+      render: (row: any) => (
+        <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
+          {!row.is_default && (
+            <Button variant="outline" size="sm" onClick={() => setConfirmSetDefault(row)}
+              title={t('common.set_default', 'shared') || 'Set as default'}>
+              <Star size={14} />
+            </Button>
+          )}
+          <Button variant="outline" size="sm" onClick={() => setEditItem(row)}
+            title={t('common.edit', 'shared') || 'Edit'}>
+            <Pencil size={14} />
+          </Button>
+          <Button variant="danger" size="sm" onClick={() => setConfirmDelete(row)}
+            title={t('common.delete', 'shared') || 'Delete'}>
+            <Trash2 size={14} />
+          </Button>
+        </div>
+      ) },
+  ];
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">{t('lookups.tabs.regions', 'hr') || 'Regions'}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">{t('lookups.tabs.regions', 'hr') || 'Regions'}</h1>
+        
+      </div>
+
       <div className="grid grid-cols-2 gap-4 max-w-lg">
         <div>
           <label className="block text-sm font-medium mb-1">{t('employees.country', 'hr') || 'Country'}</label>
           <Input type="select" value={selectedCountry || ''} onChange={(v) => setSelectedCountry(Number(v))}
-            options={countries.map((c: any) => ({ value: c.id, label: c.name }))}
-            placeholder={t('common.select') || 'Select...'} baseClasses={inputBaseClasses} searchable />
+            options={countries.map((c: any) => ({ value: c.id, label: typeof c.name === 'string' ? c.name : (c.name?.ar || c.name?.en || '') }))}
+            placeholder={t('common.select', 'shared') || 'Select...'} baseClasses={inputBaseClasses} searchable />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">{t('employees.city', 'hr') || 'City'}</label>
           <Input type="select" value={selectedCity || ''} onChange={(v) => setSelectedCity(Number(v))}
-            options={cities.map((c: any) => ({ value: c.id, label: c.name }))}
-            placeholder={t('common.select') || 'Select...'} disabled={!selectedCountry} baseClasses={inputBaseClasses} searchable />
+            options={cities.map((c: any) => ({ value: c.id, label: typeof c.name === 'string' ? c.name : (c.name?.ar || c.name?.en || '') }))}
+            placeholder={t('common.select', 'shared') || 'Select...'} disabled={!selectedCountry} baseClasses={inputBaseClasses} searchable />
         </div>
       </div>
+
       {selectedCity ? (
         <>
           <div className="flex gap-2">
-            <Input type="text" value={searchQuery} onChange={setSearchQuery} placeholder={t('common.search') || 'Search'} baseClasses={inputBaseClasses} className="flex-1" />
-            <Button onClick={() => setIsDialogOpen(true)}>{t('employee_form.add_region', 'hr') || 'Add Region'}</Button>
+            <Input type="text" value={searchQuery} onChange={setSearchQuery}
+              placeholder={t('common.search', 'shared') || 'Search...'}
+              baseClasses={inputBaseClasses} className="w-60" />
+            <Button onClick={() => setIsCreateOpen(true)}>{t('employee_form.add_region', 'hr') || 'Add Region'}</Button>
           </div>
-          <Dialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} title={t('employee_form.add_region', 'hr') || 'Add Region'}>
+
+          <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)}
+            title={t('employee_form.add_region', 'hr') || 'Add Region'}>
             <GenericCreateForm
-              fields={[{ name: 'name', label: t('employees.region', 'hr') || 'Region name', required: true }]}
+              fields={[{ name: 'name', label: t('employees.region', 'hr') || 'Region name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
               schema={RegionFormSchema.omit({ city_id: true })}
-              onSubmit={async (data) => { try { return await create({ name: { ar: data.name }, city_id: selectedCity }); } catch { toast.error(t('lookups.create_error', 'hr').replace('{name}', entity)); throw {}; } }}
-              onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAllByCity(selectedCity!); setIsDialogOpen(false); }}
-              onCancel={() => setIsDialogOpen(false)}
+              onSubmit={async (data) => { try { return await create({ ...data, name: { ar: data.name }, city_id: selectedCity }); } catch { toast.error(t('lookups.create_error', 'hr').replace('{name}', entity)); throw {}; } }}
+              onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAllByCity(selectedCity); setIsCreateOpen(false); }}
+              onCancel={() => setIsCreateOpen(false)}
               submitLabel={t('employee_form.add_region', 'hr') || 'Add Region'}
             />
           </Dialog>
+
+          <Dialog isOpen={!!editItem} onClose={() => setEditItem(null)}
+            title={t('common.edit', 'shared') + ' ' + entity}>
+            <GenericCreateForm
+              fields={[{ name: 'name', label: t('employees.region', 'hr') || 'Region name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
+              schema={RegionFormSchema.omit({ city_id: true })}
+              defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), is_default: editItem.is_default } : undefined}
+              onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: { ar: data.name } }); } catch { toast.error(t('lookups.update_error', 'hr').replace('{name}', entity)); throw {}; } }}
+              onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); selectedCity && getAllByCity(selectedCity); setEditItem(null); }}
+              onCancel={() => setEditItem(null)}
+              submitLabel={t('common.save', 'shared') || 'Save'}
+            />
+          </Dialog>
+
           {loading && <LoadingState />}
           {error && <ErrorState message={error} onRetry={() => selectedCity && getAllByCity(selectedCity)} />}
-          {!loading && !error && filtered.length === 0 && <EmptyState message={t('lookups.no_regions', 'hr') || 'No regions found'} />}
+          {!loading && !error && filtered.length === 0 && (
+            <EmptyState message={t('lookups.no_regions', 'hr') || 'No regions found'} />
+          )}
           {!loading && !error && filtered.length > 0 && (
-            <div className="mt-4 border rounded overflow-hidden">
-              <ul className="divide-y">
-                {filtered.map((r: any) => (
-                  <li key={r.id} className="p-3 flex justify-between items-center">
-                    <span>{r.name}</span>
-                    <Button variant="danger" size="sm" onClick={() => setConfirmDelete(r)}>
-                      {t('common.delete') || 'Delete'}
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <DataTable columns={columns} data={filtered} rowKey="id" loading={false}
+              emptyMessage={t('lookups.no_regions', 'hr') || 'No regions found'} />
           )}
         </>
       ) : (
         <EmptyState message={t('lookups.select_city_first', 'hr') || 'Please select a city first'} icon={<MapPin size={24} />} />
       )}
 
-      <ConfirmDialog
-        isOpen={!!confirmDelete}
-        type="danger"
+      <ConfirmDialog isOpen={!!confirmDelete} type="danger"
         title={t('common.confirm_delete_title', 'shared').replace('{entity}', entity)}
         message={t('common.confirm_delete_message', 'shared').replace('{entity}', entity)}
         confirmLabel={t('common.delete', 'shared') || 'Delete'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        onConfirm={handleDeleteConfirm}
-        onCancel={() => setConfirmDelete(null)}
-      />
+        onConfirm={handleDeleteConfirm} onCancel={() => setConfirmDelete(null)} />
+
+      <ConfirmDialog isOpen={!!confirmSetDefault} 
+        title={t('common.set_default_title', 'shared')?.replace('{entity}', entity) || 'Set as default'}
+        message={t('common.set_default_message', 'shared')?.replace('{entity}', entity) || `Are you sure you want to set this ${entity} as default?`}
+        confirmLabel={t('common.set_default', 'shared') || 'Set as default'}
+        cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
+        onConfirm={handleSetDefaultConfirm} onCancel={() => setConfirmSetDefault(null)} />
     </div>
   );
 }

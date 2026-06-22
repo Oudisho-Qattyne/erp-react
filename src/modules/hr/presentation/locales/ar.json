@@ -123,7 +123,10 @@
     "not_available": "غير متوفر",
     "no_employment_data": "لا توجد معلومات وظيفية مسجلة",
     "no_education_data": "لا توجد مؤهلات علمية مسجلة",
+    "edu_category_initial": "أولي",
+    "edu_category_adjusted": "معدل",
     "edu_category_latest": "أحدث",
+    "edu_category_current": "حالي",
     "edu_category_previous": "سابقة",
     "status_active": "نشط",
     "status_inactive": "غير نشط",
@@ -196,8 +199,15 @@
       "job_category_required": "التصنيف الوظيفي مطلوب",
       "workplace_city_required": " مدينة العمل مطلوب",
       "name_invalid": "الاسم غير صالح",
-      "birthdate_invalid": "تاريخ الولادة غير صالح"
-    }
+      "birthdate_invalid": "تاريخ الولادة غير صالح",
+      "country_required": "الدولة مطلوبة",
+      "city_required": "المدينة مطلوبة",
+      "region_required": "منطقة السكن مطلوبة"
+    },
+    "unsaved_title": "تغييرات غير محفوظة",
+    "unsaved_message": "لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد المغادرة؟",
+    "unsaved_leave": "مغادرة",
+    "unsaved_stay": "البقاء"
   },
   "lookups": {
     "title": "إدارة البيانات الأساسية",
@@ -222,8 +232,11 @@
     "no_regions": "لا يوجد مناطق",
     "no_universities": "لا يوجد جامعات",
     "no_faculties": "لا يوجد افرع",
-    "no_specializations": "لا يوجد اختصاصات"
-
+    "no_specializations": "لا يوجد اختصاصات",
+    "updated": "تم تحديث {name} بنجاح",
+    "update_error": "فشل تحديث {name}",
+    "set_default_success": "تم تعيين {name} كافتراضي بنجاح",
+    "set_default_error": "فشل تعيين {name} كافتراضي"
   },
   "reports": {
     "title": "التقارير والتحليلات",
@@ -386,6 +399,10 @@
       "back": "عودة",
       "back_to_list": "العودة للقائمة",
       "update_error": "فشل تحديث نوع الإجازة"
-    }
+    },
+    "unsaved_title": "تغييرات غير محفوظة",
+    "unsaved_message": "لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد المغادرة؟",
+    "unsaved_leave": "مغادرة",
+    "unsaved_stay": "البقاء"
   }
 }

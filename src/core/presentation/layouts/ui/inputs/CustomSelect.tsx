@@ -2,9 +2,10 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ChevronDown, Search, Check } from 'lucide-react';
 import { useLanguage } from '../../../context/i18n/I18nProvider';
 
-interface Option {
+export interface Option {
   value: number | string;
   label: string;
+  is_default?:boolean
 }
 
 interface CustomSelectProps {
@@ -111,6 +112,15 @@ export function CustomSelect({
       }
     }
   }, [focusedIndex]);
+
+    useEffect(() => { 
+      if(options.length>0 && !value){
+        const default_values = options.filter(op => op.is_default)
+        if(default_values.length>0){
+          onChange(default_values[0].value)
+        }
+      }
+    } , [options]) 
 
   return (
     <div 

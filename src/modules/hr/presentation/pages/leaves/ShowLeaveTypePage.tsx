@@ -86,9 +86,9 @@ export function ShowLeaveTypePage() {
         >
           {t("leave.show_leave.back", "hr")}
         </Button>
-        <Button variant="primary" onClick={() => navigate(`/hr/leaves/${id}/edit`)}>
+        {/* <Button variant="primary" onClick={() => navigate(`/hr/leaves/${id}/edit`)}>
           {t("leave.show_leave.edit", "hr")}
-        </Button>
+        </Button> */}
       </div>
 
       <div className="bg-card/60 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-border shadow-sm">

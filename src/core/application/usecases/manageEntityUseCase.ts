@@ -13,7 +13,7 @@ export function createManageEntityUsecase<T,TCreate , TUpdate, ID = number>(
       try {
         return await repository.findAll();
       } catch (error : any) {
-        throw new Error(`Failed to fetch entities: ${error.message}`);
+        throw error;
       }
     },
 
@@ -21,21 +21,19 @@ export function createManageEntityUsecase<T,TCreate , TUpdate, ID = number>(
       try {
         return await repository.findById(id);
       } catch (error : any) {
-        // If your API throws on 404, catch and return null
         if (error.status === 404) return null;
-        throw new Error(`Failed to fetch entity with id ${id}: ${error.message}`);
+        throw error;
       }
     },
 
     async create(data: TCreate): Promise<DomainResponse<T>> {
-      // Optionally validate before calling repo
       if (validator) {
         await validator(data);
       }
       try {
         return await repository.create(data);
       } catch (error : any) {
-        throw new Error(`Failed to create entity: ${error.message}`);
+        throw error;
       }
     },
 
@@ -43,7 +41,7 @@ export function createManageEntityUsecase<T,TCreate , TUpdate, ID = number>(
       try {
         return await repository.update(id, data);
       } catch (error : any) {
-        throw new Error(`Failed to update entity ${id}: ${error.message}`);
+        throw error;
       }
     },
 
@@ -51,7 +49,7 @@ export function createManageEntityUsecase<T,TCreate , TUpdate, ID = number>(
       try {
         await repository.delete(id);
       } catch (error : any) {
-        throw new Error(`Failed to delete entity ${id}: ${error.message}`);
+        throw error;
       }
     },
   };

@@ -10,6 +10,8 @@ import type { RuleField } from "../../components/leaveRules/RuleConditionCompone
 import { Plus, Trash2 } from "lucide-react"
 import { getCreateLeaveSchema, type LeaveFormValues } from "../../schemas/leaveForm"
 import { getEligibilityFields } from "../../utils/RulesFields"
+import { useUnsavedChanges } from "../../../../../core/presentation/hooks/useUnsavedChanges"
+import { ConfirmDialog } from "../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog"
 
 type FieldConfig = Omit<FormInputProps<any>, "name"> & { name: string }
 
@@ -54,21 +56,22 @@ interface LeaveFormProps {
 export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubmit, onCancel, validateOnMount }: LeaveFormProps) {
   const { t } = useLanguage()
 
-  const { handleSubmit, isValid, isSubmitting, form, setValue, trigger, errors, getValues } = useDynamicForm<LeaveFormValues>({
+  const { handleSubmit, isValid, isSubmitting, isDirty, form, setValue, trigger, errors, getValues } = useDynamicForm<LeaveFormValues>({
     schema: getCreateLeaveSchema(t) as any,
     defaultValues,
     mode: "onChange",
   })
 
-  const prevErrorCount = useRef(0)
+  const { showConfirm, confirmNavigation, cancelNavigation, attemptNavigation } = useUnsavedChanges(isDirty)
+
+  const errorCount = Object.keys(errors).length
   useEffect(() => {
     const keys = Object.keys(errors)
-    if (keys.length > 0 && keys.length !== prevErrorCount.current) {
+    if (keys.length > 0) {
       const el = document.querySelector(`[for="${keys[0]}"]`)
       if (el) el.scrollIntoView({ behavior: "smooth", block: "center" })
     }
-    prevErrorCount.current = keys.length
-  }, [errors])
+  }, [errorCount])
 
   const hasTriggered = useRef(false)
   useEffect(() => {
@@ -201,7 +204,21 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
       ...data,
       eligibility_rules: eligibilityRule ,
     }
-    await onSubmit(payload)
+    try {
+      await onSubmit(payload)
+    } catch (err: any) {
+      if (err.validationErrors) {
+        const entries = Object.entries(err.validationErrors)
+        entries.forEach(([field, msgs]) => {
+          const msg = Array.isArray(msgs) ? msgs[0] : String(msgs)
+          form.setError(field as any, { message: msg })
+        })
+        const firstField = entries[0][0]
+        const el = document.querySelector(`[for="${firstField}"]`)
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" })
+      }
+      throw err
+    }
   }
 
   return (
@@ -289,7 +306,7 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
 
         <div className="flex items-center justify-end gap-3 pt-2">
           {onCancel && (
-            <Button variant="secondary" onClick={onCancel} type="button">
+            <Button variant="secondary" onClick={() => attemptNavigation(() => onCancel?.())} type="button">
               {t("common.cancel", "shared")}
             </Button>
           )}
@@ -297,6 +314,16 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
             {t("common.save", "shared")}
           </Button>
         </div>
+        <ConfirmDialog
+          isOpen={showConfirm}
+          title={t("leave.unsaved_title", "hr") || "Unsaved Changes"}
+          message={t("leave.unsaved_message", "hr") || "You have unsaved changes. Are you sure you want to leave?"}
+          type="alert"
+          confirmLabel={t("leave.unsaved_leave", "hr") || "Leave"}
+          cancelLabel={t("leave.unsaved_stay", "hr") || "Stay"}
+          onConfirm={confirmNavigation}
+          onCancel={cancelNavigation}
+        />
       </form>
     </FormProvider>
   )

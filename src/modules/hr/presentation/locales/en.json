@@ -123,7 +123,10 @@
     "not_available": "Not available",
     "no_employment_data": "No employment data recorded",
     "no_education_data": "No educational qualifications recorded",
+    "edu_category_initial": "Initial",
+    "edu_category_adjusted": "Adjusted",
     "edu_category_latest": "Latest",
+    "edu_category_current": "Current",
     "edu_category_previous": "Previous",
     "status_active": "Active",
     "status_inactive": "Inactive",
@@ -195,8 +198,15 @@
       "job_category_required": "Job category is required",
       "workplace_city_required": "Workplace city Required",
       "name_invalid": "Invalid name",
-      "birthdate_invalid": "Invalid birth date"
-    }
+      "birthdate_invalid": "Invalid birth date",
+      "country_required": "Country is required",
+      "city_required": "City is required",
+      "region_required": "Residential region is required"
+    },
+    "unsaved_title": "Unsaved Changes",
+    "unsaved_message": "You have unsaved changes. Are you sure you want to leave?",
+    "unsaved_leave": "Leave",
+    "unsaved_stay": "Stay"
   },
   "lookups": {
     "title": "Master Data Management",
@@ -221,7 +231,11 @@
     "no_regions": "No regions",
     "no_universities": "No universities",
     "no_faculties": "No faculties",
-    "no_specializations": "No specializations"
+    "no_specializations": "No specializations",
+    "updated": "{name} updated successfully",
+    "update_error": "Failed to update {name}",
+    "set_default_success": "{name} set as default successfully",
+    "set_default_error": "Failed to set {name} as default"
   },
   "reports": {
     "title": "Reports & Analytics",
@@ -384,6 +398,10 @@
       "back": "Back",
       "back_to_list": "Back to list",
       "update_error": "Failed to update leave type"
-    }
+    },
+    "unsaved_title": "Unsaved Changes",
+    "unsaved_message": "You have unsaved changes. Are you sure you want to leave?",
+    "unsaved_leave": "Leave",
+    "unsaved_stay": "Stay"
   }
 }
