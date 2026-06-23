@@ -51,6 +51,14 @@
     },
     "leave": {
       "user_eligible_leave_types": "أنواع الإجازات المستحقة"
+    },
+    "leave_balance": {
+      "title": "أرصدة الإجازات"
+    },
+    "employee_leave_balances": {
+      "title": "أرصدة إجازات الموظفين",
+      "select_prompt": "اختر موظفاً لعرض أرصدة إجازاته",
+      "select_employee": "اختيار موظف"
     }
   },
   "employees": {
@@ -116,7 +124,14 @@
     "study_status": "حالة الدراسة",
     "degree_name": "اسم الشهادة",
     "children": "الاولاد",
-    "child_name": "اسم الابن"
+    "child_name": "اسم الابن",
+    "employee_status_logs": "سجل حالات الموظف",
+    "job_status_logs": "سجل الحالات الوظيفية",
+    "employee_status_logs_load_error": "فشل تحميل سجل حالات الموظف: {{message}}",
+    "job_status_logs_load_error": "فشل تحميل سجل الحالات الوظيفية: {{message}}",
+    "picker_title": "اختيار الموظفين",
+    "selected": "مختار",
+    "load_error": "فشل تحميل الموظفين"
   },
   "show_employee": {
     "personal_info": "المعلومات الشخصية",
@@ -144,6 +159,7 @@
     "status_terminated": "منتهي",
     "status_on_leave": "في إجازة",
     "status_unknown": "غير معروف",
+    "status_logs": "سجل الحالات",
     "contract_full_time": "دوام كامل",
     "contract_part_time": "دوام جزئي",
     "contract_temporary": "مؤقت",
@@ -429,5 +445,20 @@
     "unsaved_message": "لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد المغادرة؟",
     "unsaved_leave": "مغادرة",
     "unsaved_stay": "البقاء"
+  },
+  "leave_balance": {
+    "my_balances": "أرصدة الإجازات",
+    "overview": "نظرة عامة",
+    "leave_type": "نوع الإجازة",
+    "accrual_period": "الدورة",
+    "yearly": "سنوي",
+    "monthly": "شهري",
+    "entitled": "مستحق",
+    "consumed": "مستهلك",
+    "available": "متاح",
+    "carried_forward": "مرحل",
+    "adjustment_added": "تعديل +",
+    "adjustment_deducted": "تعديل -",
+    "no_data": "لا توجد أرصدة إجازات"
   }
 }

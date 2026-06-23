@@ -18,6 +18,8 @@
     "archive": "Archive",
     "save":"Save",
     "cancel": "Cancel",
+    "change": "Change",
+    "confirm": "Confirm",
     "is_default":"Default value",
     "yes":"Yes",
     "set_default":"Set as default",

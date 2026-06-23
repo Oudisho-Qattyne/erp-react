@@ -1,15 +1,11 @@
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
+import { useForm, FormProvider } from "react-hook-form"
 import { Dialog } from "../dialog/Dialog"
 import { Button } from "../buttons/Button"
-import Input from "../inputs/Input"
+import { FormInput, type FormInputProps } from "../inputs/FormInput"
 import { useLanguage } from "../../../context/i18n/I18nProvider"
 
-export interface FilterField {
-  name: string
-  label: string
-  type: "text" | "select" | "number" | "date" | "boolean"
-  options?: { value: string; label: string }[]
-}
+export type FilterField = Omit<FormInputProps<any>, "name"> & { name: string }
 
 interface FilterDialogProps {
   isOpen: boolean
@@ -22,20 +18,16 @@ interface FilterDialogProps {
 
 export function FilterDialog({ isOpen, fields, initialValues = {}, onFilter, onCancel, onReset }: FilterDialogProps) {
   const { t } = useLanguage()
-  const [values, setValues] = useState<Record<string, any>>(initialValues)
+  const form = useForm({ defaultValues: initialValues })
 
   useEffect(() => {
-    setValues(initialValues)
+    form.reset(initialValues)
   }, [initialValues, isOpen])
 
-  const setValue = (name: string, val: any) => {
-    setValues((prev) => ({ ...prev, [name]: val }))
-  }
-
-  const handleApply = () => onFilter(values)
+  const handleApply = () => onFilter(form.getValues())
   const handleReset = () => {
     const empty = Object.fromEntries(fields.map((f) => [f.name, ""]))
-    setValues(empty)
+    form.reset(empty)
     onReset?.()
   }
 
@@ -59,44 +51,13 @@ export function FilterDialog({ isOpen, fields, initialValues = {}, onFilter, onC
         </div>
       }
     >
-      <div className="space-y-4">
-        {fields.map((field) => (
-          <div key={field.name}>
-            <label className="block text-sm font-medium text-text mb-1">{field.label}</label>
-            {field.type === "boolean" ? (
-              <select
-                value={values[field.name] ?? ""}
-                onChange={(e) => setValue(field.name, e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-card text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-              >
-                <option value="">{t("common.all", "shared") || "الكل"}</option>
-                <option value="true">{t("common.yes", "shared") || "نعم"}</option>
-                <option value="false">{t("common.no", "shared") || "لا"}</option>
-              </select>
-            ) : field.type === "select" ? (
-              <select
-                value={values[field.name] ?? ""}
-                onChange={(e) => setValue(field.name, e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-border bg-card text-text text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-              >
-                <option value="">{t("common.all", "shared") || "الكل"}</option>
-                {field.options?.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <Input
-                type={field.type === "number" ? "number" : "text"}
-                value={values[field.name] ?? ""}
-                onChange={(val) => setValue(field.name, val)}
-                placeholder={field.label}
-              />
-            )}
-          </div>
-        ))}
-      </div>
+      <FormProvider {...form}>
+        <div className="space-y-4">
+          {fields.map((field) => (
+            <FormInput key={field.name} {...field} name={field.name as any} />
+          ))}
+        </div>
+      </FormProvider>
     </Dialog>
   )
 }

@@ -26,6 +26,8 @@ import { EntityFormSchema } from '../../../../core/presentation/schemas/entityFo
 import type { JobStatus } from '../../domain/entities/jobStatus/jobStatus';
 import type { EmployeeStatus } from '../../domain/entities/employeeStatus/employeeStatus';
 import { EmployeeStatusFormSchema } from '../schemas/employeeStatus/employeeStatus';
+import { EmployeeStatusLogsDialog } from '../components/employee/EmployeeStatuseLogsDialog';
+import { JobStatusLogsDialog } from '../components/employee/JobStatusLogsDialog';
 
 // -----------------------------------------------------------------------------
 // Helper: Generic Create Form wrapper (with explicit types)
@@ -68,7 +70,7 @@ export const EMPLOYEE_EMPTY_DEFAULTS = {
     contract_type: null,
     contract_nature: null,
     job_category: null,
-   
+
     workplace_city_id: null,
   },
   job_status_id: null,
@@ -206,6 +208,7 @@ export interface EmployeeFormProps {
   submitLabel?: string;
   cancelLabel?: string;
   loading?: boolean;
+  employee_id?: number
 }
 
 const getNestedValue = (obj: any, path: string): any => {
@@ -229,6 +232,7 @@ export function EmployeeForm({
   submitLabel,
   cancelLabel,
   loading = false,
+  employee_id
 }: EmployeeFormProps) {
   const { t } = useLanguage();
   const actualSubmitLabel = submitLabel || t('employee_form.save', 'hr') || 'حفظ الموظف';
@@ -239,6 +243,8 @@ export function EmployeeForm({
     defaultValues: { ...EMPLOYEE_EMPTY_DEFAULTS, ...defaultValues } as EmployeeFormValues,
     mode: 'onChange',
   });
+  const [statusLogsOpen, setStatusLogsOpen] = useState<boolean>(false)
+  const [jobStatusLogsOpen, setJobStatusLogsOpen] = useState<boolean>(false)
   const { handleSubmit, formState, watch, setValue } = methods;
   const { isValid, isSubmitting, errors, isDirty } = formState;
 
@@ -600,23 +606,26 @@ export function EmployeeForm({
     {
       name: 'employee_status_id', type: 'select-or-create', searchable: true, label: t('employees.employee_status_id', 'hr') || 'Employee Status',
       labelPath: 'data.name',
+      infoButton:employee_id ? () => { setStatusLogsOpen(true) } : null,
       renderCreateForm: (onSuccess, onCancel) => <EmployeeStatusCreateForm onSuccess={(v, i) => {
         onSuccess(v, i)
       }} onCancel={onCancel} />,
-      required:true,
+      required: true,
       compute: computeEmployeeStatuses,
     },
-    {name:'employee_status_note' , type:'text' , label:t('employees.employee_status_note' , 'hr') || 'ملاحظة حالة الموظف' ,required:true ,  dependsOn: ['employee_status_id'], compute: async (values) => {
-      if (!values.employee_status_id) {
-        return ({ disabled: true })
+    {
+      name: 'employee_status_note', type: 'text', label: t('employees.employee_status_note', 'hr') || 'ملاحظة حالة الموظف', required: true, dependsOn: ['employee_status_id'], compute: async (values) => {
+        if (!values.employee_status_id) {
+          return ({ disabled: true })
+        }
+        else {
+          return ({ disabled: false })
+        }
       }
-      else{
-        return ({ disabled: false })
-      }
-    }}
+    }
 
   ];
-console.log(errors);
+  console.log(errors);
 
   const EMPLOYMENT_FIELDS: FieldConfig[] = [
     { name: 'employment_details.job_title', label: t('employees.job_title', 'hr') || 'المسمى الوظيفي' },
@@ -662,6 +671,7 @@ console.log(errors);
       searchable: true,
       labelPath: 'data.name',
       type: 'select-or-create',
+      infoButton:employee_id ? () => { setJobStatusLogsOpen(true) } : null,
       renderCreateForm: (onSuccess, onCancel) => <JobStatusCreateForm onSuccess={onSuccess} onCancel={onCancel} />,
       compute: async (values) => {
         const response = await loadJobStatus();
@@ -669,11 +679,11 @@ console.log(errors);
       }
     },
     {
-      name: 'job_status_note', label: t('employees.job_status_note', 'hr') || 'ملاحظات الحالة الوظيفية', dependsOn: ['job_status_id'],required:true, compute: async (values) => {
+      name: 'job_status_note', label: t('employees.job_status_note', 'hr') || 'ملاحظات الحالة الوظيفية', dependsOn: ['job_status_id'], required: true, compute: async (values) => {
         if (!values.job_status_id) {
           return ({ disabled: true })
         }
-        else{
+        else {
           return ({ disabled: false })
         }
       }
@@ -711,6 +721,7 @@ console.log(errors);
       <form onSubmit={methods.handleSubmit(async (data) => {
         try {
           await onSubmit(data)
+          methods.reset(data)
         } catch (err: any) {
           if (err.validationErrors) {
             const entries = Object.entries(err.validationErrors)
@@ -739,9 +750,11 @@ console.log(errors);
         <div className="bg-card rounded-lg p-4 border border-border">
           <h3 className="text-lg font-bold mb-4">{t('show_employee.employment_details', 'hr') || 'المعلومات الوظيفية'}</h3>
           <div className={`grid ${gridColsClass} gap-4`}>
-            {EMPLOYMENT_FIELDS.filter(f => f.name !== 'employment_details.org_unit_id').map((field) => (
-              <FormInput key={field.name} {...field} />
-            ))}
+            {EMPLOYMENT_FIELDS.filter(f => f.name !== 'employment_details.org_unit_id').map((field) => {
+              return (
+                <FormInput key={field.name} {...field} />
+              )
+            })}
             {/* Custom organizational unit tree select */}
             <div className={`md:col-span-${columns}`}>
               <OrganizationalUnitTreeSelect
@@ -834,7 +847,7 @@ console.log(errors);
                       />
                     )}
                   />
-                  <FormInput name={`educations.${idx}.graduation_year`} label={t('employees.graduation_year', 'hr') || "سنة التخرج"} type='number' />
+                  <FormInput name={`educations.${idx}.graduation_year`} label={t('employees.graduation_year', 'hr') || "سنة التخرج"} />
                   <FormInput name={`educations.${idx}.academic_stage`} label={t('employees.academic_stage', 'hr') || "المرحلة الأكاديمية"} />
                   <FormInput name={`educations.${idx}.study_status`} label={t('employees.study_status', 'hr') || "حالة الدراسة"} />
                 </div>
@@ -845,11 +858,16 @@ console.log(errors);
             </Button>
           </div>
         </div>
-
+        {employee_id && (
+          <EmployeeStatusLogsDialog isOpen={statusLogsOpen} onClose={() => setStatusLogsOpen(false)} employeeId={employee_id} />
+        )}
+        {employee_id && (
+          <JobStatusLogsDialog isOpen={jobStatusLogsOpen} onClose={() => setJobStatusLogsOpen(false)} employeeId={employee_id} />
+        )}
         {/* Form Actions */}
         <div className="flex justify-end gap-3">
           {onCancel && (
-            <Button type="button" variant="outline" onClick={() => attemptNavigation(() => onCancel?.())}>
+            <Button type="button" variant="outline" onClick={() => employee_id ? attemptNavigation(() => onCancel?.()) :onCancel?.() }>
               {actualCancelLabel}
             </Button>
           )}

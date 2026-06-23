@@ -4,10 +4,11 @@ import { SelectOrCreate } from './SelectOrCreate';
 import { MultiSelectOrCreate } from './MultiSelectOrCreate';
 import { DatePicker } from './DatePicker';
 import { DataMatrixInput, type MatrixFieldConfig } from './DataMatrixInput';
+import { Info } from 'lucide-react';
 export type InputType = 'text' | 'number' | 'email' | 'password' | 'textarea' | 'date' | 'select' | 'select-or-create' | 'multi-select-or-create' | 'data-matrix' | 'checkbox';
 
 interface InputProps {
-  type:InputType;
+  type: InputType;
   value?: any;
   onChange: (value: any) => void;
   options?: { value: number | string; label: string }[];
@@ -17,7 +18,7 @@ interface InputProps {
   searchable?: boolean;
   rows?: number;
   createTitle?: string;
-  labelPath?:string
+  labelPath?: string
   renderCreateForm?: (
     onSuccess: (newValue: any, newItem: any) => void,
     onCancel: () => void,
@@ -28,7 +29,7 @@ interface InputProps {
   max?: number;
   step?: number;
   baseClasses?: string;
-  className?:string;
+  className?: string;
   // data-matrix
   matrixFields?: MatrixFieldConfig[];
   numberOfRows?: number;
@@ -36,9 +37,10 @@ interface InputProps {
   maxRows?: number;
   matrixErrors?: Record<number, Record<string, string>>;
   rowSchema?: { safeParse: (data: any) => { success: boolean; error?: { flatten: () => { fieldErrors: Record<string, string[]> } } } };
+  infoButton?: () => void | null
 }
 
-const Input: React.FC<InputProps> = ({
+const InputTypes: React.FC<InputProps> = ({
   type,
   value,
   onChange,
@@ -56,7 +58,7 @@ const Input: React.FC<InputProps> = ({
   max,
   step,
   baseClasses = '',
-  className="",
+  className = "",
   matrixFields,
   numberOfRows,
   minRows,
@@ -178,7 +180,7 @@ const Input: React.FC<InputProps> = ({
       return (
         <input
           type={type}
-          value={type === 'number' ? finalValue :finalValue}
+          value={type === 'number' ? finalValue : finalValue}
           onChange={(e) =>
             onChange(type === 'number' ? Number(e.target.value) : e.target.value)
           }
@@ -193,4 +195,14 @@ const Input: React.FC<InputProps> = ({
   }
 };
 
+
+const Input: React.FC<InputProps> = (props) => {
+  return <div className='relative flex gap-3 justify-center items-center'>
+    <InputTypes {...props} />
+    {
+      props.infoButton &&
+      <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => props.infoButton()} />
+    }
+  </div>
+}
 export default Input;

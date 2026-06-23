@@ -15,6 +15,8 @@ import type { ContractNature } from "../valueObjects/ContractNature";
 import type { ContractType } from "../valueObjects/ContractType";
 import type { EmploymentStatus } from "../valueObjects/EmploymentStatus";
 import type { ChronicDiseases } from "../../../../core/domain/entities/chronicDiseases/chronicDiseases";
+import type { JobStatus } from "./jobStatus/jobStatus";
+import type { EmployeeStatus } from "./employeeStatus/employeeStatus";
 
 export interface EducationEntry {
   id: number;
@@ -40,11 +42,19 @@ export interface EmployeeChildren {
   birthdate: string
 }
 
+export interface OrganizationalUnit {
+  id: number;
+  name: string;
+  parent_id: number | null;
+  created_at: string;
+}
+
 export interface EmploymentDetails {
   id: number;
   employee_id: number;
   job_title: string;
   org_unit_id: number;
+  organizational_unit?: OrganizationalUnit;
   status: EmploymentStatus;                    // e.g., 'active'
   appointment_date: string;          // YYYY-MM-DD
   contract_type: ContractType;             // 'Full-time', etc.
@@ -94,7 +104,9 @@ export interface EmployeeData {
   photo_id:string;
 
   employee_status_id:number;
+  employee_status?: EmployeeStatus;
   employee_status_note:string;
   job_status_id:number;
+  job_status?: JobStatus;
   job_status_note:string;
 }

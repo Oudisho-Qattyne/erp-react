@@ -22,6 +22,8 @@ import LeavesTypesPage from './presentation/pages/leaves/LeavesTypesPage'
 import { ShowLeaveTypePage } from './presentation/pages/leaves/ShowLeaveTypePage'
 import { EditLeaveTypePage } from './presentation/pages/leaves/EditLeaveTypePage'
 import { UserEligibleLeaveTypes } from './presentation/pages/leaves/UserEligibleLeaveTypes'
+import { UserLeaveBalances } from './presentation/pages/leaveBalances/UserLeaveBalances'
+import { EmployeeLeaveBalances } from './presentation/pages/leaveBalances/EmployeeLeaveBalances'
 
 const usersModule: Module = {
   name: 'hr',
@@ -67,6 +69,30 @@ const usersModule: Module = {
       label: 'leave.user_eligible_leave_types',
       nav: true,
       order: 20,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'hr',
+      requiresAuth: true,
+    },
+    {
+      path: '/hr/user-leave-balances',
+      element: <UserLeaveBalances />,
+      layout: 'dashboard',
+      label: 'leave_balance.title',
+      nav: true,
+      order: 21,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'hr',
+      requiresAuth: true,
+    },
+    {
+      path: '/hr/employee-leave-balances',
+      element: <EmployeeLeaveBalances />,
+      layout: 'dashboard',
+      label: 'employee_leave_balances.title',
+      nav: true,
+      order: 22,
       moduleName: 'hr',
       icon: <Users size={18} />,
       group: 'hr',

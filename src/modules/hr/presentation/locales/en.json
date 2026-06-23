@@ -51,6 +51,14 @@
     },
     "leave": {
       "user_eligible_leave_types": "User Eligible Leave Types"
+    },
+    "leave_balance": {
+      "title": "My Leave Balances"
+    },
+    "employee_leave_balances": {
+      "title": "Employee Leave Balances",
+      "select_prompt": "Select an employee to view their leave balances",
+      "select_employee": "Select Employee"
     }
   },
   "employees": {
@@ -116,7 +124,14 @@
     "study_status": "Study Status",
     "degree_name": "Degree Name",
     "children": "Children",
-    "child_name": "Child's Name"
+    "child_name": "Child's Name",
+    "employee_status_logs": "Employee Status Logs",
+    "job_status_logs": "Job Status Logs",
+    "employee_status_logs_load_error": "Failed to load employee status logs",
+    "job_status_logs_load_error": "Failed to load job status logs",
+    "picker_title": "Select Employees",
+    "selected": "selected",
+    "load_error": "Failed to load employees"
   },
   "show_employee": {
     "personal_info": "Personal Information",
@@ -144,6 +159,7 @@
     "status_terminated": "Terminated",
     "status_on_leave": "On Leave",
     "status_unknown": "Unknown",
+    "status_logs": "Status Logs",
     "contract_full_time": "Full Time",
     "contract_part_time": "Part Time",
     "contract_temporary": "Temporary",
@@ -210,7 +226,6 @@
       "job_status_note_required": "Job status note is required",
       "employee_status_id_required": "Employee status is required",
       "employee_status_note_required": "Employee status note is required",
-    "employee_status_note_required" : "Employee status note is required",
       "appointment_date_invalid": "Appointment date must be in YYYY-MM-DD format",
       "contract_type_invalid": "Invalid contract type",
       "contract_nature_invalid": "Invalid contract nature",
@@ -428,5 +443,20 @@
     "unsaved_message": "You have unsaved changes. Are you sure you want to leave?",
     "unsaved_leave": "Leave",
     "unsaved_stay": "Stay"
+  },
+  "leave_balance": {
+    "my_balances": "My Leave Balances",
+    "overview": "Overview",
+    "leave_type": "Leave Type",
+    "accrual_period": "Period",
+    "yearly": "Yearly",
+    "monthly": "Monthly",
+    "entitled": "Entitled",
+    "consumed": "Consumed",
+    "available": "Available",
+    "carried_forward": "Carried Forward",
+    "adjustment_added": "Adj +",
+    "adjustment_deducted": "Adj -",
+    "no_data": "No leave balances found"
   }
 }

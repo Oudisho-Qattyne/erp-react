@@ -81,7 +81,7 @@ export function SelectOrCreate({
 
   return (
     <>
-      <div className="flex gap-2">
+      <div className="flex w-full gap-2">
         <CustomSelect
           options={combinedOptions}
           value={value}
@@ -90,7 +90,7 @@ export function SelectOrCreate({
           disabled={disabled}
           required={required}
           searchable={searchable}
-          baseClasses={`${baseClasses} flex-1`}
+          baseClasses={`${baseClasses}`}
         />
         <Button
           type="button"

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
 interface DialogProps {
@@ -50,7 +51,7 @@ export function Dialog({ isOpen, onClose, title, children, actions, size = 'md',
 
   if (!shouldRender) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-100000 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
@@ -75,7 +76,6 @@ export function Dialog({ isOpen, onClose, title, children, actions, size = 'md',
         <div className="flex-1 overflow-y-auto p-4">{children}</div>
         {/* Footer actions (optional) */}
         {actions && <div className="p-4 border-t border-border flex justify-end gap-2">{actions}</div>}
-      </div>
     </div>
-  );
+  </div>, document.body)
 }
