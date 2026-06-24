@@ -17,7 +17,9 @@ import {
   Calendar,
   Contact,
   Activity,
-  Pencil
+  Pencil,
+  History,
+  Info
 } from 'lucide-react';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import { useManageEmployee } from '../hooks/useEmployees';
@@ -27,6 +29,8 @@ import { Spinner } from '../../../../core/presentation/layouts/ui/state/Spinner'
 import { ErrorState } from '../../../../core/presentation/layouts/ui/state/ErrorState';
 import { EmptyState } from '../../../../core/presentation/layouts/ui/state/EmptyState';
 import { useStorage } from '../../../../core/registry/storage/StorageProvider';
+import { EmployeeStatusLogsDialog } from '../components/employee/EmployeeStatuseLogsDialog';
+import { JobStatusLogsDialog } from '../components/employee/JobStatusLogsDialog';
 
 export function ShowEmployeePage() {
   const { id } = useParams<{ id: string }>();
@@ -36,13 +40,15 @@ export function ShowEmployeePage() {
 
   const [FileExplorerOpen, setFileExplorerOpen] = useState<boolean>(false)
   const [employeePhotoPickerOpen, setEmployeePhotoPickerOpen] = useState<boolean>(false)
+  const [statusLogsOpen, setStatusLogsOpen] = useState<boolean>(false)
+  const [jobStatusLogsOpen, setJobStatusLogsOpen] = useState<boolean>(false)
   const storage = useStorage();
 
   const [employee, setEmployee] = useState<EmployeeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [photoUpdating, setPhotoUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { getById , update } = useManageEmployee()
+  const { getById, update } = useManageEmployee()
   const fetchEmployee = async () => {
     try {
       setLoading(true);
@@ -70,8 +76,8 @@ export function ShowEmployeePage() {
     if (items.length === 0) return;
     setPhotoUpdating(true);
     try {
-      const  { ...newData } = employee
-      await update(Number(id), { ...newData , photo_id: items[0]._id });
+      const { ...newData } = employee
+      await update(Number(id), { ...newData, photo_id: items[0]._id });
       await fetchEmployee();
       setEmployeePhotoPickerOpen(false);
     } catch (err: any) {
@@ -203,6 +209,11 @@ export function ShowEmployeePage() {
               )}
               <InfoRow label={t('employees.sham_cash_account', 'hr') || 'حساب الشام كاش'} value={employee.sham_cash_account} icon={<CreditCard size={14} />} />
               <InfoRow label={t('employees.civil_registry_record', 'hr') || 'رقم القيد المدني'} value={employee.civil_registry_record} />
+              <div className="flex items-center justify-between gap-2">
+                <InfoRow label={t('employees.employee_status_id', 'hr') || 'حالة الموظف'} value={employee.employee_status ? (getLocalizedName(employee.employee_status.name) || employee.employee_status_id) : employee.employee_status_id} />
+                <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setStatusLogsOpen(true)} />
+              </div>
+              <InfoRow label={t('employees.employee_status_note', 'hr') || 'ملاحظات حالة الموظف'} value={employee.employee_status_note} />
             </div>
           </div>
 
@@ -268,7 +279,12 @@ export function ShowEmployeePage() {
             {employee.employment_details ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <InfoRow label={t('employees.job_title', 'hr') || 'المسمى الوظيفي'} value={employee.employment_details.job_title} />
-              <InfoRow label={t('employees.assigned_job', 'hr') || 'العمل المكلف به'} value={employee.assigned_job} />
+                <div className="flex items-center justify-between gap-2">
+                  <InfoRow label={t('employees.job_status', 'hr') || 'الحالة الوظيفية'} value={employee.job_status ? (getLocalizedName(employee.job_status.name) || employee.job_status_id) : employee.job_status_id} />
+                  <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setJobStatusLogsOpen(true)} />
+                </div>
+                <InfoRow label={t('employees.job_status_note', 'hr') || 'ملاحظات الحالة الوظيفية'} value={employee.job_status_note} />
+                <InfoRow label={t('employees.assigned_job', 'hr') || 'العمل المكلف به'} value={employee.assigned_job} />
 
                 <div className="flex flex-col gap-1.5">
                   <span className="text-sm text-text-muted">{t('employees.status', 'hr') || 'حالة الموظف'}</span>
@@ -282,7 +298,7 @@ export function ShowEmployeePage() {
                 <InfoRow label={t('employees.contract_type', 'hr') || 'نوع العقد'} value={getContractType(employee.employment_details.contract_type, t)} />
                 <InfoRow label={t('employees.contract_nature', 'hr') || 'طبيعة العقد'} value={getContractNature(employee.employment_details.contract_nature, t)} />
                 <InfoRow label={t('employees.job_category', 'hr') || 'التصنيف الوظيفي'} value={employee.employment_details.job_category} />
-                <InfoRow label={t('employees.org_unit_id', 'hr') || 'الرقم التعريفي للوحدة التنظيمية'} value={employee.employment_details.org_unit_id} icon={<Building2 size={14} />} />
+                <InfoRow label={t('employees.org_unit_id', 'hr') || 'الوحدة التنظيمية'} value={employee.employment_details.organizational_unit?.name || employee.employment_details.org_unit_id} icon={<Building2 size={14} />} />
                 <InfoRow label={t('employees.workplace_city', 'hr') || 'مدينة العمل'} value={employee.employment_details.workplace_city?.name || employee.employment_details.workplace_city_id || '-'} icon={<MapPin size={14} />} />
               </div>
             ) : (
@@ -360,6 +376,12 @@ export function ShowEmployeePage() {
       {storage?.FilePickerComponent && employee?.folder &&
         <storage.FilePickerComponent onSelect={handlePhotoSelect} multiple={false} isOpen={employeePhotoPickerOpen} onClose={() => { setEmployeePhotoPickerOpen(false) }} folderId={employee.folder} fileTypes={["image"]} />
       }
+      {employee?.id && (
+        <EmployeeStatusLogsDialog isOpen={statusLogsOpen} onClose={() => setStatusLogsOpen(false)} employeeId={employee.id} />
+      )}
+      {employee?.id && (
+        <JobStatusLogsDialog isOpen={jobStatusLogsOpen} onClose={() => setJobStatusLogsOpen(false)} employeeId={employee.id} />
+      )}
     </div>
   );
 }

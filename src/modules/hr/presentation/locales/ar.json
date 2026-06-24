@@ -46,12 +46,73 @@
     },
     "admin": "الإدارة العامة",
     "hr": " إدارة الموارد البشرية",
-    "leave_types":{
-      "title":"إدارة أنواع الإجازات"
+    "leave_types": {
+      "title": "إدارة أنواع الإجازات"
     },
     "leave": {
       "user_eligible_leave_types": "أنواع الإجازات المستحقة"
+    },
+    "leave_balance": {
+      "title": "أرصدة الإجازات"
+    },
+    "employee_leave_balances": {
+      "title": "أرصدة إجازات الموظفين"
+    },
+    "leave_request": {
+      "title": "طلبات الإجازة",
+      "create_title":"طلب إجازة"
+    },
+    "adjust_leave_balance": {
+    "title": "تعديل رصيد الإجازات"
     }
+  },
+  "leave_request": {
+    "my_requests_load_error": "فشل تحميل طلبات الإجازة",
+    "employee_requests_load_error": "فشل تحميل طلبات إجازة الموظف",
+    "request_load_error": "فشل تحميل طلب الإجازة",
+    "create_success": "تم إنشاء طلب الإجازة بنجاح",
+    "create_error": "فشل إنشاء طلب الإجازة",
+    "update_success": "تم تحديث طلب الإجازة بنجاح",
+    "update_error": "فشل تحديث طلب الإجازة",
+    "process_success": "تمت معالجة طلب الإجازة بنجاح",
+    "process_error": "فشلت معالجة طلب الإجازة",
+    "create_title": "إنشاء طلب إجازة",
+    "select_leave_type": "اختيار نوع الإجازة",
+    "request_details": "تفاصيل الطلب",
+    "start_date": "تاريخ ووقت البداية",
+    "end_date": "تاريخ ووقت النهاية",
+    "requested_units": "عدد الوحدات المطلوبة",
+    "requested_units_placeholder": "أدخل عدد الوحدات",
+    "reason": "السبب",
+    "reason_placeholder": "أدخل سبب طلب الإجازة",
+    "submit": "إرسال الطلب"
+  },
+  "leave_types": {
+    "type_name": "نوع الإجازة",
+    "picker_title": "اختيار أنواع الإجازات",
+    "no_data": "لا توجد أنواع إجازات",
+    "selected": "مختار"
+  },
+  "employee_leave_balances": {
+    "title": "أرصدة إجازات الموظفين",
+    "select_prompt": "اختر موظفاً لعرض أرصدة إجازاته",
+    "select_employee": "اختيار موظف"
+  },
+  "adjust_leave_balance": {
+    "title": "تعديل رصيد الإجازات",
+    "employees": "الموظفين",
+    "select_employees": "اختيار موظفين",
+    "select_leave_type": "اختيار نوع الإجازة",
+    "leave_type_details": "تفاصيل نوع الإجازة",
+    "adjustment_details": "تفاصيل التعديل",
+    "adjustment_type": "نوع التعديل",
+    "add": "إضافة",
+    "subtract": "خصم",
+    "quantity": "الكمية",
+    "quantity_placeholder": "أدخل الكمية",
+    "notes": "ملاحظات",
+    "notes_placeholder": "ملاحظات (اختياري)",
+    "submit": "تعديل الرصيد"
   },
   "employees": {
     "internal_id": "الرقم الداخلي",
@@ -90,12 +151,12 @@
     "health_status": "الحالة الصحية",
     "injury_details": "تفاصيل الإصابة",
     "injury_date": "تاريخ الإصابة",
-    "chronic_diseases" : "الأمراض المزمنة",
+    "chronic_diseases": "الأمراض المزمنة",
     "job_status": "الحالة الوظيفية",
     "job_status_note": "ملاحظات الحالة الوظيفية",
     "employee_status": "حالة الموظف",
     "employee_status_id": "حالة الموظف",
-    "employee_status_note" : "ملاحظة حالة الموظف",
+    "employee_status_note": "ملاحظة حالة الموظف",
     "country": "الدولة",
     "city": "المدينة",
     "region": "منطقة السكن",
@@ -116,7 +177,14 @@
     "study_status": "حالة الدراسة",
     "degree_name": "اسم الشهادة",
     "children": "الاولاد",
-    "child_name": "اسم الابن"
+    "child_name": "اسم الابن",
+    "employee_status_logs": "سجل حالات الموظف",
+    "job_status_logs": "سجل الحالات الوظيفية",
+    "employee_status_logs_load_error": "فشل تحميل سجل حالات الموظف: {{message}}",
+    "job_status_logs_load_error": "فشل تحميل سجل الحالات الوظيفية: {{message}}",
+    "picker_title": "اختيار الموظفين",
+    "selected": "مختار",
+    "load_error": "فشل تحميل الموظفين"
   },
   "show_employee": {
     "personal_info": "المعلومات الشخصية",
@@ -144,6 +212,7 @@
     "status_terminated": "منتهي",
     "status_on_leave": "في إجازة",
     "status_unknown": "غير معروف",
+    "status_logs": "سجل الحالات",
     "contract_full_time": "دوام كامل",
     "contract_part_time": "دوام جزئي",
     "contract_temporary": "مؤقت",
@@ -178,8 +247,7 @@
     "add_employee_status": "إضافة حالة موظف",
     "employee_status": "حالة الموظف",
     "add_org_unit": "إضافة وحدة تنظيمية",
-    "add_chronic_disease":"إضافة مرض مزمن",
-
+    "add_chronic_disease": "إضافة مرض مزمن",
     "saving": "جاري...",
     "validation": {
       "category_invalid": "يجب أن يكون التصنيف \"أحدث\" أو \"سابقة\"",
@@ -198,7 +266,7 @@
       "gender_invalid": "الجنس يجب أن يكون ذكراً أو أنثى",
       "date_birth_invalid": "تاريخ الميلاد بصيغة YYYY-MM-DD",
       "place_birth_required": "مكان الميلاد مطلوب",
-      "assigned_job_required":"العمل المكلف به مطلوب",
+      "assigned_job_required": "العمل المكلف به مطلوب",
       "marital_status_invalid": "الحالة الاجتماعية غير صالحة",
       "number_of_children_invalid": "عدد الأولاد مطلوب",
       "blood_type_invalid": "فصيلة الدم غير صالحة",
@@ -211,7 +279,6 @@
       "job_status_note_required": "ملاحظات الحالة الوظيفية مطلوبة",
       "employee_status_id_required": "حالة الموظف مطلوبة",
       "employee_status_note_required": "ملاحظات حالة الموظف مطلوبة",
-
       "appointment_date_invalid": "تاريخ التعيين بصيغة YYYY-MM-DD",
       "contract_type_invalid": "نوع العقد غير صالح",
       "contract_nature_invalid": "طبيعة العقد غير صالحة",
@@ -334,7 +401,7 @@
     }
   },
   "leave": {
-    "add":"إضافة نوع إجازة",
+    "add": "إضافة نوع إجازة",
     "general": "عام",
     "request_limits": "حدود الطلب",
     "toggles": "إعدادات",
@@ -429,5 +496,20 @@
     "unsaved_message": "لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد المغادرة؟",
     "unsaved_leave": "مغادرة",
     "unsaved_stay": "البقاء"
+  },
+  "leave_balance": {
+    "my_balances": "أرصدة الإجازات",
+    "overview": "نظرة عامة",
+    "leave_type": "نوع الإجازة",
+    "accrual_period": "الدورة",
+    "yearly": "سنوي",
+    "monthly": "شهري",
+    "entitled": "مستحق",
+    "consumed": "مستهلك",
+    "available": "متاح",
+    "carried_forward": "مرحل",
+    "adjustment_added": "تعديل +",
+    "adjustment_deducted": "تعديل -",
+    "no_data": "لا توجد أرصدة إجازات"
   }
 }

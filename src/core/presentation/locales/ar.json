@@ -18,8 +18,11 @@
     "archive": "أرشفة",
     "save":"حفظ",
     "cancel": "إلغاء",
+    "change": "تغيير",
+    "confirm": "تأكيد",
     "is_default":"قيمة افتراضية",
     "yes":"نعم",
+    "no":"لا",
     "set_default":"تعيين كافتراضي",
     "set_default_title": "تعيين {entity} كافتراضي",
     "set_default_message": "هل أنت متأكد من تعيين {entity} كافتراضي؟"

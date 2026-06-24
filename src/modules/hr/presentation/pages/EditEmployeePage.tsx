@@ -22,8 +22,8 @@ export function EditEmployeePage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [defaultValues, setDefaultValues] = useState<Partial<EmployeeFormValues> | null>(null);
-  const {getById} = useManageEmployee();
-  
+  const { getById } = useManageEmployee();
+
   useEffect(() => {
     const fetchEmployee = async () => {
       try {
@@ -36,27 +36,27 @@ export function EditEmployeePage() {
             internal_id: emp.internal_id,
             national_id: emp.national_id,
             first_name: emp.first_name,
-            father_name: emp.father_name ,
-            grandfather_name: emp.grandfather_name ,
+            father_name: emp.father_name,
+            grandfather_name: emp.grandfather_name,
             last_name: emp.last_name,
-            mother_name: emp.mother_name ,
+            mother_name: emp.mother_name,
             gender: emp.gender,
-            date_birth: emp.date_birth ,
-            place_birth: emp.place_birth ,
-            assigned_job: emp.assigned_job ,
-            marital_status: emp.marital_status ,
-            number_of_children: emp.number_of_children ,
-            spouse_name: emp.spouse_name ,
-            spouse_workplace: emp.spouse_workplace ,
-            blood_type: emp.blood_type ,
-            phone_number: emp.phone_number ,
-            sham_cash_account: emp.sham_cash_account ,
-            residence_country_id: emp.residence_region?.city?.country?.id ,
-            residence_city_id: emp.residence_region?.city?.id ,
+            date_birth: emp.date_birth,
+            place_birth: emp.place_birth,
+            assigned_job: emp.assigned_job,
+            marital_status: emp.marital_status,
+            number_of_children: emp.number_of_children,
+            spouse_name: emp.spouse_name,
+            spouse_workplace: emp.spouse_workplace,
+            blood_type: emp.blood_type,
+            phone_number: emp.phone_number,
+            sham_cash_account: emp.sham_cash_account,
+            residence_country_id: emp.residence_region?.city?.country?.id,
+            residence_city_id: emp.residence_region?.city?.id,
             residence_region_id: emp.residence_region?.id ?? emp.residence_region_id ?? 0,
-            residential_area_details: emp.residential_area_details ,
-            civil_registry_record: emp.civil_registry_record ,
-            health_status: emp.health_status ,
+            residential_area_details: emp.residential_area_details,
+            civil_registry_record: emp.civil_registry_record,
+            health_status: emp.health_status,
             injury_details: emp.injury_details || null,
             injury_date: emp.injury_date || null,
             chronic_disease_ids: emp.chronic_diseases?.map((d: any) => d.id) || [],
@@ -75,21 +75,21 @@ export function EditEmployeePage() {
 
             educations: emp.educations?.map((edu: any) => ({
               category: edu.category || 'latest',
-              degree_name: edu.degree_name ,
-              university_id: edu.university_id ,
-              faculty_id: edu.faculty_id ,
-              specialization_id: edu.specialization_id ,
+              degree_name: edu.degree_name,
+              university_id: edu.university_id,
+              faculty_id: edu.faculty_id,
+              specialization_id: edu.specialization_id,
               graduation_year: edu.graduation_year,
               academic_stage: edu.academic_stage || null,
               study_status: edu.study_status || null,
             })) || [],
-            job_status_id:  emp.job_status_id || undefined,
+            job_status_id: emp.job_status_id || undefined,
             job_status_note: emp.job_status_note || undefined,
             employee_status_id: emp.employee_status_id || undefined,
             employee_status_note: emp.employee_status_note || undefined,
             children: emp.children?.map((child: any) => ({
               name: child.name,
-              birthdate: child.birthdate ,
+              birthdate: child.birthdate,
             })) || [],
           };
           setDefaultValues(mappedValues);
@@ -137,8 +137,8 @@ export function EditEmployeePage() {
     <div className="space-y-6 max-w-7xl mx-auto pb-10 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => navigate(`/hr/employees/${id}`)}
             leftIcon={<ArrowRight size={18} />}
             className="text-text-muted hover:text-text"
@@ -158,6 +158,7 @@ export function EditEmployeePage() {
       {defaultValues && (
         <div className="bg-card/60 backdrop-blur-sm rounded-2xl p-6 border border-border shadow-sm">
           <EmployeeForm
+            employee_id={Number(id)}
             defaultValues={defaultValues}
             onSubmit={handleSubmit}
             onCancel={() => navigate(`/hr/employees/${id}`)}

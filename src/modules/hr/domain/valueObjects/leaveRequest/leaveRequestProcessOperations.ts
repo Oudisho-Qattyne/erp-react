@@ -1,0 +1,1 @@
+export type LeaveRequestProcessOperations = "approve" | "reject" | "cancel"

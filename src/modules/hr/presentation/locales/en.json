@@ -46,12 +46,74 @@
     },
     "admin": "Admin",
     "hr": "Human Resources Management",
-    "leave_types":{
-      "title":"Leave types Management"
+    "leave_types": {
+      "title": "Leave types Management"
     },
     "leave": {
       "user_eligible_leave_types": "User Eligible Leave Types"
+    },
+    "leave_balance": {
+      "title": "My Leave Balances"
+    },
+    "employee_leave_balances": {
+      "title": "Employee Leave Balances"
+    },
+    "leave_request": {
+      "title": "Leave Requests",
+      "create_title":"Request a leave"
+
+    },
+    "adjust_leave_balance": {
+      "title": "Adjust Leave Balance"
     }
+  },
+  "leave_request": {
+    "my_requests_load_error": "Failed to load leave requests",
+    "employee_requests_load_error": "Failed to load employee leave requests",
+    "request_load_error": "Failed to load leave request",
+    "create_success": "Leave request created successfully",
+    "create_error": "Failed to create leave request",
+    "update_success": "Leave request updated successfully",
+    "update_error": "Failed to update leave request",
+    "process_success": "Leave request processed successfully",
+    "process_error": "Failed to process leave request",
+    "create_title": "Create Leave Request",
+    "select_leave_type": "Select Leave Type",
+    "request_details": "Request Details",
+    "start_date": "Start Date & Time",
+    "end_date": "End Date & Time",
+    "requested_units": "Requested Units",
+    "requested_units_placeholder": "Enter number of units",
+    "reason": "Reason",
+    "reason_placeholder": "Enter the reason for your leave request",
+    "submit": "Submit Request"
+  },
+  "leave_types": {
+    "type_name": "Leave Type",
+    "picker_title": "Select Leave Types",
+    "no_data": "No leave types found",
+    "selected": "selected"
+  },
+  "employee_leave_balances": {
+    "title": "Employee Leave Balances",
+    "select_prompt": "Select an employee to view their leave balances",
+    "select_employee": "Select Employee"
+  },
+  "adjust_leave_balance": {
+    "title": "Adjust Leave Balance",
+    "employees": "Employees",
+    "select_employees": "Select Employees",
+    "select_leave_type": "Select Leave Type",
+    "leave_type_details": "Leave Type Details",
+    "adjustment_details": "Adjustment Details",
+    "adjustment_type": "Adjustment Type",
+    "add": "Add",
+    "subtract": "Subtract",
+    "quantity": "Quantity",
+    "quantity_placeholder": "Enter quantity",
+    "notes": "Notes",
+    "notes_placeholder": "Notes (optional)",
+    "submit": "Adjust Balance"
   },
   "employees": {
     "internal_id": "Internal ID",
@@ -90,12 +152,12 @@
     "health_status": "Health Status",
     "injury_details": "Injury Details",
     "injury_date": "Injury Date",
-    "chronic_diseases" : "Chronic Diseases",
+    "chronic_diseases": "Chronic Diseases",
     "job_status": "Job Status",
     "job_status_note": "Job Status Note",
     "employee_status": "Employee Status",
     "employee_status_id": "Employee Status",
-    "employee_status_note" : "ملاحظة حالة الموظف",
+    "employee_status_note": "ملاحظة حالة الموظف",
     "country": "Country",
     "city": "City",
     "region": "Residential Region",
@@ -116,7 +178,14 @@
     "study_status": "Study Status",
     "degree_name": "Degree Name",
     "children": "Children",
-    "child_name": "Child's Name"
+    "child_name": "Child's Name",
+    "employee_status_logs": "Employee Status Logs",
+    "job_status_logs": "Job Status Logs",
+    "employee_status_logs_load_error": "Failed to load employee status logs",
+    "job_status_logs_load_error": "Failed to load job status logs",
+    "picker_title": "Select Employees",
+    "selected": "selected",
+    "load_error": "Failed to load employees"
   },
   "show_employee": {
     "personal_info": "Personal Information",
@@ -144,6 +213,7 @@
     "status_terminated": "Terminated",
     "status_on_leave": "On Leave",
     "status_unknown": "Unknown",
+    "status_logs": "Status Logs",
     "contract_full_time": "Full Time",
     "contract_part_time": "Part Time",
     "contract_temporary": "Temporary",
@@ -178,7 +248,7 @@
     "add_employee_status": "Add Employee Status",
     "employee_status": "Employee Status",
     "add_org_unit": "Add Organizational Unit",
-    "add_chronic_disease":"Add chronic Disease",
+    "add_chronic_disease": "Add chronic Disease",
     "saving": "Saving...",
     "validation": {
       "category_invalid": "Category must be 'Latest' or 'Previous'",
@@ -197,7 +267,7 @@
       "gender_invalid": "Gender must be male or female",
       "date_birth_invalid": "Date of birth must be in YYYY-MM-DD format",
       "place_birth_required": "Place of birth is required",
-      "assigned_job_required":"Assigned Job Required",
+      "assigned_job_required": "Assigned Job Required",
       "marital_status_invalid": "Invalid marital status",
       "number_of_children_invalid": "Number of children must be positive",
       "blood_type_invalid": "Invalid blood type",
@@ -210,7 +280,6 @@
       "job_status_note_required": "Job status note is required",
       "employee_status_id_required": "Employee status is required",
       "employee_status_note_required": "Employee status note is required",
-    "employee_status_note_required" : "Employee status note is required",
       "appointment_date_invalid": "Appointment date must be in YYYY-MM-DD format",
       "contract_type_invalid": "Invalid contract type",
       "contract_nature_invalid": "Invalid contract nature",
@@ -333,7 +402,7 @@
     }
   },
   "leave": {
-    "add":"Add leave type",
+    "add": "Add leave type",
     "general": "General",
     "request_limits": "Request Limits",
     "toggles": "Settings",
@@ -428,5 +497,20 @@
     "unsaved_message": "You have unsaved changes. Are you sure you want to leave?",
     "unsaved_leave": "Leave",
     "unsaved_stay": "Stay"
+  },
+  "leave_balance": {
+    "my_balances": "My Leave Balances",
+    "overview": "Overview",
+    "leave_type": "Leave Type",
+    "accrual_period": "Period",
+    "yearly": "Yearly",
+    "monthly": "Monthly",
+    "entitled": "Entitled",
+    "consumed": "Consumed",
+    "available": "Available",
+    "carried_forward": "Carried Forward",
+    "adjustment_added": "Adj +",
+    "adjustment_deducted": "Adj -",
+    "no_data": "No leave balances found"
   }
 }

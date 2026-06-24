@@ -36,7 +36,7 @@ export interface FormInputProps<T extends FieldValues> {
   step?: number;
   // For select-or-create
   createTitle?: string;
-  labelPath?:string;
+  labelPath?: string;
   renderCreateForm?: (
     onSuccess: (value: number | string, item?: unknown) => void,
     onCancel: () => void,
@@ -52,6 +52,7 @@ export interface FormInputProps<T extends FieldValues> {
   // Dependency
   dependsOn?: Path<T>[];
   compute?: (values: Record<Path<T>, any>) => ComputedProps | Promise<ComputedProps>;
+  infoButton?: () => void
 }
 
 export function FormInput<T extends FieldValues>({
@@ -81,6 +82,7 @@ export function FormInput<T extends FieldValues>({
   rowSchema,
   dependsOn = [],
   compute,
+  infoButton
 }: FormInputProps<T>) {
   const { t, direction } = useLanguage();
   const { setValue, watch, getValues, control } = useFormContext<T>();
@@ -134,6 +136,7 @@ export function FormInput<T extends FieldValues>({
       <div className={`w-full mb-4 ${className || ''}`}>
         <label htmlFor={name} className="flex items-center gap-2 cursor-pointer">
           <Input
+            infoButton={infoButton}
             type="checkbox"
             value={finalValue}
             onChange={handleChange}
@@ -183,6 +186,8 @@ export function FormInput<T extends FieldValues>({
         </label>
       )}
       <Input
+            infoButton={infoButton}
+
         type={type}
         value={finalValue}
         onChange={handleChange}
