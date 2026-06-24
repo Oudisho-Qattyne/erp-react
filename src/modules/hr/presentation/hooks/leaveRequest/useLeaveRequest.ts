@@ -30,11 +30,11 @@ export interface UseLeaveRequestReturn {
   hasErrors: () => boolean
   pagination: { currentPage: number; lastPage: number; total: number; hasMore: boolean }
   filter: FilterLeaveRequestDto
-  setFilter: (patch: Partial<FilterLeaveRequestDto>) => void
+  setFilter: (patch: Partial<FilterLeaveRequestDto> | ((prev: FilterLeaveRequestDto) => FilterLeaveRequestDto)) => void
   resetFilter: () => void
   clearError: () => void
   findAllMyLeaveRequests: () => Promise<void>
-  findAllEmployeeLeaveRequests: (employeeId: number) => Promise<void>
+  findAllEmployeeLeaveRequests: (employeeId?: number) => Promise<void>
   findLeaveRequestById: (id: number) => Promise<void>
   createLeaveRequest: (data: CreateLeaveRequestDto) => Promise<void>
   updateLeaveRequest: (id: number, data: UpdateLeaveRequestDto) => Promise<void>
@@ -63,8 +63,8 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
 
   const clearError = useCallback(() => setError(initRecord(null)), [])
 
-  const setFilter = useCallback((patch: Partial<FilterLeaveRequestDto>) => {
-    setFilterState((prev) => ({ ...prev, ...patch }))
+  const setFilter = useCallback((patch: Partial<FilterLeaveRequestDto> | ((prev: FilterLeaveRequestDto) => FilterLeaveRequestDto)) => {
+    setFilterState((prev) => typeof patch === "function" ? patch(prev) : { ...prev, ...patch })
   }, [])
 
   const resetFilter = useCallback(() => setFilterState(DEFAULT_FILTER), [])
@@ -98,11 +98,11 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
     }
   }, [useCase, filter, t])
 
-  const findAllEmployeeLeaveRequests = useCallback(async (employeeId: number) => {
+  const findAllEmployeeLeaveRequests = useCallback(async (employeeId?: number) => {
     setFnLoading("findAllEmployeeLeaveRequests", true)
     setFnError("findAllEmployeeLeaveRequests", null)
     try {
-      const res = await useCase.findAllEmployeeLeaveRequests({ ...filter, employee_id: employeeId })
+      const res = await useCase.findAllEmployeeLeaveRequests({ ...filter, ...(employeeId !== undefined ? { employee_id: employeeId } : {}) })
       setEmployeeLeaveRequests(res.data)
       setPagination({
         currentPage: res.currentPage || 1,
@@ -185,9 +185,7 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])
 
-  useEffect(() => {
-    findAllMyLeaveRequests()
-  }, [filter])
+
 
   return {
     myLeaveRequests,

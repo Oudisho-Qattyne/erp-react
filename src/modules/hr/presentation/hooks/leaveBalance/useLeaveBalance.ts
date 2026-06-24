@@ -28,11 +28,11 @@ export interface UseLeaveBalanceReturn {
   hasErrors: () => boolean
   pagination: { currentPage: number; lastPage: number; total: number; hasMore: boolean }
   filter: FilterLeaveBalancesDto
-  setFilter: (patch: Partial<FilterLeaveBalancesDto>) => void
+  setFilter: (patch: Partial<FilterLeaveBalancesDto> | ((prev: FilterLeaveBalancesDto) => FilterLeaveBalancesDto)) => void
   resetFilter: () => void
   clearError: () => void
   findAllMyLeaveBalances: () => Promise<void>
-  findAllEmployeeLeaveBalances: (employeeId: number) => Promise<void>
+  findAllEmployeeLeaveBalances: (employeeId?: number) => Promise<void>
   adjustLeaveBalance: (adjust: AdjustLeaveBalanceDto) => Promise<void>
   setSearch: (search: string) => void
   setPage: (page: number) => void
@@ -57,8 +57,8 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
 
   const clearError = useCallback(() => setError(initRecord(null)), [])
 
-  const setFilter = useCallback((patch: Partial<FilterLeaveBalancesDto>) => {
-    setFilterState((prev) => ({ ...prev, ...patch }))
+  const setFilter = useCallback((patch: Partial<FilterLeaveBalancesDto> | ((prev: FilterLeaveBalancesDto) => FilterLeaveBalancesDto)) => {
+    setFilterState((prev) => typeof patch === "function" ? patch(prev) : { ...prev, ...patch })
   }, [])
 
   const resetFilter = useCallback(() => setFilterState(DEFAULT_FILTER), [])
@@ -92,7 +92,7 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
     }
   }, [useCase, filter, language])
 
-  const findAllEmployeeLeaveBalances = useCallback(async (employeeId: number) => {
+  const findAllEmployeeLeaveBalances = useCallback(async (employeeId?: number) => {
     setFnLoading("findAllEmployeeLeaveBalances", true)
     setFnError("findAllEmployeeLeaveBalances", null)
     try {

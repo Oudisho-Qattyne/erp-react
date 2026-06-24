@@ -16,7 +16,8 @@ interface LeaveTypePickerDialogProps {
     onClose: () => void
     onConfirm: (selected: EntityWithNameOnly[]) => void
     multiple?: boolean
-    initialSelected?: EntityWithNameOnly[]
+    initialSelected?: EntityWithNameOnly[],
+    eligible?:boolean
 }
 
 export function LeaveTypePickerDialog({
@@ -25,9 +26,10 @@ export function LeaveTypePickerDialog({
     onConfirm,
     multiple = false,
     initialSelected = [],
+    eligible = false
 }: LeaveTypePickerDialogProps) {
     const { t, language } = useLanguage()
-    const { items: leaveTypes, loading, error, pagination, filter, setSearch, setPage, setFilter, resetFilter } = useLeaveTypes()
+    const { items: leaveTypes, userEligibleLeaveTypes, loading ,isLoading, error, pagination, filter, setSearch, setPage, setFilter, resetFilter , findUserEligibleLeaveTypes } = useLeaveTypes()
 
     const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(initialSelected.map((e) => e.id))
     const [isFilterOpen, setIsFilterOpen] = useState(false)
@@ -38,7 +40,11 @@ export function LeaveTypePickerDialog({
             setSelectedKeys(initialSelected.map((e) => e.id))
         }
     }, [isOpen, initialSelected])
-
+    useEffect(() => {
+        if(eligible){
+            findUserEligibleLeaveTypes()
+        }
+    } ,[])
     const filterFields: FilterField[] = []
 
     const handleApplyFilter = (values: Record<string, any>) => {
@@ -53,7 +59,7 @@ export function LeaveTypePickerDialog({
     }
 
     const handleConfirm = () => {
-        const selected = leaveTypes.filter((e) => selectedKeys.includes(e.id))
+        const selected = (eligible ? userEligibleLeaveTypes : leaveTypes).filter((e) => selectedKeys.includes(e.id))
         onConfirm(selected)
         onClose()
     }
@@ -112,14 +118,14 @@ export function LeaveTypePickerDialog({
                     </Button>
                 </div>
 
-                {loading.findAll && <LoadingState />}
-                {error.findAll && !loading.findAll && (
+                {isLoading() && <LoadingState />}
+                {error.findAll && !isLoading() && (
                     <ErrorState message={error.findAll} onRetry={() => { }} />
                 )}
-                {!loading.findAll && !error.findAll && (
+                {!isLoading() && !error.findAll && (
                     <DataTable
                         columns={columns}
-                        data={leaveTypes}
+                        data={(eligible ? userEligibleLeaveTypes : leaveTypes)}
                         rowKey="id"
                         selectable={multiple || undefined}
                         selectedRows={multiple ? selectedKeys : undefined}

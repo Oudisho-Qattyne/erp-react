@@ -60,7 +60,11 @@
     },
     "leave_request": {
       "title": "طلبات الإجازة",
-      "create_title":"طلب إجازة"
+      "create_title": "طلب إجازة",
+      "edit_title": "تعديل طلب الإجازة"
+    },
+    "employee_leave_requests": {
+      "title": "طلبات إجازة الموظفين"
     },
     "adjust_leave_balance": {
     "title": "تعديل رصيد الإجازات"
@@ -77,14 +81,40 @@
     "process_success": "تمت معالجة طلب الإجازة بنجاح",
     "process_error": "فشلت معالجة طلب الإجازة",
     "create_title": "إنشاء طلب إجازة",
+    "edit_title": "تعديل طلب الإجازة",
     "select_leave_type": "اختيار نوع الإجازة",
     "request_details": "تفاصيل الطلب",
     "start_date": "تاريخ ووقت البداية",
     "end_date": "تاريخ ووقت النهاية",
     "requested_units": "عدد الوحدات المطلوبة",
     "requested_units_placeholder": "أدخل عدد الوحدات",
+    "my_requests": "طلبات الإجازة الخاصة بي",
+    "new_request": "طلب جديد",
+    "no_data": "لا توجد طلبات إجازة",
+    "leave_type": "نوع الإجازة",
+    "status": "الحالة",
+    "units": "الوحدات",
+    "status_draft": "مسودة",
+    "status_pending": "قيد الانتظار",
+    "status_approved": "تمت الموافقة",
+    "status_rejected": "مرفوض",
+    "status_cancelled": "ملغي",
+    "cancelled_by_user": "ملغي من قبل المستخدم",
+    "cancel_confirm_title": "إلغاء طلب الإجازة",
+    "cancel_confirm_message": "هل أنت متأكد من إلغاء طلب الإجازة؟",
+    "approve": "موافقة",
+    "reject": "رفض",
+    "approve_confirm_title": "الموافقة على طلب الإجازة",
+    "approve_confirm_message": "هل أنت متأكد من الموافقة على طلب الإجازة؟",
+    "reject_confirm_title": "رفض طلب الإجازة",
+    "reject_confirm_message": "هل أنت متأكد من رفض طلب الإجازة؟",
+    "from_date": "من تاريخ",
+    "to_date": "إلى تاريخ",
+    "employee_name": "الموظف",
     "reason": "السبب",
     "reason_placeholder": "أدخل سبب طلب الإجازة",
+    "review_notes": "ملاحظات المراجعة",
+    "review_notes_placeholder": "أدخل ملاحظات المراجعة...",
     "submit": "إرسال الطلب"
   },
   "leave_types": {
@@ -511,5 +541,10 @@
     "adjustment_added": "تعديل +",
     "adjustment_deducted": "تعديل -",
     "no_data": "لا توجد أرصدة إجازات"
+  },
+  "employee_leave_requests": {
+    "title": "طلبات إجازة الموظفين",
+    "select_prompt": "اختر موظفاً لعرض طلبات إجازته",
+    "select_employee": "اختر موظفاً"
   }
 }

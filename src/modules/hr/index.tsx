@@ -25,6 +25,8 @@ import { UserEligibleLeaveTypes } from './presentation/pages/leaves/UserEligible
 import { UserLeaveBalances } from './presentation/pages/leaveBalances/UserLeaveBalances'
 import { EmployeeLeaveBalances } from './presentation/pages/leaveBalances/EmployeeLeaveBalances'
 import { CreateLeaveRequest } from './presentation/pages/leaveRequest/CreateLeaveRequest'
+import { UserLeaveRequests } from './presentation/pages/leaveRequest/UseLeaveRequests'
+import { EmployeeLeaveRequests } from './presentation/pages/leaveRequest/EmployeeLeaveRequests'
 import { AdjustEmployeesLeaveBalance } from './presentation/pages/leaveBalances/AdjustEmployeesLeaveBalance'
 
 const usersModule: Module = {
@@ -101,14 +103,45 @@ const usersModule: Module = {
       requiresAuth: true,
     },
     {
+      path: '/hr/my-leave-requests',
+      element: <UserLeaveRequests />,
+      layout: 'dashboard',
+      label: 'leave_request.title',
+      nav: true,
+      order: 23,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'hr',
+      requiresAuth: true,
+    },
+    {
+      path: '/hr/employee-leave-requests',
+      element: <EmployeeLeaveRequests />,
+      layout: 'dashboard',
+      label: 'employee_leave_requests.title',
+      nav: true,
+      order: 24,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'hr',
+      requiresAuth: true,
+    },
+    {
       path: '/hr/leave-requests/create',
       element: <CreateLeaveRequest />,
       layout: 'dashboard',
       label: 'leave_request.create_title',
-      nav: true,
+      nav: false,
       moduleName: 'hr',
-      icon: <Users size={18} />,
-      group: 'hr',
+      requiresAuth: true,
+    },
+    {
+      path: '/hr/leave-requests/:id/edit',
+      element: <CreateLeaveRequest />,
+      layout: 'dashboard',
+      label: 'leave_request.edit_title',
+      nav: false,
+      moduleName: 'hr',
       requiresAuth: true,
     },
     {
