@@ -606,7 +606,7 @@ export function EmployeeForm({
     {
       name: 'employee_status_id', type: 'select-or-create', searchable: true, label: t('employees.employee_status_id', 'hr') || 'Employee Status',
       labelPath: 'data.name',
-      infoButton:employee_id ? () => { setStatusLogsOpen(true) } : null,
+      infoButton:employee_id ? () => { setStatusLogsOpen(true) } : undefined,
       renderCreateForm: (onSuccess, onCancel) => <EmployeeStatusCreateForm onSuccess={(v, i) => {
         onSuccess(v, i)
       }} onCancel={onCancel} />,
@@ -671,7 +671,7 @@ export function EmployeeForm({
       searchable: true,
       labelPath: 'data.name',
       type: 'select-or-create',
-      infoButton:employee_id ? () => { setJobStatusLogsOpen(true) } : null,
+      infoButton:employee_id ? () => { setJobStatusLogsOpen(true) } : undefined,
       renderCreateForm: (onSuccess, onCancel) => <JobStatusCreateForm onSuccess={onSuccess} onCancel={onCancel} />,
       compute: async (values) => {
         const response = await loadJobStatus();

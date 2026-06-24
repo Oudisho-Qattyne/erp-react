@@ -37,7 +37,7 @@ export const EmployeeLeaveBalances = () => {
     }
 
     const filterFields: FilterField[] = [
-        { name: "leave_type_id", label: t("leave_balance.leave_type", "hr") || "Leave Type", type: "select", options: leaveTypes.map((lt) => ({ value: String(lt.id), label: typeof lt.name == "string" ? lt.name : lt.name.ar })) },
+        { name: "leave_type_id", label: t("leave_balance.leave_type", "hr") || "Leave Type", type: "select", options: leaveTypes.map((lt) => ({ value: String(lt.id), label: typeof lt.name == "string" ? lt.name : lt.name.ar? lt.name.ar : "" })) },
     ]
 
     const handleApplyFilter = (values: Record<string, any>) => {

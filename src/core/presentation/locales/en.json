@@ -22,6 +22,7 @@
     "confirm": "Confirm",
     "is_default":"Default value",
     "yes":"Yes",
+    "no":"No",
     "set_default":"Set as default",
     "set_default_title": "Set as default {entity}",
     "set_default_message": "Are you sure you want to set this {entity} as default?"

@@ -201,7 +201,7 @@ const Input: React.FC<InputProps> = (props) => {
     <InputTypes {...props} />
     {
       props.infoButton &&
-      <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => props.infoButton()} />
+      <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => props.infoButton ? props.infoButton() : undefined} />
     }
   </div>
 }

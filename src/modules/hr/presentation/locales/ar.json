@@ -46,8 +46,8 @@
     },
     "admin": "الإدارة العامة",
     "hr": " إدارة الموارد البشرية",
-    "leave_types":{
-      "title":"إدارة أنواع الإجازات"
+    "leave_types": {
+      "title": "إدارة أنواع الإجازات"
     },
     "leave": {
       "user_eligible_leave_types": "أنواع الإجازات المستحقة"
@@ -56,10 +56,32 @@
       "title": "أرصدة الإجازات"
     },
     "employee_leave_balances": {
-      "title": "أرصدة إجازات الموظفين",
-      "select_prompt": "اختر موظفاً لعرض أرصدة إجازاته",
-      "select_employee": "اختيار موظف"
+      "title": "أرصدة إجازات الموظفين"
+    },
+    "adjust_leave_balance": {
+      "title": "تعديل رصيد الإجازات"
     }
+  },
+  "employee_leave_balances": {
+    "title": "أرصدة إجازات الموظفين",
+    "select_prompt": "اختر موظفاً لعرض أرصدة إجازاته",
+    "select_employee": "اختيار موظف"
+  },
+  "adjust_leave_balance": {
+    "title": "تعديل رصيد الإجازات",
+    "employees": "الموظفين",
+    "select_employees": "اختيار موظفين",
+    "select_leave_type": "اختيار نوع الإجازة",
+    "leave_type_details": "تفاصيل نوع الإجازة",
+    "adjustment_details": "تفاصيل التعديل",
+    "adjustment_type": "نوع التعديل",
+    "add": "إضافة",
+    "subtract": "خصم",
+    "quantity": "الكمية",
+    "quantity_placeholder": "أدخل الكمية",
+    "notes": "ملاحظات",
+    "notes_placeholder": "ملاحظات (اختياري)",
+    "submit": "تعديل الرصيد"
   },
   "employees": {
     "internal_id": "الرقم الداخلي",
@@ -98,12 +120,12 @@
     "health_status": "الحالة الصحية",
     "injury_details": "تفاصيل الإصابة",
     "injury_date": "تاريخ الإصابة",
-    "chronic_diseases" : "الأمراض المزمنة",
+    "chronic_diseases": "الأمراض المزمنة",
     "job_status": "الحالة الوظيفية",
     "job_status_note": "ملاحظات الحالة الوظيفية",
     "employee_status": "حالة الموظف",
     "employee_status_id": "حالة الموظف",
-    "employee_status_note" : "ملاحظة حالة الموظف",
+    "employee_status_note": "ملاحظة حالة الموظف",
     "country": "الدولة",
     "city": "المدينة",
     "region": "منطقة السكن",
@@ -194,8 +216,7 @@
     "add_employee_status": "إضافة حالة موظف",
     "employee_status": "حالة الموظف",
     "add_org_unit": "إضافة وحدة تنظيمية",
-    "add_chronic_disease":"إضافة مرض مزمن",
-
+    "add_chronic_disease": "إضافة مرض مزمن",
     "saving": "جاري...",
     "validation": {
       "category_invalid": "يجب أن يكون التصنيف \"أحدث\" أو \"سابقة\"",
@@ -214,7 +235,7 @@
       "gender_invalid": "الجنس يجب أن يكون ذكراً أو أنثى",
       "date_birth_invalid": "تاريخ الميلاد بصيغة YYYY-MM-DD",
       "place_birth_required": "مكان الميلاد مطلوب",
-      "assigned_job_required":"العمل المكلف به مطلوب",
+      "assigned_job_required": "العمل المكلف به مطلوب",
       "marital_status_invalid": "الحالة الاجتماعية غير صالحة",
       "number_of_children_invalid": "عدد الأولاد مطلوب",
       "blood_type_invalid": "فصيلة الدم غير صالحة",
@@ -227,7 +248,6 @@
       "job_status_note_required": "ملاحظات الحالة الوظيفية مطلوبة",
       "employee_status_id_required": "حالة الموظف مطلوبة",
       "employee_status_note_required": "ملاحظات حالة الموظف مطلوبة",
-
       "appointment_date_invalid": "تاريخ التعيين بصيغة YYYY-MM-DD",
       "contract_type_invalid": "نوع العقد غير صالح",
       "contract_nature_invalid": "طبيعة العقد غير صالحة",
@@ -350,7 +370,7 @@
     }
   },
   "leave": {
-    "add":"إضافة نوع إجازة",
+    "add": "إضافة نوع إجازة",
     "general": "عام",
     "request_limits": "حدود الطلب",
     "toggles": "إعدادات",

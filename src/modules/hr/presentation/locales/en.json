@@ -46,8 +46,8 @@
     },
     "admin": "Admin",
     "hr": "Human Resources Management",
-    "leave_types":{
-      "title":"Leave types Management"
+    "leave_types": {
+      "title": "Leave types Management"
     },
     "leave": {
       "user_eligible_leave_types": "User Eligible Leave Types"
@@ -56,10 +56,32 @@
       "title": "My Leave Balances"
     },
     "employee_leave_balances": {
-      "title": "Employee Leave Balances",
-      "select_prompt": "Select an employee to view their leave balances",
-      "select_employee": "Select Employee"
+      "title": "Employee Leave Balances"
+    },
+    "adjust_leave_balance": {
+      "title": "Adjust Leave Balance"
     }
+  },
+  "employee_leave_balances": {
+    "title": "Employee Leave Balances",
+    "select_prompt": "Select an employee to view their leave balances",
+    "select_employee": "Select Employee"
+  },
+  "adjust_leave_balance": {
+    "title": "Adjust Leave Balance",
+    "employees": "Employees",
+    "select_employees": "Select Employees",
+    "select_leave_type": "Select Leave Type",
+    "leave_type_details": "Leave Type Details",
+    "adjustment_details": "Adjustment Details",
+    "adjustment_type": "Adjustment Type",
+    "add": "Add",
+    "subtract": "Subtract",
+    "quantity": "Quantity",
+    "quantity_placeholder": "Enter quantity",
+    "notes": "Notes",
+    "notes_placeholder": "Notes (optional)",
+    "submit": "Adjust Balance"
   },
   "employees": {
     "internal_id": "Internal ID",
@@ -98,12 +120,12 @@
     "health_status": "Health Status",
     "injury_details": "Injury Details",
     "injury_date": "Injury Date",
-    "chronic_diseases" : "Chronic Diseases",
+    "chronic_diseases": "Chronic Diseases",
     "job_status": "Job Status",
     "job_status_note": "Job Status Note",
     "employee_status": "Employee Status",
     "employee_status_id": "Employee Status",
-    "employee_status_note" : "ملاحظة حالة الموظف",
+    "employee_status_note": "ملاحظة حالة الموظف",
     "country": "Country",
     "city": "City",
     "region": "Residential Region",
@@ -194,7 +216,7 @@
     "add_employee_status": "Add Employee Status",
     "employee_status": "Employee Status",
     "add_org_unit": "Add Organizational Unit",
-    "add_chronic_disease":"Add chronic Disease",
+    "add_chronic_disease": "Add chronic Disease",
     "saving": "Saving...",
     "validation": {
       "category_invalid": "Category must be 'Latest' or 'Previous'",
@@ -213,7 +235,7 @@
       "gender_invalid": "Gender must be male or female",
       "date_birth_invalid": "Date of birth must be in YYYY-MM-DD format",
       "place_birth_required": "Place of birth is required",
-      "assigned_job_required":"Assigned Job Required",
+      "assigned_job_required": "Assigned Job Required",
       "marital_status_invalid": "Invalid marital status",
       "number_of_children_invalid": "Number of children must be positive",
       "blood_type_invalid": "Invalid blood type",
@@ -348,7 +370,7 @@
     }
   },
   "leave": {
-    "add":"Add leave type",
+    "add": "Add leave type",
     "general": "General",
     "request_limits": "Request Limits",
     "toggles": "Settings",

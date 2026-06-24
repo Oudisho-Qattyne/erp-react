@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nProvider"
 import { useLeaveTypes } from "../../hooks/leave/useLeaveTypes"
+import { useLeaveTypeLocalization } from "../../hooks/leave/useLeaveTypeLocalization"
 import { Button } from "../../../../../core/presentation/layouts/ui/buttons/Button"
 import { LoadingState } from "../../../../../core/presentation/layouts/ui/state/LoadingState"
 import { ErrorState } from "../../../../../core/presentation/layouts/ui/state/ErrorState"
@@ -32,6 +33,7 @@ export function ShowLeaveTypePage() {
   const navigate = useNavigate()
   const { t, direction } = useLanguage()
   const { currentLeave, findById, loading, error } = useLeaveTypes()
+  const { getLeaveLabel } = useLeaveTypeLocalization()
 
   useEffect(() => {
     if (id) findById(Number(id))
@@ -63,16 +65,6 @@ export function ShowLeaveTypePage() {
       employee_contract_type: t("rules.fields.employee_contract_type", "hr"),
     }
     return labels[field] || field
-  }
-
-  const labelMap: Record<string, string> = {
-    balance_mode: t("leave.balance_" + leave.balance_mode, "hr"),
-    accrual_period: t("leave.accrual_" + leave.accrual_period, "hr"),
-    proration_basis: t("leave.proration_" + leave.proration_rules.basis, "hr"),
-    proration_calculation: t("leave.proration_" + leave.proration_rules.calculation, "hr"),
-    proration_rounding: t("leave.proration_rounding_" + leave.proration_rules.rounding, "hr"),
-    unit_day: t("leave.unit_day", "hr"),
-    unit_hour: t("leave.unit_hour", "hr"),
   }
 
   return (
@@ -115,7 +107,7 @@ export function ShowLeaveTypePage() {
           <div className="space-y-4">
             <InfoRow label={t("leave.name", "hr")} value={leave.name as string} />
             <InfoRow label={t("leave.description", "hr")} value={leave.description} />
-            <InfoRow label={t("leave.unit", "hr")} value={leave.unit === "day" ? t("leave.unit_day", "hr") : t("leave.unit_hour", "hr")} />
+            <InfoRow label={t("leave.unit", "hr")} value={getLeaveLabel(leave, "unit")} />
             <InfoRow label={t("leave.min_request_units", "hr")} value={leave.min_request_units} />
             <InfoRow label={t("leave.max_request_units", "hr")} value={leave.max_request_units} />
           </div>
@@ -143,8 +135,8 @@ export function ShowLeaveTypePage() {
             {t("leave.balance", "hr")}
           </h2>
           <div className="space-y-4">
-            <InfoRow label={t("leave.balance_mode", "hr")} value={labelMap.balance_mode} />
-            <InfoRow label={t("leave.accrual_period", "hr")} value={labelMap.accrual_period} />
+            <InfoRow label={t("leave.balance_mode", "hr")} value={getLeaveLabel(leave, "balance_mode")} />
+            <InfoRow label={t("leave.accrual_period", "hr")} value={getLeaveLabel(leave, "accrual_period")} />
             <InfoRow label={t("leave.allow_carry_forward", "hr")} value={<YesNo value={leave.allow_carry_forward} />} />
             {leave.allow_carry_forward && (
               <InfoRow label={t("leave.carry_forward_limit", "hr")} value={leave.carry_forward_limit} />
@@ -157,9 +149,9 @@ export function ShowLeaveTypePage() {
             {t("leave.proration_rules", "hr")}
           </h2>
           <div className="space-y-4">
-            <InfoRow label={t("leave.proration_basis", "hr")} value={labelMap.proration_basis} />
-            <InfoRow label={t("leave.proration_calculation", "hr")} value={labelMap.proration_calculation} />
-            <InfoRow label={t("leave.proration_rounding", "hr")} value={labelMap.proration_rounding} />
+            <InfoRow label={t("leave.proration_basis", "hr")} value={getLeaveLabel(leave, "proration_basis")} />
+            <InfoRow label={t("leave.proration_calculation", "hr")} value={getLeaveLabel(leave, "proration_calculation")} />
+            <InfoRow label={t("leave.proration_rounding", "hr")} value={getLeaveLabel(leave, "proration_rounding")} />
           </div>
         </div>
       </div>
@@ -188,7 +180,7 @@ export function ShowLeaveTypePage() {
               />
               <InfoRow
                 label={t("leave.grant_unit", "hr")}
-                value={(leave.entitlement_rules as FixedGrantCase).grant.unit === "day" ? labelMap.unit_day : labelMap.unit_hour}
+                value={getLeaveLabel(leave, "unit")}
               />
             </div>
           )}
@@ -200,7 +192,7 @@ export function ShowLeaveTypePage() {
                   <RuleGroupComponent value={band.rule} onChange={() => {}} fields={eligibilityFields} disabled />
                   <div className="flex gap-4">
                     <InfoRow label={t("leave.grant_value", "hr")} value={band.grant.value} />
-                    <InfoRow label={t("leave.grant_unit", "hr")} value={band.grant.unit === "day" ? labelMap.unit_day : labelMap.unit_hour} />
+                    <InfoRow label={t("leave.grant_unit", "hr")} value={getLeaveLabel(leave, "unit")} />
                   </div>
                 </div>
               ))}
