@@ -134,7 +134,7 @@ export function EmployeePickerDialog({
             selectable={multiple || undefined}
             selectedRows={multiple ? selectedKeys : undefined}
             onSelectionChange={multiple ? setSelectedKeys : undefined}
-            onRowClick={handleRowClick}
+            onRowClick={multiple ? undefined :handleRowClick}
             pagination={{
               page: pagination.currentPage,
               totalPages: pagination.lastPage,

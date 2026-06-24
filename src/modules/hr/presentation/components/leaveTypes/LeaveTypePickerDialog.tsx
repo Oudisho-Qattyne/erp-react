@@ -79,7 +79,7 @@ export function LeaveTypePickerDialog({
             isOpen={isOpen}
             onClose={onClose}
             title={t("leave_types.picker_title", "hr") || "Select Leave Types"}
-            size="md"
+            size="2xl"
             actions={
                 <div className="flex items-center justify-end gap-3 w-full">
                     <Button variant="outline" onClick={onClose}>

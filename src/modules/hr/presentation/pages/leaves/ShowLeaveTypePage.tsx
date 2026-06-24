@@ -6,27 +6,13 @@ import { useLeaveTypeLocalization } from "../../hooks/leave/useLeaveTypeLocaliza
 import { Button } from "../../../../../core/presentation/layouts/ui/buttons/Button"
 import { LoadingState } from "../../../../../core/presentation/layouts/ui/state/LoadingState"
 import { ErrorState } from "../../../../../core/presentation/layouts/ui/state/ErrorState"
+import { SectionCard } from "../../../../../core/presentation/layouts/ui/card/SectionCard"
+import { InfoRow } from "../../../../../core/presentation/layouts/ui/card/InfoRow"
+import { YesNo } from "../../../../../core/presentation/layouts/ui/card/YesNo"
 import { RuleGroupComponent } from "../../components/leaveRules/RuleGroupComponent"
-import { ArrowRight, CheckCircle, XCircle } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import type { Leave, Band, FixedGrantCase } from "../../../domain/entities/leave/leave"
 import { getEligibilityFields } from "../../utils/RulesFields"
-
-function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="text-sm text-text-muted">{label}</span>
-      <span className="text-base font-medium text-text">
-        {value ?? <span className="text-text-muted/50 italic">—</span>}
-      </span>
-    </div>
-  )
-}
-
-function YesNo({ value }: { value: boolean }) {
-  return value
-    ? <span className="inline-flex items-center gap-1 text-success"><CheckCircle size={16} /> Yes</span>
-    : <span className="inline-flex items-center gap-1 text-text-muted"><XCircle size={16} /> No</span>
-}
 
 export function ShowLeaveTypePage() {
   const { id } = useParams<{ id: string }>()
@@ -100,10 +86,7 @@ export function ShowLeaveTypePage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border shadow-sm">
-          <h2 className="text-lg font-bold text-text mb-4 pb-3 border-b border-border/50">
-            {t("leave.general", "hr")}
-          </h2>
+        <SectionCard title={t("leave.general", "hr")}>
           <div className="space-y-4">
             <InfoRow label={t("leave.name", "hr")} value={leave.name as string} />
             <InfoRow label={t("leave.description", "hr")} value={leave.description} />
@@ -111,12 +94,9 @@ export function ShowLeaveTypePage() {
             <InfoRow label={t("leave.min_request_units", "hr")} value={leave.min_request_units} />
             <InfoRow label={t("leave.max_request_units", "hr")} value={leave.max_request_units} />
           </div>
-        </div>
+        </SectionCard>
 
-        <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border shadow-sm">
-          <h2 className="text-lg font-bold text-text mb-4 pb-3 border-b border-border/50">
-            {t("leave.toggles", "hr")}
-          </h2>
+        <SectionCard title={t("leave.toggles", "hr")}>
           <div className="grid grid-cols-2 gap-4">
             <InfoRow label={t("leave.is_paid", "hr")} value={<YesNo value={leave.is_paid} />} />
             <InfoRow label={t("leave.requires_attachment", "hr")} value={<YesNo value={leave.requires_attachment} />} />
@@ -126,14 +106,11 @@ export function ShowLeaveTypePage() {
             <InfoRow label={t("leave.allow_split", "hr")} value={<YesNo value={leave.allow_split} />} />
             <InfoRow label={t("leave.is_active", "hr")} value={<YesNo value={leave.is_active} />} />
           </div>
-        </div>
+        </SectionCard>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border shadow-sm">
-          <h2 className="text-lg font-bold text-text mb-4 pb-3 border-b border-border/50">
-            {t("leave.balance", "hr")}
-          </h2>
+        <SectionCard title={t("leave.balance", "hr")}>
           <div className="space-y-4">
             <InfoRow label={t("leave.balance_mode", "hr")} value={getLeaveLabel(leave, "balance_mode")} />
             <InfoRow label={t("leave.accrual_period", "hr")} value={getLeaveLabel(leave, "accrual_period")} />
@@ -142,31 +119,22 @@ export function ShowLeaveTypePage() {
               <InfoRow label={t("leave.carry_forward_limit", "hr")} value={leave.carry_forward_limit} />
             )}
           </div>
-        </div>
+        </SectionCard>
 
-        <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border shadow-sm">
-          <h2 className="text-lg font-bold text-text mb-4 pb-3 border-b border-border/50">
-            {t("leave.proration_rules", "hr")}
-          </h2>
+        <SectionCard title={t("leave.proration_rules", "hr")}>
           <div className="space-y-4">
             <InfoRow label={t("leave.proration_basis", "hr")} value={getLeaveLabel(leave, "proration_basis")} />
             <InfoRow label={t("leave.proration_calculation", "hr")} value={getLeaveLabel(leave, "proration_calculation")} />
             <InfoRow label={t("leave.proration_rounding", "hr")} value={getLeaveLabel(leave, "proration_rounding")} />
           </div>
-        </div>
+        </SectionCard>
       </div>
 
-      <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border shadow-sm">
-        <h2 className="text-lg font-bold text-text mb-4 pb-3 border-b border-border/50">
-          {t("leave.eligibility_rules", "hr")}
-        </h2>
+      <SectionCard title={t("leave.eligibility_rules", "hr")}>
         <RuleGroupComponent value={leave.eligibility_rules} onChange={() => {}} fields={eligibilityFields} disabled />
-      </div>
+      </SectionCard>
 
-      <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border shadow-sm">
-        <h2 className="text-lg font-bold text-text mb-4 pb-3 border-b border-border/50">
-          {t("leave.entitlement_rules", "hr")}
-        </h2>
+      <SectionCard title={t("leave.entitlement_rules", "hr")}>
         <div className="space-y-4">
           <InfoRow
             label={t("leave.entitlement_type", "hr")}
@@ -199,7 +167,7 @@ export function ShowLeaveTypePage() {
             </div>
           )}
         </div>
-      </div>
+      </SectionCard>
     </div>
   )
 }

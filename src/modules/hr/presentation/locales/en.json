@@ -58,9 +58,41 @@
     "employee_leave_balances": {
       "title": "Employee Leave Balances"
     },
+    "leave_request": {
+      "title": "Leave Requests",
+      "create_title":"Request a leave"
+
+    },
     "adjust_leave_balance": {
       "title": "Adjust Leave Balance"
     }
+  },
+  "leave_request": {
+    "my_requests_load_error": "Failed to load leave requests",
+    "employee_requests_load_error": "Failed to load employee leave requests",
+    "request_load_error": "Failed to load leave request",
+    "create_success": "Leave request created successfully",
+    "create_error": "Failed to create leave request",
+    "update_success": "Leave request updated successfully",
+    "update_error": "Failed to update leave request",
+    "process_success": "Leave request processed successfully",
+    "process_error": "Failed to process leave request",
+    "create_title": "Create Leave Request",
+    "select_leave_type": "Select Leave Type",
+    "request_details": "Request Details",
+    "start_date": "Start Date & Time",
+    "end_date": "End Date & Time",
+    "requested_units": "Requested Units",
+    "requested_units_placeholder": "Enter number of units",
+    "reason": "Reason",
+    "reason_placeholder": "Enter the reason for your leave request",
+    "submit": "Submit Request"
+  },
+  "leave_types": {
+    "type_name": "Leave Type",
+    "picker_title": "Select Leave Types",
+    "no_data": "No leave types found",
+    "selected": "selected"
   },
   "employee_leave_balances": {
     "title": "Employee Leave Balances",

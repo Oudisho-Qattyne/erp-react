@@ -2,6 +2,8 @@ import { useState, useEffect } from "react"
 import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nProvider"
 import { Button } from "../../../../../core/presentation/layouts/ui/buttons/Button"
 import Input from "../../../../../core/presentation/layouts/ui/inputs/Input"
+import { InfoRow } from "../../../../../core/presentation/layouts/ui/card/InfoRow"
+import { YesNo } from "../../../../../core/presentation/layouts/ui/card/YesNo"
 import { EmployeePickerDialog } from "../../components/employee/EmployeePickerDialog"
 import { LeaveTypePickerDialog } from "../../components/leaveTypes/LeaveTypePickerDialog"
 import { useLeaveBalance } from "../../hooks/leaveBalance/useLeaveBalance"
@@ -9,9 +11,8 @@ import { useLeaveTypes } from "../../hooks/leave/useLeaveTypes"
 import { useLeaveTypeLocalization } from "../../hooks/leave/useLeaveTypeLocalization"
 import type { EmployeeListItem } from "../../../domain/entities/EmployeeListItem"
 import type { EntityWithNameOnly } from "../../../../../core/domain/entities/EntityWithNameOnly"
-import type { Leave } from "../../../domain/entities/leave/leave"
 import type { AdjustLeaveBalanceDto } from "../../../application/dtos/LeaveBalance/AdjustLeaveBalanceDto"
-import { User, X, Plus, Minus, FileText, Info, Calendar, CheckCircle, XCircle, Clock } from "lucide-react"
+import { User, X, Plus, Minus, FileText, Info, Calendar, Clock } from "lucide-react"
 
 export function AdjustEmployeesLeaveBalance() {
     const { t, language } = useLanguage()
@@ -76,9 +77,6 @@ export function AdjustEmployeesLeaveBalance() {
     const getLocalizedText = (text: string | { ar?: string; en?: string } | undefined) =>
         typeof text === "string" ? text : language === "ar" ? text?.ar : text?.en
 
-    const formatBool = (val: boolean | undefined) =>
-        val ? (t("common.yes", "shared") || "نعم") : (t("common.no", "shared") || "لا")
-
     return (
         <div className="p-6 space-y-6">
             <h1 className="text-2xl font-bold">{t("adjust_leave_balance.title", "hr") || "تعديل رصيد الإجازات"}</h1>
@@ -134,19 +132,19 @@ export function AdjustEmployeesLeaveBalance() {
                             <Info size={16} className="text-primary" />
                             {t("adjust_leave_balance.leave_type_details", "hr") || "تفاصيل نوع الإجازة"}
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-sm">
-                            <DetailField label={t("leave.description", "hr") || "الوصف"} value={getLocalizedText(currentLeave.description)} />
-                            <DetailField label={t("leave.unit", "hr") || "الوحدة"} value={getLeaveLabel(currentLeave, "unit")} icon={<Clock size={14} />} />
-                            <DetailField label={t("leave.is_paid", "hr") || "مدفوعة"} value={formatBool(currentLeave.is_paid)} icon={currentLeave.is_paid ? <CheckCircle size={14} className="text-success" /> : <XCircle size={14} className="text-danger" />} />
-                            <DetailField label={t("leave.balance_mode", "hr") || "نظام الرصيد"} value={getLeaveLabel(currentLeave, "balance_mode")} />
-                            <DetailField label={t("leave.accrual_period", "hr") || "دورة الاستحقاق"} value={getLeaveLabel(currentLeave, "accrual_period")} icon={<Calendar size={14} />} />
-                            <DetailField label={t("leave.requires_approval", "hr") || "يتطلب موافقة"} value={formatBool(currentLeave.requires_approval)} />
-                            <DetailField label={t("leave.requires_attachment", "hr") || "يتطلب مرفق"} value={formatBool(currentLeave.requires_attachment)} />
-                            <DetailField label={t("leave.allow_carry_forward", "hr") || "ترحيل الرصيد"} value={formatBool(currentLeave.allow_carry_forward)} />
-                            <DetailField label={t("leave.allow_half_day", "hr") || "نصف يوم"} value={formatBool(currentLeave.allow_half_day)} />
-                            <DetailField label={t("leave.allow_hourly", "hr") || "بالساعة"} value={formatBool(currentLeave.allow_hourly)} />
-                            <DetailField label={t("leave.allow_split", "hr") || "تجزئة"} value={formatBool(currentLeave.allow_split)} />
-                            <DetailField label={t("leave.is_active", "hr") || "نشط"} value={formatBool(currentLeave.is_active)} />
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            <InfoRow label={t("leave.description", "hr") || "الوصف"} value={getLocalizedText(currentLeave.description)} />
+                            <InfoRow label={t("leave.unit", "hr") || "الوحدة"} value={getLeaveLabel(currentLeave, "unit")} />
+                            <InfoRow label={t("leave.is_paid", "hr") || "مدفوعة"} value={<YesNo value={currentLeave.is_paid || false} />} />
+                            <InfoRow label={t("leave.balance_mode", "hr") || "نظام الرصيد"} value={getLeaveLabel(currentLeave, "balance_mode")} />
+                            <InfoRow label={t("leave.accrual_period", "hr") || "دورة الاستحقاق"} value={getLeaveLabel(currentLeave, "accrual_period")} />
+                            <InfoRow label={t("leave.requires_approval", "hr") || "يتطلب موافقة"} value={<YesNo value={currentLeave.requires_approval || false} />} />
+                            <InfoRow label={t("leave.requires_attachment", "hr") || "يتطلب مرفق"} value={<YesNo value={currentLeave.requires_attachment || false} />} />
+                            <InfoRow label={t("leave.allow_carry_forward", "hr") || "ترحيل الرصيد"} value={<YesNo value={currentLeave.allow_carry_forward || false} />} />
+                            <InfoRow label={t("leave.allow_half_day", "hr") || "نصف يوم"} value={<YesNo value={currentLeave.allow_half_day || false} />} />
+                            <InfoRow label={t("leave.allow_hourly", "hr") || "بالساعة"} value={<YesNo value={currentLeave.allow_hourly || false} />} />
+                            <InfoRow label={t("leave.allow_split", "hr") || "تجزئة"} value={<YesNo value={currentLeave.allow_split || false} />} />
+                            <InfoRow label={t("leave.is_active", "hr") || "نشط"} value={<YesNo value={currentLeave.is_active || false} />} />
                         </div>
                     </div>
                 )}
@@ -239,15 +237,6 @@ export function AdjustEmployeesLeaveBalance() {
                 multiple={false}
                 initialSelected={selectedLeaveType ? [selectedLeaveType] : []}
             />
-        </div>
-    )
-}
-
-function DetailField({ label, value, icon }: { label: string; value?: string; icon?: React.ReactNode }) {
-    return (
-        <div className="flex flex-col gap-1">
-            <span className="text-xs text-text-muted flex items-center gap-1">{icon}{label}</span>
-            <span className="font-medium text-text">{value || "-"}</span>
         </div>
     )
 }

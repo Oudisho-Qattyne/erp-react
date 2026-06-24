@@ -58,9 +58,40 @@
     "employee_leave_balances": {
       "title": "أرصدة إجازات الموظفين"
     },
+    "leave_request": {
+      "title": "طلبات الإجازة",
+      "create_title":"طلب إجازة"
+    },
     "adjust_leave_balance": {
-      "title": "تعديل رصيد الإجازات"
+    "title": "تعديل رصيد الإجازات"
     }
+  },
+  "leave_request": {
+    "my_requests_load_error": "فشل تحميل طلبات الإجازة",
+    "employee_requests_load_error": "فشل تحميل طلبات إجازة الموظف",
+    "request_load_error": "فشل تحميل طلب الإجازة",
+    "create_success": "تم إنشاء طلب الإجازة بنجاح",
+    "create_error": "فشل إنشاء طلب الإجازة",
+    "update_success": "تم تحديث طلب الإجازة بنجاح",
+    "update_error": "فشل تحديث طلب الإجازة",
+    "process_success": "تمت معالجة طلب الإجازة بنجاح",
+    "process_error": "فشلت معالجة طلب الإجازة",
+    "create_title": "إنشاء طلب إجازة",
+    "select_leave_type": "اختيار نوع الإجازة",
+    "request_details": "تفاصيل الطلب",
+    "start_date": "تاريخ ووقت البداية",
+    "end_date": "تاريخ ووقت النهاية",
+    "requested_units": "عدد الوحدات المطلوبة",
+    "requested_units_placeholder": "أدخل عدد الوحدات",
+    "reason": "السبب",
+    "reason_placeholder": "أدخل سبب طلب الإجازة",
+    "submit": "إرسال الطلب"
+  },
+  "leave_types": {
+    "type_name": "نوع الإجازة",
+    "picker_title": "اختيار أنواع الإجازات",
+    "no_data": "لا توجد أنواع إجازات",
+    "selected": "مختار"
   },
   "employee_leave_balances": {
     "title": "أرصدة إجازات الموظفين",

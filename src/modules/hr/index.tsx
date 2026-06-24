@@ -24,6 +24,7 @@ import { EditLeaveTypePage } from './presentation/pages/leaves/EditLeaveTypePage
 import { UserEligibleLeaveTypes } from './presentation/pages/leaves/UserEligibleLeaveTypes'
 import { UserLeaveBalances } from './presentation/pages/leaveBalances/UserLeaveBalances'
 import { EmployeeLeaveBalances } from './presentation/pages/leaveBalances/EmployeeLeaveBalances'
+import { CreateLeaveRequest } from './presentation/pages/leaveRequest/CreateLeaveRequest'
 import { AdjustEmployeesLeaveBalance } from './presentation/pages/leaveBalances/AdjustEmployeesLeaveBalance'
 
 const usersModule: Module = {
@@ -94,6 +95,17 @@ const usersModule: Module = {
       label: 'employee_leave_balances.title',
       nav: true,
       order: 22,
+      moduleName: 'hr',
+      icon: <Users size={18} />,
+      group: 'hr',
+      requiresAuth: true,
+    },
+    {
+      path: '/hr/leave-requests/create',
+      element: <CreateLeaveRequest />,
+      layout: 'dashboard',
+      label: 'leave_request.create_title',
+      nav: true,
       moduleName: 'hr',
       icon: <Users size={18} />,
       group: 'hr',

@@ -1,7 +1,5 @@
-export interface CreateLeaveRequestDto{
-  leave_type_id: number,
-  start_date: string,
-  end_date: string,
-  requested_units: number,
-  reason: string
-}
+import type { LeaveRequest } from "../../../domain/entities/leaveRequest/leaveRequest";
+
+export type CreateLeaveRequestDto = Omit<LeaveRequest,"id" | "employee_id" | "status" | "review_notes" | "employee_name" | "leave_type">;
+
+export type UpdateLeaveRequestDto = Partial<Omit<LeaveRequest, "id" | "employee_id" | "employee_name" | "leave_type">>;

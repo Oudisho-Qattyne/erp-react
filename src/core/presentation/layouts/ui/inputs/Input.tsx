@@ -3,9 +3,11 @@ import { CustomSelect } from './CustomSelect';
 import { SelectOrCreate } from './SelectOrCreate';
 import { MultiSelectOrCreate } from './MultiSelectOrCreate';
 import { DatePicker } from './DatePicker';
+import { TimePicker } from './TimePicker';
+import { DateTimePicker } from './DateTimePicker';
 import { DataMatrixInput, type MatrixFieldConfig } from './DataMatrixInput';
 import { Info } from 'lucide-react';
-export type InputType = 'text' | 'number' | 'email' | 'password' | 'textarea' | 'date' | 'select' | 'select-or-create' | 'multi-select-or-create' | 'data-matrix' | 'checkbox';
+export type InputType = 'text' | 'number' | 'email' | 'password' | 'textarea' | 'date' | 'time' | 'datetime' | 'select' | 'select-or-create' | 'multi-select-or-create' | 'data-matrix' | 'checkbox';
 
 interface InputProps {
   type: InputType;
@@ -166,6 +168,30 @@ const InputTypes: React.FC<InputProps> = ({
     case 'date':
       return (
         <DatePicker
+          value={value}
+          onChange={onChange}
+          placeholder={finalPlaceholder}
+          disabled={finalDisabled}
+          required={finalRequired}
+          className={localClass}
+        />
+      );
+
+    case 'time':
+      return (
+        <TimePicker
+          value={value}
+          onChange={onChange}
+          placeholder={finalPlaceholder}
+          disabled={finalDisabled}
+          required={finalRequired}
+          className={localClass}
+        />
+      );
+
+    case 'datetime':
+      return (
+        <DateTimePicker
           value={value}
           onChange={onChange}
           placeholder={finalPlaceholder}
