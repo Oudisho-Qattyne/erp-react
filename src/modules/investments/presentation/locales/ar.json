@@ -1,0 +1,36 @@
+{
+  "title": "الإستثمارات",
+  "plot_areas": {
+    "title": "المناطق",
+    "add": "إضافة منطقة",
+    "name": "اسم المنطقة",
+    "is_active": "فعال؟",
+    "is_default": "تعيين كافتراضي؟",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا يوجد مناطق"
+  },
+  "plot_classifications": {
+    "title": "التصنيفات",
+    "add": "إضافة تصنيف",
+    "name": "اسم التصنيف",
+    "is_active": "فعال؟",
+    "is_default": "تعيين كافتراضي؟",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا يوجد تصنيفات"
+  },
+  "navigation": {
+    "title": "الإستثمارات",
+    "plot_areas": {
+      "title": "المناطق"
+    },
+    "plot_classifications": {
+      "title": "التصنيفات"
+    }
+  }
+}
