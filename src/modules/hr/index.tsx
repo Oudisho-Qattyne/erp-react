@@ -55,6 +55,7 @@ const usersModule: Module = {
       icon: <CalendarClock className="w-5 h-5" />,
       group: 'hr',
       requiresAuth: true,
+      requiredPermission: ['hr.leave-types.list', 'hr.leave-balance.list', 'hr.leave-requests.list', 'hr.leave-balance.adjust']
     },
     {
       path: '/hr/leaves',
@@ -68,6 +69,7 @@ const usersModule: Module = {
       group: 'hr',
       parentNav: '/hr/leaves-management',
       requiresAuth: true,
+      requiredPermission: 'hr.leave-types.list',
     },
     {
       path: '/hr/leaves/:id',
@@ -77,6 +79,7 @@ const usersModule: Module = {
       nav: false,
       moduleName: 'hr',
       requiresAuth: true,
+      requiredPermission: 'hr.leave-types.view',
     },
     {
       path: '/hr/my-eligible-leave-types',
@@ -101,6 +104,7 @@ const usersModule: Module = {
       icon: <Wallet size={18} />,
       group: 'hr',
       requiresAuth: true,
+      requiredPermission: 'hr.leave-balance.list',
     },
     {
       path: '/hr/employee-leave-balances',
@@ -114,6 +118,7 @@ const usersModule: Module = {
       group: 'hr',
       parentNav: '/hr/leaves-management',
       requiresAuth: true,
+      requiredPermission: 'hr.leave-balance.list',
     },
     {
       path: '/hr/my-leave-requests',
@@ -126,6 +131,7 @@ const usersModule: Module = {
       icon: <FileText size={18} />,
       group: 'hr',
       requiresAuth: true,
+      requiredPermission: 'hr.leave-requests.list',
     },
     {
       path: '/hr/employee-leave-requests',
@@ -139,6 +145,7 @@ const usersModule: Module = {
       group: 'hr',
       parentNav: '/hr/leaves-management',
       requiresAuth: true,
+      requiredPermission: 'hr.leave-requests.list',
     },
     {
       path: '/hr/leave-requests/create',
@@ -170,6 +177,7 @@ const usersModule: Module = {
       group: 'hr',
       parentNav: '/hr/leaves-management',
       requiresAuth: true,
+      requiredPermission: 'hr.leave-balance.adjust',
     },
     // {
     //   path: '/hr/leaves/:id/edit',
@@ -190,6 +198,7 @@ const usersModule: Module = {
       moduleName: 'hr',
       icon: <Users size={18} />,
       group: 'hr',
+      requiredPermission: 'hr.employees.list',
     },
     {
       path: '/hr/employees/:id',
@@ -199,7 +208,7 @@ const usersModule: Module = {
       nav: false,
       moduleName: 'hr',
       requiresAuth: true,
-      // requiredRole: 'admin',
+      requiredPermission: 'hr.employees.view',
     },
     {
       path: '/hr/employees/:id/edit',
@@ -209,7 +218,7 @@ const usersModule: Module = {
       nav: false,
       moduleName: 'hr',
       requiresAuth: true,
-      // requiredRole: 'admin',
+      requiredPermission: 'hr.employees.update',
     },
 
     {
@@ -241,7 +250,7 @@ const usersModule: Module = {
       element: <CitiesPage />,
       layout: 'dashboard',
       label: 'lookups.tabs.cities',
-      nav: true,
+      nav: true, 
       order: 2,
       moduleName: 'hr',
       icon: <Building2 size={18} />,
@@ -307,6 +316,7 @@ const usersModule: Module = {
       icon: <Briefcase size={18} />,
       group: 'lookups',
       parentNav: '/hr/lookups',
+      requiredPermission: 'hr.job-statuses.list',
     },
     {
       path: '/hr/lookups/employee-statuses',
@@ -319,6 +329,7 @@ const usersModule: Module = {
       icon: <BadgeCheck size={18} />,
       group: 'lookups',
       parentNav: '/hr/lookups',
+      requiredPermission: 'hr.employee-statuses.list',
     }
   ],
   locales: { en: enLocales, ar: arLocales },

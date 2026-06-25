@@ -39,16 +39,44 @@ export function LeaveTypePickerDialog({
         if (isOpen) {
             setSelectedKeys(initialSelected.map((e) => e.id))
         }
-    }, [isOpen, initialSelected])
+    }, [isOpen])
     useEffect(() => {
         if(eligible){
             findUserEligibleLeaveTypes()
         }
     } ,[])
-    const filterFields: FilterField[] = []
+    const filterFields: FilterField[] = [
+        { name: "unit", label: t("leave.unit", "hr"), type: "select", options: [{ value: "day", label: t("leave.unit_day", "hr") }, { value: "hour", label: t("leave.unit_hour", "hr") }] },
+        { name: "balance_mode", label: t("leave.balance_mode", "hr"), type: "select", options: [
+            { value: "accrual", label: t("leave.balance_accrual", "hr") },
+            { value: "fixed_grant", label: t("leave.balance_fixed_grant", "hr") },
+            { value: "once_per_life", label: t("leave.balance_once_per_life", "hr") },
+            { value: "once_per_service", label: t("leave.balance_once_per_service", "hr") },
+            { value: "none", label: t("leave.balance_none", "hr") },
+        ] },
+        { name: "accrual_period", label: t("leave.accrual_period", "hr"), type: "select", options: [{ value: "yearly", label: t("leave.accrual_yearly", "hr") }, { value: "monthly", label: t("leave.accrual_monthly", "hr") }, { value: "none", label: t("leave.accrual_none", "hr") }] },
+        { name: "is_paid", label: t("leave.is_paid", "hr"), type: "checkbox" },
+        { name: "is_active", label: t("leave.is_active", "hr"), type: "checkbox" },
+        { name: "requires_approval", label: t("leave.requires_approval", "hr"), type: "checkbox" },
+        { name: "allow_half_day", label: t("leave.allow_half_day", "hr"), type: "checkbox" },
+        { name: "allow_hourly", label: t("leave.allow_hourly", "hr"), type: "checkbox" },
+        { name: "allow_split", label: t("leave.allow_split", "hr"), type: "checkbox" },
+    ]
 
     const handleApplyFilter = (values: Record<string, any>) => {
-        setFilter(values as any)
+        const parsed: Record<string, any> = {}
+        for (const [key, val] of Object.entries(values)) {
+            if (val === "" || val === undefined) {
+                continue
+            } else if (val === "true") {
+                parsed[key] = true
+            } else if (val === "false") {
+                parsed[key] = false
+            } else {
+                parsed[key] = val
+            }
+        }
+        setFilter(parsed as any)
         setIsFilterOpen(false)
     }
 

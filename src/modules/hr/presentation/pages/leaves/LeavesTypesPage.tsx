@@ -63,12 +63,12 @@ export default function LeavesTypesPage() {
     { name: "allow_split", label: t("leave.allow_split", "hr"), type: "checkbox" },
   ]
 
-  const handleApplyFilter = (values: Record<string, any>) => {
-    const parsed: Record<string, any> = {}
-    for (const [key, val] of Object.entries(values)) {
-      if (val === "" || val === undefined) {
-        parsed[key] = undefined
-      } else if (val === "true") {
+    const handleApplyFilter = (values: Record<string, any>) => {
+        const parsed: Record<string, any> = {}
+        for (const [key, val] of Object.entries(values)) {
+            if (val === "" || val === undefined) {
+                continue
+            } else if (val === "true") {
         parsed[key] = true
       } else if (val === "false") {
         parsed[key] = false
@@ -185,7 +185,7 @@ export default function LeavesTypesPage() {
             onItemsPerPageChange: (size) => setPage(1),
             itemsPerPageOptions: [5, 10, 20, 50],
           }}
-          emptyMessage={t("leave.no_data", "hr") || "لا توجد إجازات"}
+          emptyMessage={t("common.no_data", "shared") || "لا توجد إجازات"}
         />
       )}
 

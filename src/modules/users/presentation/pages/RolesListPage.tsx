@@ -92,7 +92,7 @@ export function RolesListPage() {
             className="p-1.5 rounded-md hover:bg-danger/10 text-text-muted hover:text-danger transition-colors"
             title={t('common.delete', 'shared') || 'Delete'}
           >
-            <Trash2 size={16} />
+            <Trash2 size={16}  className="text-danger"/>
           </button>
         </div>
       ),

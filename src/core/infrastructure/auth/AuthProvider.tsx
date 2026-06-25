@@ -1,6 +1,6 @@
 // src/core/auth/AuthProvider.tsx
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { getUserFromToken, isTokenValid, removeToken, setToken } from './authStorage';
+import { getUserFromToken, getAuthUser, setAuthUser, removeAuthUser, isTokenValid, removeToken, setToken } from './authStorage';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -23,9 +23,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const valid = isTokenValid();
     setIsAuthenticated(valid);
     if (valid) {
-      setUser(getUserFromToken());
+      setUser(getAuthUser() || getUserFromToken());
     } else {
       setUser(null);
+      removeAuthUser();
     }
     setLoading(false);
   }, []);
@@ -40,11 +41,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = (token: string, userData?: any) => {
     setToken(token);
     setIsAuthenticated(true);
-    setUser(userData || getUserFromToken());
+    const user = userData || getUserFromToken();
+    setUser(user);
+    if (userData) setAuthUser(userData);
   };
 
   const logout = () => {
     removeToken();
+    removeAuthUser();
     setIsAuthenticated(false);
     setUser(null);
   };
