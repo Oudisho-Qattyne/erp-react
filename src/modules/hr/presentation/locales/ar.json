@@ -16,7 +16,9 @@
     "choose": "اختر...",
     "level": "المستوى",
     "name": "الاسم",
-    "name_required": "الاسم مطلوب"
+    "name_required": "الاسم مطلوب",
+    "parent": "الوحدة الأم",
+    "none": "بدون"
   },
   "navigation": {
     "reports": {
@@ -41,7 +43,9 @@
         "faculties": "الكليات",
         "specializations": "التخصصات",
         "job_statuses": "الحالة الوظيفية",
-        "employee_statuses": "حالة الموظف"
+        "employee_statuses": "حالة الموظف",
+        "chronic_diseases": "الأمراض المزمنة",
+        "organizational_levels": "المستويات التنظيمية"
       }
     },
     "admin": "الإدارة العامة",
@@ -70,7 +74,7 @@
       "title": "طلبات إجازة الموظفين"
     },
     "adjust_leave_balance": {
-    "title": "تعديل رصيد الإجازات"
+      "title": "تعديل رصيد الإجازات"
     }
   },
   "leave_request": {
@@ -338,7 +342,9 @@
       "faculties": "الكليات",
       "specializations": "التخصصات",
       "job_statuses": "الحالة الوظيفية",
-      "employee_statuses": "حالة الموظف"
+      "employee_statuses": "حالة الموظف",
+      "chronic_diseases": "الأمراض المزمنة",
+      "organizational_levels": "المستويات التنظيمية"
     },
     "select_country_first": "الرجاء اختيار دولة لعرض مدنها",
     "select_city_first": "الرجاء اختيار مدينة أولاً",
@@ -356,6 +362,8 @@
     "no_specializations": "لا يوجد اختصاصات",
     "no_job_statuses": "لا يوجد حالات وظيفية",
     "no_employee_statuses": "لا يوجد حالات موظف",
+    "no_chronic_diseases": "لا يوجد أمراض مزمنة",
+    "no_organizational_levels": "لا يوجد مستويات تنظيمية",
     "updated": "تم تحديث {name} بنجاح",
     "update_error": "فشل تحديث {name}",
     "set_default_success": "تم تعيين {name} كافتراضي بنجاح",

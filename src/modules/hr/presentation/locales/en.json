@@ -16,7 +16,9 @@
     "choose": "Choose...",
     "level": "Level",
     "name": "Name",
-    "name_required": "Name is required"
+    "name_required": "Name is required",
+    "parent": "Parent Unit",
+    "none": "None"
   },
   "navigation": {
     "reports": {
@@ -41,7 +43,9 @@
         "faculties": "Faculties",
         "specializations": "Specializations",
         "job_statuses": "Job Statuses",
-        "employee_statuses": "Employee Statuses"
+        "employee_statuses": "Employee Statuses",
+        "chronic_diseases": "Chronic Diseases",
+        "organizational_levels": "Organizational Levels"
       }
     },
     "admin": "Admin",
@@ -338,7 +342,9 @@
       "faculties": "Faculties",
       "specializations": "Specializations",
       "job_statuses": "Job Statuses",
-      "employee_statuses": "Employee Statuses"
+      "employee_statuses": "Employee Statuses",
+      "chronic_diseases": "Chronic Diseases",
+      "organizational_levels": "Organizational Levels"
     },
     "select_country_first": "Please select a country to view its cities",
     "select_city_first": "Please select a city first",
@@ -356,6 +362,8 @@
     "no_specializations": "No specializations",
     "no_job_statuses": "No job statuses",
     "no_employee_statuses": "No employee statuses",
+    "no_chronic_diseases": "No chronic diseases",
+    "no_organizational_levels": "No organizational levels",
     "updated": "{name} updated successfully",
     "update_error": "Failed to update {name}",
     "set_default_success": "{name} set as default successfully",

@@ -129,7 +129,6 @@ export const EmployeeLeaveRequests = () => {
     }
 
     const filterFields: FilterField[] = [
-
         {
             name: "employee_id",
             render: (form) => {
@@ -218,7 +217,7 @@ export const EmployeeLeaveRequests = () => {
 
     const columns: ColumnDef<LeaveRequest>[] = [
         { key: "id", label: "#", width: 60, sortable: true },
-        { key: "employee_name", label: t("leave_request.employee_name", "hr") || "Employee", width: 160, sortable: true },
+        { key: "employee", label: t("leave_request.employee_name", "hr") || "Employee", width: 160, sortable: true , render : (row) => row.employee?.full_name },
         {
             key: "leave_type",
             label: t("leave_request.leave_type", "hr") || "Leave Type",

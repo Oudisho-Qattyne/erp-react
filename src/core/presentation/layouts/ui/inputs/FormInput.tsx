@@ -26,7 +26,7 @@ export interface FormInputProps<T extends FieldValues> {
   hint?: string;
   className?: string;
   // For select & select-or-create
-  options?: { value: number | string; label: string }[]
+  options?: { value: number | string | any; label: string }[]
   searchable?: boolean;
   // For textarea
   rows?: number;

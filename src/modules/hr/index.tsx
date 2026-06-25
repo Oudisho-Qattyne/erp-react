@@ -1,7 +1,7 @@
 // import UsersPage from './presentation/pages/UsersPage'
 import enLocales from './presentation/locales/en.json'
 import arLocales from './presentation/locales/ar.json'
-import { Users, CalendarClock, Database, BarChart3, CalendarDays, UserCheck, Wallet, Gauge, FileText, FileSearch, SlidersHorizontal, Flag, Building2, Map, GraduationCap, BookOpen, Beaker, Briefcase, BadgeCheck } from 'lucide-react'
+import { Users, CalendarClock, Database, BarChart3, CalendarDays, UserCheck, Wallet, Gauge, FileText, FileSearch, SlidersHorizontal, Flag, Building2, Map, GraduationCap, BookOpen, Beaker, Briefcase, BadgeCheck, Heart, StarIcon,  } from 'lucide-react'
 import type { Module } from '../../core/moduleRegistry'
 import { Navigate } from 'react-router-dom'
 // import CreateUserPage from './presentation/pages/CreateUserPage'
@@ -17,6 +17,8 @@ import { FacultiesPage } from './presentation/pages/lookups/FacultiesPage'
 import { SpecializationsPage } from './presentation/pages/lookups/SpecializationsPage'
 import { JobStatusesPage } from './presentation/pages/lookups/JobStatusesPage'
 import { EmployeeStatusesPage } from './presentation/pages/lookups/EmployeeStatusesPage'
+import { ChronicDiseasesPage } from './presentation/pages/lookups/ChronicDiseasesPage'
+import { OrganizationalLevelsPage } from './presentation/pages/lookups/OrganizationalLevelsPage'
 import { Rules } from './presentation/pages/Rules'
 import LeaveForm from './presentation/pages/leaves/LeaveForm'
 import LeavesTypesPage from './presentation/pages/leaves/LeavesTypesPage'
@@ -330,6 +332,32 @@ const usersModule: Module = {
       group: 'lookups',
       parentNav: '/hr/lookups',
       requiredPermission: 'hr.employee-statuses.list',
+    },
+    {
+      path: '/hr/lookups/chronic-diseases',
+      element: <ChronicDiseasesPage />,
+      layout: 'dashboard',
+      label: 'lookups.tabs.chronic_diseases',
+      nav: true,
+      order: 9,
+      moduleName: 'hr',
+      icon: <Heart size={18} />,
+      group: 'lookups',
+      parentNav: '/hr/lookups',
+      requiredPermission: 'hr.chronic-diseases.list',
+    },
+    {
+      path: '/hr/lookups/organizational-levels',
+      element: <OrganizationalLevelsPage />,
+      layout: 'dashboard',
+      label: 'lookups.tabs.organizational_levels',
+      nav: true,
+      order: 10,
+      moduleName: 'hr',
+      icon: <StarIcon size={18} />,
+      group: 'lookups',
+      parentNav: '/hr/lookups',
+      requiredPermission: 'hr.organizational-levels.list',
     }
   ],
   locales: { en: enLocales, ar: arLocales },
