@@ -46,6 +46,9 @@
     },
     "admin": "Admin",
     "hr": "Human Resources Management",
+    "leaves_management": {
+      "title": "Leave Management"
+    },
     "leave_types": {
       "title": "Leave types Management"
     },

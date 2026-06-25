@@ -46,8 +46,11 @@
     },
     "admin": "الإدارة العامة",
     "hr": " إدارة الموارد البشرية",
+    "leaves_management": {
+      "title": "إدارة الإجازات"
+    },
     "leave_types": {
-      "title": "إدارة أنواع الإجازات"
+      "title": "أنواع الإجازات"
     },
     "leave": {
       "user_eligible_leave_types": "أنواع الإجازات المستحقة"

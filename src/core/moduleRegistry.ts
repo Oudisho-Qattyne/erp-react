@@ -9,6 +9,8 @@ export interface NavItem {
   group: string
   href: string
   permission?: string
+  children?: NavItem[]
+  moduleName?: string
 }
 
 export interface NavGroup {
@@ -30,6 +32,7 @@ export type ModuleRoute = {
   moduleName: string
   icon?: ReactNode
   group?: string
+  parentNav?: string
   requiresAuth?: boolean;
   requiredRole?: string | string[];
   requiredPermission?: string | string[];
@@ -95,7 +98,7 @@ export const getNavGroups = (): NavGroup[] => {
 
 export const getNavItems = (): NavItem[] => {
   const routes = getAllRoutes().filter(route => route.nav === true)
-  return routes.map(route => ({
+  const allItems: (NavItem & { parentNav?: string })[] = routes.map(route => ({
     id: `${route.moduleName}.${route.path}`,
     label: route.label,
     icon: route.icon ?? null,
@@ -103,7 +106,19 @@ export const getNavItems = (): NavItem[] => {
     href: route.path,
     permission: route.requiredPermission as string | undefined,
     moduleName: route.moduleName,
+    parentNav: route.parentNav,
   }))
+  // Attach children to parents by matching parentNav to parent's href
+  for (const item of allItems) {
+    if (!item.parentNav) continue
+    const parent = allItems.find(p => p.href === item.parentNav)
+    if (parent) {
+      if (!parent.children) parent.children = []
+      parent.children.push(item)
+    }
+  }
+  // Return only root items (those without parentNav)
+  return allItems.filter(item => !item.parentNav).map(({ parentNav: _, ...rest }) => rest)
 }
 
 // ========== Auto‑discovery (Synchronous, Eager) ==========
