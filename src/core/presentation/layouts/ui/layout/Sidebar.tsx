@@ -18,7 +18,7 @@ interface SidebarProps {
 
 export function Sidebar({ user, unreadNotifications = 0 }: SidebarProps) {
   const { collapsed } = useSidebar();
-  const { navItems, navGroups } = useNavigation(user?.role);
+  const { navItems, navGroups } = useNavigation();
 
   return (
     <aside

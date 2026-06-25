@@ -8,7 +8,7 @@ interface AuthContextType {
   loading: boolean;
   login: (token: string, userData?: any) => void;
   logout: () => void;
-  hasPermission: (permission?: string) => boolean;
+  hasPermission: (permission?: string | string[]) => boolean;
   hasRole: (roles?: string | string[]) => boolean;
 }
 
@@ -49,9 +49,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUser(null);
   };
 
-  const hasPermission = (permission?: string): boolean => {
+  const hasPermission = (permission?: string | string[]): boolean => {
     if (!permission) return true;
     if (!isAuthenticated) return false;
+    if (Array.isArray(permission)) {
+      return permission.some(p => user?.permissions?.includes(p) ?? false);
+    }
     return user?.permissions?.includes(permission) ?? false;
   };
 

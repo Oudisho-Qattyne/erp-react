@@ -5,7 +5,7 @@ import { useAuth } from './AuthProvider';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: string | string[];
-  requiredPermission?: string;
+  requiredPermission?: string | string[];
   redirectTo?: string;
 }
 
@@ -25,6 +25,7 @@ export const ProtectedRoute = ({
   if (!isAuthenticated) {
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
+console.log(location , requiredRole , requiredPermission);
 
   if (requiredRole && !hasRole(requiredRole)) {
     return <Navigate to="/unauthorized" replace />;

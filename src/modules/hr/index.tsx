@@ -40,9 +40,8 @@ const usersModule: Module = {
       nav: true,
       order: 10,
       moduleName: 'hr',
-      icon: <Users className="w-5 h-5" />,   // 👈 React element
+      icon: <Users className="w-5 h-5" />,
       group: 'hr',
-      permission: 'hr:read',
     },
     {
       path: '/hr/leaves',

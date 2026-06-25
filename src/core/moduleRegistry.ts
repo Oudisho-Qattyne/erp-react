@@ -30,10 +30,9 @@ export type ModuleRoute = {
   moduleName: string
   icon?: ReactNode
   group?: string
-  permission?: string
   requiresAuth?: boolean;
   requiredRole?: string | string[];
-  requiredPermission?: string;
+  requiredPermission?: string | string[];
 }
 
 export type Module = {
@@ -102,7 +101,7 @@ export const getNavItems = (): NavItem[] => {
     icon: route.icon ?? null,
     group: route.group ?? "default",
     href: route.path,
-    permission: route.permission,
+    permission: route.requiredPermission as string | undefined,
     moduleName: route.moduleName,
   }))
 }
