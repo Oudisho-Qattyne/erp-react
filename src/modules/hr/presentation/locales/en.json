@@ -549,5 +549,67 @@
     "title": "Employee Leave Requests",
     "select_prompt": "Select an employee to view their leave requests",
     "select_employee": "Select Employee"
+  },
+  "permissions": {
+    "hr": {
+      "leave-balance": {
+        "list": "List Leave Balances",
+        "adjust": "Adjust Leave Balance"
+      },
+      "leave-requests": {
+        "list": "List Leave Requests"
+      },
+      "leave-types": {
+        "list": "List Leave Types",
+        "view": "View Leave Type",
+        "create": "Create Leave Type",
+        "update": "Edit Leave Type",
+        "delete": "Delete Leave Type"
+      },
+      "employees": {
+        "list": "List Employees",
+        "view": "View Employee",
+        "create": "Create Employee",
+        "update": "Edit Employee",
+        "delete": "Delete Employee"
+      },
+      "job-statuses": {
+        "list": "List Job Statuses",
+        "view": "View Job Status",
+        "create": "Create Job Status",
+        "update": "Edit Job Status",
+        "delete": "Delete Job Status"
+      },
+      "employee-statuses": {
+        "list": "List Employee Statuses",
+        "view": "View Employee Status",
+        "create": "Create Employee Status",
+        "update": "Edit Employee Status",
+        "delete": "Delete Employee Status"
+      },
+      "chronic-diseases": {
+        "list": "List Chronic Diseases",
+        "view": "View Chronic Disease",
+        "create": "Add Chronic Disease",
+        "update": "Update Chronic Disease",
+        "delete": "Delete Chronic Disease"
+      },
+      "organizational-levels": {
+        "list": "List Organizational Levels",
+        "view": "View Organizational Level",
+        "create": "Create Organizational Level",
+        "update": "Edit Organizational Level",
+        "delete": "Delete Organizational Level"
+      },
+      "eligible-leave-types": {
+        "list": "List Eligible Leave Types"
+      },
+      "employee-status-logs": {
+        "list": "List Employee Status Logs"
+      },
+      "job-status-logs": {
+        "list": "List Job Status Logs"
+      }
+    }
   }
 }

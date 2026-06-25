@@ -8,6 +8,7 @@ import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicFo
 import { getCreateRoleSchema, type RoleFormValues } from '../schemas/roleForm';
 import { useManageRoles } from '../hooks/useManageRoles';
 import type { Permissions, Permission } from '../../domain/entities/permissions';
+import { getPermissionDisplayName } from '../utils/getPermissionDisplayName';
 
 const ROLE_EMPTY_DEFAULTS: RoleFormValues = {
   name: '',
@@ -61,11 +62,6 @@ export function RoleForm({
     setValue('permissions', updated, { shouldValidate: true, shouldDirty: true });
   };
 
-  const getDisplayName = (perm: Permission): string => {
-    if (typeof perm.display_name === 'string') return perm.display_name;
-    return (perm.display_name as any)[language] || (perm.display_name as any)['en'] || perm.name;
-  };
-
   const actualSubmitLabel = submitLabel || t('role_form.save', 'users') || 'Save Role';
   const actualCancelLabel = cancelLabel || t('role_form.cancel', 'users') || 'Cancel';
 
@@ -114,7 +110,7 @@ export function RoleForm({
                                 value={selectedPermissions.includes(perm.id)}
                                 onChange={() => togglePermission(perm.id)}
                               />
-                              <span className="text-sm text-text">{getDisplayName(perm)}</span>
+                              <span className="text-sm text-text">{getPermissionDisplayName(perm, t, language)}</span>
                             </label>
                           ))}
                         </div>

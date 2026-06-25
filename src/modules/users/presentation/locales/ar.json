@@ -32,7 +32,9 @@
     "edit": "تعديل الدور",
     "role_info": "معلومات الدور",
     "permissions": "الصلاحيات",
-    "no_permissions": "لا توجد صلاحيات مخصصة"
+    "no_permissions": "لا توجد صلاحيات مخصصة",
+    "users_count": "{count} مستخدمين",
+    "created_at": "تاريخ الإنشاء {date}"
   },
   "edit_role": {
     "title": "تعديل الدور",

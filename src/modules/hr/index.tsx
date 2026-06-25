@@ -88,7 +88,6 @@ const usersModule: Module = {
       moduleName: 'hr',
       icon: <UserCheck size={18} />,
       group: 'hr',
-      parentNav: '/hr/leaves-management',
       requiresAuth: true,
     },
     {
@@ -101,7 +100,6 @@ const usersModule: Module = {
       moduleName: 'hr',
       icon: <Wallet size={18} />,
       group: 'hr',
-      parentNav: '/hr/leaves-management',
       requiresAuth: true,
     },
     {
@@ -127,7 +125,6 @@ const usersModule: Module = {
       moduleName: 'hr',
       icon: <FileText size={18} />,
       group: 'hr',
-      parentNav: '/hr/leaves-management',
       requiresAuth: true,
     },
     {
