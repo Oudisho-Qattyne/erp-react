@@ -19,6 +19,7 @@ const usersModule: Module = {
       moduleName: 'users',
       icon: <Shield size={18} />,
       group: 'users',
+      requiredPermission: 'users.roles.list',
     },
     {
       path: '/users/roles/:id',
@@ -27,6 +28,7 @@ const usersModule: Module = {
       label: 'show_role.title',
       nav: false,
       moduleName: 'users',
+      requiredPermission: 'users.roles.view',
     },
     {
       path: '/users/roles/:id/edit',
@@ -35,6 +37,7 @@ const usersModule: Module = {
       label: 'edit_role.title',
       nav: false,
       moduleName: 'users',
+      requiredPermission: 'users.roles.update',
     },
   ],
   locales: { en: enLocales, ar: arLocales },
