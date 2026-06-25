@@ -259,13 +259,11 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
                 const res = await moveStorageItem(ci.id, currentPath, apiRef.current)
 
             } catch (error) {
-                console.log(error);
             }
         })
         setCopiedItems([])
 
     }
-console.log("data in fileexplorer" , data);
 
 
     const customMenuOptions = useCallback((

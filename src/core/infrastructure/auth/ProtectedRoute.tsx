@@ -25,7 +25,6 @@ export const ProtectedRoute = ({
   if (!isAuthenticated) {
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
-console.log(location , requiredRole , requiredPermission);
 
   if (requiredRole && !hasRole(requiredRole)) {
     return <Navigate to="/unauthorized" replace />;

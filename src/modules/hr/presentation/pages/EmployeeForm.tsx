@@ -137,7 +137,6 @@ function FacultyCreateForm({ onSuccess, onCancel, universityId }: { onSuccess: (
       fields={[{ name: 'name', label: t('employees.faculty', 'hr') || 'اسم الكلية', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
       schema={schemaWithoutUni}
       onSubmit={async (data: any) => {
-        console.log(universityId);
 
         const payload = {
           ...data,
@@ -289,7 +288,6 @@ export function EmployeeForm({
 
   const computeEmployeeStatuses = async () => {
     const response = await loadEmployeeStatuses();
-    console.log(response);
     return { options: response.data.map((es: any) => ({ value: es.id, label: es.name, is_default: es.is_default })) };
   };
 
@@ -625,7 +623,6 @@ export function EmployeeForm({
     }
 
   ];
-  console.log(errors);
 
   const EMPLOYMENT_FIELDS: FieldConfig[] = [
     { name: 'employment_details.job_title', label: t('employees.job_title', 'hr') || 'المسمى الوظيفي' },
@@ -816,7 +813,6 @@ export function EmployeeForm({
                     compute={(values) => computeFaculties(values, idx)}
                     createTitle={t('employee_form.add_faculty', 'hr') || "إضافة كلية جديدة"}
                     renderCreateForm={(onSuccess, onCancel, deps) => {
-                      console.log(deps);
 
                       return (
                         <FacultyCreateForm

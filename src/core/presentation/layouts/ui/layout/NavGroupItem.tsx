@@ -131,7 +131,7 @@ function NavItemParent({
         </button>
         {expanded && (
           <div
-            className={`absolute ${isRTL ? 'right-full mr-2' : 'left-full ml-2'} top-0 bg-primary-dark border border-white/10 rounded-lg p-2 min-w-[180px] z-50 shadow-xl`}
+            className={`absolute ${isRTL ? 'right-full mr-2' : 'left-full ml-2'} top-0 bg-primary-dark border border-white/10 rounded-lg p-2 min-w-45 z-50 shadow-xl`}
           >
             {item.children?.map(child => (
               <NavItemLink key={child.id} item={child} collapsed={false} depth={0} unread={undefined} />

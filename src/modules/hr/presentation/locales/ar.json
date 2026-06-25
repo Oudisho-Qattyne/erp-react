@@ -546,9 +546,9 @@
     "no_data": "لا توجد أرصدة إجازات"
   },
   "employee_leave_requests": {
-    "title": "�頟� ����� ��������",
-    "select_prompt": "���� ����� ��� �頟� ������",
-    "select_employee": "���� �����"
+    "title": "طلبات إجازة الموظفين",
+    "select_prompt": "اختر موظفاً لعرض طلبات إجازاته",
+    "select_employee": "اختيار موظف"
   },
   "permissions": {
     "hr": {

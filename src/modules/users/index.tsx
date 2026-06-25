@@ -19,7 +19,7 @@ const usersModule: Module = {
       moduleName: 'users',
       icon: <Shield size={18} />,
       group: 'users',
-      requiredPermission: 'users.roles.list',
+      requiredPermission: 'users.roles.view',
     },
     {
       path: '/users/roles/:id',

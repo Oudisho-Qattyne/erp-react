@@ -20,7 +20,6 @@ export function ShowRolePage() {
   const [role, setRole] = useState<DetailedRole | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-console.log(role);
 
   useEffect(() => {
     if (!id) return;
