@@ -54,7 +54,7 @@ export const EmployeeLeaveRequests = () => {
     const [employeePickerOpen, setEmployeePickerOpen] = useState(false)
     const [selectedEmployeeName, setSelectedEmployeeName] = useState<string>("")
     const [leaveTypePickerOpen, setLeaveTypePickerOpen] = useState(false)
-    const [selectedLeaveTypeName, setSelectedLeaveTypeName] = useState<string>("")
+    const [selectedLeaveTypeName, setSelectedLeaveTypeName] = useState<string | undefined>("")
     const formRef = useRef<UseFormReturn | null>(null)
     const handleSearch = () => setSearch(localSearch)
 

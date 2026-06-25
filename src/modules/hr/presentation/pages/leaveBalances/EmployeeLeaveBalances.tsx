@@ -27,7 +27,7 @@ export const EmployeeLeaveBalances = () => {
     const [employeePickerOpen, setEmployeePickerOpen] = useState(false)
     const [selectedEmployeeName, setSelectedEmployeeName] = useState<string>("")
     const [leaveTypePickerOpen, setLeaveTypePickerOpen] = useState(false)
-    const [selectedLeaveTypeName, setSelectedLeaveTypeName] = useState<string>("")
+    const [selectedLeaveTypeName, setSelectedLeaveTypeName] = useState<string | undefined>("")
     const formRef = useRef<UseFormReturn | null>(null)
     const SORT_FIELD_MAP: Record<string, string> = {
         leave_type_name: "leave_type_name",
@@ -246,6 +246,8 @@ export const EmployeeLeaveBalances = () => {
                 onConfirm={handleLeaveTypePicked}
                 multiple={false}
             />
+
+
         </div>
     )
 }

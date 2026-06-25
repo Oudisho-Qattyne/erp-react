@@ -19,7 +19,7 @@ export const UserLeaveBalances = () => {
   const { myLeaveBalances, findAllMyLeaveBalances, loading, error, pagination, filter, setPage, setFilter, resetFilter } = useLeaveBalance()
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [leaveTypePickerOpen, setLeaveTypePickerOpen] = useState(false)
-  const [selectedLeaveTypeName, setSelectedLeaveTypeName] = useState<string>("")
+  const [selectedLeaveTypeName, setSelectedLeaveTypeName] = useState<string | undefined>("")
   const [sortColumn, setSortColumn] = useState<string>("leave_type_name")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const formRef = useRef<UseFormReturn | null>(null)
@@ -55,8 +55,10 @@ export const UserLeaveBalances = () => {
   const handleLeaveTypePicked = (types: EntityWithNameOnly[]) => {
     const lt = types[0]
     if (lt) {
-      setSelectedLeaveTypeName(getLocalizedTypeName(lt))
-      formRef.current?.setValue("leave_type_id", String(lt.id))
+      if(getLocalizedTypeName(lt)){
+        setSelectedLeaveTypeName(getLocalizedTypeName(lt))
+        formRef.current?.setValue("leave_type_id", String(lt.id))
+      }
     }
     setLeaveTypePickerOpen(false)
   }

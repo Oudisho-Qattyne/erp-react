@@ -34,7 +34,7 @@ export function UserLeaveRequests() {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [localSearch, setLocalSearch] = useState<string>("")
   const [leaveTypePickerOpen, setLeaveTypePickerOpen] = useState(false)
-  const [selectedLeaveTypeName, setSelectedLeaveTypeName] = useState<string>("")
+  const [selectedLeaveTypeName, setSelectedLeaveTypeName] = useState<string | undefined>("")
   const [sortColumn, setSortColumn] = useState<string>("id")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const formRef = useRef<UseFormReturn | null>(null)
