@@ -52,7 +52,7 @@ export function ShowRolePage() {
         >
           {t('show_role.back', 'users') || 'Back'}
         </Button>
-        <Button variant="primary" onClick={() => navigate(`/users/roles/${id}/edit`)}>
+        <Button variant="primary" onClick={() => navigate(`/users/roles/${id}/edit`)} requiredPermission="users.roles.edit">
           {t('show_role.edit', 'users') || 'Edit Role'}
         </Button>
       </div>

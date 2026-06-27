@@ -250,8 +250,8 @@ export const EmployeeLeaveRequests = () => {
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={(e) => { e.stopPropagation(); navigate(`/hr/leave-requests/${row.id}`) }}
-                        title={t("common.view", "shared") || "View"}
+                        onClick={(e) => { e.stopPropagation(); navigate(`/hr/employee-leave-requests/${row.id}`) }}
+                            title={t("common.view", "shared") || "View"}
                     >
                         <Eye size={16} />
                     </Button>
@@ -316,6 +316,7 @@ export const EmployeeLeaveRequests = () => {
                         columns={columns}
                         data={employeeLeaveRequests}
                         rowKey="id"
+                        onRowClick={(row) => navigate(`/hr/employee-leave-requests/${row.id}`)}
                         sortColumn={sortColumn}
                         sortOrder={sortOrder}
                         onSort={handleSort}

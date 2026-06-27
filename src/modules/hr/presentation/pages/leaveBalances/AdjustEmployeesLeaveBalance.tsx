@@ -216,6 +216,7 @@ export function AdjustEmployeesLeaveBalance() {
                         onClick={handleSubmit}
                         disabled={!selectedLeaveType || quantity <= 0 || selectedEmployees.length === 0 || isSubmitting}
                         isLoading={isSubmitting}
+                        requiredPermission="hr.leave-balance.adjust"
                     >
                         {t("adjust_leave_balance.submit", "hr") || "تعديل الرصيد"}
                     </Button>

@@ -130,7 +130,7 @@ export function EmployeesPage() {
         </div>
 
         {/* Add button on the right */}
-        <Button variant="primary" onClick={() => setIsAddDialogOpen(true)}>
+        <Button variant="primary" onClick={() => setIsAddDialogOpen(true)} requiredPermission="hr.employees.create">
           + {t('employees.add', 'hr') || 'إضافة موظف'}
         </Button>
       </div>

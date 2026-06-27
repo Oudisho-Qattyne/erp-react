@@ -29,6 +29,8 @@ import { UserLeaveBalances } from './presentation/pages/leaveBalances/UserLeaveB
 import { EmployeeLeaveBalances } from './presentation/pages/leaveBalances/EmployeeLeaveBalances'
 import { CreateLeaveRequest } from './presentation/pages/leaveRequest/CreateLeaveRequest'
 import { UserLeaveRequests } from './presentation/pages/leaveRequest/UseLeaveRequests'
+import { ShowLeaveRequestPage } from './presentation/pages/leaveRequest/ShowLeaveRequestPage'
+import { ShowLeaveRequestAdminPage } from './presentation/pages/leaveRequest/ShowLeaveRequestAdminPage'
 import { EmployeeLeaveRequests } from './presentation/pages/leaveRequest/EmployeeLeaveRequests'
 import { AdjustEmployeesLeaveBalance } from './presentation/pages/leaveBalances/AdjustEmployeesLeaveBalance'
 
@@ -150,11 +152,30 @@ const usersModule: Module = {
       requiredPermission: 'hr.leave-requests.list',
     },
     {
+      path: '/hr/employee-leave-requests/:id',
+      element: <ShowLeaveRequestAdminPage />,
+      layout: 'dashboard',
+      label: 'leave_request.show_title',
+      nav: false,
+      moduleName: 'hr',
+      requiresAuth: true,
+      requiredPermission: 'hr.leave-requests.list',
+    },
+    {
       path: '/hr/leave-requests/create',
       element: <CreateLeaveRequest />,
       layout: 'dashboard',
       label: 'leave_request.create_title',
       nav: true,
+      moduleName: 'hr',
+      requiresAuth: true,
+    },
+    {
+      path: '/hr/leave-requests/:id',
+      element: <ShowLeaveRequestPage />,
+      layout: 'dashboard',
+      label: 'leave_request.show_title',
+      nav: false,
       moduleName: 'hr',
       requiresAuth: true,
     },

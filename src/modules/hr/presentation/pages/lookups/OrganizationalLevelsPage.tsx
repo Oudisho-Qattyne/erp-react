@@ -116,11 +116,11 @@ export function OrganizationalLevelsPage() {
       render: (row: any) => (
         <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
           <Button variant="ghost" size="sm" onClick={() => setEditItem(row)}
-            title={t('common.edit', 'shared') || 'Edit'}>
+            title={t('common.edit', 'shared') || 'Edit'} requiredPermission="hr.organizational-levels.update">
             <Pencil size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)}
-            title={t('common.delete', 'shared') || 'Delete'}>
+            title={t('common.delete', 'shared') || 'Delete'} requiredPermission="hr.organizational-levels.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
         </div>
@@ -132,7 +132,7 @@ export function OrganizationalLevelsPage() {
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-bold">{t('lookups.tabs.organizational_levels', 'hr') || 'Organizational Levels'}</h1>
         <div className="w-full flex gap-2">
-          <Button onClick={() => setIsCreateOpen(true)}>{t('employee_form.add_org_unit', 'hr') || 'Add Organizational Unit'}</Button>
+          <Button onClick={() => setIsCreateOpen(true)} requiredPermission="hr.organizational-levels.create">{t('employee_form.add_org_unit', 'hr') || 'Add Organizational Unit'}</Button>
         </div>
       </div>
 

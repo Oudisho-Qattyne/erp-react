@@ -68,7 +68,8 @@
     "leave_request": {
       "title": "Leave Requests",
       "create_title": "Request a leave",
-      "edit_title": "Edit Leave Request"
+      "edit_title": "Edit Leave Request",
+      "show_title": "Leave Request Details"
     },
     "employee_leave_requests": {
       "title": "Employee Leave Requests"

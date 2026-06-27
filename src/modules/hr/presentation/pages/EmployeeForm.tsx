@@ -596,6 +596,8 @@ export function EmployeeForm({
     {
       name: 'chronic_disease_ids', type: 'multi-select-or-create', searchable: true, label: t('employees.chronic_diseases', 'hr') || 'تاريخ الإصابة',
       labelPath: 'data.name',
+      requiredPermission: 'hr.chronic-diseases.list',
+      createButtonPermission: 'hr.chronic-diseases.create',
       renderCreateForm: (onSuccess, onCancel) => <ChronicDiseaseCreateForm onSuccess={(v, i) => {
         onSuccess(v, i)
       }} onCancel={onCancel} />,
@@ -603,6 +605,8 @@ export function EmployeeForm({
     },
     {
       name: 'employee_status_id', type: 'select-or-create', searchable: true, label: t('employees.employee_status_id', 'hr') || 'Employee Status',
+      requiredPermission: 'hr.employee-statuses.list',
+      createButtonPermission: 'hr.employee-statuses.create',
       labelPath: 'data.name',
       infoButton:employee_id ? () => { setStatusLogsOpen(true) } : undefined,
       renderCreateForm: (onSuccess, onCancel) => <EmployeeStatusCreateForm onSuccess={(v, i) => {
@@ -668,6 +672,8 @@ export function EmployeeForm({
       searchable: true,
       labelPath: 'data.name',
       type: 'select-or-create',
+      requiredPermission: 'hr.job-statuses.list',
+      createButtonPermission: 'hr.job-statuses.create',
       infoButton:employee_id ? () => { setJobStatusLogsOpen(true) } : undefined,
       renderCreateForm: (onSuccess, onCancel) => <JobStatusCreateForm onSuccess={onSuccess} onCancel={onCancel} />,
       compute: async (values) => {

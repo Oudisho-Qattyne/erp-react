@@ -70,16 +70,16 @@ export function ChronicDiseasesPage() {
         <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
           {!row.is_default && (
             <Button variant="ghost" size="sm" onClick={() => setConfirmSetDefault(row)}
-              title={t('common.set_default', 'shared') || 'Set as default'}>
+              title={t('common.set_default', 'shared') || 'Set as default'} requiredPermission="hr.chronic-diseases.update">
               <Star size={16} />
             </Button>
           )}
           <Button variant="ghost" size="sm" onClick={() => setEditItem(row)}
-            title={t('common.edit', 'shared') || 'Edit'}>
+            title={t('common.edit', 'shared') || 'Edit'} requiredPermission="hr.chronic-diseases.update">
             <Pencil size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)}
-            title={t('common.delete', 'shared') || 'Delete'}>
+            title={t('common.delete', 'shared') || 'Delete'} requiredPermission="hr.chronic-diseases.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
         </div>
@@ -94,7 +94,7 @@ export function ChronicDiseasesPage() {
           <Input type="text" value={searchQuery} onChange={setSearchQuery}
             placeholder={t('common.search', 'shared') || 'Search...'}
             baseClasses={inputBaseClasses} className="w-60" />
-          <Button onClick={() => setIsCreateOpen(true)}>{t('employee_form.add_chronic_disease', 'hr') || 'Add Chronic Disease'}</Button>
+          <Button onClick={() => setIsCreateOpen(true)} requiredPermission="hr.chronic-diseases.create">{t('employee_form.add_chronic_disease', 'hr') || 'Add Chronic Disease'}</Button>
         </div>
       </div>
 

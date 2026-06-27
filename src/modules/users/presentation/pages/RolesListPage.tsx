@@ -103,7 +103,7 @@ export function RolesListPage() {
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">{t('roles.title', 'users') || 'Roles'}</h1>
-        <Button variant="primary" onClick={() => setIsAddDialogOpen(true)}>
+        <Button variant="primary" onClick={() => setIsAddDialogOpen(true)} requiredPermission="users.roles.add">
           + {t('roles.add', 'users') || 'Add Role'}
         </Button>
       </div>

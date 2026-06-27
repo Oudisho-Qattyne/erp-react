@@ -68,7 +68,8 @@
     "leave_request": {
       "title": "طلبات الإجازة",
       "create_title": "طلب إجازة",
-      "edit_title": "تعديل طلب الإجازة"
+      "edit_title": "تعديل طلب الإجازة",
+      "show_title": "تفاصيل طلب الإجازة"
     },
     "employee_leave_requests": {
       "title": "طلبات إجازة الموظفين"
