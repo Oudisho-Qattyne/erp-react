@@ -73,28 +73,35 @@ export function RolesListPage() {
       align: 'center',
       render: (row) => (
         <div className="flex items-center justify-center gap-2">
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => navigate(`/users/roles/${row.id}`)}
-            className="p-1.5 rounded-md hover:bg-primary/10 text-text-muted hover:text-primary transition-colors"
             title={t('common.view', 'shared') || 'View'}
+            requiredPermission="users.roles.view"
           >
             <Eye size={16} />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => navigate(`/users/roles/${row.id}/edit`)}
-            className="p-1.5 rounded-md hover:bg-warning/10 text-text-muted hover:text-warning transition-colors"
             title={t('common.edit', 'shared') || 'Edit'}
+            requiredPermission="users.roles.edit"
           >
             <Pencil size={16} />
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setRoleToDelete(row)}
-            className="p-1.5 rounded-md hover:bg-danger/10 text-text-muted hover:text-danger transition-colors"
             title={t('common.delete', 'shared') || 'Delete'}
+            requiredPermission="users.roles.delete"
+            className="text-danger hover:text-danger"
           >
-            <Trash2 size={16}  className="text-danger"/>
-          </button>
-        </div>
+            <Trash2 size={16} />
+          </Button>
+        </div> 
       ),
     },
   ];

@@ -1,7 +1,66 @@
 {
-    "navigation":{
-        "storage":{
-            "title":"التخزين"
-        }
+  "navigation": {
+    "storage": {
+      "title": "التخزين"
     }
+  },
+  "toolbar": {
+    "add_folder": "مجلد جديد",
+    "upload_file": "رفع ملف",
+    "delete_selected": "حذف المحدد",
+    "rename": "إعادة تسمية",
+    "cut": "قص",
+    "paste": "لصق"
+  },
+  "delete_confirm": {
+    "title": "تأكيد الحذف",
+    "message": "هل أنت متأكد من حذف العناصر المحددة؟",
+    "irreversible": "لا يمكن التراجع عن هذا الإجراء.",
+    "deleting": "جاري الحذف...",
+    "confirm": "حذف"
+  },
+  "rename": {
+    "dialog_title_folder": "إعادة تسمية المجلد",
+    "dialog_title_file": "إعادة تسمية الملف",
+    "new_name": "الاسم الجديد",
+    "hint_file": "يمكنك تغيير الاسم فقط، الامتداد (.{ext}) سيتم الحفاظ عليه.",
+    "updating": "جاري التحديث...",
+    "confirm": "إعادة تسمية"
+  },
+  "folder_create": {
+    "placeholder": "اسم المجلد",
+    "creating": "جاري الإنشاء...",
+    "confirm": "إنشاء"
+  },
+  "file_upload": {
+    "original_file": "الملف الأصلي:",
+    "file_name": "اسم الملف",
+    "file_name_placeholder": "اسم الملف",
+    "hint": "يمكنك تغيير الاسم، الامتداد ثابت",
+    "secure_storage": "تخزين آمن (تشفير الملف)",
+    "uploading": "جاري الرفع...",
+    "confirm": "رفع",
+    "cancel": "إلغاء"
+  },
+  "create_item_dialog": {
+    "title_folder": "إنشاء مجلد جديد",
+    "title_file": "رفع ملف"
+  },
+  "context_menu": {
+    "rename": "إعادة تسمية",
+    "delete": "حذف",
+    "download": "تحميل",
+    "cut": "قص",
+    "paste": "لصق"
+  },
+  "file_picker": {
+    "title": "اختر الملفات",
+    "cancel": "إلغاء",
+    "select": "تحديد",
+    "select_count": "تحديد ({count})"
+  },
+  "file_explorer_dialog": {
+    "title": "مستكشف الملفات"
+  },
+  "error_message": "حدث خطأ ما"
 }

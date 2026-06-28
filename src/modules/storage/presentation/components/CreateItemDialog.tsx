@@ -1,5 +1,5 @@
-// src/modules/storage/presentation/components/CreateItemDialog.tsx
 import { Dialog } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
+import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import { FileUploadForm } from './FileUploadForm';
 import { FolderCreateForm } from './FolderCreateForm';
 
@@ -26,10 +26,11 @@ export function CreateItemDialog({
   apiRef,
   clipPath
 }: CreateItemDialogProps) {
-  const title = type === 'folder' ? 'إنشاء مجلد جديد' : 'رفع ملف';
+  const { t } = useLanguage();
+  const titleKey = type === 'folder' ? 'create_item_dialog.title_folder' : 'create_item_dialog.title_file';
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} title={title}>
+    <Dialog isOpen={isOpen} onClose={onClose} title={t(titleKey, 'storage')}>
       {type === 'folder' && (
         <FolderCreateForm
           parentId={parentId}
