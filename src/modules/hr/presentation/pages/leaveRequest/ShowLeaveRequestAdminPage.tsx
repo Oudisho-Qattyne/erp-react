@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nProvider"
+import { useAuth } from "../../../../../core/infrastructure/auth/AuthProvider"
 import { useLeaveRequest } from "../../hooks/leaveRequest/useLeaveRequest"
 import { Button } from "../../../../../core/presentation/layouts/ui/buttons/Button"
 import { LoadingState } from "../../../../../core/presentation/layouts/ui/state/LoadingState"
@@ -23,6 +24,7 @@ export function ShowLeaveRequestAdminPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { t, language, direction } = useLanguage()
+  const { hasPermission } = useAuth()
   const { currentLeaveRequest, findLeaveRequestById, loading, error, processLeaveRequest } = useLeaveRequest()
   const [processAction, setProcessAction] = useState<"approve" | "reject" | null>(null)
   const [reviewNotes, setReviewNotes] = useState("")
@@ -74,7 +76,7 @@ export function ShowLeaveRequestAdminPage() {
         >
           {t("common.back", "shared")}
         </Button>
-        {lr.status === "pending" && (
+        {lr.status === "pending" && hasPermission('hr.leave-requests.manage') && (
           <div className="flex items-center gap-2">
             <Button
               variant="primary"

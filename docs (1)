@@ -57,6 +57,9 @@ paths:
                   type: object
                   required: [en, ar]
                   properties: { en: { type: string, example: 'country name in english' }, ar: { type: string, example: 'اسم الدولة في العربية' } }
+                is_default:
+                  type: boolean
+                  example: false
       responses:
         200:
           description: 'Created successfully'
@@ -126,6 +129,9 @@ paths:
                 name:
                   type: object
                   properties: { en: { type: string, example: 'country name in english' }, ar: { type: string, example: 'اسم الدولة في العربية' } }
+                is_default:
+                  type: boolean
+                  example: false
       responses:
         200:
           description: 'Updated successfully'
@@ -247,6 +253,9 @@ paths:
                 country_id:
                   type: integer
                   example: 1
+                is_default:
+                  type: boolean
+                  example: false
       responses:
         200:
           description: 'Created successfully'
@@ -318,6 +327,9 @@ paths:
                   properties: { en: { type: string, example: 'city name in english' }, ar: { type: string, example: 'اسم المدينة في العربية' } }
                 country_id:
                   type: integer
+                is_default:
+                  type: boolean
+                  example: false
       responses:
         200:
           description: 'Updated successfully'
@@ -373,6 +385,9 @@ paths:
                 city_id:
                   type: integer
                   example: 1
+                is_default:
+                  type: boolean
+                  example: false
       responses:
         200:
           description: 'Created successfully'
@@ -444,6 +459,9 @@ paths:
                   properties: { en: { type: string, example: 'region name in english' }, ar: { type: string, example: 'اسم المنطقة في العربية' } }
                 city_id:
                   type: integer
+                is_default:
+                  type: boolean
+                  example: false
       responses:
         200:
           description: 'Updated successfully'
@@ -520,6 +538,9 @@ paths:
                 name:
                   type: string
                   example: 'Damascus University'
+                is_default:
+                  type: boolean
+                  example: false
       responses:
         200:
           description: 'Created successfully'
@@ -583,6 +604,9 @@ paths:
               properties:
                 name:
                   type: string
+                is_default:
+                  type: boolean
+                  example: false
       responses:
         200:
           description: 'Updated successfully'
@@ -682,6 +706,9 @@ paths:
                 university_id:
                   type: integer
                   example: 1
+                is_default:
+                  type: boolean
+                  example: false
       responses:
         200:
           description: 'Created successfully'
@@ -747,6 +774,9 @@ paths:
                   type: string
                 university_id:
                   type: integer
+                is_default:
+                  type: boolean
+                  example: false
       responses:
         200:
           description: 'Updated successfully'
@@ -846,6 +876,9 @@ paths:
                 faculty_id:
                   type: integer
                   example: 1
+                is_default:
+                  type: boolean
+                  example: false
       responses:
         200:
           description: 'Created successfully'
@@ -911,6 +944,9 @@ paths:
                   type: string
                 faculty_id:
                   type: integer
+                is_default:
+                  type: boolean
+                  example: false
       responses:
         200:
           description: 'Updated successfully'
@@ -1258,6 +1294,58 @@ paths:
                 $ref: '#/components/schemas/SuccessResponse'
         404:
           $ref: '#/components/responses/NotFound'
+  '/hr/employees/{id}/job-status-logs':
+    get:
+      summary: 'Get job status change history for an employee'
+      tags:
+        - Employees
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Job status history retrieved successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/JobStatusLog' } } } }
+        404:
+          $ref: '#/components/responses/NotFound'
+  '/hr/employees/{id}/employee-status-logs':
+    get:
+      summary: 'Get employee status change history for an employee'
+      tags:
+        - Employees
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Employee status history retrieved successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/EmployeeStatusLog' } } } }
+        404:
+          $ref: '#/components/responses/NotFound'
   /hr/employees/eligible-leave-types:
     get:
       summary: 'Get leave types the authenticated employee is eligible for'
@@ -1413,6 +1501,272 @@ paths:
                 $ref: '#/components/schemas/SuccessResponse'
         404:
           $ref: '#/components/responses/NotFound'
+  /hr/job-statuses:
+    get:
+      summary: 'List job statuses'
+      tags:
+        - 'Job Statuses'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          $ref: '#/components/parameters/HrPage'
+        -
+          $ref: '#/components/parameters/HrPerPage'
+        -
+          $ref: '#/components/parameters/HrSortByName'
+        -
+          $ref: '#/components/parameters/HrSortByCreatedAt'
+      responses:
+        200:
+          description: 'Paginated list of job status records'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/JobStatus' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      summary: 'Create job status'
+      tags:
+        - 'Job Statuses'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobStatusInput'
+      responses:
+        200:
+          description: 'Job status created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/JobStatus' } } }
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/hr/job-statuses/{id}':
+    get:
+      summary: 'Get job status details'
+      tags:
+        - 'Job Statuses'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Job status details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/JobStatus' } } }
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Update job status'
+      tags:
+        - 'Job Statuses'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobStatusUpdateInput'
+      responses:
+        200:
+          description: 'Job status updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/JobStatus' } } }
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      summary: 'Delete job status'
+      tags:
+        - 'Job Statuses'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Job status deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /hr/employee-statuses:
+    get:
+      summary: 'List employee statuses'
+      tags:
+        - 'Employee Statuses'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          $ref: '#/components/parameters/HrPage'
+        -
+          $ref: '#/components/parameters/HrPerPage'
+        -
+          $ref: '#/components/parameters/HrSortByName'
+        -
+          $ref: '#/components/parameters/HrSortByCreatedAt'
+      responses:
+        200:
+          description: 'Paginated list of employee status records'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/EmployeeStatus' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      summary: 'Create employee status'
+      tags:
+        - 'Employee Statuses'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeStatusInput'
+      responses:
+        200:
+          description: 'Employee status created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/EmployeeStatus' } } }
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/hr/employee-statuses/{id}':
+    get:
+      summary: 'Get employee status details'
+      tags:
+        - 'Employee Statuses'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Employee status details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/EmployeeStatus' } } }
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Update employee status'
+      tags:
+        - 'Employee Statuses'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeStatusUpdateInput'
+      responses:
+        200:
+          description: 'Employee status updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/EmployeeStatus' } } }
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      summary: 'Delete employee status'
+      tags:
+        - 'Employee Statuses'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Employee status deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        404:
+          $ref: '#/components/responses/NotFound'
   /hr/leave-types:
     get:
       summary: 'List all leave types'
@@ -1511,8 +1865,8 @@ paths:
                   - { type: object, properties: { data: { $ref: '#/components/schemas/LeaveTypeInfo' } } }
         404:
           $ref: '#/components/responses/NotFound'
-    put:
-      summary: 'Update a leave type'
+    delete:
+      summary: 'Delete a leave type'
       tags:
         - 'Leave Types'
       security:
@@ -1525,24 +1879,16 @@ paths:
           required: true
           schema:
             type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LeaveTypeUpdateRequest'
       responses:
         200:
-          description: 'Leave type updated successfully'
+          description: 'Leave type deleted successfully'
           content:
             application/json:
               schema:
-                allOf:
-                  - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/LeaveTypeInfo' } } }
+                $ref: '#/components/schemas/SuccessResponse'
         404:
           $ref: '#/components/responses/NotFound'
-        422:
-          $ref: '#/components/responses/ValidationError'
+  '/hr/leave-types/{id}/archive':
     patch:
       summary: 'Archive a leave type'
       tags:
@@ -1568,29 +1914,6 @@ paths:
                   - { type: object, properties: { data: { $ref: '#/components/schemas/LeaveTypeInfo' } } }
         400:
           $ref: '#/components/responses/ValidationError'
-        404:
-          $ref: '#/components/responses/NotFound'
-    delete:
-      summary: 'Delete a leave type'
-      tags:
-        - 'Leave Types'
-      security:
-        -
-          sanctumAuth: {  }
-      parameters:
-        -
-          name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        200:
-          description: 'Leave type deleted successfully'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessResponse'
         404:
           $ref: '#/components/responses/NotFound'
   /hr/resolvers:
@@ -1624,6 +1947,420 @@ paths:
                   - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/ResolverInfo' } } } }
         401:
           $ref: '#/components/responses/Unauthenticated'
+  /hr/leave-balance/adjust:
+    post:
+      summary: 'Adjust leave balance for one or more employees'
+      description: "Adds or deducts leave balance units for specific employees under a given leave type.\nWhen deducting, the quantity is automatically capped to the employee's available free balance to prevent negative balance.\n"
+      tags:
+        - 'Leave Balance'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveBalanceAdjustmentRequest'
+      responses:
+        200:
+          description: 'Adjustment applied successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  /hr/leave-balance:
+    get:
+      summary: 'List employee leave balances'
+      description: "Returns the current leave balance for employees, grouped by leave type.\nFor accrual leave types (yearly/monthly), only transactions within the current period are included.\nFor non-accrual leave types, all transactions are aggregated.\n"
+      tags:
+        - 'Leave Balance'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          $ref: '#/components/parameters/HrPage'
+        -
+          $ref: '#/components/parameters/HrPerPage'
+        -
+          $ref: '#/components/parameters/HrLeaveBalanceSearch'
+        -
+          $ref: '#/components/parameters/HrLeaveBalanceEmployeeIdFilter'
+        -
+          $ref: '#/components/parameters/HrLeaveBalanceLeaveTypeIdFilter'
+        -
+          $ref: '#/components/parameters/HrSortByEntitledUnits'
+        -
+          $ref: '#/components/parameters/HrSortByConsumedUnits'
+        -
+          $ref: '#/components/parameters/HrSortBySystemCorrectionAddedUnits'
+        -
+          $ref: '#/components/parameters/HrSortBySystemCorrectionDeductedUnits'
+        -
+          $ref: '#/components/parameters/HrSortByAdjustmentAddedUnits'
+        -
+          $ref: '#/components/parameters/HrSortByAdjustmentDeductedUnits'
+        -
+          $ref: '#/components/parameters/HrSortByCarriedForwardUnits'
+        -
+          $ref: '#/components/parameters/HrSortByAvailableUnits'
+        -
+          $ref: '#/components/parameters/HrSortByLeaveTypeName'
+      responses:
+        200:
+          description: 'Paginated list of leave balances'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/EmployeeLeaveBalance' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  /hr/leave-balance/my:
+    get:
+      summary: 'Get my leave balance'
+      description: "Returns the current leave balance for the authenticated employee, grouped by leave type.\nFor accrual leave types (yearly/monthly), only transactions within the current period are included.\nFor non-accrual leave types, all transactions are aggregated.\n"
+      tags:
+        - 'Leave Balance'
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'List of leave balances for the authenticated employee'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/EmployeeLeaveBalance' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+  /hr/leave-requests/my:
+    get:
+      summary: 'Get my leave requests'
+      description: "Returns a paginated list of leave requests for the authenticated employee,\nincluding leave type details.\n"
+      tags:
+        - 'Leave Requests'
+      parameters:
+        -
+          $ref: '#/components/parameters/HrPage'
+        -
+          $ref: '#/components/parameters/HrPerPage'
+      responses:
+        200:
+          description: "Paginated list of the authenticated employee's leave requests"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/LeaveRequestInfo' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+  '/hr/leave-requests/{id}':
+    get:
+      summary: 'Get a leave request by ID'
+      description: "Returns a single leave request with employee and leave type details.\n"
+      tags:
+        - 'Leave Requests'
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'Leave request details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/LeaveRequestInfo' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      summary: 'Update a leave request'
+      description: "Updates the leave request fields. Only the owning employee can update their own requests.\nThe validation pipeline is re-run with the updated values.\nAllowed fields: `start_date`, `end_date`, `requested_units`, `reason`.\n"
+      tags:
+        - 'Leave Requests'
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                start_date:
+                  type: string
+                  format: date-time
+                  description: 'Start date of the leave'
+                  example: '2026-07-10T00:00:00'
+                end_date:
+                  type: string
+                  format: date-time
+                  description: 'End date of the leave'
+                  example: '2026-07-15T00:00:00'
+                requested_units:
+                  type: number
+                  description: 'Number of units requested'
+                  example: 5
+                reason:
+                  type: string
+                  description: 'Reason for the leave request'
+                  example: 'Updated vacation plan'
+      responses:
+        200:
+          description: 'Leave request updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/LeaveRequestInfo' } } }
+        400:
+          description: 'Validation failed (eligibility, balance, etc.)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          description: 'Forbidden — not the owner'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  /hr/leave-requests:
+    get:
+      summary: 'List all leave requests'
+      description: "Returns a paginated list of all leave requests with employee and leave type details.\nSupports filtering by search (employee name), employee_id, leave_type_id, status, and date ranges\nvia the LeaveRequest scopeFilter.\n"
+      tags:
+        - 'Leave Requests'
+      parameters:
+        -
+          $ref: '#/components/parameters/HrPage'
+        -
+          $ref: '#/components/parameters/HrPerPage'
+        -
+          $ref: '#/components/parameters/HrEmployeeSearch'
+        -
+          $ref: '#/components/parameters/HrEmployeeIdFilter'
+        -
+          name: leave_type_id
+          in: query
+          required: false
+          schema:
+            type: integer
+          example: 1
+        -
+          name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - draft
+              - pending
+              - approved
+              - rejected
+              - cancelled
+          example: pending
+        -
+          name: from_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          example: '2026-01-01'
+        -
+          name: to_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          example: '2026-12-31'
+      responses:
+        200:
+          description: 'Paginated list of leave requests'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/LeaveRequestInfo' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      summary: 'Submit a new leave request'
+      description: "Creates a new leave request for the authenticated employee after running\nthe full validation pipeline: eligibility rules, notice period, min/max units,\nentitlement & proration resolution, available balance check, and split restriction.\n"
+      tags:
+        - 'Leave Requests'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeaveRequestCreateRequest'
+      responses:
+        200:
+          description: 'Leave request created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/LeaveRequestInfo' } } }
+        400:
+          description: 'Validation failed (eligibility, balance, etc.)'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/hr/leave-requests/{id}/approve':
+    post:
+      summary: 'Approve a leave request'
+      description: "Approves a pending leave request, updates its status to `approved`,\nand creates a `leave_consumption` balance transaction for the consumed units.\n"
+      tags:
+        - 'Leave Requests'
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                review_notes:
+                  type: string
+                  nullable: true
+                  example: 'Approved by manager'
+      responses:
+        200:
+          description: 'Leave request approved successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/LeaveRequestInfo' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  '/hr/leave-requests/{id}/reject':
+    post:
+      summary: 'Reject a leave request'
+      description: "Rejects a pending leave request, updates its status to `rejected`,\nand records the reviewer's notes.\n"
+      tags:
+        - 'Leave Requests'
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - review_notes
+              properties:
+                review_notes:
+                  type: string
+                  example: 'Does not meet department requirements'
+      responses:
+        200:
+          description: 'Leave request rejected successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/LeaveRequestInfo' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/hr/leave-requests/{id}/cancel':
+    post:
+      summary: 'Cancel a leave request'
+      description: "Cancels a leave request, updates its status to `cancelled`.\nAn optional reason can be provided; if omitted the original reason is preserved.\n"
+      tags:
+        - 'Leave Requests'
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  nullable: true
+                  example: 'No longer needed'
+      responses:
+        200:
+          description: 'Leave request cancelled successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/LeaveRequestInfo' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
   /storage-management:
     get:
       summary: 'List root-level storage items'
@@ -2497,6 +3234,9 @@ components:
         name:
           type: string
           example: Syria
+        is_default:
+          type: boolean
+          example: false
         created_at:
           type: string
           example: '2024-01-01 10:00:00'
@@ -2509,6 +3249,9 @@ components:
         name:
           type: string
           example: Damascus
+        is_default:
+          type: boolean
+          example: false
         country_id:
           type: integer
           example: 1
@@ -2524,6 +3267,9 @@ components:
         name:
           type: string
           example: Baramkeh
+        is_default:
+          type: boolean
+          example: false
         city_id:
           type: integer
           example: 1
@@ -2539,6 +3285,9 @@ components:
         name:
           type: string
           example: 'Damascus University'
+        is_default:
+          type: boolean
+          example: false
         created_at:
           type: string
           example: '2024-01-01 10:00:00'
@@ -2551,6 +3300,9 @@ components:
         name:
           type: string
           example: 'Faculty of Engineering'
+        is_default:
+          type: boolean
+          example: false
         university_id:
           type: integer
           example: 1
@@ -2566,6 +3318,9 @@ components:
         name:
           type: string
           example: 'Computer Engineering'
+        is_default:
+          type: boolean
+          example: false
         faculty_id:
           type: integer
           example: 1
@@ -2700,6 +3455,9 @@ components:
         name:
           type: string
           example: Diabetes
+        is_default:
+          type: boolean
+          example: false
         created_at:
           type: string
           example: 1602288000
@@ -2712,6 +3470,9 @@ components:
           type: string
           maxLength: 150
           example: Diabetes
+        is_default:
+          type: boolean
+          example: false
     ChronicDiseaseUpdateInput:
       type: object
       properties:
@@ -2719,6 +3480,121 @@ components:
           type: string
           maxLength: 150
           example: Diabetes
+        is_default:
+          type: boolean
+          example: false
+    JobStatus:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Full-time
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          example: 1602288000
+    JobStatusInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 150
+          example: Full-time
+        is_default:
+          type: boolean
+          example: false
+    JobStatusUpdateInput:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 150
+          example: Part-time
+        is_default:
+          type: boolean
+          example: false
+    EmployeeStatus:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Active
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          example: 1602288000
+    EmployeeStatusInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 150
+          example: Active
+        is_default:
+          type: boolean
+          example: false
+    EmployeeStatusUpdateInput:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 150
+          example: Inactive
+        is_default:
+          type: boolean
+          example: false
+    JobStatusLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        employee_id:
+          type: integer
+          example: 1
+        job_status_id:
+          type: integer
+          example: 1
+        job_status_note:
+          type: string
+          nullable: true
+          example: 'Transferred to full-time'
+        created_at:
+          type: string
+          example: 1602288000
+    EmployeeStatusLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        employee_id:
+          type: integer
+          example: 1
+        employee_status_id:
+          type: integer
+          example: 1
+        employee_status_note:
+          type: string
+          nullable: true
+          example: 'Transferred to full-time'
+        created_at:
+          type: string
+          example: 1602288000
     EmployeeInfo:
       type: object
       properties:
@@ -2866,6 +3742,26 @@ components:
             path:
               type: string
               example: private/employees/EMP001-Ahmad_Khaled_Hassan
+        job_status_id:
+          type: integer
+          nullable: true
+          example: 1
+        job_status_note:
+          type: string
+          nullable: true
+          example: 'Initial hire'
+        job_status:
+          $ref: '#/components/schemas/JobStatus'
+        employee_status_id:
+          type: integer
+          nullable: true
+          example: 1
+        employee_status_note:
+          type: string
+          nullable: true
+          example: 'Active employee'
+        employee_status:
+          $ref: '#/components/schemas/EmployeeStatus'
         created_at:
           type: string
           example: 1602288000
@@ -3038,6 +3934,21 @@ components:
           description: 'Required when `marital_status` is `married` and `number_of_children` is greater than 0. The array length must match `number_of_children`.'
           items:
             $ref: '#/components/schemas/EmployeeChildInput'
+        job_status_id:
+          type: integer
+          example: 1
+        job_status_note:
+          type: string
+          nullable: true
+          example: 'Initial hire'
+        employee_status_id:
+          type: integer
+          nullable: true
+          example: 1
+        employee_status_note:
+          type: string
+          nullable: true
+          example: 'Active employee'
     EmployeeUpdateRequest:
       type: object
       properties:
@@ -3147,17 +4058,47 @@ components:
           nullable: true
           items:
             $ref: '#/components/schemas/EmployeeChildInput'
+        job_status_id:
+          type: integer
+          nullable: true
+          example: 1
+        job_status_note:
+          type: string
+          nullable: true
+          example: 'Transferred to part-time'
+        employee_status_id:
+          type: integer
+          nullable: true
+          example: 1
+        employee_status_note:
+          type: string
+          nullable: true
+          example: 'Status changed'
     RuleCondition:
       type: object
       description: 'A single leaf condition comparing a field against a value'
       required:
+        - type
         - field
         - operator
         - value
       properties:
+        type:
+          type: string
+          enum:
+            - condition
+          example: condition
         field:
           type: string
-          example: employment_type
+          enum:
+            - employee_age
+            - employee_gender
+            - employee_number_of_children
+            - employee_years_of_service
+            - employee_marital_status
+            - employee_job_title
+            - employee_contract_type
+          example: employee_age
         operator:
           type: string
           enum:
@@ -3167,10 +4108,10 @@ components:
             - '>='
             - '<'
             - '<='
-            - in
-            - between
-            - contains
-          example: '='
+            - IN
+            - 'NOT IN'
+            - BETWEEN
+          example: '>='
         value:
           description: 'The value to compare against (type depends on the field)'
     RuleGroup:
@@ -3201,35 +4142,34 @@ components:
               -
                 $ref: '#/components/schemas/RuleGroup'
     eligibility_rules_example:
-      type: object
-      description: 'Example structure for leave type eligibility rules'
-      properties:
-        rule:
+      oneOf:
+        -
+          $ref: '#/components/schemas/RuleCondition'
+        -
           $ref: '#/components/schemas/RuleGroup'
       example:
-        rule:
-          type: group
-          operator: AND
-          conditions:
-            -
-              type: condition
-              field: employment_type
-              operator: '='
-              value: permanent
-            -
-              type: group
-              operator: OR
-              conditions:
-                -
-                  type: condition
-                  field: service_years
-                  operator: '>='
-                  value: 5
-                -
-                  type: condition
-                  field: job_grade
-                  operator: '>='
-                  value: 8
+        type: group
+        operator: AND
+        conditions:
+          -
+            type: condition
+            field: employee_contract_type
+            operator: '='
+            value: permanent
+          -
+            type: group
+            operator: OR
+            conditions:
+              -
+                type: condition
+                field: employee_years_of_service
+                operator: '>='
+                value: 5
+              -
+                type: condition
+                field: employee_job_title
+                operator: '='
+                value: Manager
     entitlement_rules:
       type: object
       description: "Entitlement rule definitions.\nAccepts one of two structures: `bands` (tiered bands with rule-based matching) or `fixed` (flat grant).\nFor now only the `bands` structure is used.\n"
@@ -3269,7 +4209,7 @@ components:
               conditions:
                 -
                   type: condition
-                  field: service_years
+                  field: employee_years_of_service
                   operator: '<'
                   value: 5
             grant:
@@ -3282,12 +4222,12 @@ components:
               conditions:
                 -
                   type: condition
-                  field: service_years
+                  field: employee_years_of_service
                   operator: '>='
                   value: 5
                 -
                   type: condition
-                  field: service_years
+                  field: employee_years_of_service
                   operator: '<'
                   value: 10
             grant:
@@ -3300,7 +4240,7 @@ components:
               conditions:
                 -
                   type: condition
-                  field: service_years
+                  field: employee_years_of_service
                   operator: '>='
                   value: 10
             grant:
@@ -3561,6 +4501,198 @@ components:
           type: boolean
           default: true
           example: true
+    LeaveBalanceAdjustmentRequest:
+      type: object
+      required:
+        - leave_type_id
+        - employee_ids
+        - adjustment_type
+        - quantity
+      properties:
+        leave_type_id:
+          type: integer
+          description: 'ID of the leave type to adjust'
+          example: 1
+        employee_ids:
+          type: array
+          description: 'List of employee IDs to apply the adjustment to'
+          minItems: 1
+          items:
+            type: integer
+          example:
+            - 1
+            - 2
+            - 3
+        adjustment_type:
+          type: string
+          description: 'Type of adjustment'
+          enum:
+            - add
+            - deduct
+          example: add
+        quantity:
+          type: number
+          description: 'Number of units to add or deduct'
+          example: 5
+        notes:
+          type: string
+          nullable: true
+          description: 'Optional reason for the adjustment'
+          example: 'Manager adjustment'
+    EmployeeLeaveBalance:
+      type: object
+      properties:
+        employee_id:
+          type: integer
+          example: 1
+        leave_type_id:
+          type: integer
+          example: 1
+        leave_type_name:
+          type: string
+          example: 'Annual Leave'
+        accrual_period:
+          type: string
+          nullable: true
+          enum:
+            - yearly
+            - monthly
+            - none
+          example: yearly
+        entitled_units:
+          type: number
+          format: float
+          example: 21
+        consumed_units:
+          type: number
+          format: float
+          example: 5
+        system_correction_added_units:
+          type: number
+          format: float
+          example: 0
+        system_correction_deducted_units:
+          type: number
+          format: float
+          example: 0
+        adjustment_added_units:
+          type: number
+          format: float
+          example: 3
+        adjustment_deducted_units:
+          type: number
+          format: float
+          example: 0
+        carried_forward_units:
+          type: number
+          format: float
+          example: 0
+        available_units:
+          type: number
+          format: float
+          example: 19
+    LeaveRequestCreateRequest:
+      type: object
+      required:
+        - leave_type_id
+        - start_date
+        - end_date
+        - requested_units
+        - reason
+      properties:
+        leave_type_id:
+          type: integer
+          description: 'ID of the leave type'
+          example: 1
+        start_date:
+          type: string
+          format: date-time
+          description: 'Start date of the leave'
+          example: '2026-07-01T00:00:00'
+        end_date:
+          type: string
+          format: date-time
+          description: 'End date of the leave'
+          example: '2026-07-05T00:00:00'
+        requested_units:
+          type: number
+          description: 'Number of units requested (days/hours depending on leave type)'
+          example: 5
+        reason:
+          type: string
+          description: 'Reason for the leave request'
+          example: 'Annual vacation'
+    LeaveRequestInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        employee_id:
+          type: integer
+          example: 1
+        leave_type_id:
+          type: integer
+          example: 1
+        start_date:
+          type: string
+          example: 01-07-2026
+        end_date:
+          type: string
+          example: 05-07-2026
+        requested_units:
+          type: number
+          format: float
+          example: 5
+        reason:
+          type: string
+          example: 'Annual vacation'
+        status:
+          type: string
+          enum:
+            - draft
+            - pending
+            - approved
+            - rejected
+            - cancelled
+          example: pending
+        review_notes:
+          type: string
+          nullable: true
+          example: null
+        employee_name:
+          type: string
+          nullable: true
+          example: 'John Doe Smith'
+          description: 'Employee full name, included only when the `employee` relation is loaded'
+        leave_type:
+          allOf:
+            -
+              $ref: '#/components/schemas/LeaveTypeInfo'
+          nullable: true
+          description: 'Leave type details, included only when the `leaveType` relation is loaded'
+        submitted_at:
+          type: string
+          nullable: true
+          example: null
+        approved_at:
+          type: string
+          nullable: true
+          example: null
+        rejected_at:
+          type: string
+          nullable: true
+          example: null
+        cancelled_at:
+          type: string
+          nullable: true
+          example: null
+        created_at:
+          type: string
+          example: 19-06-2026
+        updated_at:
+          type: string
+          example: 19-06-2026
     LeaveTypeUpdateRequest:
       type: object
       properties:
@@ -4244,6 +5376,112 @@ components:
         enum:
           - 'true'
           - 'false'
+    HrLeaveBalanceSearch:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+        example: annual
+    HrLeaveBalanceEmployeeIdFilter:
+      name: employee_id
+      in: query
+      required: false
+      schema:
+        type: integer
+        example: 10
+    HrLeaveBalanceLeaveTypeIdFilter:
+      name: leave_type_id
+      in: query
+      required: false
+      schema:
+        type: integer
+        example: 1
+    HrSortByEntitledUnits:
+      name: 'sort_by[entitled_units]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: desc
+    HrSortByConsumedUnits:
+      name: 'sort_by[consumed_units]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: desc
+    HrSortBySystemCorrectionAddedUnits:
+      name: 'sort_by[system_correction_added_units]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+    HrSortBySystemCorrectionDeductedUnits:
+      name: 'sort_by[system_correction_deducted_units]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+    HrSortByAdjustmentAddedUnits:
+      name: 'sort_by[adjustment_added_units]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+    HrSortByAdjustmentDeductedUnits:
+      name: 'sort_by[adjustment_deducted_units]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+    HrSortByCarriedForwardUnits:
+      name: 'sort_by[carried_forward_units]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+    HrSortByAvailableUnits:
+      name: 'sort_by[available_units]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: asc
+    HrSortByLeaveTypeName:
+      name: 'sort_by[leave_type_name]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: asc
   responses:
     Unauthenticated:
       description: Unauthenticated
@@ -4306,6 +5544,18 @@ tags:
   -
     name: 'Leave Types'
     description: 'Manage leave type definitions with eligibility, entitlement, and proration rules'
+  -
+    name: 'Leave Balance'
+    description: 'Adjust and manage leave balance for employees'
+  -
+    name: 'Leave Requests'
+    description: 'Manage employee leave requests with validation'
+  -
+    name: 'Job Statuses'
+    description: 'Manage job status definitions'
+  -
+    name: 'Employee Statuses'
+    description: 'Manage employee status definitions'
   -
     name: Storage
     description: 'Resolve storage items by ID or list root-level items'

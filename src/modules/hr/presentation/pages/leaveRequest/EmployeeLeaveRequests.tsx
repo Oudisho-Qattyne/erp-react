@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nProvider"
+import { useAuth } from "../../../../../core/infrastructure/auth/AuthProvider"
 import { Button } from "../../../../../core/presentation/layouts/ui/buttons/Button"
 import { DataTable, type ColumnDef } from "../../../../../core/presentation/layouts/ui/tables/ResizableTable"
 import { LoadingState } from "../../../../../core/presentation/layouts/ui/state/LoadingState"
@@ -29,19 +30,10 @@ const statusStyles: Record<string, string> = {
 
 const LEAVE_REQUEST_STATUSES = ["draft", "pending", "approved", "rejected", "cancelled"]
 
-const SORT_FIELD_MAP: Record<string, string> = {
-    id: "id",
-    employee_name: "employee_name",
-    leave_type: "leave_type_name",
-    start_date: "start_date",
-    end_date: "end_date",
-    requested_units: "requested_units",
-    status: "status",
-}
-
 export const EmployeeLeaveRequests = () => {
     const { t, language } = useLanguage()
     const navigate = useNavigate()
+    const { hasPermission } = useAuth()
     const { employeeLeaveRequests, findAllEmployeeLeaveRequests, loading, error, pagination, filter, setPage, setFilter, resetFilter, setSearch, processLeaveRequest } = useLeaveRequest()
 
     const { items: leaveTypes } = useLeaveTypes()
@@ -49,38 +41,12 @@ export const EmployeeLeaveRequests = () => {
     const [localSearch, setLocalSearch] = useState<string>("")
     const [processAction, setProcessAction] = useState<{ id: number; action: "approve" | "reject" } | null>(null)
     const [reviewNotes, setReviewNotes] = useState<string>("")
-    const [sortColumn, setSortColumn] = useState<string>("id")
-    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
     const [employeePickerOpen, setEmployeePickerOpen] = useState(false)
     const [selectedEmployeeName, setSelectedEmployeeName] = useState<string>("")
     const [leaveTypePickerOpen, setLeaveTypePickerOpen] = useState(false)
     const [selectedLeaveTypeName, setSelectedLeaveTypeName] = useState<string | undefined>("")
     const formRef = useRef<UseFormReturn | null>(null)
     const handleSearch = () => setSearch(localSearch)
-
-    const handleSort = (columnKey: string) => {
-        const field = SORT_FIELD_MAP[columnKey]
-        if (!field) return
-        if (columnKey === sortColumn) {
-            const newOrder = sortOrder === "asc" ? "desc" : "asc"
-            setSortOrder(newOrder)
-            setFilter((prev) => {
-                const next = { ...prev } as any
-                Object.values(SORT_FIELD_MAP).forEach((f) => delete next[`sort_by[${f}]`])
-                next[`sort_by[${field}]`] = newOrder
-                return next
-            })
-        } else {
-            setSortColumn(columnKey)
-            setSortOrder("asc")
-            setFilter((prev) => {
-                const next = { ...prev } as any
-                Object.values(SORT_FIELD_MAP).forEach((f) => delete next[`sort_by[${f}]`])
-                next[`sort_by[${field}]`] = "asc"
-                return next
-            })
-        }
-    }
 
     const getLeaveTypeName = (row: LeaveRequest) => {
         if (row.leave_type?.name) {
@@ -216,23 +182,21 @@ export const EmployeeLeaveRequests = () => {
     }, [filter])
 
     const columns: ColumnDef<LeaveRequest>[] = [
-        { key: "id", label: "#", width: 60, sortable: true },
-        { key: "employee", label: t("leave_request.employee_name", "hr") || "Employee", width: 160, sortable: true , render : (row) => row.employee?.full_name },
+        { key: "id", label: "#", width: 60 },
+        { key: "employee", label: t("leave_request.employee_name", "hr") || "Employee", width: 160, render : (row) => row.employee?.full_name },
         {
             key: "leave_type",
             label: t("leave_request.leave_type", "hr") || "Leave Type",
             width: 160,
-            sortable: true,
             render: (row) => getLeaveTypeName(row),
         },
-        { key: "start_date", label: t("leave_request.start_date", "hr") || "Start Date", width: 120, sortable: true },
-        { key: "end_date", label: t("leave_request.end_date", "hr") || "End Date", width: 120, sortable: true },
-        { key: "requested_units", label: t("leave_request.units", "hr") || "Units", width: 80, align: "center", sortable: true },
+        { key: "start_date", label: t("leave_request.start_date", "hr") || "Start Date", width: 120 },
+        { key: "end_date", label: t("leave_request.end_date", "hr") || "End Date", width: 120 },
+        { key: "requested_units", label: t("leave_request.units", "hr") || "Units", width: 80, align: "center" },
         {
             key: "status",
             label: t("leave_request.status", "hr") || "Status",
             width: 110,
-            sortable: true,
             render: (row) => (
                 <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold border ${statusStyles[row.status] || ""}`}>
                     {t(`leave_request.status_${row.status}`, "hr") || row.status}
@@ -255,7 +219,7 @@ export const EmployeeLeaveRequests = () => {
                     >
                         <Eye size={16} />
                     </Button>
-                    {row.status === PENDING_STATUS && (
+                    {row.status === PENDING_STATUS && hasPermission('hr.leave-requests.manage') && (
                         <>
                             <Button
                                 variant="ghost"
@@ -317,9 +281,6 @@ export const EmployeeLeaveRequests = () => {
                         data={employeeLeaveRequests}
                         rowKey="id"
                         onRowClick={(row) => navigate(`/hr/employee-leave-requests/${row.id}`)}
-                        sortColumn={sortColumn}
-                        sortOrder={sortOrder}
-                        onSort={handleSort}
                         emptyMessage={t("leave_request.no_data", "hr") || "No leave requests found"}
                         pagination={{
                             page: pagination.currentPage,

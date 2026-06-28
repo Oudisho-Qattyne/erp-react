@@ -35,44 +35,10 @@ export function UserLeaveRequests() {
   const [localSearch, setLocalSearch] = useState<string>("")
   const [leaveTypePickerOpen, setLeaveTypePickerOpen] = useState(false)
   const [selectedLeaveTypeName, setSelectedLeaveTypeName] = useState<string | undefined>("")
-  const [sortColumn, setSortColumn] = useState<string>("id")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
-  const formRef = useRef<UseFormReturn | null>(null)
-  const handleSearch = () => setFilter({ search: localSearch, page: 1 })
+    const formRef = useRef<UseFormReturn | null>(null)
+    const handleSearch = () => setFilter({ search: localSearch, page: 1 })
 
-  const SORT_FIELD_MAP: Record<string, string> = {
-    id: "id",
-    leave_type: "leave_type_name",
-    start_date: "start_date",
-    end_date: "end_date",
-    requested_units: "requested_units",
-    status: "status",
-  }
-
-  const handleSort = (key: string) => {
-    const field = SORT_FIELD_MAP[key] || key
-    if (sortColumn === field) {
-      const newOrder = sortOrder === "asc" ? "desc" : "asc"
-      setSortOrder(newOrder)
-      setFilter((prev) => {
-        const next = { ...prev } as any
-        Object.values(SORT_FIELD_MAP).forEach((f) => delete next[`sort_by[${f}]`])
-        next[`sort_by[${field}]`] = newOrder
-        return next
-      })
-    } else {
-      setSortColumn(field)
-      setSortOrder("asc")
-      setFilter((prev) => {
-        const next = { ...prev } as any
-        Object.values(SORT_FIELD_MAP).forEach((f) => delete next[`sort_by[${f}]`])
-        next[`sort_by[${field}]`] = "asc"
-        return next
-      })
-    }
-  }
-
-  useEffect(() => {
+    useEffect(() => {
     findAllMyLeaveRequests()
   }, [filter])
 
@@ -164,22 +130,20 @@ export function UserLeaveRequests() {
   }
 
   const columns: ColumnDef<LeaveRequest>[] = [
-    { key: "id", label: "#", width: 60, sortable: true },
+    { key: "id", label: "#", width: 60 },
     {
-      key: "leave_type",
-      label: t("leave_request.leave_type", "hr") || "Leave Type",
-      width: 160,
-      sortable: true,
-      render: (row) => getLeaveTypeName(row),
+        key: "leave_type",
+        label: t("leave_request.leave_type", "hr") || "Leave Type",
+        width: 160,
+        render: (row) => getLeaveTypeName(row),
     },
-    { key: "start_date", label: t("leave_request.start_date", "hr") || "Start Date", width: 120, sortable: true },
-    { key: "end_date", label: t("leave_request.end_date", "hr") || "End Date", width: 120, sortable: true },
-    { key: "requested_units", label: t("leave_request.units", "hr") || "Units", width: 80, align: "center", sortable: true },
+    { key: "start_date", label: t("leave_request.start_date", "hr") || "Start Date", width: 120 },
+    { key: "end_date", label: t("leave_request.end_date", "hr") || "End Date", width: 120 },
+    { key: "requested_units", label: t("leave_request.units", "hr") || "Units", width: 80, align: "center" },
     {
-      key: "status",
-      label: t("leave_request.status", "hr") || "Status",
-      width: 110,
-      sortable: true,
+        key: "status",
+        label: t("leave_request.status", "hr") || "Status",
+        width: 110,
       render: (row) => (
         <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold border ${statusStyles[row.status] || ""}`}>
           {t(`leave_request.status_${row.status}`, "hr") || row.status}
@@ -262,15 +226,12 @@ export function UserLeaveRequests() {
               {t("common.reset", "shared") || "Reset"}
             </Button>
           </div>
-          <DataTable
-            columns={columns}
-            data={myLeaveRequests}
-            rowKey="id"
-            onRowClick={(row) => navigate(`/hr/leave-requests/${row.id}`)}
-            emptyMessage={t("leave_request.no_data", "hr") || "No leave requests found"}
-            sortColumn={sortColumn}
-            sortOrder={sortOrder}
-            onSort={handleSort}
+            <DataTable
+                columns={columns}
+                data={myLeaveRequests}
+                rowKey="id"
+                onRowClick={(row) => navigate(`/hr/leave-requests/${row.id}`)}
+                emptyMessage={t("leave_request.no_data", "hr") || "No leave requests found"}
             pagination={{
               page: pagination.currentPage,
               totalPages: pagination.lastPage,

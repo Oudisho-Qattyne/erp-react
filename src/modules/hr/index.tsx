@@ -96,6 +96,7 @@ const usersModule: Module = {
       icon: <UserCheck size={18} />,
       group: 'hr',
       requiresAuth: true,
+      requiredPermission: 'hr.employees.view-eligible-leave-types',
     },
     {
       path: '/hr/my-leave-balances',
