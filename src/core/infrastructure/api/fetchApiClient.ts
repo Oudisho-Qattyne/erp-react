@@ -1,5 +1,5 @@
 // src/core/infrastructure/api/fetchApiClient.ts
-import { getToken } from '../auth/authStorage';
+import { getToken, removeToken, removeAuthUser } from '../auth/authStorage';
 import { createApiError } from '../../domain/common/errors/ApiError';
 import type { ApiClient, RequestConfig } from '../../domain/common/api/ApiClient';
 
@@ -42,6 +42,12 @@ export function createFetchApiClient(
 
     // Handle error responses (non‑2xx)
     if (!response.ok) {
+      if (response.status === 401) {
+        removeToken();
+        removeAuthUser();
+        window.location.href = '/auth';
+        throw createApiError('Unauthorized', null, 401);
+      }
       const errorData = await response.json().catch(() => null);
       const message = errorData?.message || `HTTP error! status: ${response.status}`;
       const validationErrors = errorData?.validationErrors;

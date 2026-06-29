@@ -45,6 +45,13 @@
     "back": "Back",
     "submit": "Update Role"
   },
+  "permissions": {
+    "users": {
+      "users": {
+        "link-to-employee": "Link User to Employee"
+      }
+    }
+  },
   "role_form": {
     "save": "Save Role",
     "cancel": "Cancel",

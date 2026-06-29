@@ -77,7 +77,7 @@ export function ShowEmployeePage() {
     setPhotoUpdating(true);
     try {
       const { ...newData } = employee
-      await update(Number(id), { ...newData, photo_id: items[0]._id });
+      await update(Number(id), {  photo_id: items[0]._id });
       await fetchEmployee();
       setEmployeePhotoPickerOpen(false);
     } catch (err: any) {

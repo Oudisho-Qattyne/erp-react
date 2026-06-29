@@ -566,7 +566,8 @@
         "adjust": "Adjust Leave Balance"
       },
       "leave-requests": {
-        "list": "List Leave Requests"
+        "list": "List Leave Requests",
+        "manage": "Manage Leave Requests"
       },
       "leave-types": {
         "list": "List Leave Types",
@@ -580,7 +581,8 @@
         "view": "View Employee",
         "create": "Create Employee",
         "update": "Edit Employee",
-        "delete": "Delete Employee"
+        "delete": "Delete Employee",
+        "view-eligible-leave-types": "View Eligible Leave Types"
       },
       "job-statuses": {
         "list": "List Job Statuses",

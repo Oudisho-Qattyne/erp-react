@@ -45,6 +45,13 @@
     "back": "العودة",
     "submit": "تحديث الدور"
   },
+  "permissions": {
+    "users": {
+      "users": {
+        "link-to-employee": "ربط المستخدم بالموظف"
+      }
+    }
+  },
   "role_form": {
     "save": "حفظ الدور",
     "cancel": "إلغاء",
