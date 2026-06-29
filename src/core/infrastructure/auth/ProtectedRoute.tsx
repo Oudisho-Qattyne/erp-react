@@ -5,7 +5,7 @@ import { useAuth } from './AuthProvider';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredRole?: string | string[];
-  requiredPermission?: string;
+  requiredPermission?: string | string[];
   redirectTo?: string;
 }
 

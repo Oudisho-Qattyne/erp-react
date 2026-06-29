@@ -1,8 +1,9 @@
 // import UsersPage from './presentation/pages/UsersPage'
 import enLocales from './presentation/locales/en.json'
 import arLocales from './presentation/locales/ar.json'
-import { Users } from 'lucide-react'   // or any icon component
+import { Users, CalendarClock, Database, BarChart3, CalendarDays, UserCheck, Wallet, Gauge, FileText, FileSearch, SlidersHorizontal, Flag, Building2, Map, GraduationCap, BookOpen, Beaker, Briefcase, BadgeCheck, Heart, StarIcon,  } from 'lucide-react'
 import type { Module } from '../../core/moduleRegistry'
+import { Navigate } from 'react-router-dom'
 // import CreateUserPage from './presentation/pages/CreateUserPage'
 import { ReportsPage } from './presentation/pages/ReportsPage'
 import { EmployeesPage } from './presentation/pages/EmployeesPage'
@@ -16,6 +17,8 @@ import { FacultiesPage } from './presentation/pages/lookups/FacultiesPage'
 import { SpecializationsPage } from './presentation/pages/lookups/SpecializationsPage'
 import { JobStatusesPage } from './presentation/pages/lookups/JobStatusesPage'
 import { EmployeeStatusesPage } from './presentation/pages/lookups/EmployeeStatusesPage'
+import { ChronicDiseasesPage } from './presentation/pages/lookups/ChronicDiseasesPage'
+import { OrganizationalLevelsPage } from './presentation/pages/lookups/OrganizationalLevelsPage'
 import { Rules } from './presentation/pages/Rules'
 import LeaveForm from './presentation/pages/leaves/LeaveForm'
 import LeavesTypesPage from './presentation/pages/leaves/LeavesTypesPage'
@@ -25,6 +28,10 @@ import { UserEligibleLeaveTypes } from './presentation/pages/leaves/UserEligible
 import { UserLeaveBalances } from './presentation/pages/leaveBalances/UserLeaveBalances'
 import { EmployeeLeaveBalances } from './presentation/pages/leaveBalances/EmployeeLeaveBalances'
 import { CreateLeaveRequest } from './presentation/pages/leaveRequest/CreateLeaveRequest'
+import { UserLeaveRequests } from './presentation/pages/leaveRequest/UseLeaveRequests'
+import { ShowLeaveRequestPage } from './presentation/pages/leaveRequest/ShowLeaveRequestPage'
+import { ShowLeaveRequestAdminPage } from './presentation/pages/leaveRequest/ShowLeaveRequestAdminPage'
+import { EmployeeLeaveRequests } from './presentation/pages/leaveRequest/EmployeeLeaveRequests'
 import { AdjustEmployeesLeaveBalance } from './presentation/pages/leaveBalances/AdjustEmployeesLeaveBalance'
 
 const usersModule: Module = {
@@ -38,9 +45,21 @@ const usersModule: Module = {
       nav: true,
       order: 10,
       moduleName: 'hr',
-      icon: <Users className="w-5 h-5" />,   // 👈 React element
+      icon: <BarChart3 className="w-5 h-5" />,
       group: 'hr',
-      permission: 'hr:read',
+    },
+    {
+      path: '/hr/leaves-management',
+      element: <Navigate to="/hr/leaves" replace />,
+      layout: 'dashboard',
+      label: 'leaves_management.title',
+      nav: true,
+      order: 20,
+      moduleName: 'hr',
+      icon: <CalendarClock className="w-5 h-5" />,
+      group: 'hr',
+      requiresAuth: true,
+      requiredPermission: ['hr.leave-types.list', 'hr.leave-balance.list', 'hr.leave-requests.list', 'hr.leave-balance.adjust']
     },
     {
       path: '/hr/leaves',
@@ -48,12 +67,13 @@ const usersModule: Module = {
       layout: 'dashboard',
       label: 'leave_types.title',
       nav: true,
-      order: 10,
-      icon: <Users className="w-5 h-5" />,
+      order: 1,
       moduleName: 'hr',
+      icon: <CalendarDays className="w-5 h-5" />,
       group: 'hr',
+      parentNav: '/hr/leaves-management',
       requiresAuth: true,
-      // requiredRole: 'admin',
+      requiredPermission: 'hr.leave-types.list',
     },
     {
       path: '/hr/leaves/:id',
@@ -63,30 +83,33 @@ const usersModule: Module = {
       nav: false,
       moduleName: 'hr',
       requiresAuth: true,
+      requiredPermission: 'hr.leave-types.view',
     },
     {
-      path: '/hr/user-eligible-leave-types',
+      path: '/hr/my-eligible-leave-types',
       element: <UserEligibleLeaveTypes />,
       layout: 'dashboard',
       label: 'leave.user_eligible_leave_types',
       nav: true,
-      order: 20,
+      order: 2,
       moduleName: 'hr',
-      icon: <Users size={18} />,
+      icon: <UserCheck size={18} />,
       group: 'hr',
       requiresAuth: true,
+      requiredPermission: 'hr.employees.view-eligible-leave-types',
     },
     {
-      path: '/hr/user-leave-balances',
+      path: '/hr/my-leave-balances',
       element: <UserLeaveBalances />,
       layout: 'dashboard',
       label: 'leave_balance.title',
       nav: true,
-      order: 21,
+      order: 3,
       moduleName: 'hr',
-      icon: <Users size={18} />,
+      icon: <Wallet size={18} />,
       group: 'hr',
       requiresAuth: true,
+      requiredPermission: 'hr.leave-balance.list',
     },
     {
       path: '/hr/employee-leave-balances',
@@ -94,11 +117,50 @@ const usersModule: Module = {
       layout: 'dashboard',
       label: 'employee_leave_balances.title',
       nav: true,
-      order: 22,
+      order: 4,
       moduleName: 'hr',
-      icon: <Users size={18} />,
+      icon: <Gauge size={18} />,
+      group: 'hr',
+      parentNav: '/hr/leaves-management',
+      requiresAuth: true,
+      requiredPermission: 'hr.leave-balance.list',
+    },
+    {
+      path: '/hr/my-leave-requests',
+      element: <UserLeaveRequests />,
+      layout: 'dashboard',
+      label: 'leave_request.title',
+      nav: true,
+      order: 5,
+      moduleName: 'hr',
+      icon: <FileText size={18} />,
       group: 'hr',
       requiresAuth: true,
+      requiredPermission: 'hr.leave-requests.list',
+    },
+    {
+      path: '/hr/employee-leave-requests',
+      element: <EmployeeLeaveRequests />,
+      layout: 'dashboard',
+      label: 'employee_leave_requests.title',
+      nav: true,
+      order: 6,
+      moduleName: 'hr',
+      icon: <FileSearch size={18} />,
+      group: 'hr',
+      parentNav: '/hr/leaves-management',
+      requiresAuth: true,
+      requiredPermission: 'hr.leave-requests.list',
+    },
+    {
+      path: '/hr/employee-leave-requests/:id',
+      element: <ShowLeaveRequestAdminPage />,
+      layout: 'dashboard',
+      label: 'leave_request.show_title',
+      nav: false,
+      moduleName: 'hr',
+      requiresAuth: true,
+      requiredPermission: 'hr.leave-requests.list',
     },
     {
       path: '/hr/leave-requests/create',
@@ -107,8 +169,24 @@ const usersModule: Module = {
       label: 'leave_request.create_title',
       nav: true,
       moduleName: 'hr',
-      icon: <Users size={18} />,
-      group: 'hr',
+      requiresAuth: true,
+    },
+    {
+      path: '/hr/leave-requests/:id',
+      element: <ShowLeaveRequestPage />,
+      layout: 'dashboard',
+      label: 'leave_request.show_title',
+      nav: false,
+      moduleName: 'hr',
+      requiresAuth: true,
+    },
+    {
+      path: '/hr/leave-requests/:id/edit',
+      element: <CreateLeaveRequest />,
+      layout: 'dashboard',
+      label: 'leave_request.edit_title',
+      nav: false,
+      moduleName: 'hr',
       requiresAuth: true,
     },
     {
@@ -117,11 +195,13 @@ const usersModule: Module = {
       layout: 'dashboard',
       label: 'adjust_leave_balance.title',
       nav: true,
-      order: 23,
+      order: 7,
       moduleName: 'hr',
-      icon: <Users size={18} />,
+      icon: <SlidersHorizontal size={18} />,
       group: 'hr',
+      parentNav: '/hr/leaves-management',
       requiresAuth: true,
+      requiredPermission: 'hr.leave-balance.adjust',
     },
     // {
     //   path: '/hr/leaves/:id/edit',
@@ -142,6 +222,7 @@ const usersModule: Module = {
       moduleName: 'hr',
       icon: <Users size={18} />,
       group: 'hr',
+      requiredPermission: 'hr.employees.list',
     },
     {
       path: '/hr/employees/:id',
@@ -151,7 +232,7 @@ const usersModule: Module = {
       nav: false,
       moduleName: 'hr',
       requiresAuth: true,
-      // requiredRole: 'admin',
+      requiredPermission: 'hr.employees.view',
     },
     {
       path: '/hr/employees/:id/edit',
@@ -161,30 +242,44 @@ const usersModule: Module = {
       nav: false,
       moduleName: 'hr',
       requiresAuth: true,
-      // requiredRole: 'admin',
+      requiredPermission: 'hr.employees.update',
     },
 
+    {
+      path: '/hr/lookups',
+      element: <Navigate to="/hr/lookups/countries" replace />,
+      layout: 'dashboard',
+      label: 'lookups.title',
+      nav: true,
+      order: 40,
+      moduleName: 'hr',
+      icon: <Database className="w-5 h-5" />,
+      group: 'lookups',
+      requiresAuth: true,
+    },
     {
       path: '/hr/lookups/countries',
       element: <CountriesPage />,
       layout: 'dashboard',
       label: 'lookups.tabs.countries',
       nav: true,
-      order: 40,
+      order: 1,
       moduleName: 'hr',
-      icon: <Users size={18} />,
+      icon: <Flag size={18} />,
       group: 'lookups',
+      parentNav: '/hr/lookups',
     },
     {
       path: '/hr/lookups/cities',
       element: <CitiesPage />,
       layout: 'dashboard',
       label: 'lookups.tabs.cities',
-      nav: true,
-      order: 41,
+      nav: true, 
+      order: 2,
       moduleName: 'hr',
-      icon: <Users size={18} />,
+      icon: <Building2 size={18} />,
       group: 'lookups',
+      parentNav: '/hr/lookups',
     },
     {
       path: '/hr/lookups/regions',
@@ -192,10 +287,11 @@ const usersModule: Module = {
       layout: 'dashboard',
       label: 'lookups.tabs.regions',
       nav: true,
-      order: 42,
+      order: 3,
       moduleName: 'hr',
-      icon: <Users size={18} />,
+      icon: <Map size={18} />,
       group: 'lookups',
+      parentNav: '/hr/lookups',
     },
     {
       path: '/hr/lookups/universities',
@@ -203,10 +299,11 @@ const usersModule: Module = {
       layout: 'dashboard',
       label: 'lookups.tabs.universities',
       nav: true,
-      order: 43,
+      order: 4,
       moduleName: 'hr',
-      icon: <Users size={18} />,
+      icon: <GraduationCap size={18} />,
       group: 'lookups',
+      parentNav: '/hr/lookups',
     },
     {
       path: '/hr/lookups/faculties',
@@ -214,10 +311,11 @@ const usersModule: Module = {
       layout: 'dashboard',
       label: 'lookups.tabs.faculties',
       nav: true,
-      order: 44,
+      order: 5,
       moduleName: 'hr',
-      icon: <Users size={18} />,
+      icon: <BookOpen size={18} />,
       group: 'lookups',
+      parentNav: '/hr/lookups',
     },
     {
       path: '/hr/lookups/specializations',
@@ -225,10 +323,11 @@ const usersModule: Module = {
       layout: 'dashboard',
       label: 'lookups.tabs.specializations',
       nav: true,
-      order: 45,
+      order: 6,
       moduleName: 'hr',
-      icon: <Users size={18} />,
+      icon: <Beaker size={18} />,
       group: 'lookups',
+      parentNav: '/hr/lookups',
     },
     {
       path: '/hr/lookups/job-statuses',
@@ -236,10 +335,12 @@ const usersModule: Module = {
       layout: 'dashboard',
       label: 'lookups.tabs.job_statuses',
       nav: true,
-      order: 46,
+      order: 7,
       moduleName: 'hr',
-      icon: <Users size={18} />,
+      icon: <Briefcase size={18} />,
       group: 'lookups',
+      parentNav: '/hr/lookups',
+      requiredPermission: 'hr.job-statuses.list',
     },
     {
       path: '/hr/lookups/employee-statuses',
@@ -247,10 +348,38 @@ const usersModule: Module = {
       layout: 'dashboard',
       label: 'lookups.tabs.employee_statuses',
       nav: true,
-      order: 47,
+      order: 8,
       moduleName: 'hr',
-      icon: <Users size={18} />,
+      icon: <BadgeCheck size={18} />,
       group: 'lookups',
+      parentNav: '/hr/lookups',
+      requiredPermission: 'hr.employee-statuses.list',
+    },
+    {
+      path: '/hr/lookups/chronic-diseases',
+      element: <ChronicDiseasesPage />,
+      layout: 'dashboard',
+      label: 'lookups.tabs.chronic_diseases',
+      nav: true,
+      order: 9,
+      moduleName: 'hr',
+      icon: <Heart size={18} />,
+      group: 'lookups',
+      parentNav: '/hr/lookups',
+      requiredPermission: 'hr.chronic-diseases.list',
+    },
+    {
+      path: '/hr/lookups/organizational-levels',
+      element: <OrganizationalLevelsPage />,
+      layout: 'dashboard',
+      label: 'lookups.tabs.organizational_levels',
+      nav: true,
+      order: 10,
+      moduleName: 'hr',
+      icon: <StarIcon size={18} />,
+      group: 'lookups',
+      parentNav: '/hr/lookups',
+      requiredPermission: 'hr.organizational-levels.list',
     }
   ],
   locales: { en: enLocales, ar: arLocales },

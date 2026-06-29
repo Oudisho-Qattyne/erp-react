@@ -5,6 +5,7 @@ import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProv
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
 import { DataTable, type ColumnDef } from '../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { Dialog } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
+import { FilterDialog, type FilterField } from '../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import type { EmployeeListItem } from '../../domain/entities/EmployeeListItem';
 import { EmployeeForm } from './EmployeeForm';
 import { FormInput } from '../../../../core/presentation/layouts/ui/inputs/FormInput';
@@ -12,11 +13,13 @@ import Input from '../../../../core/presentation/layouts/ui/inputs/Input';
 import { LoadingState } from '../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../core/presentation/layouts/ui/state/ErrorState';
 import { useManageEmployee } from '../hooks/useEmployees';
+import { Filter, Search } from 'lucide-react';
 
 export function EmployeesPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const genderOptions = [
     { value: '', label: t('employees.gender_all', 'hr') || 'الكل' },
@@ -35,12 +38,14 @@ export function EmployeesPage() {
     perPage,
     sortBy,
     sortOrder,
+    extraFilters,
     setSearch,
     setGender,
     setPage,
     setPerPage,
     setSortBy,
     setSortOrder,
+    setExtraFilters,
     resetFilters,
     refetch,
     create, // from useManageEmployee
@@ -95,6 +100,44 @@ export function EmployeesPage() {
     refetch(); // refresh list
   };
 
+  const filterFields: FilterField[] = [
+    { name: "gender", label: t("employees.gender", "hr"), type: "select", options: [
+      { value: "", label: t("employees.gender_all", "hr") || "All" },
+      { value: "male", label: t("employees.gender_male", "hr") },
+      { value: "female", label: t("employees.gender_female", "hr") },
+    ]},
+    { name: "marital_status", label: t("employees.marital_status", "hr"), type: "select", options: [
+      { value: "", label: t("common.all", "shared") || "All" },
+      { value: "single", label: t("employees.marital_single", "hr") },
+      { value: "married", label: t("employees.marital_married", "hr") },
+      { value: "divorced", label: t("employees.marital_divorced", "hr") },
+      { value: "widowed", label: t("employees.marital_widowed", "hr") },
+    ]},
+    { name: "blood_type", label: t("employees.blood_type", "hr"), type: "select", options: [
+      { value: "", label: t("common.all", "shared") || "All" },
+      { value: "A+", label: "A+" }, { value: "A-", label: "A-" },
+      { value: "B+", label: "B+" }, { value: "B-", label: "B-" },
+      { value: "AB+", label: "AB+" }, { value: "AB-", label: "AB-" },
+      { value: "O+", label: "O+" }, { value: "O-", label: "O-" },
+    ]},
+    { name: "date_birth", label: t("employees.date_birth", "hr"), type: "date" },
+    { name: "has_sham_cash_account", label: t("employees.has_sham_cash_account", "hr"), type: "select", options: [
+      { value: "", label: t("common.all", "shared") || "All" },
+      { value: "true", label: t("common.yes", "shared") },
+      { value: "false", label: t("common.no", "shared") },
+    ]},
+  ]
+
+  const handleApplyFilter = (values: Record<string, any>) => {
+    const parsed: Record<string, any> = {}
+    for (const [key, val] of Object.entries(values)) {
+      if (val !== "" && val !== undefined) parsed[key] = val
+    }
+    setExtraFilters(parsed)
+    setPage(1)
+    setIsFilterOpen(false)
+  }
+
   return (
     <div className="p-4 space-y-4">
       {/* Filters Bar - Left side filters, Right side add button */}
@@ -108,21 +151,13 @@ export function EmployeesPage() {
             onChange={(val) => setSearch(val as string)}
             className="w-56"
           />
-          {/* Gender filter */}
-          <select
-            value={gender}
-            onChange={(e) => setGender(e.target.value)}
-            className="px-3 py-2 rounded-md border border-border bg-card text-text text-sm focus:border-primary w-32"
-          >
-            {genderOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-          {/* Search & Reset buttons */}
-          <Button variant="primary" onClick={() => refetch()} size="sm">
+
+                   {/* Search & Reset buttons */}
+          <Button variant="primary" onClick={() => refetch()} size="sm" leftIcon={<Search size={14} />}>
             {t('common.search', 'shared') || 'بحث'}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
+            {t('common.filter', 'shared') || 'تصفية'}
           </Button>
           <Button variant="outline" onClick={resetFilters} size="sm">
             {t('common.reset', 'shared') || 'مسح'}
@@ -130,7 +165,7 @@ export function EmployeesPage() {
         </div>
 
         {/* Add button on the right */}
-        <Button variant="primary" onClick={() => setIsAddDialogOpen(true)}>
+        <Button variant="primary" onClick={() => setIsAddDialogOpen(true)} requiredPermission="hr.employees.create">
           + {t('employees.add', 'hr') || 'إضافة موظف'}
         </Button>
       </div>
@@ -168,6 +203,14 @@ export function EmployeesPage() {
     onCancel={() => setIsAddDialogOpen(false)}
   />
 </Dialog>
+      <FilterDialog
+        isOpen={isFilterOpen}
+        fields={filterFields}
+        initialValues={extraFilters}
+        onFilter={handleApplyFilter}
+        onCancel={() => setIsFilterOpen(false)}
+        onReset={() => { setExtraFilters({}); setPage(1); setIsFilterOpen(false) }}
+      />
     </div>
   );
 }

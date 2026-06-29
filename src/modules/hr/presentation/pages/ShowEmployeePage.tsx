@@ -77,7 +77,7 @@ export function ShowEmployeePage() {
     setPhotoUpdating(true);
     try {
       const { ...newData } = employee
-      await update(Number(id), { ...newData, photo_id: items[0]._id });
+      await update(Number(id), {  photo_id: items[0]._id });
       await fetchEmployee();
       setEmployeePhotoPickerOpen(false);
     } catch (err: any) {
@@ -113,11 +113,11 @@ export function ShowEmployeePage() {
         </Button>
         <div className="flex gap-3">
           {storage?.FileExplorerDialogComponent && employee?.folder && (
-            <Button variant="outline" onClick={() => setFileExplorerOpen(true)}>
+            <Button variant="outline" onClick={() => setFileExplorerOpen(true)} requiredPermission="storage.storage.view">
               {t('show_employee.folder', 'hr') || 'مجلد الموظف'}
             </Button>
           )}
-          <Button variant="primary" onClick={() => navigate(`/hr/employees/${id}/edit`)}>
+          <Button variant="primary" onClick={() => navigate(`/hr/employees/${id}/edit`)} requiredPermission="hr.employees.update">
             {t('show_employee.edit', 'hr') || 'تعديل الموظف'}
           </Button>
         </div>

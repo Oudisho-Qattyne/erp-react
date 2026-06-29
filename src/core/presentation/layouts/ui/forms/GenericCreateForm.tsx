@@ -6,8 +6,12 @@ import { Button } from '../buttons/Button';
 import { z, type ZodSchema, type ZodObject } from 'zod';
 import { useDynamicForm } from '../../../hooks/useDynamicForm221';
 import type { InputType } from '../inputs/Input';
+import type { UseFormReturn } from 'react-hook-form';
 
-export type FieldConfig<T extends FieldValues = any> = Omit<FormInputProps<T>, 'name'> & { name: Path<T> };
+export type FieldConfig<T extends FieldValues = any> = Omit<FormInputProps<T>, 'name'> & {
+  name: Path<T>;
+  render?: (methods: UseFormReturn<T>) => React.ReactNode;
+};
 
 function isZodObject(schema: ZodSchema<any>): schema is ZodObject<any> {
   return 'shape' in schema;
@@ -20,7 +24,7 @@ function flattenSchema(
   const fields: { path: string; schema: z.ZodTypeAny }[] = [];
   const shape = schema.shape;
   for (const [key, fieldSchema] of Object.entries(shape)) {
-    const path = prefix ? `${prefix}.${key}` : key;
+    const path = prefix ? `${ prefix }.${ key }`: key;
     if (fieldSchema instanceof z.ZodObject) {
       fields.push(...flattenSchema(fieldSchema as ZodObject<any>, path));
     } else {
@@ -49,15 +53,29 @@ export function GenericCreateForm({
   onCancel,
   submitLabel = 'حفظ',
 }: GenericCreateFormProps) {
-  const {form:methods} = useDynamicForm({ schema, defaultValues });
+  const { form: methods } = useDynamicForm({ schema, defaultValues });
   const { handleSubmit, formState } = methods;
   const { isValid, isSubmitting } = formState;
   const formRef = useRef<HTMLDivElement>(null);
 
   const handleFormSubmit = async (data: any) => {
-    const result = await onSubmit(data);
-    onSuccess(result?.data?.id, result);
-    methods.reset();
+    try {
+      const result = await onSubmit(data);
+      onSuccess(result?.data?.id, result);
+      methods.reset();
+    } catch (err: any) {
+      if (err.validationErrors) {
+        const entries = Object.entries(err.validationErrors);
+        entries.forEach(([field, msgs]) => {
+          const msg = Array.isArray(msgs) ? msgs[0] : String(msgs);
+          methods.setError(field as any, { message: msg });
+        });
+        const firstField = entries[0][0]
+        const el = document.querySelector(`[for="${firstField}"]`)
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" })
+      }
+      throw err;
+    }
   };
 
   useEffect(() => {
@@ -80,7 +98,9 @@ export function GenericCreateForm({
         <div ref={formRef} className="space-y-4">
           <div className="space-y-3">
             {explicitFields.map((field) => (
-              <FormInput key={field.name as string} {...field} label={field.label}/>
+              field.render
+                ? <React.Fragment key={field.name as string}>{field.render(methods as any)}</React.Fragment>
+                : <FormInput key={field.name as string} {...field} label={field.label} />
             ))}
           </div>
           <div className="flex justify-end gap-3 pt-2">

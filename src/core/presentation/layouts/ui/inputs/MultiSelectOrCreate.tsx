@@ -21,6 +21,7 @@ interface MultiSelectOrCreateProps {
   dependentData?: any;
   baseClasses?: string;
   labelPath?: string;
+  createButtonPermission?: string | string[];
 }
 
 export function MultiSelectOrCreate({
@@ -36,6 +37,7 @@ export function MultiSelectOrCreate({
   dependentData,
   baseClasses,
   labelPath,
+  createButtonPermission,
 }: MultiSelectOrCreateProps) {
   const { t, direction } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
@@ -157,6 +159,7 @@ export function MultiSelectOrCreate({
             onClick={() => setIsDialogOpen(true)}
             disabled={disabled}
             className="shrink-0 h-9.5"
+            requiredPermission={createButtonPermission}
           >
             {disabled ? '' : newLabel}
           </Button>

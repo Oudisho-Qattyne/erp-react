@@ -8,8 +8,8 @@ import { ProfileHeader } from '../../../../core/presentation/layouts/ui/card/Pro
 import { LoadingState } from '../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../core/presentation/layouts/ui/state/ErrorState';
 import type { DetailedRole } from '../../domain/entities/role';
-import type { Permission } from '../../domain/entities/permissions';
 import { useManageRoles } from '../hooks/useManageRoles';
+import { getPermissionDisplayName } from '../utils/getPermissionDisplayName';
 
 export function ShowRolePage() {
   const { id } = useParams<{ id: string }>();
@@ -28,11 +28,6 @@ export function ShowRolePage() {
       .catch((err: any) => setError(err?.message || t('show_role.load_error', 'users') || 'Error loading role data'))
       .finally(() => setLoading(false));
   }, [id]);
-
-  const getDisplayName = (perm: Permission): string => {
-    if (typeof perm.display_name === 'string') return perm.display_name;
-    return (perm.display_name as any)[language] || (perm.display_name as any)['en'] || perm.name;
-  };
 
   if (loading) return <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />;
 
@@ -57,7 +52,7 @@ export function ShowRolePage() {
         >
           {t('show_role.back', 'users') || 'Back'}
         </Button>
-        <Button variant="primary" onClick={() => navigate(`/users/roles/${id}/edit`)}>
+        <Button variant="primary" onClick={() => navigate(`/users/roles/${id}/edit`)} requiredPermission="users.roles.edit">
           {t('show_role.edit', 'users') || 'Edit Role'}
         </Button>
       </div>
@@ -68,11 +63,11 @@ export function ShowRolePage() {
         <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-4 text-sm text-text-muted/80">
           <div className="flex items-center gap-1.5 bg-background/50 px-3 py-1.5 rounded-lg border border-border/50">
             <Users size={14} className="text-primary" />
-            <span>{role.number_of_users} users</span>
+            <span>{t('show_role.users_count', 'users').replace('{count}', String(role.number_of_users))}</span>
           </div>
           <div className="flex items-center gap-1.5 bg-background/50 px-3 py-1.5 rounded-lg border border-border/50">
             <Calendar size={14} className="text-primary" />
-            <span>{role.created_at}</span>
+            <span>{t('show_role.created_at', 'users').replace('{date}', role.created_at)}</span>
           </div>
         </div>
       </ProfileHeader>
@@ -98,7 +93,7 @@ export function ShowRolePage() {
                           key={perm.id}
                           className="px-2.5 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full border border-primary/20"
                         >
-                          {getDisplayName(perm)}
+                          {getPermissionDisplayName(perm, t, language)}
                         </span>
                       ))}
                     </div>

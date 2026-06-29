@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../hooks';
-import { JobStatusFormSchema } from '../../schemas/jobStatus/jobStatus.schema';
+import { ChronicDiseasesFormSchema } from '../../schemas/chronicDiseases/chronicDiseases.schema';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { Dialog } from '../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { GenericCreateForm } from '../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
@@ -13,12 +13,12 @@ import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { toast } from 'sonner';
 import { Pencil, Trash2, Star } from 'lucide-react';
-import type { JobStatus } from '../../../domain/entities/jobStatus/jobStatus';
+import type { ChronicDiseases } from '../../../../../core/domain/entities/chronicDiseases/chronicDiseases';
 
-export function JobStatusesPage() {
+export function ChronicDiseasesPage() {
   const { t } = useLanguage();
-  const { entities: items, getAll, create, update, remove, loading, error } = useEntityCrud<JobStatus>('/hr/job-statuses', '/hr/job-statuses');
-  const entity = t('lookups.tabs.job_statuses', 'hr') || 'Job Status';
+  const { entities: items, getAll, create, update, remove, loading, error } = useEntityCrud<ChronicDiseases>('/hr/chronic-diseases', '/hr/chronic-diseases');
+  const entity = t('lookups.tabs.chronic_diseases', 'hr') || 'Chronic Diseases';
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
@@ -59,7 +59,7 @@ export function JobStatusesPage() {
   };
 
   const columns = [
-    { key: 'name', label: t('employee_form.job_status', 'hr') || 'Job Status', width: 300,
+    { key: 'name', label: t('employees.chronic_diseases', 'hr') || 'Chronic Disease', width: 300,
       render: (row: any) => typeof row.name === 'string' ? row.name : (row.name?.ar || row.name?.en || '') },
     { key: 'is_default', label: t('common.is_default', 'shared') || 'Default', width: 120,
       render: (row: any) => row.is_default
@@ -70,16 +70,16 @@ export function JobStatusesPage() {
         <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
           {!row.is_default && (
             <Button variant="ghost" size="sm" onClick={() => setConfirmSetDefault(row)}
-              title={t('common.set_default', 'shared') || 'Set as default'} requiredPermission="hr.job-statuses.update">
+              title={t('common.set_default', 'shared') || 'Set as default'} requiredPermission="hr.chronic-diseases.update">
               <Star size={16} />
             </Button>
           )}
           <Button variant="ghost" size="sm" onClick={() => setEditItem(row)}
-            title={t('common.edit', 'shared') || 'Edit'} requiredPermission="hr.job-statuses.update">
+            title={t('common.edit', 'shared') || 'Edit'} requiredPermission="hr.chronic-diseases.update">
             <Pencil size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)}
-            title={t('common.delete', 'shared') || 'Delete'} requiredPermission="hr.job-statuses.delete">
+            title={t('common.delete', 'shared') || 'Delete'} requiredPermission="hr.chronic-diseases.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
         </div>
@@ -89,32 +89,32 @@ export function JobStatusesPage() {
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold">{t('lookups.tabs.job_statuses', 'hr') || 'Job Statuses'}</h1>
+        <h1 className="text-2xl font-bold">{t('lookups.tabs.chronic_diseases', 'hr') || 'Chronic Diseases'}</h1>
         <div className="w-full flex gap-2">
           <Input type="text" value={searchQuery} onChange={setSearchQuery}
             placeholder={t('common.search', 'shared') || 'Search...'}
             baseClasses={inputBaseClasses} className="w-60" />
-          <Button onClick={() => setIsCreateOpen(true)} requiredPermission="hr.job-statuses.create">{t('employee_form.add_job_status', 'hr') || 'Add Job Status'}</Button>
+          <Button onClick={() => setIsCreateOpen(true)} requiredPermission="hr.chronic-diseases.create">{t('employee_form.add_chronic_disease', 'hr') || 'Add Chronic Disease'}</Button>
         </div>
       </div>
 
       <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)}
-        title={t('employee_form.add_job_status', 'hr') || 'Add Job Status'}>
+        title={t('employee_form.add_chronic_disease', 'hr') || 'Add Chronic Disease'}>
         <GenericCreateForm
-          fields={[{ name: 'name', label: t('employee_form.job_status', 'hr') || 'Job Status', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
-          schema={JobStatusFormSchema}
+          fields={[{ name: 'name', label: t('employees.chronic_diseases', 'hr') || 'Chronic Disease', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
+          schema={ChronicDiseasesFormSchema}
           onSubmit={async (data) => { try { return await create({ ...data, name: data.name }); } catch { toast.error(t('lookups.create_error', 'hr').replace('{name}', entity)); throw {}; } }}
           onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAll(); setIsCreateOpen(false); }}
           onCancel={() => setIsCreateOpen(false)}
-          submitLabel={t('employee_form.add_job_status', 'hr') || 'Add Job Status'}
+          submitLabel={t('employee_form.add_chronic_disease', 'hr') || 'Add Chronic Disease'}
         />
       </Dialog>
 
       <Dialog isOpen={!!editItem} onClose={() => setEditItem(null)}
         title={t('common.edit', 'shared') + ' ' + entity}>
         <GenericCreateForm
-          fields={[{ name: 'name', label: t('employee_form.job_status', 'hr') || 'Job Status', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
-          schema={JobStatusFormSchema}
+          fields={[{ name: 'name', label: t('employees.chronic_diseases', 'hr') || 'Chronic Disease', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
+          schema={ChronicDiseasesFormSchema}
           defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), is_default: editItem.is_default } : undefined}
           onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: data.name }); } catch { toast.error(t('lookups.update_error', 'hr').replace('{name}', entity)); throw {}; } }}
           onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); getAll(); setEditItem(null); }}
@@ -127,7 +127,7 @@ export function JobStatusesPage() {
       {error && <ErrorState message={error} onRetry={getAll} />}
       {!loading && !error && (
         <DataTable columns={columns} data={filtered} rowKey="id" loading={false}
-          emptyMessage={t('lookups.no_job_statuses', 'hr') || 'No job statuses found'} />
+          emptyMessage={t('lookups.no_chronic_diseases', 'hr') || 'No chronic diseases found'} />
       )}
 
       <ConfirmDialog isOpen={!!confirmDelete} type="danger"

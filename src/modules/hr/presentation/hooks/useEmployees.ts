@@ -35,12 +35,14 @@ export interface UseManageEmployeeReturn {
   perPage: number;
   sortBy: string;
   sortOrder: 'asc' | 'desc';
+  extraFilters: Record<string, any>;
   setSearch: (val: string) => void;
   setGender: (val: string) => void;
   setPage: (page: number) => void;
   setPerPage: (size: number) => void;
   setSortBy: (key: string) => void;
   setSortOrder: (order: 'asc' | 'desc') => void;
+  setExtraFilters: (patch: Record<string, any>) => void;
   resetFilters: () => void;
   refetch: () => Promise<void>;
   // Single entity CRUD (using repository / usecase)
@@ -77,6 +79,7 @@ export function useManageEmployee(params: UseManageEmployeeParams = {}): UseMana
   const [perPage, setPerPage] = useState(initialPerPage);
   const [sortBy, setSortBy] = useState(initialSortBy);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(initialSortOrder);
+  const [extraFilters, setExtraFilters] = useState<Record<string, any>>({});
 
   // Prepare CRUD (repository + usecase) for single entity operations
   const repository = useMemo(() => createEmployeeRepository(apiClient), [apiClient]);
@@ -96,6 +99,9 @@ export function useManageEmployee(params: UseManageEmployeeParams = {}): UseMana
       if (sortBy) {
         params.sort_by = { [sortBy]: sortOrder };
       }
+      for (const [key, val] of Object.entries(extraFilters)) {
+        if (val !== undefined && val !== null && val !== '') params[key] = val;
+      }
       const response = await apiClient.get<DomainResponse<EmployeeListItem[]>>('/hr/employees', { params });
       setEmployees(response.data);
       if (response.pagination) {
@@ -111,7 +117,7 @@ export function useManageEmployee(params: UseManageEmployeeParams = {}): UseMana
     } finally {
       setLoading(false);
     }
-  }, [apiClient, page, perPage, search, gender, sortBy, sortOrder]);
+  }, [apiClient, page, perPage, search, gender, sortBy, sortOrder, extraFilters]);
 
   useEffect(() => {
     fetchEmployees();
@@ -123,6 +129,7 @@ export function useManageEmployee(params: UseManageEmployeeParams = {}): UseMana
     setPage(1);
     setSortBy('');
     setSortOrder('desc');
+    setExtraFilters({});
   }, []);
 
   const refetch = useCallback(async () => {
@@ -168,12 +175,14 @@ export function useManageEmployee(params: UseManageEmployeeParams = {}): UseMana
     perPage,
     sortBy,
     sortOrder,
+    extraFilters,
     setSearch,
     setGender,
     setPage,
     setPerPage,
     setSortBy,
     setSortOrder,
+    setExtraFilters,
     resetFilters,
     refetch,
     getById,

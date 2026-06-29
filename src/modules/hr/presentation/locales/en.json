@@ -16,7 +16,9 @@
     "choose": "Choose...",
     "level": "Level",
     "name": "Name",
-    "name_required": "Name is required"
+    "name_required": "Name is required",
+    "parent": "Parent Unit",
+    "none": "None"
   },
   "navigation": {
     "reports": {
@@ -41,11 +43,16 @@
         "faculties": "Faculties",
         "specializations": "Specializations",
         "job_statuses": "Job Statuses",
-        "employee_statuses": "Employee Statuses"
+        "employee_statuses": "Employee Statuses",
+        "chronic_diseases": "Chronic Diseases",
+        "organizational_levels": "Organizational Levels"
       }
     },
     "admin": "Admin",
     "hr": "Human Resources Management",
+    "leaves_management": {
+      "title": "Leave Management"
+    },
     "leave_types": {
       "title": "Leave types Management"
     },
@@ -60,8 +67,12 @@
     },
     "leave_request": {
       "title": "Leave Requests",
-      "create_title":"Request a leave"
-
+      "create_title": "Request a leave",
+      "edit_title": "Edit Leave Request",
+      "show_title": "Leave Request Details"
+    },
+    "employee_leave_requests": {
+      "title": "Employee Leave Requests"
     },
     "adjust_leave_balance": {
       "title": "Adjust Leave Balance"
@@ -78,14 +89,40 @@
     "process_success": "Leave request processed successfully",
     "process_error": "Failed to process leave request",
     "create_title": "Create Leave Request",
+    "edit_title": "Edit Leave Request",
     "select_leave_type": "Select Leave Type",
     "request_details": "Request Details",
     "start_date": "Start Date & Time",
     "end_date": "End Date & Time",
     "requested_units": "Requested Units",
     "requested_units_placeholder": "Enter number of units",
+    "my_requests": "My Leave Requests",
+    "new_request": "New Request",
+    "no_data": "No leave requests found",
+    "leave_type": "Leave Type",
+    "status": "Status",
+    "units": "Units",
+    "status_draft": "Draft",
+    "status_pending": "Pending",
+    "status_approved": "Approved",
+    "status_rejected": "Rejected",
+    "status_cancelled": "Cancelled",
+    "cancelled_by_user": "Cancelled by user",
+    "cancel_confirm_title": "Cancel Leave Request",
+    "cancel_confirm_message": "Are you sure you want to cancel this leave request?",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approve_confirm_title": "Approve Leave Request",
+    "approve_confirm_message": "Are you sure you want to approve this leave request?",
+    "reject_confirm_title": "Reject Leave Request",
+    "reject_confirm_message": "Are you sure you want to reject this leave request?",
+    "from_date": "From Date",
+    "to_date": "To Date",
+    "employee_name": "Employee",
     "reason": "Reason",
     "reason_placeholder": "Enter the reason for your leave request",
+    "review_notes": "Review Notes",
+    "review_notes_placeholder": "Enter review notes...",
     "submit": "Submit Request"
   },
   "leave_types": {
@@ -306,7 +343,9 @@
       "faculties": "Faculties",
       "specializations": "Specializations",
       "job_statuses": "Job Statuses",
-      "employee_statuses": "Employee Statuses"
+      "employee_statuses": "Employee Statuses",
+      "chronic_diseases": "Chronic Diseases",
+      "organizational_levels": "Organizational Levels"
     },
     "select_country_first": "Please select a country to view its cities",
     "select_city_first": "Please select a city first",
@@ -324,6 +363,8 @@
     "no_specializations": "No specializations",
     "no_job_statuses": "No job statuses",
     "no_employee_statuses": "No employee statuses",
+    "no_chronic_diseases": "No chronic diseases",
+    "no_organizational_levels": "No organizational levels",
     "updated": "{name} updated successfully",
     "update_error": "Failed to update {name}",
     "set_default_success": "{name} set as default successfully",
@@ -512,5 +553,74 @@
     "adjustment_added": "Adj +",
     "adjustment_deducted": "Adj -",
     "no_data": "No leave balances found"
+  },
+  "employee_leave_requests": {
+    "title": "Employee Leave Requests",
+    "select_prompt": "Select an employee to view their leave requests",
+    "select_employee": "Select Employee"
+  },
+  "permissions": {
+    "hr": {
+      "leave-balance": {
+        "list": "List Leave Balances",
+        "adjust": "Adjust Leave Balance"
+      },
+      "leave-requests": {
+        "list": "List Leave Requests",
+        "manage": "Manage Leave Requests"
+      },
+      "leave-types": {
+        "list": "List Leave Types",
+        "view": "View Leave Type",
+        "create": "Create Leave Type",
+        "update": "Edit Leave Type",
+        "delete": "Delete Leave Type"
+      },
+      "employees": {
+        "list": "List Employees",
+        "view": "View Employee",
+        "create": "Create Employee",
+        "update": "Edit Employee",
+        "delete": "Delete Employee",
+        "view-eligible-leave-types": "View Eligible Leave Types"
+      },
+      "job-statuses": {
+        "list": "List Job Statuses",
+        "view": "View Job Status",
+        "create": "Create Job Status",
+        "update": "Edit Job Status",
+        "delete": "Delete Job Status"
+      },
+      "employee-statuses": {
+        "list": "List Employee Statuses",
+        "view": "View Employee Status",
+        "create": "Create Employee Status",
+        "update": "Edit Employee Status",
+        "delete": "Delete Employee Status"
+      },
+      "chronic-diseases": {
+        "list": "List Chronic Diseases",
+        "view": "View Chronic Disease",
+        "create": "Add Chronic Disease",
+        "update": "Update Chronic Disease",
+        "delete": "Delete Chronic Disease"
+      },
+      "organizational-levels": {
+        "list": "List Organizational Levels",
+        "view": "View Organizational Level",
+        "create": "Create Organizational Level",
+        "update": "Edit Organizational Level",
+        "delete": "Delete Organizational Level"
+      },
+      "eligible-leave-types": {
+        "list": "List Eligible Leave Types"
+      },
+      "employee-status-logs": {
+        "list": "List Employee Status Logs"
+      },
+      "job-status-logs": {
+        "list": "List Job Status Logs"
+      }
+    }
   }
 }

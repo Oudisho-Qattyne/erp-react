@@ -32,7 +32,9 @@
     "edit": "Edit Role",
     "role_info": "Role Information",
     "permissions": "Permissions",
-    "no_permissions": "No permissions assigned"
+    "no_permissions": "No permissions assigned",
+    "users_count": "{count} users",
+    "created_at": "Created at {date}"
   },
   "edit_role": {
     "title": "Edit Role",
@@ -42,6 +44,13 @@
     "back_to_list": "Back to List",
     "back": "Back",
     "submit": "Update Role"
+  },
+  "permissions": {
+    "users": {
+      "users": {
+        "link-to-employee": "Link User to Employee"
+      }
+    }
   },
   "role_form": {
     "save": "Save Role",

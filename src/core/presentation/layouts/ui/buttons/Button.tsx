@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext, useMemo } from 'react';
 import { Spinner } from '../state/Spinner';
+import { AuthContext } from '../../../../infrastructure/auth/AuthProvider';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'gold' | 'danger' | 'outline' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -11,6 +12,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   isLoading?: boolean;
+  requiredPermission?: string | string[];
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
@@ -40,10 +42,19 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       children,
       className = '',
       disabled,
+      requiredPermission,
       ...props
     },
     ref
   ) => {
+    const auth = useContext(AuthContext);
+    const hasRequiredPermission = useMemo(() => {
+      if (!requiredPermission) return true;
+      return auth?.hasPermission(requiredPermission) ?? false;
+    }, [requiredPermission, auth]);
+
+    if (!hasRequiredPermission) return null;
+
     const baseClasses = 'inline-flex items-center justify-center gap-2 rounded-md font-bold transition-all duration-300 ease-out focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer hover:scale-[1.02] active:scale-[0.98] active:translate-y-[1px]';
     const variantClass = variantClasses[variant];
     const sizeClass = sizeClasses[size];

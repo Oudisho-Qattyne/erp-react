@@ -1,7 +1,66 @@
 {
-    "navigation":{
-        "storage":{
-            "title":"storage"
-        }
+  "navigation": {
+    "storage": {
+      "title": "Storage"
     }
+  },
+  "toolbar": {
+    "add_folder": "New Folder",
+    "upload_file": "Upload File",
+    "delete_selected": "Delete Selected",
+    "rename": "Rename",
+    "cut": "Cut",
+    "paste": "Paste"
+  },
+  "delete_confirm": {
+    "title": "Confirm Deletion",
+    "message": "Are you sure you want to delete the selected items?",
+    "irreversible": "This action cannot be undone.",
+    "deleting": "Deleting...",
+    "confirm": "Delete"
+  },
+  "rename": {
+    "dialog_title_folder": "Rename Folder",
+    "dialog_title_file": "Rename File",
+    "new_name": "New Name",
+    "hint_file": "You can only change the name, the extension (.{ext}) will be preserved.",
+    "updating": "Updating...",
+    "confirm": "Rename"
+  },
+  "folder_create": {
+    "placeholder": "Folder name",
+    "creating": "Creating...",
+    "confirm": "Create"
+  },
+  "file_upload": {
+    "original_file": "Original file:",
+    "file_name": "File name",
+    "file_name_placeholder": "File name",
+    "hint": "You can change the name, the extension is fixed",
+    "secure_storage": "Secure storage (file encryption)",
+    "uploading": "Uploading...",
+    "confirm": "Upload",
+    "cancel": "Cancel"
+  },
+  "create_item_dialog": {
+    "title_folder": "Create New Folder",
+    "title_file": "Upload File"
+  },
+  "context_menu": {
+    "rename": "Rename",
+    "delete": "Delete",
+    "download": "Download",
+    "cut": "Cut",
+    "paste": "Paste"
+  },
+  "file_picker": {
+    "title": "Select Files",
+    "cancel": "Cancel",
+    "select": "Select",
+    "select_count": "Select ({count})"
+  },
+  "file_explorer_dialog": {
+    "title": "File Explorer"
+  },
+  "error_message": "Something went wrong"
 }

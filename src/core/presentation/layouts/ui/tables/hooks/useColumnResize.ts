@@ -7,6 +7,8 @@ interface UseColumnResizeOptions {
 
 export function useColumnResize({ initialWidths = [], minWidth = 60 }: UseColumnResizeOptions = {}) {
   const [columnWidths, setColumnWidths] = useState<number[]>(initialWidths);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragJustEnded = useRef(false);
   const resizingRef = useRef({
     active: false,
     columnIndex: -1,
@@ -33,6 +35,9 @@ export function useColumnResize({ initialWidths = [], minWidth = 60 }: UseColumn
 
   const handleMouseUp = useCallback(() => {
     resizingRef.current.active = false;
+    dragJustEnded.current = true;
+    setTimeout(() => { dragJustEnded.current = false; }, 0);
+    setIsDragging(false);
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
   }, [handleMouseMove]);
@@ -45,6 +50,7 @@ export function useColumnResize({ initialWidths = [], minWidth = 60 }: UseColumn
       startWidth,
       direction,
     };
+    setIsDragging(true);
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
   };
@@ -60,5 +66,7 @@ export function useColumnResize({ initialWidths = [], minWidth = 60 }: UseColumn
     columnWidths,
     setColumnWidths,
     startResize,
+    isDragging,
+    dragJustEnded,
   };
 }
