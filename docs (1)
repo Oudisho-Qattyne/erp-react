@@ -95,7 +95,6 @@ paths:
             enum:
               - en
               - ar
-            example: ar
       responses:
         200:
           description: 'Country details'
@@ -1172,6 +1171,8 @@ paths:
         -
           $ref: '#/components/parameters/HrWorkPlaceCityFilter'
         -
+          $ref: '#/components/parameters/HrLinkedToUserFilter'
+        -
           $ref: '#/components/parameters/HrSortByFirstName'
         -
           $ref: '#/components/parameters/HrSortByLastName'
@@ -1346,7 +1347,37 @@ paths:
                   - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/EmployeeStatusLog' } } } }
         404:
           $ref: '#/components/responses/NotFound'
-  /hr/employees/eligible-leave-types:
+  '/hr/employees/{id}/eligible-leave-types':
+    get:
+      summary: 'Get eligible leave types for a specific employee'
+      description: "Evaluates the active, non-archived leave types against the specified employee's\neligibility rules using the Rule Evaluator Service. Returns only leave types the\nemployee passes.\n"
+      tags:
+        - Employees
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 'Employee ID'
+      responses:
+        200:
+          description: 'List of eligible leave types (id and name only)'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/LeaveTypeSummary' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /hr/employees/eligible-leave-types/my:
     get:
       summary: 'Get leave types the authenticated employee is eligible for'
       description: "Evaluates the active, non-archived leave types against the authenticated employee's\neligibility rules using the Rule Evaluator Service. Returns only leave types the\nemployee passes.\n"
@@ -1518,6 +1549,8 @@ paths:
           $ref: '#/components/parameters/HrSortByName'
         -
           $ref: '#/components/parameters/HrSortByCreatedAt'
+        -
+          $ref: '#/components/parameters/HrJobStatusSearch'
       responses:
         200:
           description: 'Paginated list of job status records'
@@ -1651,6 +1684,8 @@ paths:
           $ref: '#/components/parameters/HrSortByName'
         -
           $ref: '#/components/parameters/HrSortByCreatedAt'
+        -
+          $ref: '#/components/parameters/HrEmployeeStatusSearch'
       responses:
         200:
           description: 'Paginated list of employee status records'
@@ -2046,12 +2081,73 @@ paths:
                   - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/EmployeeLeaveBalance' } } } }
         401:
           $ref: '#/components/responses/Unauthenticated'
+  '/hr/leave-balance/employee/{id}':
+    get:
+      summary: 'Get leave balance for a specific employee'
+      description: "Returns the current leave balance for the specified employee, grouped by leave type.\nFor accrual leave types (yearly/monthly), only transactions within the current period are included.\nFor non-accrual leave types, all transactions are aggregated.\n"
+      tags:
+        - 'Leave Balance'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 'Employee ID'
+      responses:
+        200:
+          description: 'List of leave balances for the specified employee'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/EmployeeLeaveBalance' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+  '/hr/leave-requests/employee/{id}':
+    get:
+      summary: 'Get leave requests for a specific employee'
+      description: "Returns a paginated list of leave requests for the specified employee,\nincluding leave type details.\n"
+      tags:
+        - 'Leave Requests'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 'Employee ID'
+      responses:
+        200:
+          description: "Paginated list of the employee's leave requests"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/LeaveRequestInfo' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
   /hr/leave-requests/my:
     get:
       summary: 'Get my leave requests'
       description: "Returns a paginated list of leave requests for the authenticated employee,\nincluding leave type details.\n"
       tags:
         - 'Leave Requests'
+      security:
+        -
+          sanctumAuth: {  }
       parameters:
         -
           $ref: '#/components/parameters/HrPage'
@@ -2074,6 +2170,9 @@ paths:
       description: "Returns a single leave request with employee and leave type details.\n"
       tags:
         - 'Leave Requests'
+      security:
+        -
+          sanctumAuth: {  }
       parameters:
         -
           name: id
@@ -2099,6 +2198,9 @@ paths:
       description: "Updates the leave request fields. Only the owning employee can update their own requests.\nThe validation pipeline is re-run with the updated values.\nAllowed fields: `start_date`, `end_date`, `requested_units`, `reason`.\n"
       tags:
         - 'Leave Requests'
+      security:
+        -
+          sanctumAuth: {  }
       parameters:
         -
           name: id
@@ -2163,6 +2265,9 @@ paths:
       description: "Returns a paginated list of all leave requests with employee and leave type details.\nSupports filtering by search (employee name), employee_id, leave_type_id, status, and date ranges\nvia the LeaveRequest scopeFilter.\n"
       tags:
         - 'Leave Requests'
+      security:
+        -
+          sanctumAuth: {  }
       parameters:
         -
           $ref: '#/components/parameters/HrPage'
@@ -2224,6 +2329,9 @@ paths:
       description: "Creates a new leave request for the authenticated employee after running\nthe full validation pipeline: eligibility rules, notice period, min/max units,\nentitlement & proration resolution, available balance check, and split restriction.\n"
       tags:
         - 'Leave Requests'
+      security:
+        -
+          sanctumAuth: {  }
       requestBody:
         required: true
         content:
@@ -2255,6 +2363,9 @@ paths:
       description: "Approves a pending leave request, updates its status to `approved`,\nand creates a `leave_consumption` balance transaction for the consumed units.\n"
       tags:
         - 'Leave Requests'
+      security:
+        -
+          sanctumAuth: {  }
       parameters:
         -
           name: id
@@ -2291,6 +2402,9 @@ paths:
       description: "Rejects a pending leave request, updates its status to `rejected`,\nand records the reviewer's notes.\n"
       tags:
         - 'Leave Requests'
+      security:
+        -
+          sanctumAuth: {  }
       parameters:
         -
           name: id
@@ -2331,6 +2445,9 @@ paths:
       description: "Cancels a leave request, updates its status to `cancelled`.\nAn optional reason can be provided; if omitted the original reason is preserved.\n"
       tags:
         - 'Leave Requests'
+      security:
+        -
+          sanctumAuth: {  }
       parameters:
         -
           name: id
@@ -2833,6 +2950,61 @@ paths:
               schema:
                 $ref: '#/components/schemas/ValidationErrorResponse'
   /users/:
+    post:
+      summary: 'Create a new user'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+                - password
+                - mobile
+                - role
+              properties:
+                name:
+                  type: string
+                  example: 'John Doe'
+                email:
+                  type: string
+                  format: email
+                  example: john@example.com
+                password:
+                  type: string
+                  example: password
+                mobile:
+                  type: string
+                  example: '01000000000'
+                role:
+                  type: string
+                  example: admin
+      responses:
+        200:
+          description: 'User created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/User' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        422:
+          description: 'Validation error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
     get:
       summary: 'List all users'
       tags:
@@ -2853,6 +3025,13 @@ paths:
           schema:
             type: integer
           description: 'Items per page'
+        -
+          in: query
+          name: linked_to_user
+          schema:
+            type: boolean
+          required: false
+          description: 'Filter by whether user is linked to an employee'
       responses:
         200:
           description: 'List of users'
@@ -3016,6 +3195,48 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         403:
           $ref: '#/components/responses/Forbidden'
+  /users/link-to-employee:
+    post:
+      summary: 'Link a user to an employee'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+              properties:
+                user_id:
+                  type: integer
+                  example: 1
+                employee_id:
+                  type: integer
+                  example: 10
+      responses:
+        200:
+          description: 'User linked to employee successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/User' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          description: 'User not found'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /users/roles:
     get:
       summary: 'List all roles'
@@ -5047,7 +5268,6 @@ components:
         enum:
           - en
           - ar
-        example: en
     SearchQuery:
       name: search
       in: query
@@ -5055,7 +5275,6 @@ components:
       description: 'Partial match (LIKE) on `name`'
       schema:
         type: string
-        example: damascus
     SortByName:
       name: 'sort_by[name]'
       in: query
@@ -5066,7 +5285,6 @@ components:
         enum:
           - asc
           - desc
-        example: asc
     SortByCode:
       name: 'sort_by[code]'
       in: query
@@ -5077,7 +5295,6 @@ components:
         enum:
           - asc
           - desc
-        example: asc
     SortByCreatedAt:
       name: 'sort_by[created_at]'
       in: query
@@ -5088,7 +5305,6 @@ components:
         enum:
           - asc
           - desc
-        example: desc
     UniversityIdQuery:
       name: university_id
       in: query
@@ -5096,7 +5312,6 @@ components:
       description: 'Filter faculties by university ID (optional when not scoped by path)'
       schema:
         type: integer
-        example: 1
     FacultyIdQuery:
       name: faculty_id
       in: query
@@ -5104,7 +5319,6 @@ components:
       description: 'Filter specializations by faculty ID (optional when not scoped by path)'
       schema:
         type: integer
-        example: 1
     HrPage:
       name: page
       in: query
@@ -5142,6 +5356,20 @@ components:
       schema:
         type: string
         example: diabetes
+    HrJobStatusSearch:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+        example: active
+    HrEmployeeStatusSearch:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
+        example: Permanent
     HrSortByName:
       name: 'sort_by[name]'
       in: query
@@ -5277,6 +5505,14 @@ components:
       schema:
         type: integer
         example: 14
+    HrLinkedToUserFilter:
+      name: linked_to_user
+      in: query
+      required: false
+      schema:
+        type: boolean
+        example: true
+      description: 'Filter by whether employee is linked to a user account'
     HrEmployeeIdFilter:
       name: employee_id
       in: query
