@@ -46,7 +46,7 @@ export function createFetchApiClient(
         removeToken();
         removeAuthUser();
         window.location.href = '/auth';
-        throw createApiError('Unauthorized', null, 401);
+        throw createApiError('Unauthorized', undefined, 401);
       }
       const errorData = await response.json().catch(() => null);
       const message = errorData?.message || `HTTP error! status: ${response.status}`;
