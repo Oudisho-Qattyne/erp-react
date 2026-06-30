@@ -17,7 +17,7 @@ export function createCrufRepository<T,TCreate , TUpdate, ID = number>(apiCliein
             return apiClieint.put<DomainResponse<T>,TUpdate>(`${restUrl}/${id}`, data)
         },
         delete: async(id: ID) => {
-            apiClieint.delete(`${restUrl}/${id}`)
+            return apiClieint.delete(`${restUrl}/${id}`)
         }
     }
 }

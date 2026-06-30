@@ -10,8 +10,8 @@ return{
     findAllMyLeaveBalances(filter?: any) {
         return apiClient.get<DpomainResponsePaginated<LeaveBalance[]>>(`${baseUrl}/my`, { params: filter })
     },
-    findAllEmployeeLeaveBalances(employeeId : number, filter?: any) {
-        return apiClient.get<DpomainResponsePaginated<LeaveBalance[]>>(baseUrl, { params: filter })
+    findAllEmployeeLeaveBalances(employeeId : number | undefined, filter?: any) {
+        return apiClient.get<DpomainResponsePaginated<LeaveBalance[]>>(baseUrl, { params: { ...filter, ...(employeeId !== undefined ? { employee_id: employeeId } : {}) } })
     },
     adjustLeaveBalance(adjust : any) {
         return apiClient.post<DpomainResponsePaginated<any>>(`${baseUrl}/adjust` , adjust)

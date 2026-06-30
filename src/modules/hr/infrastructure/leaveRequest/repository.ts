@@ -11,7 +11,7 @@ export const createLeaveRequesteRepository = (apiClient: ApiClient): ILeaveReque
 return{
     createLeaveRequest : (leaveRequest : any) => apiClient.post<DomainResponse<LeaveRequest>>(baseUrl , leaveRequest),
 
-    getAllEmployeeLeaveRequests:(filter : any) => apiClient.get<DpomainResponsePaginated<LeaveRequest[]>>(baseUrl , {params:filter}),
+    getAllLeaveRequests:(filter : any) => apiClient.get<DpomainResponsePaginated<LeaveRequest[]>>(baseUrl , {params:filter}),
     getAllMyLeaveRequests:(filter : any) => apiClient.get<DpomainResponsePaginated<LeaveRequest[]>>(`${baseUrl}/my` , {params:filter}),
     getLeaveRequestById:(id :number) => apiClient.get<DomainResponse<LeaveRequest>>(`${baseUrl}/${id}`),
 

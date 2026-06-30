@@ -1,5 +1,5 @@
 // src/core/presentation/layouts/ui/inputs/FormInput.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext, useMemo } from 'react';
 import { useFormContext, useFormState, type FieldValues, type Path } from 'react-hook-form';
 import { Plus, CalendarIcon } from 'lucide-react';
 import { CustomSelect } from './CustomSelect';
@@ -13,6 +13,7 @@ import { SelectOrCreate } from './SelectOrCreate';
 import Input, { type InputType } from './Input';
 import type { MatrixFieldConfig } from './DataMatrixInput';
 import { useDependentField, type ComputedProps } from './hooks/useDependentField';
+import { AuthContext } from '../../../../infrastructure/auth/AuthProvider';
 
 
 export interface FormInputProps<T extends FieldValues> {
@@ -26,7 +27,7 @@ export interface FormInputProps<T extends FieldValues> {
   hint?: string;
   className?: string;
   // For select & select-or-create
-  options?: { value: number | string; label: string }[]
+  options?: { value: number | string | any; label: string }[]
   searchable?: boolean;
   // For textarea
   rows?: number;
@@ -52,7 +53,9 @@ export interface FormInputProps<T extends FieldValues> {
   // Dependency
   dependsOn?: Path<T>[];
   compute?: (values: Record<Path<T>, any>) => ComputedProps | Promise<ComputedProps>;
-  infoButton?: () => void
+  infoButton?: () => void;
+  requiredPermission?: string | string[];
+  createButtonPermission?: string | string[];
 }
 
 export function FormInput<T extends FieldValues>({
@@ -82,9 +85,12 @@ export function FormInput<T extends FieldValues>({
   rowSchema,
   dependsOn = [],
   compute,
-  infoButton
+  infoButton,
+  requiredPermission,
+  createButtonPermission,
 }: FormInputProps<T>) {
   const { t, direction } = useLanguage();
+  const auth = useContext(AuthContext);
   const { setValue, watch, getValues, control } = useFormContext<T>();
   const { errors } = useFormState({ control, name });
 
@@ -113,6 +119,11 @@ export function FormInput<T extends FieldValues>({
   const finalValue = computed.value !== undefined ? computed.value : currentValue;
   const finalMatrixFields = computed.matrixFields ?? matrixFields;
   const finalNumberOfRows = computed.numberOfRows ?? numberOfRows;
+
+  const hasAccess = useMemo(() => {
+    if (!requiredPermission) return true;
+    return auth?.hasPermission(requiredPermission) ?? false;
+  }, [requiredPermission, auth]);
 
   if (finalHidden) return null;
   if (loading && hasDeps && !finalValue) {
@@ -193,7 +204,7 @@ export function FormInput<T extends FieldValues>({
         onChange={handleChange}
         options={finalOptions}
         placeholder={finalPlaceholder}
-        disabled={finalDisabled}
+        disabled={finalDisabled || !hasAccess}
         required={finalRequired}
         searchable={searchable}
         rows={rows}
@@ -211,6 +222,8 @@ export function FormInput<T extends FieldValues>({
         matrixErrors={matrixErrors}
         rowSchema={rowSchema}
         baseClasses={baseClasses}
+        requiredPermission={requiredPermission}
+        createButtonPermission={createButtonPermission}
       />
       {error && <div className={errorClasses}>{t(`validation.${error}`, 'shared') || error}</div>}
       {hint && !error && <div className={hintClasses}>{hint}</div>}

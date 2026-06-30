@@ -23,6 +23,7 @@ interface SelectOrCreateProps {
   baseClasses?: string;
   /** Dot‑notation path to the label inside the newItem, e.g. "data.name.ar" */
   labelPath?: string;
+  createButtonPermission?: string | string[];
 }
 
 export function SelectOrCreate({
@@ -37,7 +38,8 @@ export function SelectOrCreate({
   renderCreateForm,
   dependentData,
   baseClasses,
-  labelPath, 
+  labelPath,
+  createButtonPermission, 
 }: SelectOrCreateProps) {
   const { t } = useLanguage();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -100,6 +102,7 @@ export function SelectOrCreate({
           onClick={() => setIsDialogOpen(true)}
           disabled={disabled}
           className="shrink-0 h-9.5"
+          requiredPermission={createButtonPermission}
         >
           {disabled ? '' : newLabel}
         </Button>

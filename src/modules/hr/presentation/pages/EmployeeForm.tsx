@@ -137,7 +137,6 @@ function FacultyCreateForm({ onSuccess, onCancel, universityId }: { onSuccess: (
       fields={[{ name: 'name', label: t('employees.faculty', 'hr') || 'اسم الكلية', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
       schema={schemaWithoutUni}
       onSubmit={async (data: any) => {
-        console.log(universityId);
 
         const payload = {
           ...data,
@@ -289,7 +288,6 @@ export function EmployeeForm({
 
   const computeEmployeeStatuses = async () => {
     const response = await loadEmployeeStatuses();
-    console.log(response);
     return { options: response.data.map((es: any) => ({ value: es.id, label: es.name, is_default: es.is_default })) };
   };
 
@@ -598,6 +596,8 @@ export function EmployeeForm({
     {
       name: 'chronic_disease_ids', type: 'multi-select-or-create', searchable: true, label: t('employees.chronic_diseases', 'hr') || 'تاريخ الإصابة',
       labelPath: 'data.name',
+      requiredPermission: 'hr.chronic-diseases.list',
+      createButtonPermission: 'hr.chronic-diseases.create',
       renderCreateForm: (onSuccess, onCancel) => <ChronicDiseaseCreateForm onSuccess={(v, i) => {
         onSuccess(v, i)
       }} onCancel={onCancel} />,
@@ -605,6 +605,8 @@ export function EmployeeForm({
     },
     {
       name: 'employee_status_id', type: 'select-or-create', searchable: true, label: t('employees.employee_status_id', 'hr') || 'Employee Status',
+      requiredPermission: 'hr.employee-statuses.list',
+      createButtonPermission: 'hr.employee-statuses.create',
       labelPath: 'data.name',
       infoButton:employee_id ? () => { setStatusLogsOpen(true) } : undefined,
       renderCreateForm: (onSuccess, onCancel) => <EmployeeStatusCreateForm onSuccess={(v, i) => {
@@ -625,7 +627,6 @@ export function EmployeeForm({
     }
 
   ];
-  console.log(errors);
 
   const EMPLOYMENT_FIELDS: FieldConfig[] = [
     { name: 'employment_details.job_title', label: t('employees.job_title', 'hr') || 'المسمى الوظيفي' },
@@ -671,6 +672,8 @@ export function EmployeeForm({
       searchable: true,
       labelPath: 'data.name',
       type: 'select-or-create',
+      requiredPermission: 'hr.job-statuses.list',
+      createButtonPermission: 'hr.job-statuses.create',
       infoButton:employee_id ? () => { setJobStatusLogsOpen(true) } : undefined,
       renderCreateForm: (onSuccess, onCancel) => <JobStatusCreateForm onSuccess={onSuccess} onCancel={onCancel} />,
       compute: async (values) => {
@@ -816,7 +819,6 @@ export function EmployeeForm({
                     compute={(values) => computeFaculties(values, idx)}
                     createTitle={t('employee_form.add_faculty', 'hr') || "إضافة كلية جديدة"}
                     renderCreateForm={(onSuccess, onCancel, deps) => {
-                      console.log(deps);
 
                       return (
                         <FacultyCreateForm

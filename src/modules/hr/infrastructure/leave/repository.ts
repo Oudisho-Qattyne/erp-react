@@ -28,7 +28,7 @@ export const createLeaveTypeRepository = (apiClient: ApiClient): ILeaveTypeRepos
       return apiClient.delete<DpomainResponsePaginated<Leave>> (`${baseUrl}/${id}`)
     },
     getUserEligibleLeaveTypes() {
-      return apiClient.get<DomainResponse<EntityWithNameOnly[]>>(`/hr/employees/eligible-leave-types`)
+      return apiClient.get<DomainResponse<EntityWithNameOnly[]>>(`/hr/employees/eligible-leave-types/my`)
     }
   };
 };

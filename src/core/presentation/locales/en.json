@@ -54,5 +54,10 @@
     "message" : "Sorry, the page you are reaching does not exist",
     "title" : "الصفحة غير موجودة"
 
+  },
+  "unauthorized": {
+    "back_home" : "Back Home",
+    "message" : "You do not have permission to access this page",
+    "title" : "Unauthorized"
   }
 }

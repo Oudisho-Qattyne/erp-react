@@ -34,6 +34,7 @@ const storageModule: Module = {
       moduleName: 'storage',
       icon: <FolderIcon size={18} />,
       group: 'storage', // or a new group
+      requiredPermission: 'storage.storage.view',
     },
   ],
   locales: { en: enLocales, ar: arLocales },

@@ -83,7 +83,7 @@ export function DataTable<T extends Record<string, any>>({
 }: DataTableProps<T>) {
   const { direction, t } = useLanguage();
   const initialWidths = columns.map(col => col.width || 150);
-  const { columnWidths, startResize } = useColumnResize({ initialWidths, minWidth: 60 });
+  const { columnWidths, startResize, isDragging, dragJustEnded } = useColumnResize({ initialWidths, minWidth: 60 });
   const totalWidth = columnWidths.reduce((sum, w) => sum + w, 0);
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -113,6 +113,7 @@ export function DataTable<T extends Record<string, any>>({
   // Sorting handlers
   // ─────────────────────────────────────────────────────────────────────────
   const handleHeaderClick = (col: ColumnDef<T>) => {
+    if (isDragging || dragJustEnded.current) return;
     if (col.sortable && onSort) {
       onSort(col.key);
     }
@@ -222,7 +223,7 @@ export function DataTable<T extends Record<string, any>>({
                 {columns.map((col, idx) => (
                   <th
                     key={col.key}
-                    onClick={() => handleHeaderClick(col)}
+                    onClick={() =>isDragging? null:handleHeaderClick(col)}
                     className={`py-3 px-4 ${direction === 'rtl' ? 'text-right' : 'text-left'} font-semibold text-sm text-text-muted relative select-none group/th whitespace-nowrap border-border/30 ${direction === 'rtl' ? 'border-l' : 'border-r'} ${col.sortable ? 'cursor-pointer hover:bg-primary/5' : ''} ${col.className || ''}`}
                     style={{ width: `${columnWidths[idx]}px`, minWidth: `${columnWidths[idx]}px` }}
                   >

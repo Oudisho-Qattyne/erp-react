@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import { FormInput } from '../../../../core/presentation/layouts/ui/inputs/FormInput';
@@ -8,6 +8,7 @@ import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicFo
 import { getCreateRoleSchema, type RoleFormValues } from '../schemas/roleForm';
 import { useManageRoles } from '../hooks/useManageRoles';
 import type { Permissions, Permission } from '../../domain/entities/permissions';
+import { getPermissionDisplayName } from '../utils/getPermissionDisplayName';
 
 const ROLE_EMPTY_DEFAULTS: RoleFormValues = {
   name: '',
@@ -61,10 +62,12 @@ export function RoleForm({
     setValue('permissions', updated, { shouldValidate: true, shouldDirty: true });
   };
 
-  const getDisplayName = (perm: Permission): string => {
-    if (typeof perm.display_name === 'string') return perm.display_name;
-    return (perm.display_name as any)[language] || (perm.display_name as any)['en'] || perm.name;
-  };
+  const toggleGroup = useCallback((permIds: number[], currentlySelected: boolean) => {
+    const updated = currentlySelected
+      ? selectedPermissions.filter((id) => !permIds.includes(id))
+      : [...selectedPermissions, ...permIds.filter((id) => !selectedPermissions.includes(id))];
+    setValue('permissions', updated, { shouldValidate: true, shouldDirty: true });
+  }, [selectedPermissions, setValue]);
 
   const actualSubmitLabel = submitLabel || t('role_form.save', 'users') || 'Save Role';
   const actualCancelLabel = cancelLabel || t('role_form.cancel', 'users') || 'Cancel';
@@ -100,26 +103,40 @@ export function RoleForm({
                 <div key={moduleName} className="border border-border rounded-lg p-4">
                   <h4 className="text-md font-bold mb-3 text-primary">{moduleName}</h4>
                   <div className="space-y-3">
-                    {Object.entries(groups).map(([groupKey, perms]) => (
-                      <div key={groupKey}>
-                        <h5 className="text-sm font-semibold text-text-muted mb-2 capitalize">{groupKey}</h5>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                          {perms.map((perm) => (
-                            <label
-                              key={perm.id}
-                              className="flex items-center gap-2 p-2 rounded-md hover:bg-primary-light/5 cursor-pointer"
-                            >
-                              <Input
-                                type="checkbox"
-                                value={selectedPermissions.includes(perm.id)}
-                                onChange={() => togglePermission(perm.id)}
-                              />
-                              <span className="text-sm text-text">{getDisplayName(perm)}</span>
-                            </label>
-                          ))}
+                    {Object.entries(groups).map(([groupKey, perms]) => {
+                      const permIds = perms.map(p => p.id);
+                      const selectedCount = permIds.filter(id => selectedPermissions.includes(id)).length;
+                      const allSelected = selectedCount === permIds.length;
+                      const noneSelected = selectedCount === 0;
+
+                      return (
+                        <div key={groupKey}>
+                          <label className="flex items-center gap-2 mb-2 cursor-pointer">
+                            <GroupCheckbox
+                              checked={allSelected}
+                              indeterminate={!allSelected && !noneSelected}
+                              onChange={() => toggleGroup(permIds, allSelected)}
+                            />
+                            <span className="text-sm font-semibold text-text-muted capitalize">{groupKey}</span>
+                          </label>
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                            {perms.map((perm) => (
+                              <label
+                                key={perm.id}
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-primary-light/5 cursor-pointer"
+                              >
+                                <Input
+                                  type="checkbox"
+                                  value={selectedPermissions.includes(perm.id)}
+                                  onChange={() => togglePermission(perm.id)}
+                                />
+                                <span className="text-sm text-text">{getPermissionDisplayName(perm, t, language)}</span>
+                              </label>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               ))}
@@ -143,5 +160,25 @@ export function RoleForm({
         </div>
       </form>
     </FormProvider>
+  );
+}
+
+function GroupCheckbox({ checked, indeterminate, onChange }: { checked: boolean; indeterminate: boolean; onChange: () => void }) {
+  const ref = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.indeterminate = indeterminate;
+    }
+  }, [indeterminate]);
+
+  return (
+    <input
+      ref={ref}
+      type="checkbox"
+      checked={checked}
+      onChange={onChange}
+      className="w-4 h-4 rounded border-border bg-background text-primary focus:ring-primary cursor-pointer"
+    />
   );
 }

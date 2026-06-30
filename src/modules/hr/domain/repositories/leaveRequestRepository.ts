@@ -7,7 +7,7 @@ export interface ILeaveRequestRepository{
     createLeaveRequest:(leaveRequest : any) => Promise<DomainResponse<any>>,
 
     getAllMyLeaveRequests:(filter : any) => Promise<DpomainResponsePaginated<LeaveRequest[]>>,
-    getAllEmployeeLeaveRequests:(filter : any) => Promise<DpomainResponsePaginated<LeaveRequest[]>>,
+    getAllLeaveRequests:(filter : any) => Promise<DpomainResponsePaginated<LeaveRequest[]>>,
     getLeaveRequestById:(id:number) => Promise<DomainResponse<LeaveRequest>>,
 
     updateLeaveRequest:(id:number , leaveRequest : any) => Promise<DomainResponse<LeaveRequest>>,

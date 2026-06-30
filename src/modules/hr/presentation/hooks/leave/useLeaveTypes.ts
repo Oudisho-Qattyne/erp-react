@@ -9,7 +9,7 @@ import type { EntityWithNameOnly } from "../../../../../core/domain/entities/Ent
 import type { Leave } from "../../../domain/entities/leave/leave"
 import { toast } from "sonner"
 
-const OP_KEYS = ["findAll", "findById", "create", "update", "archive", "delete"] as const
+const OP_KEYS = ["findAll", "findById", "create", "update", "archive", "delete", "findUserEligibleLeaveTypes"] as const
 
 function initRecord<T>(value: T): Record<string, T> {
   return Object.fromEntries(OP_KEYS.map((k) => [k, value]))
@@ -34,6 +34,7 @@ const DEFAULT_FILTER: FilterLeaveDto = {
 
 export interface UseLeaveTypesReturn {
   items: EntityWithNameOnly[]
+  userEligibleLeaveTypes: EntityWithNameOnly[]
   currentLeave: Leave | null
   loading: Record<string, boolean>
   isLoading: () => boolean
@@ -46,7 +47,7 @@ export interface UseLeaveTypesReturn {
     hasMore: boolean
   }
   filter: FilterLeaveDto
-  setFilter: (patch: Partial<FilterLeaveDto>) => void
+  setFilter: (patch: Partial<FilterLeaveDto> | ((prev: FilterLeaveDto) => FilterLeaveDto)) => void
   resetFilter: () => void
   clearError: () => void
   findAll: () => Promise<void>
@@ -58,6 +59,7 @@ export interface UseLeaveTypesReturn {
   setSearch: (search: string) => void
   setPage: (page: number) => void
   setSort: (field: "name" | "created_at", dir: "asc" | "desc") => void
+  findUserEligibleLeaveTypes: () => Promise<void>
 }
 
 export const useLeaveTypes = (): UseLeaveTypesReturn => {
@@ -65,6 +67,7 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
   const { language } = useLanguage()
 
   const [items, setItems] = useState<EntityWithNameOnly[]>([])
+  const [userEligibleLeaveTypes, setUserEligibleLeaveTypes] = useState<EntityWithNameOnly[]>([])
   const [currentLeave, setCurrentLeave] = useState<Leave | null>(null)
   const [loading, setLoading] = useState<Record<string, boolean>>(() => initRecord(false))
   const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null))
@@ -79,8 +82,8 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
 
   const clearError = useCallback(() => setError(initRecord(null)), [])
 
-  const setFilter = useCallback((patch: Partial<FilterLeaveDto>) => {
-    setFilterState((prev) => ({ ...prev, ...patch }))
+  const setFilter = useCallback((patch: Partial<FilterLeaveDto> | ((prev: FilterLeaveDto) => FilterLeaveDto)) => {
+    setFilterState((prev) => (typeof patch === "function" ? patch(prev) : { ...prev, ...patch }))
   }, [])
 
   const resetFilter = useCallback(() => setFilterState(DEFAULT_FILTER), [])
@@ -204,6 +207,21 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
     }
   }, [useCase, language, findAll])
 
+  const findUserEligibleLeaveTypesFn = useCallback(async () => {
+    setFnLoading("findUserEligibleLeaveTypes", true)
+    setFnError("findUserEligibleLeaveTypes", null)
+    try {
+      const res = await useCase.findUserEligibleLeaveTypes()
+      setUserEligibleLeaveTypes(res.data)
+    } catch (err: any) {
+      const msg = err.message || "Failed to fetch eligible leave types"
+      setFnError("findUserEligibleLeaveTypes", msg)
+      toast.error(language === "ar" ? `فشل تحميل أنواع الإجازات المستحقة: ${msg}` : `Failed to load eligible leave types: ${msg}`)
+    } finally {
+      setFnLoading("findUserEligibleLeaveTypes", false)
+    }
+  }, [useCase, language])
+
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])
 
@@ -213,6 +231,7 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
 
   return {
     items,
+    userEligibleLeaveTypes,
     currentLeave,
     loading,
     isLoading,
@@ -232,5 +251,6 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
     setSearch,
     setPage,
     setSort,
+    findUserEligibleLeaveTypes: findUserEligibleLeaveTypesFn,
   }
 }

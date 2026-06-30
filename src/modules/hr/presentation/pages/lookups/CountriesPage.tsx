@@ -85,7 +85,6 @@ export function CountriesPage() {
         </div>
       ) },
   ];
-console.log(editItem);
 
   return (
     <div className="p-6 space-y-6">
