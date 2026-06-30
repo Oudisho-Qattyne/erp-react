@@ -13,6 +13,7 @@
     "@fontsource/noto-sans-arabic": "^5.2.10",
     "@fontsource/tajawal": "^5.2.7",
     "@hookform/resolvers": "^5.2.2",
+    "@react-google-maps/api": "^2.20.8",
     "@svar-ui/react-filemanager": "^2.5.0",
     "@tailwindcss/vite": "^4.3.0",
     "lucide-react": "^1.16.0",
