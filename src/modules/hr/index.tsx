@@ -3,6 +3,8 @@ import enLocales from './presentation/locales/en.json'
 import arLocales from './presentation/locales/ar.json'
 import { Users, CalendarClock, Database, BarChart3, CalendarDays, UserCheck, Wallet, Gauge, FileText, FileSearch, SlidersHorizontal, Flag, Building2, Map, GraduationCap, BookOpen, Beaker, Briefcase, BadgeCheck, Heart, StarIcon,  } from 'lucide-react'
 import type { Module } from '../../core/moduleRegistry'
+import { registerHrApi, type HrApi } from '../../core/registry/hr/hrRegistry'
+import { EmployeePickerDialog } from './presentation/components/employee/EmployeePickerDialog'
 import { Navigate } from 'react-router-dom'
 // import CreateUserPage from './presentation/pages/CreateUserPage'
 import { ReportsPage } from './presentation/pages/ReportsPage'
@@ -33,6 +35,13 @@ import { ShowLeaveRequestPage } from './presentation/pages/leaveRequest/ShowLeav
 import { ShowLeaveRequestAdminPage } from './presentation/pages/leaveRequest/ShowLeaveRequestAdminPage'
 import { EmployeeLeaveRequests } from './presentation/pages/leaveRequest/EmployeeLeaveRequests'
 import { AdjustEmployeesLeaveBalance } from './presentation/pages/leaveBalances/AdjustEmployeesLeaveBalance'
+
+const createHrApi = (): HrApi => ({
+  EmployeePickerComponent: EmployeePickerDialog,
+})
+
+const hrApi = createHrApi()
+registerHrApi(hrApi)
 
 const usersModule: Module = {
   name: 'hr',

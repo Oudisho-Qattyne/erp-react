@@ -15,6 +15,7 @@ export interface FilterEmployeeDto {
     specialization_id?: number;
     organizational_unit?: number;
     work_place_city?: number;
+    linked_to_user?: boolean;
     "sort_by[first_name]"?: SortType;
     "sort_by[last_name]"?: SortType;
     "sort_by[created_at]"?: SortType;

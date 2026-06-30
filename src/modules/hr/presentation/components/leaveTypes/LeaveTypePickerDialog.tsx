@@ -18,6 +18,7 @@ interface LeaveTypePickerDialogProps {
     multiple?: boolean
     initialSelected?: EntityWithNameOnly[],
     eligible?:boolean
+    defaultFilter?: Record<string, any>
 }
 
 export function LeaveTypePickerDialog({
@@ -26,7 +27,8 @@ export function LeaveTypePickerDialog({
     onConfirm,
     multiple = false,
     initialSelected = [],
-    eligible = false
+    eligible = false,
+    defaultFilter,
 }: LeaveTypePickerDialogProps) {
     const { t, language } = useLanguage()
     const { items: leaveTypes, userEligibleLeaveTypes, loading ,isLoading, error, pagination, filter, setSearch, setPage, setFilter, resetFilter , findUserEligibleLeaveTypes } = useLeaveTypes()
@@ -38,8 +40,17 @@ export function LeaveTypePickerDialog({
     useEffect(() => {
         if (isOpen) {
             setSelectedKeys(initialSelected.map((e) => e.id))
+            if (defaultFilter) {
+                const parsed: Record<string, any> = {}
+                for (const [key, val] of Object.entries(defaultFilter)) {
+                    if (val === "true") parsed[key] = true
+                    else if (val === "false") parsed[key] = false
+                    else parsed[key] = val
+                }
+                setFilter(parsed as any)
+            }
         }
-    }, [isOpen])
+    }, [isOpen, defaultFilter])
     useEffect(() => {
         if(eligible){
             findUserEligibleLeaveTypes()
@@ -64,7 +75,7 @@ export function LeaveTypePickerDialog({
     ]
 
     const handleApplyFilter = (values: Record<string, any>) => {
-        const parsed: Record<string, any> = {}
+        const parsed: Record<string, any> = { page: 1, per_page: filter.per_page }
         for (const [key, val] of Object.entries(values)) {
             if (val === "" || val === undefined) {
                 continue
@@ -76,7 +87,7 @@ export function LeaveTypePickerDialog({
                 parsed[key] = val
             }
         }
-        setFilter(parsed as any)
+        setFilter(() => parsed as any)
         setIsFilterOpen(false)
     }
 

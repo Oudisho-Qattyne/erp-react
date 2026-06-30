@@ -94,17 +94,16 @@ export const UserLeaveBalances = () => {
   ]
 
   const handleApplyFilter = (values: Record<string, any>) => {
-    const parsed: Record<string, any> = {}
+    const parsed: Record<string, any> = { page: 1, per_page: filter.per_page }
     for (const [key, val] of Object.entries(values)) {
-      if (val === "" || val === undefined) {
-        parsed[key] = undefined
-      } else if (key === "leave_type_id") {
+      if (val === "" || val === undefined) continue
+      if (key === "leave_type_id") {
         parsed[key] = Number(val)
       } else {
         parsed[key] = val
       }
     }
-    setFilter(parsed as any)
+    setFilter(() => parsed as any)
     setIsFilterOpen(false)
   }
 

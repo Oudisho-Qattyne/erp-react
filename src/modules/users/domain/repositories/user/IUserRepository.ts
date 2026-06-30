@@ -9,10 +9,10 @@ export interface IUserRepository {
     createUser: (user: any) => Promise<DomainResponse<User>>;
     updateUser: (id: number, user: any) => Promise<DomainResponse<User>>;
 
-    updateSignature: (id: number, signature: File) => Promise<DomainResponse<User>>;
+    updateSignature: (signature: File) => Promise<DomainResponse<User>>;
 
     exportUsersExcel: () => Promise<DomainResponse<Blob>>;
     exportUsersPdf: () => Promise<DomainResponse<Blob>>;
 
-    linkUserToEmployee: () => Promise<DomainResponse<User>>
+    linkUserToEmployee: (user_id : number, emplyee_id : number) => Promise<DomainResponse<User>>
 }

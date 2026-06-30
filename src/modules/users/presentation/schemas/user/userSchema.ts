@@ -1,11 +1,27 @@
 import { z } from 'zod';
-import { EntityFormSchema } from '../../../../../core/presentation/schemas/entityForm.schema copy';
 
-export const UserUpdateFormSchema =z.object({
-  name: z.string().min(1, 'Name is required'),
-  mobile: z.string().nullable(),               // nullable to match User entity
-  status: z.string().min(1, 'Status is required'), // or z.enum(['active','inactive']) if you know the exact values
-  role_id: z.number('Role is required')
-});
+export const getCreateUserSchema = (t: (key: string, module?: string) => string) =>
+  z.object({
+    name: z.string().min(1, t('user_form.validation.name_required', 'users') || 'Name is required'),
+    email: z.string().email(t('user_form.validation.email_invalid', 'users') || 'Invalid email address'),
+    mobile: z.string().min(1, t('user_form.validation.mobile_required', 'users') || 'Mobile is required'),
+    password: z.string().min(6, t('user_form.validation.password_min', 'users') || 'Password must be at least 6 characters'),
+    confirmPassword: z.string().min(1, t('user_form.validation.confirm_password_required', 'users') || 'Please confirm your password'),
+    role: z.string( t('user_form.validation.role_required', 'users') || 'Role is required' ),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: t('user_form.validation.passwords_mismatch', 'users') || 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
-export type UserUpdateFormValues = z.infer<typeof UserUpdateFormSchema>;
+export type UserCreateFormValues = z.infer<ReturnType<typeof getCreateUserSchema>>;
+
+export const getUpdateUserSchema = (t: (key: string, module?: string) => string) =>
+  z.object({
+    name: z.string().min(1, t('user_form.validation.name_required', 'users') || 'Name is required'),
+    email: z.string().email(t('user_form.validation.email_invalid', 'users') || 'Invalid email address'),
+    mobile: z.string().min(1, t('user_form.validation.mobile_required', 'users') || 'Mobile is required'),
+    // status: z.string().min(1, t('user_form.validation.status_required', 'users') || 'Status is required'),
+    role: z.string(t('user_form.validation.role_required', 'users') || 'Role is required' ),
+  });
+
+export type UserUpdateFormValues = z.infer<ReturnType<typeof getUpdateUserSchema>>;

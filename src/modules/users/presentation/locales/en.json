@@ -9,6 +9,12 @@
     },
     "edit_role": {
       "title": "Edit Role"
+    },
+    "users":{
+      "title":"Users"
+    },
+    "link_user":{
+      "title":"Link User to Employee"
     }
   },
   "roles": {
@@ -65,5 +71,64 @@
       "display_name_required": "Display name is required",
       "permissions_required": "At least one permission is required"
     }
+  },
+  "user_form": {
+    "validation": {
+      "name_required": "Name is required",
+      "email_invalid": "Invalid email address",
+      "mobile_required": "Mobile is required",
+      "password_min": "Password must be at least 6 characters",
+      "confirm_password_required": "Please confirm your password",
+      "passwords_mismatch": "Passwords do not match",
+      "status_required": "Status is required",
+      "role_required": "Role is required"
+    }
+  },
+  "users": {
+    "title": "Users",
+    "add": "Add User",
+    "add_title": "Add New User",
+    "add_form_placeholder": "User creation form",
+    "no_data": "No users found",
+    "name": "Name",
+    "email": "Email",
+    "mobile": "Mobile",
+    "status": "Status",
+    "status_active": "Active",
+    "status_inactive": "Inactive",
+    "status_suspended": "Suspended",
+    "role": "Role",
+    "created_at": "Created At",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "linked_to_employee": "Linked to Employee",
+    "permissions": "Permissions",
+    "no_permissions": "No permissions assigned",
+    "user_info": "User Information"
+  },
+  "show_user": {
+    "title": "User Details",
+    "back": "Back",
+    "edit": "Edit User",
+    "not_found": "User not found",
+    "load_error": "Error loading user data"
+  },
+  "edit_user": {
+    "title": "Edit User",
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "saving": "Saving..."
+  },
+  "link_user": {
+    "title": "Link User to Employee",
+    "select_employee": "Select Employee",
+    "select_user": "Select User",
+    "selected_employee": "Selected Employee",
+    "selected_user": "Selected User",
+    "link": "Link",
+    "linking": "Linking...",
+    "success": "User linked to employee successfully",
+    "no_employee_selected": "No employee selected",
+    "no_user_selected": "No user selected"
   }
 }

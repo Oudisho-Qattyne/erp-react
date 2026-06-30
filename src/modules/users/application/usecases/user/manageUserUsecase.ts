@@ -25,16 +25,19 @@ export const createManageUserUseCase = (
     updateUser(id: number, data: UpdateuserDto): Promise<DomainResponse<User>> {
       return repository.updateUser(id, data);
     },
-    updateSignature(id: number, file: File): Promise<DomainResponse<User>> {
-        return repository.updateSignature(id , file);
+    updateSignature( file: File): Promise<DomainResponse<User>> {
+        return repository.updateSignature(file);
       },
 
-    delete(id: number): Promise<DomainResponse<[]>> {
-      return repository.delteRole(id);
+    exportUsersExcel() {
+        return repository.exportUsersExcel()
+    },
+    exportUsersPdf() {
+        return repository.exportUsersPdf()
     },
 
-    getPermissions(): Promise<DomainResponse<Permissions>> {
-      return repository.getPermissions();
-    },
+    linkUserToEmployee(user_id : number , employee_id : number) {
+        return repository.linkUserToEmployee(user_id , employee_id)
+    }
   };
 };

@@ -60,7 +60,8 @@
       "user_eligible_leave_types": "User Eligible Leave Types"
     },
     "leave_balance": {
-      "title": "My Leave Balances"
+      "title": "My Leave Balances",
+      "employee_name": "Employee"
     },
     "employee_leave_balances": {
       "title": "Employee Leave Balances"
@@ -220,6 +221,8 @@
     "job_status_logs": "Job Status Logs",
     "employee_status_logs_load_error": "Failed to load employee status logs",
     "job_status_logs_load_error": "Failed to load job status logs",
+    "has_sham_cash_account": "Has Sham Cash Account",
+    "linked_to_user": "Linked to User",
     "picker_title": "Select Employees",
     "selected": "selected",
     "load_error": "Failed to load employees"
@@ -493,11 +496,13 @@
     "proration_monthly_started": "Monthly Started",
     "proration_monthly_completed": "Monthly Completed",
     "proration_daily": "Daily",
+    "proration_undefined": "Not Set",
     "proration_rounding": "Proration Rounding",
     "proration_rounding_none": "None",
     "proration_rounding_floor": "Floor",
     "proration_rounding_ceil": "Ceil",
     "proration_rounding_half": "Half",
+    "proration_rounding_undefined": "Not Set",
     "validation": {
       "name_required": "Leave name is required",
       "description_required": "Description is required",
@@ -543,6 +548,7 @@
     "my_balances": "My Leave Balances",
     "overview": "Overview",
     "leave_type": "Leave Type",
+    "employee_name": "Employee",
     "accrual_period": "Period",
     "yearly": "Yearly",
     "monthly": "Monthly",

@@ -10,6 +10,7 @@ import type { RuleField } from "../../components/leaveRules/RuleConditionCompone
 import { Plus, Trash2 } from "lucide-react"
 import { getCreateLeaveSchema, type LeaveFormValues } from "../../schemas/leaveForm"
 import { getEligibilityFields } from "../../utils/RulesFields"
+import { cleanPayload } from "../../../../../core/utils/cleanPayload"
 import { useUnsavedChanges } from "../../../../../core/presentation/hooks/useUnsavedChanges"
 import { ConfirmDialog } from "../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog"
 
@@ -31,16 +32,12 @@ export const LEAVE_EMPTY_DEFAULTS: LeaveFormValues = {
   accrual_period: "yearly",
   allow_carry_forward: false,
   carry_forward_limit: undefined,
-  eligibility_rules: {type: "group", operator: "AND", conditions: [] },
+  eligibility_rules: { type: "group", operator: "AND", conditions: [] },
   entitlement_rules: {
     type: "fixed",
     grant: { value: 0, unit: "day" },
   },
-  proration_rules: {
-    basis: "hire_date",
-    calculation: "monthly_started",
-    rounding: "none",
-  },
+
   is_active: true,
 }
 
@@ -151,6 +148,25 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
         return { disabled: false }
       },
     },
+    {
+      name:'allow_carry_forward',
+      label:t("leave.allow_carry_forward", "hr"),
+      type:'checkbox',
+      dependsOn: ["balance_mode"],
+      compute: (values) => {
+        if (values.balance_mode !== "accrual") return { disabled: true ,value:false}
+        return { disabled: false }
+      },
+    },
+    {
+      name:'carry_forward_limit',label:t("leave.carry_forward_limit", "hr"), type:'number',
+      dependsOn: ["allow_carry_forward"],
+      compute: (values) => {
+        if (values.allow_carry_forward == false) return { disabled: true , value:null}
+        return { disabled: false }
+      },
+    }
+    
   ]
 
   const BOOLEAN_FIELDS: FieldConfig[] = [
@@ -170,9 +186,13 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
       label: t("leave.proration_basis", "hr"),
       options: [
         { value: "hire_date", label: t("leave.proration_hire_date", "hr") },
-        { value: "custom_date", label: t("leave.proration_custom_date", "hr") },
+        // { value: "custom_date", label: t("leave.proration_custom_date", "hr") },
       ],
-      required: true,
+      dependsOn: ['accrual_period'],
+      compute: (values) => {
+        if (values.accrual_period == "yearly") return {  disabled: false }
+        return { disabled: true , value:null }
+      },
     },
     {
       name: "proration_rules.calculation",
@@ -181,9 +201,13 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
       options: [
         { value: "monthly_started", label: t("leave.proration_monthly_started", "hr") },
         { value: "monthly_completed", label: t("leave.proration_monthly_completed", "hr") },
-        { value: "daily", label: t("leave.proration_daily", "hr") },
+        // { value: "daily", label: t("leave.proration_daily", "hr") },
       ],
-      required: true,
+      dependsOn: ['accrual_period'],
+      compute: (values) => {
+        if (values.accrual_period == "yearly") return {  disabled: false }
+        return { disabled: true }
+      },
     },
     {
       name: "proration_rules.rounding",
@@ -193,18 +217,23 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
         { value: "none", label: t("leave.proration_rounding_none", "hr") },
         { value: "floor", label: t("leave.proration_rounding_floor", "hr") },
         { value: "ceil", label: t("leave.proration_rounding_ceil", "hr") },
-        { value: "half", label: t("leave.proration_rounding_half", "hr") },
+        // { value: "half", label: t("leave.proration_rounding_half", "hr") },
       ],
-      required: true,
+      dependsOn: ['accrual_period'],
+      compute: (values) => {
+        if (values.accrual_period == "yearly") return {  disabled: false }
+        return { disabled: true }
+      },
     },
   ]
 
   const submitHandler = async (data: LeaveFormValues) => {
-    const payload = {
+    const payload = cleanPayload({
       ...data,
-      eligibility_rules: eligibilityRule ,
-    }
+      eligibility_rules: eligibilityRule,
+    })
     try {
+      
       await onSubmit(payload)
     } catch (err: any) {
       if (err.validationErrors) {
@@ -251,10 +280,6 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
             {BALANCE_FIELDS.map((field) => (
               <FormInput key={field.name} {...field} />
             ))}
-            <FormInput name="allow_carry_forward" type="checkbox" label={t("leave.allow_carry_forward", "hr")} />
-            {allowCarryForward && (
-              <FormInput name="carry_forward_limit" type="number" label={t("leave.carry_forward_limit", "hr")} />
-            )}
           </div>
         </div>
 
@@ -294,15 +319,15 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
           </div>
           {entitlementType === "bands" && <BandsSection fields={eligibilityFields} />}
         </div>
-
-        <div className="bg-card border border-border rounded-xl p-5">
-          <h3 className="text-base font-bold text-text mb-4">{t("leave.proration_rules", "hr")}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {PROPORTION_FIELDS.map((field) => (
-              <FormInput key={field.name} {...field} />
-            ))}
+        
+          <div className="bg-card border border-border rounded-xl p-5">
+            <h3 className="text-base font-bold text-text mb-4">{t("leave.proration_rules", "hr")}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {PROPORTION_FIELDS.map((field) => (
+                <FormInput key={field.name} {...field} />
+              ))}
+            </div>
           </div>
-        </div>
 
         <div className="flex items-center justify-end gap-3 pt-2">
           {onCancel && (

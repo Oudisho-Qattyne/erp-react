@@ -47,7 +47,7 @@ export interface UseLeaveTypesReturn {
     hasMore: boolean
   }
   filter: FilterLeaveDto
-  setFilter: (patch: Partial<FilterLeaveDto>) => void
+  setFilter: (patch: Partial<FilterLeaveDto> | ((prev: FilterLeaveDto) => FilterLeaveDto)) => void
   resetFilter: () => void
   clearError: () => void
   findAll: () => Promise<void>
@@ -82,8 +82,8 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
 
   const clearError = useCallback(() => setError(initRecord(null)), [])
 
-  const setFilter = useCallback((patch: Partial<FilterLeaveDto>) => {
-    setFilterState((prev) => ({ ...prev, ...patch }))
+  const setFilter = useCallback((patch: Partial<FilterLeaveDto> | ((prev: FilterLeaveDto) => FilterLeaveDto)) => {
+    setFilterState((prev) => (typeof patch === "function" ? patch(prev) : { ...prev, ...patch }))
   }, [])
 
   const resetFilter = useCallback(() => setFilterState(DEFAULT_FILTER), [])
