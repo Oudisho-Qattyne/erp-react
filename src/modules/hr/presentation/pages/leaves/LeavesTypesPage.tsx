@@ -64,7 +64,7 @@ export default function LeavesTypesPage() {
   ]
 
     const handleApplyFilter = (values: Record<string, any>) => {
-        const parsed: Record<string, any> = {}
+        const parsed: Record<string, any> = { page: 1, per_page: filter.per_page }
         for (const [key, val] of Object.entries(values)) {
             if (val === "" || val === undefined) {
                 continue
@@ -76,7 +76,7 @@ export default function LeavesTypesPage() {
         parsed[key] = val
       }
     }
-    setFilter(parsed as any)
+    setFilter(() => parsed as any)
     setIsFilterOpen(false)
   }
 
@@ -195,7 +195,7 @@ export default function LeavesTypesPage() {
         onReset={() => { resetFilter(); setIsFilterOpen(false) }}
       />
 
-      <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={t("leave.add_title", "hr") || "إضافة إجازة جديدة"} size="2xl">
+      <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={t("leave.add", "hr") || "إضافة إجازة جديدة"} size="2xl">
         <LeaveForm onSubmit={handleCreate} onCancel={() => setIsCreateOpen(false)} />
       </Dialog>
 

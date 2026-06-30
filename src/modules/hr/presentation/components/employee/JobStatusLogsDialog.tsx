@@ -25,7 +25,7 @@ export function JobStatusLogsDialog({ isOpen, onClose, employeeId }: JobStatusLo
 
   const columns: ColumnDef<JobStatusLog>[] = [
     { key: 'id', label: '#', width: 60 },
-    { key: 'job_status_id', label: t('employees.job_status', 'hr') || 'Job Status', width: 150 },
+    { key: 'job_status', label: t('employees.job_status', 'hr') || 'Job Status', width: 150 , render : (row) => row?.job_status ? typeof(row.job_status.name)  == 'string' ? row.job_status.name : row.job_status.name.ar : "-"  },
     { key: 'job_status_note', label: t('employees.job_status_note', 'hr') || 'Note', width: 200 },
     { key: 'created_at', label: t('employees.created_at', 'hr') || 'Created At', width: 160 },
   ]

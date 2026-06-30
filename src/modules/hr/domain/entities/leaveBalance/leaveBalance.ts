@@ -1,5 +1,7 @@
 export interface LeaveBalance {
     employee_id: number,
+    employee_first_name:string,
+    employee_last_name:string,
     leave_type_id: number,
     leave_type_name: string,
     accrual_period: "yearly" | "month",

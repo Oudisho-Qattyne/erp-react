@@ -126,6 +126,11 @@ export function EmployeesPage() {
       { value: "true", label: t("common.yes", "shared") },
       { value: "false", label: t("common.no", "shared") },
     ]},
+    { name: "linked_to_user", label: t("employees.linked_to_user", "hr") || "Linked to User", type: "select", options: [
+      { value: "", label: t("common.all", "shared") || "All" },
+      { value: "true", label: t("common.yes", "shared") },
+      { value: "false", label: t("common.no", "shared") },
+    ]},
   ]
 
   const handleApplyFilter = (values: Record<string, any>) => {

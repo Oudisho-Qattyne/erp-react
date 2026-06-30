@@ -9,6 +9,12 @@
     },
     "edit_role": {
       "title": "تعديل الدور"
+    },
+    "users":{
+      "title":"المستخدمين"
+    },
+    "link_user":{
+      "title":"ربط المستخدم بالموظف"
     }
   },
   "roles": {
@@ -65,5 +71,64 @@
       "display_name_required": "الاسم المعروض مطلوب",
       "permissions_required": "يجب اختيار صلاحية واحدة على الأقل"
     }
+  },
+  "user_form": {
+    "validation": {
+      "name_required": "الاسم مطلوب",
+      "email_invalid": "البريد الإلكتروني غير صالح",
+      "mobile_required": "رقم الجوال مطلوب",
+      "password_min": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+      "confirm_password_required": "يرجى تأكيد كلمة المرور",
+      "passwords_mismatch": "كلمة المرور غير متطابقة",
+      "status_required": "الحالة مطلوبة",
+      "role_required": "الدور مطلوب"
+    }
+  },
+  "users": {
+    "title": "المستخدمين",
+    "add": "إضافة مستخدم",
+    "add_title": "إضافة مستخدم جديد",
+    "add_form_placeholder": "نموذج إنشاء مستخدم",
+    "no_data": "لم يتم العثور على مستخدمين",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "mobile": "رقم الجوال",
+    "status": "الحالة",
+    "status_active": "نشط",
+    "status_inactive": "غير نشط",
+    "status_suspended": "موقوف",
+    "role": "الدور",
+    "created_at": "تاريخ الإنشاء",
+    "password": "كلمة المرور",
+    "confirm_password": "تأكيد كلمة المرور",
+    "linked_to_employee": "مرتبط بموظف",
+    "permissions": "الصلاحيات",
+    "no_permissions": "لا توجد صلاحيات مخصصة",
+    "user_info": "معلومات المستخدم"
+  },
+  "show_user": {
+    "title": "تفاصيل المستخدم",
+    "back": "العودة",
+    "edit": "تعديل المستخدم",
+    "not_found": "المستخدم غير موجود",
+    "load_error": "حدث خطأ أثناء تحميل بيانات المستخدم"
+  },
+  "edit_user": {
+    "title": "تعديل المستخدم",
+    "save": "حفظ التغييرات",
+    "cancel": "إلغاء",
+    "saving": "جاري الحفظ..."
+  },
+  "link_user": {
+    "title": "ربط المستخدم بالموظف",
+    "select_employee": "اختيار موظف",
+    "select_user": "اختيار مستخدم",
+    "selected_employee": "الموظف المختار",
+    "selected_user": "المستخدم المختار",
+    "link": "ربط",
+    "linking": "جاري الربط...",
+    "success": "تم ربط المستخدم بالموظف بنجاح",
+    "no_employee_selected": "لم يتم اختيار موظف",
+    "no_user_selected": "لم يتم اختيار مستخدم"
   }
 }

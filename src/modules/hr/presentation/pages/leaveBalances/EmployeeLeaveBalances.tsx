@@ -15,6 +15,7 @@ import type { UseFormReturn } from "react-hook-form"
 import { User, X, FileText, Filter, Search } from "lucide-react"
 import { MiniRing } from "../../../../../core/presentation/layouts/ui/statistics/MiniRing"
 import Input from "../../../../../core/presentation/layouts/ui/inputs/Input"
+import { ro } from "zod/locales"
 
 export const EmployeeLeaveBalances = () => {
     const { t, language } = useLanguage()
@@ -135,17 +136,16 @@ export const EmployeeLeaveBalances = () => {
     ]
 
     const handleApplyFilter = (values: Record<string, any>) => {
-        const parsed: Record<string, any> = {}
+        const parsed: Record<string, any> = { page: 1, per_page: filter.per_page }
         for (const [key, val] of Object.entries(values)) {
-            if (val === "" || val === undefined) {
-                parsed[key] = undefined
-            } else if (key === "leave_type_id" || key === "employee_id") {
+            if (val === "" || val === undefined) continue
+            if (key === "leave_type_id" || key === "employee_id") {
                 parsed[key] = Number(val)
             } else {
                 parsed[key] = val
             }
         }
-        setFilter(parsed as any)
+        setFilter(() => parsed as any)
         setIsFilterOpen(false)
     }
 
@@ -155,6 +155,7 @@ export const EmployeeLeaveBalances = () => {
 
     const columns: ColumnDef<LeaveBalance>[] = [
         { key: "leave_type_name", label: t("leave_balance.leave_type", "hr") || "Leave Type", width: 160, sortable: true },
+        { key: "employee_name", label: t("leave_balance.employee_name", "hr") || "Leave Type", width: 130,  render: (row) => `${row.employee_first_name} ${row.employee_last_name}`},
         {
             key: "accrual_period", label: t("leave_balance.accrual_period", "hr") || "Period", width: 90, sortable: true,
             render: (row) => row.accrual_period === "yearly"
@@ -168,7 +169,7 @@ export const EmployeeLeaveBalances = () => {
         { key: "adjustment_added_units", label: t("leave_balance.adjustment_added", "hr") || "Adj +", width: 80, sortable: true },
         { key: "adjustment_deducted_units", label: t("leave_balance.adjustment_deducted", "hr") || "Adj -", width: 80, sortable: true },
         {
-            key: "ring", label: "", width: 200, align: "center",
+            key: "ring", label: "", width: 100, align: "center",
             render: (row) => <MiniRing value={row.available_units} total={row.entitled_units} />,
         },
     ]

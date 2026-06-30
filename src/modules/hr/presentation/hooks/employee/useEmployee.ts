@@ -28,7 +28,7 @@ export interface UseEmployeeReturn {
   error: Record<string, string | null>
   pagination: { currentPage: number; lastPage: number; total: number; hasMore: boolean }
   filter: FilterEmployeeDto
-  setFilter: (patch: Partial<FilterEmployeeDto>) => void
+  setFilter: (patch: Partial<FilterEmployeeDto> | ((prev: FilterEmployeeDto) => FilterEmployeeDto)) => void
   resetFilter: () => void
   employeeStatusPagination: { currentPage: number; lastPage: number; total: number; hasMore: boolean }
   jobStatusPagination: { currentPage: number; lastPage: number; total: number; hasMore: boolean }
@@ -65,8 +65,8 @@ export const useEmployee = (): UseEmployeeReturn => {
   const setFnLoading = (fn: string, v: boolean) => setLoading((p) => ({ ...p, [fn]: v }))
   const setFnError = (fn: string, e: string | null) => setError((p) => ({ ...p, [fn]: e }))
 
-  const setFilter = useCallback((patch: Partial<FilterEmployeeDto>) => {
-    setFilterState((prev) => ({ ...prev, ...patch }))
+  const setFilter = useCallback((patch: Partial<FilterEmployeeDto> | ((prev: FilterEmployeeDto) => FilterEmployeeDto)) => {
+    setFilterState((prev) => (typeof patch === "function" ? patch(prev) : { ...prev, ...patch }))
   }, [])
 
   const resetFilter = useCallback(() => setFilterState(DEFAULT_FILTER), [])
