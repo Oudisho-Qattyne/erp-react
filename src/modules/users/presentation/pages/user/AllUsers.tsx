@@ -128,7 +128,7 @@ export function AllUsers() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{t("users.title", "users") || "Users"}</h1>
         <div className="flex items-center gap-2">
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={exportUsersExcel}
@@ -147,7 +147,7 @@ export function AllUsers() {
             requiredPermission="users.users.export"
           >
             PDF
-          </Button>
+          </Button> */}
           <Button
             variant="primary"
             onClick={() => setIsAddOpen(true)}
