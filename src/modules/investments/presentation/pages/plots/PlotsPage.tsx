@@ -236,7 +236,7 @@ export function PlotsPage() {
           <Button onClick={() => navigate('/investments/plots/create')}>{t('plots.add', 'investments') || 'Add Plot'}</Button>
         </div>
       </div>
-        <div className="flex flex-wrap items-center gap-3 bg-surface p-3 border border-border rounded-lg">
+        <div className="flex flex-wrap items-center gap-3">
           <Input type="text" value={searchQuery} onChange={setSearchQuery} 
             placeholder={t('common.search', 'shared') || 'Search by code...'} 
             baseClasses={inputBaseClasses} className="w-64" />

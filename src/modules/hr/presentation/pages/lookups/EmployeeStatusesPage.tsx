@@ -123,10 +123,9 @@ export function EmployeeStatusesPage() {
         />
       </Dialog>
 
-      {loading && <LoadingState />}
       {error && <ErrorState message={error} onRetry={getAll} />}
-      {!loading && !error && (
-        <DataTable columns={columns} data={filtered} rowKey="id" loading={false}
+      {!error && (
+        <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
           emptyMessage={t('lookups.no_employee_statuses', 'hr') || 'No employee statuses found'} />
       )}
 

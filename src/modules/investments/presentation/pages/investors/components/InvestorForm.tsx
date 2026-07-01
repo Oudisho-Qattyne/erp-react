@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
-import { investorFormSchema } from '../../../schemas/investorForm.schema';
+import { getCreateInvestorFormSchema } from '../../../schemas/investorForm.schema';
 import { GenericCreateForm, type FieldConfig } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { Button } from '../../../../../../core/presentation/layouts/ui/buttons/Button';
 import { Pencil } from 'lucide-react';
@@ -58,7 +58,7 @@ export function InvestorForm({ investor, defaultValues, onSubmit, onSuccess, onC
         {isEditing ? (
           <GenericCreateForm
             fields={formFields}
-            schema={investorFormSchema}
+            schema={getCreateInvestorFormSchema(t)}
             defaultValues={defaultValues}
             onSubmit={onSubmit}
             onSuccess={onSuccess}

@@ -178,9 +178,7 @@ export const EmployeeLeaveBalances = () => {
         <div className="p-6 space-y-6">
             <h1 className="text-2xl font-bold">{t("employee_leave_balances.title", "hr") || "Employee Leave Balances"}</h1>
 
-            {loading.findAllEmployeeLeaveBalances ? (
-                <LoadingState />
-            ) : error.findAllEmployeeLeaveBalances ? (
+            {error.findAllEmployeeLeaveBalances ? (
                 <ErrorState message={error.findAllEmployeeLeaveBalances} onRetry={() => findAllEmployeeLeaveBalances()} />
             ) : (
                 <div className="relative w-full ">
@@ -208,6 +206,7 @@ export const EmployeeLeaveBalances = () => {
                         columns={columns}
                         data={employeeLeaveBalances}
                         rowKey="leave_type_id"
+                        loading={loading.findAllEmployeeLeaveBalances}
                         emptyMessage={t("leave_balance.no_data", "hr") || "No leave balances found"}
                         sortColumn={sortColumn}
                         sortOrder={sortOrder}

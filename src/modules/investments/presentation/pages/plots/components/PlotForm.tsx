@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../../core/presentation/hooks/data/useEntity';
-import { PlotFormSchema } from '../../../schemas/plotForm.schema';
+import { getCreatePlotFormSchema } from '../../../schemas/plotForm.schema';
 import type { PlotArea } from '../../../../domain/entities/plotArea';
 import type { PlotClassification } from '../../../../domain/entities/plotClassification';
 import { GenericCreateForm, type FieldConfig } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { SelectOnMap } from '../../../../../../core/presentation/layouts/ui/inputs/SelectOnMap';
 import { PlotStatusStepper, PLOT_STATUSES } from '../../../../../../core/presentation/layouts/ui/stepper/PlotStatusStepper';
-import { PlotAreaFormSchema } from '../../../schemas/plotAreaForm.schema';
-import { PlotClassificationFormSchema } from '../../../schemas/plotClassificationForm.schema';
+import { getCreatePlotAreaFormSchema } from '../../../schemas/plotAreaForm.schema';
+import { getCreatePlotClassificationFormSchema } from '../../../schemas/plotClassificationForm.schema';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { Button } from '../../../../../../core/presentation/layouts/ui/buttons/Button';
 import Input from '../../../../../../core/presentation/layouts/ui/inputs/Input';
@@ -64,7 +64,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
             { name: 'name', label: t('plot_areas.name', 'investments'), required: true },
             { name: 'is_active', type: 'checkbox', label: t('plot_areas.is_active', 'investments') }
           ]}
-          schema={PlotAreaFormSchema}
+          schema={getCreatePlotAreaFormSchema(t)}
           onSubmit={async (data) => createPlotArea(data)}
           onSuccess={onSuccessForm}
           onCancel={onCancelForm}
@@ -85,7 +85,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
             { name: 'name', label: t('plot_classifications.name', 'investments'), required: true },
             { name: 'is_active', type: 'checkbox', label: t('plot_classifications.is_active', 'investments') }
           ]}
-          schema={PlotClassificationFormSchema}
+          schema={getCreatePlotClassificationFormSchema(t)}
           onSubmit={async (data) => createClassification(data)}
           onSuccess={onSuccessForm}
           onCancel={onCancelForm}
@@ -177,7 +177,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
         {isEditing ? (
           <GenericCreateForm
             fields={formFields}
-            schema={PlotFormSchema}
+            schema={getCreatePlotFormSchema(t)}
             defaultValues={defaultValues}
             onSubmit={handleFormSubmit}
             onSuccess={onSuccess}

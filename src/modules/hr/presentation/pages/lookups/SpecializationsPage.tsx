@@ -149,13 +149,12 @@ export function SpecializationsPage() {
             />
           </Dialog>
 
-          {loading && <LoadingState />}
           {error && <ErrorState message={error} onRetry={() => selectedFaculty && getAllByFaculty(selectedFaculty)} />}
-          {!loading && !error && filtered.length === 0 && (
+          {!error && !loading && filtered.length === 0 && (
             <EmptyState message={t('lookups.no_specializations', 'hr') || 'No specializations found'} />
           )}
-          {!loading && !error && filtered.length > 0 && (
-            <DataTable columns={columns} data={filtered} rowKey="id" loading={false}
+          {!error && (filtered.length > 0 || loading) && (
+            <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
               emptyMessage={t('lookups.no_specializations', 'hr') || 'No specializations found'} />
           )}
         </>

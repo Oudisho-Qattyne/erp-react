@@ -22,21 +22,17 @@ export const UserEligibleLeaveTypes = () => {
     return (
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-6">{t("leave.user_eligible_leave_types", "hr") || "User Eligible Leave Types"}</h1>
-            {loading.findUserEligibleLeaveTypes
-                ?
-                <LoadingState />
-                :
-                error.findUserEligibleLeaveTypes ?
-                    <ErrorState message={error.findUserEligibleLeaveTypes} onRetry={findUserEligibleLeaveTypes} />
-                    :
-                    <DataTable
-                        columns={columns}
-                        data={userEligibleLeaveTypes}
-                        rowKey="id"
-                        loading={false}
-                        emptyMessage={t("leave.no_eligible_leave_types", "hr") || "No eligible leave types found"}
-                    />
-            }
+            {error.findUserEligibleLeaveTypes ? (
+                <ErrorState message={error.findUserEligibleLeaveTypes} onRetry={findUserEligibleLeaveTypes} />
+            ) : (
+                <DataTable
+                    columns={columns}
+                    data={userEligibleLeaveTypes}
+                    rowKey="id"
+                    loading={loading.findUserEligibleLeaveTypes}
+                    emptyMessage={t("leave.no_eligible_leave_types", "hr") || "No eligible leave types found"}
+                />
+            )}
         </div>
     )
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
-import { PlotClassificationFormSchema } from '../../schemas/plotClassificationForm.schema';
+import { getCreatePlotClassificationFormSchema } from '../../schemas/plotClassificationForm.schema';
 import type { PlotClassification } from '../../../domain/entities/plotClassification';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { Dialog } from '../../../../../core/presentation/layouts/ui/dialog/Dialog';
@@ -9,7 +9,6 @@ import { GenericCreateForm } from '../../../../../core/presentation/layouts/ui/f
 import Input from '../../../../../core/presentation/layouts/ui/inputs/Input';
 import { inputBaseClasses } from '../../../../../core/presentation/layouts/ui/inputs/styles';
 import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
-import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { toast } from 'sonner';
@@ -124,7 +123,7 @@ export function PlotClassificationsPage() {
             { name: 'is_active', type: 'checkbox', label: t('plot_classifications.is_active', 'investments') },
             { name: 'is_default', type: 'checkbox', label: t('plot_classifications.is_default', 'investments') }
           ]}
-          schema={PlotClassificationFormSchema}
+          schema={getCreatePlotClassificationFormSchema(t)}
           onSubmit={async (data) => {
             try { 
               return await create(data); 
@@ -145,7 +144,7 @@ export function PlotClassificationsPage() {
             { name: 'is_active', type: 'checkbox', label: t('plot_classifications.is_active', 'investments') },
             { name: 'is_default', type: 'checkbox', label: t('plot_classifications.is_default', 'investments') }
           ]}
-          schema={PlotClassificationFormSchema}
+          schema={getCreatePlotClassificationFormSchema(t)}
           defaultValues={editItem ? { name: editItem.name, is_active: editItem.is_active, is_default: editItem.is_default } : undefined}
           onSubmit={async (data) => {
             try { 
@@ -160,10 +159,9 @@ export function PlotClassificationsPage() {
         />
       </Dialog>
 
-      {loading && <LoadingState />}
       {error && <ErrorState message={error} onRetry={getAll} />}
-      {!loading && !error && (
-        <DataTable columns={columns} data={filtered} rowKey="id" loading={false}
+      {!error && (
+        <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
           emptyMessage={t('plot_classifications.no_records', 'investments')} />
       )}
 

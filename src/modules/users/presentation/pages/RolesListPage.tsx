@@ -115,9 +115,8 @@ export function RolesListPage() {
         </Button>
       </div>
 
-      {isLoading && <LoadingState />}
       {listError && <ErrorState message={listError} onRetry={() => getAll().then((res) => setRoles(res.data)).catch(() => {})} />}
-      {!isLoading && !listError && (
+      {!listError && (
         <DataTable
           columns={columns}
           data={roles}

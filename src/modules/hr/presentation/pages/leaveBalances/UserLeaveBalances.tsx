@@ -134,9 +134,7 @@ export const UserLeaveBalances = () => {
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">{t("leave_balance.my_balances", "hr") || "My Leave Balances"}</h1>
 
-      {loading.findAllMyLeaveBalances ? (
-        <LoadingState />
-      ) : error.findAllMyLeaveBalances ? (
+      {error.findAllMyLeaveBalances ? (
         <ErrorState message={error.findAllMyLeaveBalances} onRetry={() => {}} />
       ) : (
         <>
@@ -152,6 +150,7 @@ export const UserLeaveBalances = () => {
             columns={columns}
             data={myLeaveBalances}
             rowKey="leave_type_id"
+            loading={loading.findAllMyLeaveBalances}
             sortColumn={sortColumn}
             sortOrder={sortOrder}
             onSort={handleSort}

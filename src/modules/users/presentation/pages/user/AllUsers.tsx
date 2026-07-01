@@ -162,9 +162,7 @@ export function AllUsers() {
 
 
 
-      {loading.getAllUsers ? (
-        <LoadingState />
-      ) : error.getAllUsers ? (
+      {error.getAllUsers ? (
         <ErrorState message={error.getAllUsers} onRetry={() => getAllUsers()} />
       ) : (
         <div className="relative w-full">

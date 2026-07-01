@@ -200,9 +200,7 @@ export function UserLeaveRequests() {
         </Button>
       </div>
 
-      {loading.findAllMyLeaveRequests ? (
-        <LoadingState />
-      ) : error.findAllMyLeaveRequests ? (
+      {error.findAllMyLeaveRequests ? (
         <ErrorState message={error.findAllMyLeaveRequests} onRetry={() => findAllMyLeaveRequests()} />
       ) : (
         <>
@@ -229,6 +227,7 @@ export function UserLeaveRequests() {
                 columns={columns}
                 data={myLeaveRequests}
                 rowKey="id"
+                loading={loading.findAllMyLeaveRequests}
                 onRowClick={(row) => navigate(`/hr/leave-requests/${row.id}`)}
                 emptyMessage={t("leave_request.no_data", "hr") || "No leave requests found"}
             pagination={{

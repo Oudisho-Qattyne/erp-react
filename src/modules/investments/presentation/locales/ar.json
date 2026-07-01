@@ -10,7 +10,10 @@
     "create_error": "فشل في إنشاء {name}",
     "deleted": "تم حذف {name} بنجاح",
     "delete_error": "فشل في حذف {name}",
-    "no_records": "لا يوجد مناطق"
+    "no_records": "لا يوجد مناطق",
+    "validation": {
+      "name_required": "الاسم مطلوب"
+    }
   },
   "plot_classifications": {
     "title": "التصنيفات",
@@ -22,7 +25,10 @@
     "create_error": "فشل في إنشاء {name}",
     "deleted": "تم حذف {name} بنجاح",
     "delete_error": "فشل في حذف {name}",
-    "no_records": "لا يوجد تصنيفات"
+    "no_records": "لا يوجد تصنيفات",
+    "validation": {
+      "name_required": "الاسم مطلوب"
+    }
   },
   "plots": {
     "title": "المقاسم",
@@ -64,7 +70,16 @@
     "no_history": "لا يوجد سجل حالات",
     "show_map": "عرض في الخريطة",
     "added_by": "أضيف بواسطة",
-    "changed_by": "تم التغيير بواسطة"
+    "changed_by": "تم التغيير بواسطة",
+    "validation": {
+      "code_required": "الرمز مطلوب",
+      "area_required": "المساحة مطلوبة",
+      "area_invalid": "يجب أن تكون المساحة رقماً موجباً صحيحاً",
+      "plot_area_id_invalid": "يجب أن تكون المنطقة رقماً",
+      "plot_classification_id_invalid": "يجب أن يكون التصنيف رقماً",
+      "latitude_required": "خط العرض مطلوب",
+      "longitude_required": "خط الطول مطلوب"
+    }
   },
   "plot_status": {
     "unsold": "غير مباعة",
@@ -76,6 +91,7 @@
   "investors": {
     "title": "المستثمرين",
     "invistor":"مستثمر",
+    "created_at": "تاريخ الإنشاء",
     "add": "إضافة مستثمر",
     "edit": "تعديل مستثمر",
     "info": "معلومات المستثمر",
@@ -107,7 +123,34 @@
     "plot_classifications": "التصنيفات المستهدفة",
     "interest_created": "تم إضافة الاهتمام بنجاح",
     "interest_deleted": "تم حذف الاهتمام بنجاح",
-    "no_interests": "لم تتم إضافة أي اهتمامات بعد"
+    "no_interests": "لم تتم إضافة أي اهتمامات بعد",
+    "validation": {
+      "full_name_required": "الاسم الكامل مطلوب",
+      "nationality_required": "الجنسية مطلوبة",
+      "gender_required": "الجنس مطلوب",
+      "whatsapp_max": "يجب ألا يتجاوز رقم الواتساب 20 حرفاً",
+      "email_invalid": "البريد الإلكتروني غير صالح",
+      "address_max": "يجب ألا يتجاوز العنوان 500 حرف",
+      "max_area_min": "الحد الأقصى للمساحة لا يمكن أن يكون أقل من الحد الأدنى"
+    }
+  },
+  "permissions": {
+    "investments": {
+      "plots": {
+        "list": "قائمة المقاسم",
+        "view": "عرض مقسم",
+        "create": "إنشاء مقسم",
+        "update": "تعديل مقسم",
+        "delete": "حذف مقسم"
+      },
+      "investors": {
+        "list": "قائمة المستثمرين",
+        "view": "عرض مستثمر",
+        "create": "إنشاء مستثمر",
+        "update": "تعديل مستثمر",
+        "delete": "حذف مستثمر"
+      }
+    }
   },
   "navigation": {
     "title": "الإستثمارات",

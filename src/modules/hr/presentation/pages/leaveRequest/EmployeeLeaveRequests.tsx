@@ -4,7 +4,6 @@ import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nP
 import { useAuth } from "../../../../../core/infrastructure/auth/AuthProvider"
 import { Button } from "../../../../../core/presentation/layouts/ui/buttons/Button"
 import { DataTable, type ColumnDef } from "../../../../../core/presentation/layouts/ui/tables/ResizableTable"
-import { LoadingState } from "../../../../../core/presentation/layouts/ui/state/LoadingState"
 import { ErrorState } from "../../../../../core/presentation/layouts/ui/state/ErrorState"
 import { FilterDialog, type FilterField } from "../../../../../core/presentation/layouts/ui/filter/FilterDialog"
 import { Dialog } from "../../../../../core/presentation/layouts/ui/dialog/Dialog"
@@ -249,9 +248,7 @@ export const EmployeeLeaveRequests = () => {
         <div className="p-6 space-y-6">
             <h1 className="text-2xl font-bold">{t("employee_leave_requests.title", "hr") || "Employee Leave Requests"}</h1>
 
-            {loading.findAllEmployeeLeaveRequests ? (
-                <LoadingState />
-            ) : error.findAllEmployeeLeaveRequests ? (
+            {error.findAllEmployeeLeaveRequests ? (
                 <ErrorState message={error.findAllEmployeeLeaveRequests} onRetry={() => findAllEmployeeLeaveRequests()} />
             ) : (
                 <div className="relative w-full ">
@@ -274,11 +271,11 @@ export const EmployeeLeaveRequests = () => {
                             {t("common.reset", "shared") || "Reset"}
                         </Button>
                     </div>
-
                     <DataTable
                         columns={columns}
                         data={employeeLeaveRequests}
                         rowKey="id"
+                        loading={loading.findAllEmployeeLeaveRequests}
                         onRowClick={(row) => navigate(`/hr/employee-leave-requests/${row.id}`)}
                         emptyMessage={t("leave_request.no_data", "hr") || "No leave requests found"}
                         pagination={{

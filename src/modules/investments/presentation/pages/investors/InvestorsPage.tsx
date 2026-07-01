@@ -96,7 +96,7 @@ export function InvestorsPage() {
     },
     { 
       key: 'created_at', 
-      label: t('common.created_at', 'shared') || 'Created At', 
+      label: t('investors.created_at', 'investments') || 'Created At', 
       width: 130,
       sortable: true,
       render: (row: Investor) => row.created_at ? new Date(row.created_at).toLocaleDateString() : '—'
@@ -144,7 +144,7 @@ const entity = t('investors.investor') || "مستثمر"
           <Button onClick={() => navigate('/investments/investors/create')}>{t('investors.add', 'investments') || 'Add Investor'}</Button>
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-3 bg-surface p-3 border border-border rounded-lg">
+      <div className="flex flex-wrap items-center gap-3  ">
         <Input type="text" value={searchQuery} onChange={setSearchQuery} 
           placeholder={t('common.search', 'shared') || 'Search...'} 
           baseClasses={inputBaseClasses} className="w-64" />

@@ -127,6 +127,7 @@
     "submit": "Submit Request"
   },
   "leave_types": {
+    "title": "Leave Types",
     "type_name": "Leave Type",
     "picker_title": "Select Leave Types",
     "no_data": "No leave types found",

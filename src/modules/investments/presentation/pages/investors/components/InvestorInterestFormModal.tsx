@@ -3,12 +3,12 @@ import { useLanguage } from '../../../../../../core/presentation/context/i18n/I1
 import { GenericCreateForm, type FieldConfig } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { useEntityCrud } from '../../../../../../core/presentation/hooks/data/useEntity';
-import { investorInterestFormSchema } from '../../../schemas/investorInterestForm.schema';
+import { getCreateInvestorInterestFormSchema } from '../../../schemas/investorInterestForm.schema';
 import type { PlotArea } from '../../../../domain/entities/plotArea';
 import type { PlotClassification } from '../../../../domain/entities/plotClassification';
 
-import { PlotAreaFormSchema } from '../../../schemas/plotAreaForm.schema';
-import { PlotClassificationFormSchema } from '../../../schemas/plotClassificationForm.schema';
+import { getCreatePlotAreaFormSchema } from '../../../schemas/plotAreaForm.schema';
+import { getCreatePlotClassificationFormSchema } from '../../../schemas/plotClassificationForm.schema';
 
 interface InvestorInterestFormModalProps {
   isOpen: boolean;
@@ -50,7 +50,7 @@ export function InvestorInterestFormModal({ isOpen, onClose, investorId, onSucce
             { name: 'name', label: t('plot_areas.name', 'investments') || 'Name', required: true },
             { name: 'is_active', type: 'checkbox', label: t('plot_areas.is_active', 'investments') || 'Active' }
           ]}
-          schema={PlotAreaFormSchema}
+          schema={getCreatePlotAreaFormSchema(t)}
           onSubmit={createArea}
           onSuccess={onSuccess}
           onCancel={onCancel}
@@ -71,7 +71,7 @@ export function InvestorInterestFormModal({ isOpen, onClose, investorId, onSucce
             { name: 'name', label: t('plot_classifications.name', 'investments') || 'Name', required: true },
             { name: 'is_active', type: 'checkbox', label: t('plot_classifications.is_active', 'investments') || 'Active' }
           ]}
-          schema={PlotClassificationFormSchema}
+          schema={getCreatePlotClassificationFormSchema(t)}
           onSubmit={createClassification}
           onSuccess={onSuccess}
           onCancel={onCancel}
@@ -104,7 +104,7 @@ export function InvestorInterestFormModal({ isOpen, onClose, investorId, onSucce
     >
       <div className="p-4">
         <GenericCreateForm
-          schema={investorInterestFormSchema}
+          schema={getCreateInvestorInterestFormSchema(t)}
           fields={fields}
           onSubmit={handleSubmit}
           onSuccess={() => {
