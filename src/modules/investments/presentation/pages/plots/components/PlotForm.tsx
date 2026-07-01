@@ -126,10 +126,10 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
     { name: 'created_at', type: 'date', label: t('plots.created_at', 'investments') || 'Created At Date', hidden: !isCreate },
   ];
 
-  const handleSaveStatus = () => {
-    setStatusDate(tempStatusDate);
-    setIsEditStatusOpen(false);
-  };
+  // const handleSaveStatus = () => {
+  //   setStatusDate(tempStatusDate);
+  //   setIsEditStatusOpen(false);
+  // };
 
   const handleFormSubmit = async (data: any) => {
     return onSubmit({ ...data, status, status_date: statusDate });

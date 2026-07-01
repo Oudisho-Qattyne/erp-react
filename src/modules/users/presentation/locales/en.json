@@ -85,6 +85,7 @@
     }
   },
   "users": {
+    "employee_name" : "Employee name",
     "title": "Users",
     "add": "Add User",
     "add_title": "Add New User",

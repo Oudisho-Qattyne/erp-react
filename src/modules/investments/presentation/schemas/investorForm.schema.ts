@@ -5,7 +5,7 @@ export const investorFormSchema = z.object({
   national_id: z.string().nullable().optional(),
   passport_number: z.string().nullable().optional(),
   nationality: z.string().min(1, 'Nationality is required'),
-  gender: z.enum(['male', 'female'], { required_error: 'Gender is required' }),
+  gender: z.enum(['male', 'female'], 'Gender is required' ),
   phone: z.string().nullable().optional(),
   whatsapp_number: z.string().max(20).optional().nullable(),
   email: z.string().email().max(255).optional().nullable(),

@@ -10,7 +10,7 @@ interface InvestorFormProps {
   investor?: Investor;
   defaultValues?: any;
   onSubmit: (data: any) => Promise<any>;
-  onSuccess: () => void;
+  onSuccess: (id: number, item: any) => void;
   onCancel: () => void;
   submitLabel?: string;
   isCreate?: boolean;

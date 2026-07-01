@@ -84,9 +84,9 @@ export function EditEmployeePage() {
               academic_stage: edu.academic_stage || null,
               study_status: edu.study_status || null,
             })) || [],
-            job_status_id: emp.job_status.id || undefined,
+            job_status_id: emp.job_status?.id || undefined,
             job_status_note: emp.job_status_note || undefined,
-            employee_status_id: emp.employee_status.id || undefined,
+            employee_status_id: emp.employee_status?.id || undefined,
             employee_status_note: emp.employee_status_note || undefined,
             children: emp.children?.map((child: any) => ({
               name: child.name,

@@ -14,6 +14,7 @@ import { Eye, Trash2, MapPin, History } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { EntityWithNameOnly } from '../../../../../core/domain/entities/EntityWithNameOnly';
 import { PlotAuditLogModal } from './components/PlotAuditLogModal';
+import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 
 export function PlotsPage() {
   const { t } = useLanguage();
@@ -95,9 +96,9 @@ export function PlotsPage() {
     setConfirmLoading(false);
   };
 
-  const areaOptions = useMemo(() => areas.map(a => ({ value: String(a.id), label: a.name })), [areas]);
-  const classificationOptions = useMemo(() => classifications.map(c => ({ value: String(c.id), label: c.name })), [classifications]);
-  const userOptions = useMemo(() => users.map(u => ({ value: String(u.id), label: u.name })), [users]);
+  const areaOptions = useMemo(() => areas.map(a => ({ value: String(a.id), label: getLocalizedName(a.name) })), [areas]);
+  const classificationOptions = useMemo(() => classifications.map(c => ({ value: String(c.id), label: getLocalizedName(c.name) })), [classifications]);
+  const userOptions = useMemo(() => users.map(u => ({ value: String(u.id), label: getLocalizedName(u.name) })), [users]);
   const statusOptions = useMemo(() => [
     { value: 'unsold', label: t('plot_status.unsold', 'investments') || 'Unsold' },
     { value: 'reserved', label: t('plot_status.reserved', 'investments') || 'Reserved' },
@@ -177,18 +178,18 @@ export function PlotsPage() {
       filterable: false,
       render: (row: Plot) => row.created_at ? new Date(row.created_at).toLocaleDateString() : '—'
     },
-    { 
-      key: 'user_id', 
-      label: t('plots.added_by', 'investments') || 'Added By', 
-      width: 120,
-      sortable: false,
-      filterable: true,
-      filter: {
-        type: 'select' as const,
-        options: userOptions
-      },
-      render: (row: Plot) => row.user?.name || '—'
-    },
+    // { 
+    //   key: 'user_id', 
+    //   label: t('plots.added_by', 'investments') || 'Added By', 
+    //   width: 120,
+    //   sortable: false,
+    //   filterable: true,
+    //   filter: {
+    //     type: 'select' as const,
+    //     options: userOptions
+    //   },
+    //   render: (row: Plot) => row.user?.name || '—'
+    // },
     { 
       key: 'actions', 
       label: t('common.actions', 'shared') || 'Actions', 
@@ -215,8 +216,8 @@ export function PlotsPage() {
   ];
 
   const tablePagination = {
-    page: pagination?.current_page || 1,
-    totalPages: pagination?.last_page || 1,
+    page: pagination?.currentPage || 1,
+    totalPages: pagination?.lastPage || 1,
     totalItems: pagination?.total || 0,
     onPageChange: (newPage: number) => setPage(newPage),
   };
@@ -272,10 +273,10 @@ export function PlotsPage() {
       <ConfirmDialog
         isOpen={!!confirmDelete}
         title={t('common.delete', 'shared') || 'Delete'}
-        message={t('common.delete_confirm', 'shared', { name: confirmDelete?.code }) || 'Are you sure you want to delete this?'}
+        message={t('common.delete_confirm', 'shared').replace("{name}" , "") || 'Are you sure you want to delete this?'}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setConfirmDelete(null)}
-        isLoading={confirmLoading}
+        confirmLoading={confirmLoading}
       />
       
       <PlotAuditLogModal 

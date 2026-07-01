@@ -5,7 +5,7 @@ import Input from '../../../../../../core/presentation/layouts/ui/inputs/Input';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
 import { useApiClient } from '../../../../../../core/presentation/context/api/ApiClinetProvider';
 import { toast } from 'sonner';
-import type { Plot } from '../../../domain/entities/plot';
+import type { Plot } from '../../../../domain/entities/plot';
 
 interface ChangePlotStatusModalProps {
   isOpen: boolean;
@@ -100,7 +100,7 @@ export function ChangePlotStatusModal({ isOpen, onClose, plot, onSuccess }: Chan
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="w-full p-2 border border-border rounded-lg bg-surface text-text focus:ring-2 focus:ring-primary outline-none transition-all resize-none min-h-[100px]"
+            className="w-full p-2 border border-border rounded-lg bg-surface text-text focus:ring-2 focus:ring-primary outline-none transition-all resize-none min-h-25"
             placeholder={t('plots.notes_placeholder', 'investments') || 'Optional notes...'}
           />
         </div>

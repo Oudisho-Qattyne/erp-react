@@ -88,14 +88,13 @@ export function SelectOnMap({ latitude, longitude, onChange, disabled }: SelectO
         isOpen={isOpen} 
         onClose={() => setIsOpen(false)} 
         title={t('common.select_location', 'shared') || 'Select Location'}
-        className="max-w-4xl w-full"
       >
         <div className="flex flex-col gap-4 p-4">
           <p className="text-sm text-text-muted mb-4">
             {t('common.click_map_to_select', 'shared') || 'Click on the map to select a location'}
           </p>
           
-          <div className="w-full h-[400px] bg-primary/5 rounded-xl border border-border relative overflow-hidden">
+          <div className="w-full h-100 bg-primary/5 rounded-xl border border-border relative overflow-hidden">
             {!isLoaded ? (
               <div className="flex items-center justify-center h-full text-text-muted">
                 {t('common.loading_map', 'shared') || 'Loading Map...'}
@@ -119,7 +118,7 @@ export function SelectOnMap({ latitude, longitude, onChange, disabled }: SelectO
             )}
             
             {tempLat && tempLng && (
-              <div className="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-border text-sm font-mono z-[1000] pointer-events-none">
+              <div className="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-border text-sm font-mono z-1000 pointer-events-none">
                 {t('common.lat', 'shared') || 'Lat'}: {tempLat} <br />
                 {t('common.lng', 'shared') || 'Lng'}: {tempLng}
               </div>
