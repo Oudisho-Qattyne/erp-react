@@ -118,6 +118,14 @@ export function PlotsPage() {
       render: (row: Plot) => <span className="font-medium">{row.code}</span>
     },
     { 
+      key: 'identifier', 
+      label: t('plots.identifier', 'investments') || 'Plot Identifier', 
+      width: 120,
+      sortable: true,
+      filterable: true,
+      render: (row: Plot) => <span className="font-medium">{row.identifier}</span>
+    },
+    { 
       key: 'status', 
       label: t('plots.status', 'investments') || 'Status', 
       width: 140,

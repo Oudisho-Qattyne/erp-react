@@ -49,6 +49,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
 
   const formFields: FieldConfig[] = [
     { name: 'code', label: t('plots.code', 'investments') || 'Code', required: true },
+    { name: 'identifier', label: t('plots.identifier', 'investments') || 'Identifier', required: true },
     { name: 'area', type: 'text', label: t('plots.area', 'investments') || 'Area', required: true },
     { 
       name: 'plot_area_id', 
@@ -196,6 +197,10 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
             <div className="space-y-1">
               <span className="text-sm text-text-muted">{t('plots.code', 'investments') || 'Code'}</span>
               <p className="font-medium text-text">{plot?.code || '—'}</p>
+            </div>
+            <div className="space-y-1">
+              <span className="text-sm text-text-muted">{t('plots.identifier', 'investments') || 'Identifier'}</span>
+              <p className="font-medium text-text">{plot?.identifier || '—'}</p>
             </div>
             <div className="space-y-1">
               <span className="text-sm text-text-muted">{t('plots.area', 'investments') || 'Area'}</span>
