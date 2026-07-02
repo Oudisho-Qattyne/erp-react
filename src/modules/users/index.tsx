@@ -7,6 +7,18 @@ import { EditRolePage } from './presentation/pages/EditRolePage'
 import { ShowRolePage } from './presentation/pages/ShowRolePage'
 import { AllUsers } from './presentation/pages/user/AllUsers'
 import { LinkUserToEmployee } from './presentation/pages/user/LinkUserToEmployee'
+import { registerUserApi } from '../../core/registry/user/userRegistry'
+import { createFetchApiClient } from '../../core/infrastructure/api/fetchApiClient'
+import { createUserRepository } from './infrastructure/repositories/user/repository'
+import { createManageUserUseCase } from './application/usecases/user/manageUserUsecase'
+
+const API_BASE_URL = import.meta.env.VITE_PUBLIC_API_URL || 'http://localhost:3000/api'
+
+const client = createFetchApiClient(API_BASE_URL, () => document.documentElement.lang || 'en')
+const repository = createUserRepository(client)
+const useCase = createManageUserUseCase(repository)
+
+registerUserApi({ getCurrentUser: useCase.getCurrentUser })
 
 const usersModule: Module = {
   name: 'users',

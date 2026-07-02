@@ -122,10 +122,9 @@ export function CountriesPage() {
         />
       </Dialog>
 
-      {loading && <LoadingState />}
       {error && <ErrorState message={error} onRetry={getAll} />}
-      {!loading && !error && (
-        <DataTable columns={columns} data={filtered} rowKey="id" loading={false}
+      {!error && (
+        <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
           emptyMessage={t('lookups.no_countries', 'hr') || 'No countries found'} />
       )}
 

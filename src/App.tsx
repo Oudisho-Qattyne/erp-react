@@ -9,6 +9,7 @@ import { LanguageProvider } from './core/presentation/context/i18n/I18nProvider'
 import { ApiClientProvider } from './core/presentation/context/api/ApiClinetProvider'
 import { StorageProvider } from './core/registry/storage/StorageProvider'
 import { HrProvider } from './core/registry/hr/HrProvider'
+import { UserProvider } from './core/registry/user/UserProvider'
 import { ProtectedRoute } from './core/infrastructure/auth/ProtectedRoute'
 import { AuthProvider } from './core/infrastructure/auth/AuthProvider'
 import { Spinner } from './core/presentation/layouts/ui/state/Spinner'
@@ -111,12 +112,14 @@ function App() {
             <AuthProvider>
               <StorageProvider>
                 <HrProvider>
+                <UserProvider>
                   <Toaster
                     position="bottom-center"
                     dir="rtl"
                     richColors
                   />
                   <RouterProvider router={router} />
+                </UserProvider>
                 </HrProvider>
               </StorageProvider>
             </AuthProvider>

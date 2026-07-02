@@ -28,6 +28,7 @@ import type { EmployeeStatus } from '../../domain/entities/employeeStatus/employ
 import { EmployeeStatusFormSchema } from '../schemas/employeeStatus/employeeStatus';
 import { EmployeeStatusLogsDialog } from '../components/employee/EmployeeStatuseLogsDialog';
 import { JobStatusLogsDialog } from '../components/employee/JobStatusLogsDialog';
+import { cleanPayload } from '../../../../core/utils/cleanPayload';
 
 // -----------------------------------------------------------------------------
 // Helper: Generic Create Form wrapper (with explicit types)
@@ -723,7 +724,7 @@ export function EmployeeForm({
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(async (data) => {
         try {
-          await onSubmit(data)
+          await onSubmit(cleanPayload(data))
           methods.reset(data)
         } catch (err: any) {
           if (err.validationErrors) {

@@ -137,6 +137,7 @@ export default function LeavesTypesPage() {
 
   return (
     <div className="p-4 space-y-4">
+      <h1 className="text-2xl font-bold">{t("leave_types.title", "hr") || "Leave Types"}</h1>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <Input
@@ -161,10 +162,9 @@ export default function LeavesTypesPage() {
         </Button>
       </div>
 
-      {loading.findAll && <LoadingState />}
       {error.findAll && !loading.findAll && <ErrorState message={error.findAll} onRetry={findAll} />}
-      {!loading.findAll && !error.findAll && (
-        <DataTable
+      {!error.findAll && (
+        <DataTable loading={loading.findAll}
           columns={columns}
           data={items}
           onRowClick={(row) => navigate(`/hr/leaves/${row.id}`)}
@@ -172,7 +172,6 @@ export default function LeavesTypesPage() {
           sortColumn={sortColumn}
           sortOrder={sortOrder as any}
           onSort={handleSort}
-          loading={loading.findAll}
           pagination={{
             page: pagination.currentPage,
             totalPages: pagination.lastPage,

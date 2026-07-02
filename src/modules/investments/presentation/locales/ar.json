@@ -1,0 +1,170 @@
+{
+  "title": "الإستثمارات",
+  "plot_areas": {
+    "title": "المناطق",
+    "add": "إضافة منطقة",
+    "name": "اسم المنطقة",
+    "is_active": "فعال",
+    "is_default": "تعيين كافتراضي",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا يوجد مناطق",
+    "validation": {
+      "name_required": "الاسم مطلوب"
+    }
+  },
+  "plot_classifications": {
+    "title": "التصنيفات",
+    "add": "إضافة تصنيف",
+    "name": "اسم التصنيف",
+    "is_active": "فعال",
+    "is_default": "تعيين كافتراضي",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا يوجد تصنيفات",
+    "validation": {
+      "name_required": "الاسم مطلوب"
+    }
+  },
+  "plots": {
+    "title": "المقاسم",
+    "add": "إضافة مقسم",
+    "code": "رمز المقسم",
+    "area": "المساحة (م²)",
+    "plot_area_id": "المنطقة",
+    "plot_classification_id": "التصنيف",
+    "location": "الموقع",
+    "current_condition": "الوضع الحالي للمقسم",
+    "notes": "ملاحظات",
+    "status": "حالة المقسم",
+    "created_at": "تاريخ الإنشاء (اختياري)",
+    "status_date": "تاريخ الحالة (اختياري)",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "updated": "تم تحديث {name} بنجاح",
+    "update_error": "فشل في تحديث {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "edit_log": "سجل التعديل",
+    "no_edit_log": "لا يوجد سجل تعديلات",
+    "event": "الحدث",
+    "changes": "التعديلات",
+    "field": "الحقل",
+    "old_value": "القيمة القديمة",
+    "new_value": "القيمة الجديدة",
+    "plot_info": "معلومات المقسم",
+    "no_records": "لا يوجد مقاسم",
+    "change_status": "تغيير الحالة",
+    "select_status": "اختر الحالة",
+    "status_updated": "تم تحديث الحالة بنجاح",
+    "status_update_error": "فشل في تحديث الحالة",
+    "notes_placeholder": "ملاحظات اختيارية...",
+    "from_date": "من:",
+    "to_date": "إلى:",
+    "view_history": "عرض السجل",
+    "status_history": "سجل الحالات",
+    "no_history": "لا يوجد سجل حالات",
+    "show_map": "عرض في الخريطة",
+    "added_by": "أضيف بواسطة",
+    "changed_by": "تم التغيير بواسطة",
+    "validation": {
+      "code_required": "الرمز مطلوب",
+      "area_required": "المساحة مطلوبة",
+      "area_invalid": "يجب أن تكون المساحة رقماً موجباً صحيحاً",
+      "plot_area_id_invalid": "يجب أن تكون المنطقة رقماً",
+      "plot_classification_id_invalid": "يجب أن يكون التصنيف رقماً",
+      "latitude_required": "خط العرض مطلوب",
+      "longitude_required": "خط الطول مطلوب"
+    }
+  },
+  "plot_status": {
+    "unsold": "غير مباعة",
+    "announced": "معلن عنها",
+    "subscribed": "مكتتب بها",
+    "allocated": "مخصصة",
+    "separated": "مغصول"
+  },
+  "investors": {
+    "title": "المستثمرين",
+    "invistor":"مستثمر",
+    "created_at": "تاريخ الإنشاء",
+    "add": "إضافة مستثمر",
+    "edit": "تعديل مستثمر",
+    "info": "معلومات المستثمر",
+    "full_name": "الاسم الكامل",
+    "national_id": "الرقم الوطني",
+    "passport_number": "رقم الجواز",
+    "nationality": "الجنسية",
+    "gender": "الجنس",
+    "gender_male": "ذكر",
+    "gender_female": "أنثى",
+    "phone": "رقم الهاتف",
+    "whatsapp_number": "رقم الواتساب",
+    "email": "البريد الإلكتروني",
+    "address": "العنوان",
+    "created": "تم إنشاء المستثمر بنجاح",
+    "create_error": "فشل في إنشاء المستثمر",
+    "updated": "تم تحديث المستثمر بنجاح",
+    "update_error": "فشل في تحديث المستثمر",
+    "deleted": "تم حذف المستثمر بنجاح",
+    "delete_error": "فشل في حذف المستثمر",
+    "no_records": "لا يوجد مستثمرون",
+    "add_interest": "إضافة اهتمام",
+    "interests": "اهتمامات المستثمر",
+    "is_possible_investor_in_future": "مستثمر محتمل في المستقبل",
+    "added_by": "أضيف بواسطة",
+    "min_area": "الحد الأدنى للمساحة",
+    "max_area": "الحد الأقصى للمساحة",
+    "plot_areas": "المناطق المستهدفة",
+    "plot_classifications": "التصنيفات المستهدفة",
+    "interest_created": "تم إضافة الاهتمام بنجاح",
+    "interest_deleted": "تم حذف الاهتمام بنجاح",
+    "no_interests": "لم تتم إضافة أي اهتمامات بعد",
+    "validation": {
+      "full_name_required": "الاسم الكامل مطلوب",
+      "nationality_required": "الجنسية مطلوبة",
+      "gender_required": "الجنس مطلوب",
+      "whatsapp_max": "يجب ألا يتجاوز رقم الواتساب 20 حرفاً",
+      "email_invalid": "البريد الإلكتروني غير صالح",
+      "address_max": "يجب ألا يتجاوز العنوان 500 حرف",
+      "max_area_min": "الحد الأقصى للمساحة لا يمكن أن يكون أقل من الحد الأدنى"
+    }
+  },
+  "permissions": {
+    "investments": {
+      "plots": {
+        "list": "قائمة المقاسم",
+        "view": "عرض مقسم",
+        "create": "إنشاء مقسم",
+        "update": "تعديل مقسم",
+        "delete": "حذف مقسم"
+      },
+      "investors": {
+        "list": "قائمة المستثمرين",
+        "view": "عرض مستثمر",
+        "create": "إنشاء مستثمر",
+        "update": "تعديل مستثمر",
+        "delete": "حذف مستثمر"
+      }
+    }
+  },
+  "navigation": {
+    "title": "الإستثمارات",
+    "plot_areas": {
+      "title": "المناطق"
+    },
+    "plot_classifications": {
+      "title": "التصنيفات"
+    },
+    "plots": {
+      "title": "المقاسم"
+    },
+    "investors": {
+      "title": "المستثمرين"
+    }
+  }
+}

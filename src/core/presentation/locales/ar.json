@@ -25,7 +25,20 @@
     "no":"لا",
     "set_default":"تعيين كافتراضي",
     "set_default_title": "تعيين {entity} كافتراضي",
-    "set_default_message": "هل أنت متأكد من تعيين {entity} كافتراضي؟"
+    "set_default_message": "هل أنت متأكد من تعيين {entity} كافتراضي؟",
+    "latitude": "خط العرض",
+    "longitude": "خط الطول",
+    "lat": "عرض",
+    "lng": "طول",
+    "loading_map": "جاري تحميل الخريطة...",
+    "select_location": "تحديد الموقع",
+    "select_on_map": "تحديد على الخريطة",
+    "click_map_to_select": "انقر على الخريطة لتحديد الموقع",
+    "new": "جديد",
+    "notes": "ملاحظات",
+    "confirm_delete": "هل أنت متأكد من الحذف؟",
+    "error": "حدث خطأ",
+    "error_loading": "حدث خطأ أثناء تحميل البيانات"
   },
   "pagination": {
     "showing": "عرض",
@@ -35,6 +48,13 @@
     "previous": "السابق",
     "next": "التالي",
     "items_per_page": "لكل صفحة"
+  },
+  "permissions": {
+    "shared": {
+      "audit-logs": {
+        "view": "عرض سجل التدقيق"
+      }
+    }
   },
   "not_found":{
     "back_home" : "العودة إلى الرئيسية",

@@ -67,9 +67,10 @@ export function AllUsers() {
     {
       key: "role",
       label: t("users.role", "users") || "Role",
-      width: 140,
+      width: 120,
       render: (row) => (language === "ar" ? row.role?.display_name : row.role?.name) || "-",
     },
+    { key: "", label: t("users.employee_name", "users") || "Name", width: 180 , render:row => row.employee_first_name ?`${row.employee_first_name} ${row.employee_last_name}` : '-' },
     { key: "created_at", label: t("users.created_at", "users") || "Created At", width: 160, render: (row) => row.created_at },
     {
       key: "actions",
@@ -128,7 +129,7 @@ export function AllUsers() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{t("users.title", "users") || "Users"}</h1>
         <div className="flex items-center gap-2">
-          <Button
+          {/* <Button
             variant="outline"
             size="sm"
             onClick={exportUsersExcel}
@@ -147,7 +148,7 @@ export function AllUsers() {
             requiredPermission="users.users.export"
           >
             PDF
-          </Button>
+          </Button> */}
           <Button
             variant="primary"
             onClick={() => setIsAddOpen(true)}
@@ -161,9 +162,7 @@ export function AllUsers() {
 
 
 
-      {loading.getAllUsers ? (
-        <LoadingState />
-      ) : error.getAllUsers ? (
+      {error.getAllUsers ? (
         <ErrorState message={error.getAllUsers} onRetry={() => getAllUsers()} />
       ) : (
         <div className="relative w-full">

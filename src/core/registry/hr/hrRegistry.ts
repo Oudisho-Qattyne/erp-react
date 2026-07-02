@@ -1,11 +1,9 @@
-import type { EmployeeListItem } from "../../../modules/hr/domain/entities/EmployeeListItem"
-
 export interface EmployeePickerProps {
   isOpen: boolean
   onClose: () => void
-  onConfirm: (selected: EmployeeListItem[]) => void
+  onConfirm: (selected: any[]) => void
   multiple?: boolean
-  initialSelected?: EmployeeListItem[]
+  initialSelected?: any[]
   defaultFilter?: Record<string, any>
 }
 

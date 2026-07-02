@@ -147,13 +147,12 @@ export function CitiesPage() {
             />
           </Dialog>
 
-          {loading && <LoadingState />}
           {error && <ErrorState message={error} onRetry={() => selectedCountry && getAllByCountry(selectedCountry)} />}
-          {!loading && !error && filtered.length === 0 && !loading && !error && (
+          {!error && !loading && filtered.length === 0 && (
             <EmptyState message={t('lookups.no_cities', 'hr') || 'No cities found'} />
           )}
-          {!loading && !error && filtered.length > 0 && (
-            <DataTable columns={columns} data={filtered} rowKey="id" loading={false}
+          {!error && (filtered.length > 0 || loading) && (
+            <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
               emptyMessage={t('lookups.no_cities', 'hr') || 'No cities found'} />
           )}
         </>
