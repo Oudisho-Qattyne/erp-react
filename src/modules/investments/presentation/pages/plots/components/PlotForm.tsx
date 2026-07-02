@@ -153,6 +153,13 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
           currentStatus={status} 
           statusDate={statusDate}
           onStatusClick={isCreate ? undefined : (status) => setClickedStatus(status)}
+          permissions={{
+            unsold: 'investments.plots.set-unsold',
+            announced: 'investments.plots.set-announced',
+            subscribed: 'investments.plots.set-subscribed',
+            allocated: 'investments.plots.set-allocated',
+            separated: 'investments.plots.set-separated',
+          }}
         />
       </div>
       <div className="p-6">
@@ -160,13 +167,13 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
           <h2 className="text-lg font-bold">{t('plots.plot_info', 'investments') || 'Plot Info'}</h2>
           <div className="flex gap-2">
             {!isCreate && plot?.id && (
-              <Button onClick={() => setIsAuditModalOpen(true)} variant="outline" size="sm" className="flex items-center gap-2">
+              <Button onClick={() => setIsAuditModalOpen(true)} variant="outline" size="sm" className="flex items-center gap-2" requiredPermission="shared.audit-logs.view">
                 <History size={16} />
                 {t('plots.edit_log', 'investments') || 'سجل التعديل'}
               </Button>
             )}
             {!isEditing && !isCreate && (
-              <Button onClick={() => setIsEditing(true)} variant="outline" size="sm" className="flex items-center gap-2">
+              <Button onClick={() => setIsEditing(true)} variant="outline" size="sm" className="flex items-center gap-2" requiredPermission="investments.plots.update">
                 <Pencil size={16} />
                 {t('common.edit', 'shared') || 'Edit'}
               </Button>

@@ -203,11 +203,11 @@ export function PlotsPage() {
             </Button>
           )}
           <Button variant="ghost" size="sm" onClick={() => navigate(`/investments/plots/${row.id}/edit`)}
-            title={t('common.view', 'shared') || 'View'}>
+            title={t('common.view', 'shared') || 'View'} requiredPermission="investments.plots.view">
             <Eye size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)}
-            title={t('common.delete', 'shared') || 'Delete'}>
+            title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.plots.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
         </div>
@@ -229,11 +229,11 @@ export function PlotsPage() {
           <h1 className="text-2xl font-bold text-text">{t('plots.title', 'investments') || 'Plots'}</h1>
         </div>
         <div className="flex items-center gap-3">
-          <Button onClick={() => setIsAuditModalOpen(true)} variant="outline" className="flex items-center gap-2">
+          <Button onClick={() => setIsAuditModalOpen(true)} variant="outline" className="flex items-center gap-2" requiredPermission="shared.audit-logs.view">
             <History size={16} />
             {t('plots.edit_log', 'investments') || 'سجل التعديلات'}
           </Button>
-          <Button onClick={() => navigate('/investments/plots/create')}>{t('plots.add', 'investments') || 'Add Plot'}</Button>
+          <Button onClick={() => navigate('/investments/plots/create')} requiredPermission="investments.plots.create">{t('plots.add', 'investments') || 'Add Plot'}</Button>
         </div>
       </div>
         <div className="flex flex-wrap items-center gap-3">

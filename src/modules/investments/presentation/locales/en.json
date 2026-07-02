@@ -141,7 +141,12 @@
         "view": "View Plot",
         "create": "Create Plot",
         "update": "Edit Plot",
-        "delete": "Delete Plot"
+        "delete": "Delete Plot",
+        "set-unsold": "Set Status to Unsold",
+        "set-announced": "Set Status to Announced",
+        "set-subscribed": "Set Status to Subscribed",
+        "set-allocated": "Set Status to Allocated",
+        "set-separated": "Set Status to Separated"
       },
       "investors": {
         "list": "List Investors",
