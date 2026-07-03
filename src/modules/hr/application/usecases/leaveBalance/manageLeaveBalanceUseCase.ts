@@ -10,7 +10,7 @@ export const createManageLeaveBalanceUseCase = (repository: ILeaveBalanceReposit
      findAllMyLeaveBalances(filter?: FilterLeaveBalancesDto) {
             return repository.findAllMyLeaveBalances(filter)
         },
-        findAllEmployeeLeaveBalances(employeeId : number , filter : FilterLeaveBalancesDto) {
+        findAllEmployeeLeaveBalances(employeeId : number | undefined , filter : FilterLeaveBalancesDto) {
             return repository.findAllEmployeeLeaveBalances(employeeId , filter)
         },
         adjustLeaveBalance(adjust : AdjustLeaveBalanceDto) {

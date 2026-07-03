@@ -24,7 +24,7 @@ export interface UseEntityCrudReturn<T> {
   clearError: () => void;
 }
 
-export function useEntityCrud<T extends EntityWithNameOnly>(getUrl:string , restUrl:string): UseEntityCrudReturn<T> {
+export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:string): UseEntityCrudReturn<T> {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [entities, setEntities] = useState<T[]>([]);

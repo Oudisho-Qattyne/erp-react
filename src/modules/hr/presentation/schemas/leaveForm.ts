@@ -52,9 +52,9 @@ export const getCreateLeaveSchema = (t: (key: string, module?: string) => string
   ]);
 
   const ProportionRulesSchema = z.object({
-    basis: z.enum(['hire_date', 'custom_date'], t('leave.validation.proportion_basis_invalid', 'hr') || 'أساس التناسب غير صالح'),
-    calculation: z.enum(['monthly_started', 'monthly_completed', 'daily'], t('leave.validation.proportion_calculation_invalid', 'hr') || 'حساب التناسب غير صالح'),
-    rounding: z.enum(['none', 'floor', 'ceil', 'half'], t('leave.validation.proportion_rounding_invalid', 'hr') || 'تقريب التناسب غير صالح'),
+    basis: z.enum(['hire_date', 'custom_date'], t('leave.validation.proportion_basis_invalid', 'hr') || 'أساس التناسب غير صالح').nullable().optional(),
+    calculation: z.enum(['monthly_started', 'monthly_completed', 'daily'], t('leave.validation.proportion_calculation_invalid', 'hr') || 'حساب التناسب غير صالح').nullable().optional(),
+    rounding: z.enum(['none', 'floor', 'ceil', 'half'], t('leave.validation.proportion_rounding_invalid', 'hr') || 'تقريب التناسب غير صالح').nullable().optional(),
   });
 
   return z.object({
@@ -72,10 +72,10 @@ export const getCreateLeaveSchema = (t: (key: string, module?: string) => string
     balance_mode: z.enum(['accrual', 'fixed_grant', 'once_per_life', 'once_per_service', 'none'], t('leave.validation.balance_mode_invalid', 'hr') || 'نمط الرصيد غير صالح'),
     accrual_period: z.enum(['yearly', 'monthly', 'none']).optional(),
     allow_carry_forward: z.boolean(),
-    carry_forward_limit: z.number().min(0).optional(),
+    carry_forward_limit: z.number().min(0).nullable().optional(),
     eligibility_rules: RuleGroupContainerSchema,
     entitlement_rules: EntitlementRulesSchema,
-    proration_rules: ProportionRulesSchema,
+    proration_rules: ProportionRulesSchema.nullable().optional(),
     is_active: z.boolean(),
   });
 };

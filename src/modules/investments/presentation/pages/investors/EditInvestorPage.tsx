@@ -19,7 +19,7 @@ import type { PlotClassification } from '../../../domain/entities/plotClassifica
 function InterestCard({ interest, onDelete, t }: any) {
   const [showAreas, setShowAreas] = useState(false);
   const [showClassifications, setShowClassifications] = useState(false);
-  
+
   const { getAll: getAreas, entities: areas, loading: areasLoading } = useEntityCrud<PlotArea>('/investments/plot-areas', '/investments/plot-areas');
   const { getAll: getClassifications, entities: classifications, loading: classLoading } = useEntityCrud<PlotClassification>('/investments/plot-classifications', '/investments/plot-classifications');
 
@@ -110,7 +110,6 @@ export function EditInvestorPage() {
   const [error, setError] = useState<string | null>(null);
   const [showInterestModal, setShowInterestModal] = useState(false);
   const [interestToDelete, setInterestToDelete] = useState<number | null>(null);
-
   useEffect(() => {
     fetchInvestor();
   }, [id]);
@@ -128,13 +127,12 @@ export function EditInvestorPage() {
       setLoading(false);
     }
   };
-
   const handleBack = () => navigate('/investments/investors');
 
   const handleSubmit = async (data: any) => {
     if (!id) return;
     try {
-      return await update(id, data);
+      return await update(Number(id), data);
     } catch (err: any) {
       toast.error(t('investors.update_error', 'investments') || 'Failed to update investor');
       throw err;
@@ -184,7 +182,7 @@ export function EditInvestorPage() {
             {t('investors.add_interest', 'investments') || 'Add Interest'}
           </Button>
         </div>
-        
+
         {investor.interests && investor.interests.length > 0 ? (
           <div className="space-y-4">
             {investor.interests.map((interest) => (
@@ -207,7 +205,7 @@ export function EditInvestorPage() {
           fetchInvestor();
         }}
       />
-      
+
       <ConfirmDialog
         isOpen={interestToDelete !== null}
         title={t('common.confirm_delete_title', 'shared') || 'Delete item'}

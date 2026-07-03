@@ -96,7 +96,7 @@ export function InvestorsPage() {
     },
     { 
       key: 'created_at', 
-      label: t('common.created_at', 'shared') || 'Created At', 
+      label: t('investors.created_at', 'investments') || 'Created At', 
       width: 130,
       sortable: true,
       render: (row: Investor) => row.created_at ? new Date(row.created_at).toLocaleDateString() : '—'
@@ -128,12 +128,12 @@ export function InvestorsPage() {
   ];
 
   const tablePagination = {
-    page: pagination?.current_page || 1,
-    totalPages: pagination?.last_page || 1,
+    page: pagination?.currentPage || 1,
+    totalPages: pagination?.lastPage || 1,
     totalItems: pagination?.total || 0,
     onPageChange: (newPage: number) => setPage(newPage),
   };
-
+const entity = t('investors.investor') || "مستثمر"
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -144,7 +144,7 @@ export function InvestorsPage() {
           <Button onClick={() => navigate('/investments/investors/create')}>{t('investors.add', 'investments') || 'Add Investor'}</Button>
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-3 bg-surface p-3 border border-border rounded-lg">
+      <div className="flex flex-wrap items-center gap-3  ">
         <Input type="text" value={searchQuery} onChange={setSearchQuery} 
           placeholder={t('common.search', 'shared') || 'Search...'} 
           baseClasses={inputBaseClasses} className="w-64" />
@@ -169,10 +169,10 @@ export function InvestorsPage() {
       <ConfirmDialog
         isOpen={!!confirmDelete}
         title={t('common.delete', 'shared') || 'Delete'}
-        message={t('common.delete_confirm', 'shared', { name: confirmDelete?.full_name }) || 'Are you sure you want to delete this?'}
+        message={t('common.delete_confirm', 'shared').replace('{name}', entity) || 'Are you sure you want to delete this?'}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setConfirmDelete(null)}
-        isLoading={confirmLoading}
+        confirmLoading={confirmLoading}
       />
     </div>
   );

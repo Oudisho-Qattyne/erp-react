@@ -70,16 +70,16 @@ export function EmployeeStatusesPage() {
         <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
           {!row.is_default && (
             <Button variant="ghost" size="sm" onClick={() => setConfirmSetDefault(row)}
-              title={t('common.set_default', 'shared') || 'Set as default'}>
+              title={t('common.set_default', 'shared') || 'Set as default'} requiredPermission="hr.employee-statuses.update">
               <Star size={16} />
             </Button>
           )}
           <Button variant="ghost" size="sm" onClick={() => setEditItem(row)}
-            title={t('common.edit', 'shared') || 'Edit'}>
+            title={t('common.edit', 'shared') || 'Edit'} requiredPermission="hr.employee-statuses.update">
             <Pencil size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)}
-            title={t('common.delete', 'shared') || 'Delete'}>
+            title={t('common.delete', 'shared') || 'Delete'} requiredPermission="hr.employee-statuses.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
         </div>
@@ -94,7 +94,7 @@ export function EmployeeStatusesPage() {
           <Input type="text" value={searchQuery} onChange={setSearchQuery}
             placeholder={t('common.search', 'shared') || 'Search...'}
             baseClasses={inputBaseClasses} className="w-60" />
-          <Button onClick={() => setIsCreateOpen(true)}>{t('employee_form.add_employee_status', 'hr') || 'Add Employee Status'}</Button>
+          <Button onClick={() => setIsCreateOpen(true)} requiredPermission="hr.employee-statuses.create">{t('employee_form.add_employee_status', 'hr') || 'Add Employee Status'}</Button>
         </div>
       </div>
 
@@ -123,10 +123,9 @@ export function EmployeeStatusesPage() {
         />
       </Dialog>
 
-      {loading && <LoadingState />}
       {error && <ErrorState message={error} onRetry={getAll} />}
-      {!loading && !error && (
-        <DataTable columns={columns} data={filtered} rowKey="id" loading={false}
+      {!error && (
+        <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
           emptyMessage={t('lookups.no_employee_statuses', 'hr') || 'No employee statuses found'} />
       )}
 

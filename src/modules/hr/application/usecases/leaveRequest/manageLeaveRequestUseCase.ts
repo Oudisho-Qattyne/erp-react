@@ -7,7 +7,7 @@ export const createManageLeaveRequestUseCase = (repository: ILeaveRequestReposit
   return {
         createLeaveRequset : (leaveRequest : CreateLeaveRequestDto) => repository.createLeaveRequest(leaveRequest),
 
-        findAllEmployeeLeaveRequests : (filter : FilterLeaveRequestDto) => repository.getAllEmployeeLeaveRequests(filter),
+        findAllEmployeeLeaveRequests : (filter : FilterLeaveRequestDto) => repository.getAllLeaveRequests(filter),
         findAllMyLeaveRequests : (filter : FilterLeaveRequestDto) => repository.getAllMyLeaveRequests(filter),
         findLeaveRequestById : (id:number) => repository.getLeaveRequestById(id),
 

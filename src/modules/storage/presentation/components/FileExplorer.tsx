@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useReducer, useRef, useState } from 'react';
 import { Filemanager, Willow, type FilePreview, type IApi, type IFileMenuOption, type IParsedEntity, type TContextMenuType } from '@svar-ui/react-filemanager';
 import '@svar-ui/react-filemanager/all.css';
 import { StorageToolbar } from '../components/StorageToolbar';
@@ -15,6 +15,7 @@ import '../styles/storage-explorer.css';
 import type { StorageItemDto } from '../../application/dtos/storageItem';
 import { useFileExplorer } from '../hooks/useFileExplorer';
 import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
+import { AuthContext } from '../../../../core/infrastructure/auth/AuthProvider';
 import type { StorageItem } from '../../domain/entities/FileSystemEntry';
 
 interface FileExplorerProps {
@@ -67,7 +68,8 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
     const [rootPath, setRootPath] = useState<string>("")
     const [copidItems, setCopiedItems] = useState<StorageItemDto[]>([])
     const apiRef = useRef<any>(null);
-    const { language } = useLanguage();
+    const { t, language } = useLanguage();
+    const auth = useContext(AuthContext);
 
 
 
@@ -259,13 +261,11 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
                 const res = await moveStorageItem(ci.id, currentPath, apiRef.current)
 
             } catch (error) {
-                console.log(error);
             }
         })
         setCopiedItems([])
 
     }
-console.log("data in fileexplorer" , data);
 
 
     const customMenuOptions = useCallback((
@@ -275,11 +275,12 @@ console.log("data in fileexplorer" , data);
         if (mode !== 'file' && mode !== 'folder') return [];
 
         const options: IFileMenuOption[] = [];
+        const has = (p: string) => auth?.hasPermission(p) ?? false;
 
-        if (mode === 'folder') {
+        if (mode === 'folder' && has('storage.folder.rename')) {
             options.push({
                 id: 'rename-custom',
-                text: 'إعادة تسمية',
+                text: t('context_menu.rename', 'storage'),
                 hotkey: 'F2',
                 handler: () => {
                     if (item && item._id) {
@@ -289,21 +290,23 @@ console.log("data in fileexplorer" , data);
             });
         }
 
-        options.push({
-            id: 'delete-custom',
-            text: 'حذف',
-            hotkey: 'Shift+Delete',
-            handler: () => {
-                if (item && item._id) {
-                    const deleteItems: StorageItemDto[] = [item];
-                    setDeleteConfirm({ items: deleteItems });
-                }
-            },
-        });
-        if (mode === 'file') {
+        if (has(mode === 'folder' ? 'storage.folder.delete' : 'storage.file.delete')) {
+            options.push({
+                id: 'delete-custom',
+                text: t('context_menu.delete', 'storage'),
+                hotkey: 'Shift+Delete',
+                handler: () => {
+                    if (item && item._id) {
+                        const deleteItems: StorageItemDto[] = [item];
+                        setDeleteConfirm({ items: deleteItems });
+                    }
+                },
+            });
+        }
+        if (mode === 'file' && has('storage.file.download')) {
             options.push({
                 id: "custom-download",
-                text: "تحميل",
+                text: t('context_menu.download', 'storage'),
                 hotkey: 'd',
                 handler: async () => {
                     if (item && item._id) {
@@ -314,26 +317,29 @@ console.log("data in fileexplorer" , data);
             })
 
         }
-        options.push({
-            id: "custom-cut",
-            text: "قص",
-            hotkey: '',
-            handler: async () => {
-                handleMoveSelected()
-            }
-        })
-        options.push({
-            id: "custom-paste",
-            text: "لصق",
-            hotkey: '',
-            handler: async () => {
-                onPaste()
-            }
-        })
-
+        if (has(mode === 'folder' ? 'storage.folder.move' : 'storage.file.move')) {
+            options.push({
+                id: "custom-cut",
+                text: t('context_menu.cut', 'storage'),
+                hotkey: '',
+                handler: async () => {
+                    handleMoveSelected()
+                }
+            })
+        }
+        if (has(mode === 'folder' ? 'storage.folder.move' : 'storage.file.move')) {
+            options.push({
+                id: "custom-paste",
+                text: t('context_menu.paste', 'storage'),
+                hotkey: '',
+                handler: async () => {
+                    onPaste()
+                }
+            })
+        }
 
         return options;
-    }, [selectedItems, onPaste, handleMoveSelected, copidItems]);
+    }, [selectedItems, onPaste, handleMoveSelected, copidItems, auth]);
 
     return (
         <div className="h-full relative">
@@ -363,7 +369,7 @@ console.log("data in fileexplorer" , data);
                                 </div>
                             )}
                         </div>
-                        {hasErrors() && <p className="text-red-500 mt-2">somthing went wrong</p>}
+                        {hasErrors() && <p className="text-red-500 mt-2">{t('error_message', 'storage')}</p>}
                     </Locale>
                 </Willow>
             </div>

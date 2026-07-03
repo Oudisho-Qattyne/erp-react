@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useMemo } from 'react';
 import { CustomSelect } from './CustomSelect';
 import { SelectOrCreate } from './SelectOrCreate';
 import { MultiSelectOrCreate } from './MultiSelectOrCreate';
@@ -7,6 +7,7 @@ import { TimePicker } from './TimePicker';
 import { DateTimePicker } from './DateTimePicker';
 import { DataMatrixInput, type MatrixFieldConfig } from './DataMatrixInput';
 import { Info } from 'lucide-react';
+import { AuthContext } from '../../../../infrastructure/auth/AuthProvider';
 export type InputType = 'text' | 'number' | 'email' | 'password' | 'textarea' | 'date' | 'time' | 'datetime' | 'select' | 'select-or-create' | 'multi-select-or-create' | 'data-matrix' | 'checkbox';
 
 interface InputProps {
@@ -39,7 +40,9 @@ interface InputProps {
   maxRows?: number;
   matrixErrors?: Record<number, Record<string, string>>;
   rowSchema?: { safeParse: (data: any) => { success: boolean; error?: { flatten: () => { fieldErrors: Record<string, string[]> } } } };
-  infoButton?: () => void | null
+  infoButton?: () => void | null;
+  requiredPermission?: string | string[];
+  createButtonPermission?: string | string[];
 }
 
 const InputTypes: React.FC<InputProps> = ({
@@ -67,6 +70,7 @@ const InputTypes: React.FC<InputProps> = ({
   maxRows,
   matrixErrors,
   rowSchema,
+  createButtonPermission,
 }) => {
   const finalValue = value ?? '';
   const finalPlaceholder = placeholder ?? '';
@@ -103,7 +107,7 @@ const InputTypes: React.FC<InputProps> = ({
 
     case 'select-or-create':
       return (
-        <SelectOrCreate
+      <SelectOrCreate
           value={value}
           onChange={onChange}
           options={finalOptions}
@@ -116,6 +120,25 @@ const InputTypes: React.FC<InputProps> = ({
           dependentData={dependentData}
           baseClasses={localClass}
           labelPath={labelPath}
+          createButtonPermission={createButtonPermission}
+        />
+      )
+    case 'multi-select-or-create':
+      return (
+        <MultiSelectOrCreate
+          value={value ?? []}
+          onChange={onChange}
+          options={finalOptions}
+          placeholder={finalPlaceholder}
+          disabled={finalDisabled}
+          required={finalRequired}
+          searchable={searchable}
+          createTitle={createTitle}
+          renderCreateForm={renderCreateForm}
+          dependentData={dependentData}
+          baseClasses={localClass}
+          labelPath={labelPath}
+          createButtonPermission={createButtonPermission}
         />
       );
 
@@ -223,8 +246,14 @@ const InputTypes: React.FC<InputProps> = ({
 
 
 const Input: React.FC<InputProps> = (props) => {
+  const auth = useContext(AuthContext);
+  const hasAccess = useMemo(() => {
+    if (!props.requiredPermission) return true;
+    return auth?.hasPermission(props.requiredPermission) ?? false;
+  }, [props.requiredPermission, auth]);
+
   return <div className='relative flex gap-3 justify-center items-center'>
-    <InputTypes {...props} />
+    <InputTypes {...props} disabled={props.disabled || !hasAccess} />
     {
       props.infoButton &&
       <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => props.infoButton ? props.infoButton() : undefined} />

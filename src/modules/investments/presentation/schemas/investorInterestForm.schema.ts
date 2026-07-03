@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const investorInterestFormSchema = z.object({
+export const getCreateInvestorInterestFormSchema = (t: (key: string, module?: string) => string) => z.object({
   plot_area_ids: z.array(z.coerce.number()).nullable().optional(),
   plot_classification_ids: z.array(z.coerce.number()).nullable().optional(),
   min_area: z.coerce.number().min(0).nullable().optional(),
@@ -12,8 +12,11 @@ export const investorInterestFormSchema = z.object({
   }
   return true;
 }, {
-  message: "Max area cannot be less than Min area",
+  message: t('investors.validation.max_area_min', 'investments') || "الحد الأقصى للمساحة لا يمكن أن يكون أقل من الحد الأدنى",
   path: ["max_area"]
 });
+
+const dummyT = (() => '') as (key: string, module?: string) => string;
+export const investorInterestFormSchema = getCreateInvestorInterestFormSchema(dummyT);
 
 export type InvestorInterestFormData = z.infer<typeof investorInterestFormSchema>;

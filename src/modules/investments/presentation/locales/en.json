@@ -4,25 +4,31 @@
     "title": "Plot Areas",
     "add": "Add Plot Area",
     "name": "Area Name",
-    "is_active": "Is Active?",
-    "is_default": "Set as Default?",
+    "is_active": "Is Active",
+    "is_default": "Set as Default",
     "created": "{name} created successfully",
     "create_error": "Failed to create {name}",
     "deleted": "{name} deleted successfully",
     "delete_error": "Failed to delete {name}",
-    "no_records": "No Plot Areas found"
+    "no_records": "No Plot Areas found",
+    "validation": {
+      "name_required": "Name is required"
+    }
   },
   "plot_classifications": {
     "title": "Plot Classifications",
     "add": "Add Classification",
     "name": "Classification Name",
-    "is_active": "Is Active?",
-    "is_default": "Set as Default?",
+    "is_active": "Is Active",
+    "is_default": "Set as Default",
     "created": "{name} created successfully",
     "create_error": "Failed to create {name}",
     "deleted": "{name} deleted successfully",
     "delete_error": "Failed to delete {name}",
-    "no_records": "No Plot Classifications found"
+    "no_records": "No Plot Classifications found",
+    "validation": {
+      "name_required": "Name is required"
+    }
   },
   "plots": {
     "title": "Plots",
@@ -43,7 +49,6 @@
     "update_error": "Failed to update {name}",
     "deleted": "{name} deleted successfully",
     "delete_error": "Failed to delete {name}",
-    "view_history": "Status History",
     "edit_log": "Edit Log",
     "no_edit_log": "No edit logs found",
     "event": "Event",
@@ -65,7 +70,16 @@
     "no_history": "No status history found",
     "show_map": "Show in Map",
     "added_by": "Added By",
-    "changed_by": "Changed By"
+    "changed_by": "Changed By",
+    "validation": {
+      "code_required": "Code is required",
+      "area_required": "Area is required",
+      "area_invalid": "Area must be a valid positive number",
+      "plot_area_id_invalid": "Plot Area must be a number",
+      "plot_classification_id_invalid": "Plot Classification must be a number",
+      "latitude_required": "Latitude is required",
+      "longitude_required": "Longitude is required"
+    }
   },
   "plot_status": {
     "unsold": "Unsold",
@@ -76,6 +90,8 @@
   },
   "investors": {
     "title": "Investors",
+    "invistor":"investor",
+    "created_at": "Created At",
     "add": "Add Investor",
     "edit": "Edit Investor",
     "info": "Investor Info",
@@ -107,7 +123,34 @@
     "plot_classifications": "Target Classifications",
     "interest_created": "Interest added successfully",
     "interest_deleted": "Interest deleted successfully",
-    "no_interests": "No interests added yet"
+    "no_interests": "No interests added yet",
+    "validation": {
+      "full_name_required": "Full name is required",
+      "nationality_required": "Nationality is required",
+      "gender_required": "Gender is required",
+      "whatsapp_max": "WhatsApp number must be at most 20 characters",
+      "email_invalid": "Invalid email address",
+      "address_max": "Address must be at most 500 characters",
+      "max_area_min": "Max area cannot be less than Min area"
+    }
+  },
+  "permissions": {
+    "investments": {
+      "plots": {
+        "list": "List Plots",
+        "view": "View Plot",
+        "create": "Create Plot",
+        "update": "Edit Plot",
+        "delete": "Delete Plot"
+      },
+      "investors": {
+        "list": "List Investors",
+        "view": "View Investor",
+        "create": "Create Investor",
+        "update": "Edit Investor",
+        "delete": "Delete Investor"
+      }
+    }
   },
   "navigation": {
     "title": "Investments",

@@ -23,7 +23,7 @@ export function EditEmployeePage() {
   const [error, setError] = useState<string | null>(null);
   const [defaultValues, setDefaultValues] = useState<Partial<EmployeeFormValues> | null>(null);
   const { getById } = useManageEmployee();
-
+  
   useEffect(() => {
     const fetchEmployee = async () => {
       try {
@@ -31,6 +31,7 @@ export function EditEmployeePage() {
         const result = await getById(Number(id))
         if (result) {
           const emp = result.data
+          console.log(emp);
           // Map API data to Form Values
           const mappedValues: Partial<EmployeeFormValues> = {
             internal_id: emp.internal_id,
@@ -83,9 +84,9 @@ export function EditEmployeePage() {
               academic_stage: edu.academic_stage || null,
               study_status: edu.study_status || null,
             })) || [],
-            job_status_id: emp.job_status_id || undefined,
+            job_status_id: emp.job_status?.id || undefined,
             job_status_note: emp.job_status_note || undefined,
-            employee_status_id: emp.employee_status_id || undefined,
+            employee_status_id: emp.employee_status?.id || undefined,
             employee_status_note: emp.employee_status_note || undefined,
             children: emp.children?.map((child: any) => ({
               name: child.name,
@@ -116,6 +117,7 @@ export function EditEmployeePage() {
       navigate(`/hr/employees/${id}`);
     } catch (err: any) {
       setError(err.message || t('edit_employee.update_error', 'hr') || 'فشل في تحديث بيانات الموظف');
+      throw err
     } finally {
       setSaving(false);
     }

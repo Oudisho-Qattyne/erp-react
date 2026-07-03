@@ -49,10 +49,22 @@
     "next": "Next",
     "items_per_page": "per page"
   },
+  "permissions": {
+    "shared": {
+      "audit-logs": {
+        "view": "View Audit Logs"
+      }
+    }
+  },
   "not_found":{
     "back_home" : "Back Home",
     "message" : "Sorry, the page you are reaching does not exist",
     "title" : "الصفحة غير موجودة"
 
+  },
+  "unauthorized": {
+    "back_home" : "Back Home",
+    "message" : "You do not have permission to access this page",
+    "title" : "Unauthorized"
   }
 }

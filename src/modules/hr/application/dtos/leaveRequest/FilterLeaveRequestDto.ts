@@ -7,6 +7,6 @@ export interface FilterLeaveRequestDto {
     employee_id?: number;
     leave_type_id?: number;
     status?: LeaveRequestStatus;
-    from_date?: string;   // YYYY-MM-DD
-    to_date?: string;     // YYYY-MM-DD
+    from_date?: string;
+    to_date?: string;
 }

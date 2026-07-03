@@ -3,6 +3,7 @@ import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Di
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
 import { DataTable } from '../../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { useApiClient } from '../../../../../../core/presentation/context/api/ApiClinetProvider';
+import {type DomainResponse } from '../../../../../../core/domain/common/responce/DomainResponse';
 
 interface AuditLog {
   id: number;
@@ -37,7 +38,7 @@ export function PlotAuditLogModal({ isOpen, onClose, plotId }: PlotAuditLogModal
           const url = plotId 
             ? `/shared-kernal/audit-logs?model=${modelName}&model_id=${plotId}`
             : `/shared-kernal/audit-logs?model=${modelName}`;
-          const response = await apiClient.get(url);
+          const response = await apiClient.get<DomainResponse<any>>(url);
           if (response && Array.isArray(response.data)) {
             setLogs(response.data);
           } else {
@@ -113,14 +114,14 @@ export function PlotAuditLogModal({ isOpen, onClose, plotId }: PlotAuditLogModal
               <tbody className="divide-y divide-border">
                 {allKeys.map(k => (
                   <tr key={k} className="hover:bg-surface/50">
-                    <td className="px-2 py-1.5 font-medium text-text-muted break-all max-w-[100px]">{t(`plots.${k}`, 'investments') || k}</td>
+                    <td className="px-2 py-1.5 font-medium text-text-muted break-all max-w-25">{t(`plots.${k}`, 'investments') || k}</td>
                     {hasOld && (
-                      <td className="px-2 py-1.5 border-l border-border text-danger/80 break-all max-w-[150px]">
+                      <td className="px-2 py-1.5 border-l border-border text-danger/80 break-all max-w-37.5">
                         {oldProps[k] !== undefined && oldProps[k] !== null ? String(oldProps[k]) : '—'}
                       </td>
                     )}
                     {hasNew && (
-                      <td className="px-2 py-1.5 border-l border-border text-success/90 break-all max-w-[150px]">
+                      <td className="px-2 py-1.5 border-l border-border text-success/90 break-all max-w-37.5">
                         {newProps[k] !== undefined && newProps[k] !== null ? String(newProps[k]) : '—'}
                       </td>
                     )}

@@ -138,13 +138,12 @@ export function FacultiesPage() {
             />
           </Dialog>
 
-          {loading && <LoadingState />}
           {error && <ErrorState message={error} onRetry={() => selectedUniversity && getAllByUniversity(selectedUniversity)} />}
-          {!loading && !error && filtered.length === 0 && (
+          {!error && !loading && filtered.length === 0 && (
             <EmptyState message={t('lookups.no_faculties', 'hr') || 'No faculties found'} />
           )}
-          {!loading && !error && filtered.length > 0 && (
-            <DataTable columns={columns} data={filtered} rowKey="id" loading={false}
+          {!error && (filtered.length > 0 || loading) && (
+            <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
               emptyMessage={t('lookups.no_faculties', 'hr') || 'No faculties found'} />
           )}
         </>

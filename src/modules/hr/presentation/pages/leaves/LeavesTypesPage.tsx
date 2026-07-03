@@ -63,12 +63,12 @@ export default function LeavesTypesPage() {
     { name: "allow_split", label: t("leave.allow_split", "hr"), type: "checkbox" },
   ]
 
-  const handleApplyFilter = (values: Record<string, any>) => {
-    const parsed: Record<string, any> = {}
-    for (const [key, val] of Object.entries(values)) {
-      if (val === "" || val === undefined) {
-        parsed[key] = undefined
-      } else if (val === "true") {
+    const handleApplyFilter = (values: Record<string, any>) => {
+        const parsed: Record<string, any> = { page: 1, per_page: filter.per_page }
+        for (const [key, val] of Object.entries(values)) {
+            if (val === "" || val === undefined) {
+                continue
+            } else if (val === "true") {
         parsed[key] = true
       } else if (val === "false") {
         parsed[key] = false
@@ -76,7 +76,7 @@ export default function LeavesTypesPage() {
         parsed[key] = val
       }
     }
-    setFilter(parsed as any)
+    setFilter(() => parsed as any)
     setIsFilterOpen(false)
   }
 
@@ -94,16 +94,13 @@ export default function LeavesTypesPage() {
       align: "center",
       render: (row) => (
         <div className="flex items-center justify-center gap-1">
-          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/hr/leaves/${row.id}`) }} title={t("common.view", "shared") || "عرض"}>
+          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/hr/leaves/${row.id}`) }} title={t("common.view", "shared") || "عرض"} requiredPermission="hr.leave-types.view">
             <Eye size={16} />
           </Button>
-          {/* <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/hr/leaves/${row.id}/edit`) }} title={t("common.edit", "shared") || "تعديل"}>
-            <Edit size={16} />
-          </Button> */}
-          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedId(row.id); setConfirmAction("archive") }} title={t("common.archive", "shared") || "أرشفة"}>
+          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedId(row.id); setConfirmAction("archive") }} title={t("common.archive", "shared") || "أرشفة"} requiredPermission="hr.leave-types.update">
             <Archive size={16} />
           </Button>
-          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedId(row.id); setConfirmAction("delete") }} title={t("common.delete", "shared") || "حذف"}>
+          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedId(row.id); setConfirmAction("delete") }} title={t("common.delete", "shared") || "حذف"} requiredPermission="hr.leave-types.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
         </div>
@@ -140,6 +137,7 @@ export default function LeavesTypesPage() {
 
   return (
     <div className="p-4 space-y-4">
+      <h1 className="text-2xl font-bold">{t("leave_types.title", "hr") || "Leave Types"}</h1>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           <Input
@@ -159,15 +157,14 @@ export default function LeavesTypesPage() {
             {t("common.reset", "shared") || "مسح"}
           </Button>
         </div>
-        <Button variant="primary" onClick={() => setIsCreateOpen(true)}>
+        <Button variant="primary" onClick={() => setIsCreateOpen(true)} requiredPermission="hr.leave-types.create">
           + {t("leave.add", "hr") || "إضافة إجازة"}
         </Button>
       </div>
 
-      {loading.findAll && <LoadingState />}
       {error.findAll && !loading.findAll && <ErrorState message={error.findAll} onRetry={findAll} />}
-      {!loading.findAll && !error.findAll && (
-        <DataTable
+      {!error.findAll && (
+        <DataTable loading={loading.findAll}
           columns={columns}
           data={items}
           onRowClick={(row) => navigate(`/hr/leaves/${row.id}`)}
@@ -175,7 +172,6 @@ export default function LeavesTypesPage() {
           sortColumn={sortColumn}
           sortOrder={sortOrder as any}
           onSort={handleSort}
-          loading={loading.findAll}
           pagination={{
             page: pagination.currentPage,
             totalPages: pagination.lastPage,
@@ -185,7 +181,7 @@ export default function LeavesTypesPage() {
             onItemsPerPageChange: (size) => setPage(1),
             itemsPerPageOptions: [5, 10, 20, 50],
           }}
-          emptyMessage={t("leave.no_data", "hr") || "لا توجد إجازات"}
+          emptyMessage={t("common.no_data", "shared") || "لا توجد إجازات"}
         />
       )}
 
@@ -198,7 +194,7 @@ export default function LeavesTypesPage() {
         onReset={() => { resetFilter(); setIsFilterOpen(false) }}
       />
 
-      <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={t("leave.add_title", "hr") || "إضافة إجازة جديدة"} size="2xl">
+      <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={t("leave.add", "hr") || "إضافة إجازة جديدة"} size="2xl">
         <LeaveForm onSubmit={handleCreate} onCancel={() => setIsCreateOpen(false)} />
       </Dialog>
 

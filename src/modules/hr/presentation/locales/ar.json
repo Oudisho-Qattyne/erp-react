@@ -16,7 +16,9 @@
     "choose": "اختر...",
     "level": "المستوى",
     "name": "الاسم",
-    "name_required": "الاسم مطلوب"
+    "name_required": "الاسم مطلوب",
+    "parent": "الوحدة الأم",
+    "none": "بدون"
   },
   "navigation": {
     "reports": {
@@ -41,29 +43,40 @@
         "faculties": "الكليات",
         "specializations": "التخصصات",
         "job_statuses": "الحالة الوظيفية",
-        "employee_statuses": "حالة الموظف"
+        "employee_statuses": "حالة الموظف",
+        "chronic_diseases": "الأمراض المزمنة",
+        "organizational_levels": "المستويات التنظيمية"
       }
     },
     "admin": "الإدارة العامة",
     "hr": " إدارة الموارد البشرية",
+    "leaves_management": {
+      "title": "إدارة الإجازات"
+    },
     "leave_types": {
-      "title": "إدارة أنواع الإجازات"
+      "title": "أنواع الإجازات"
     },
     "leave": {
       "user_eligible_leave_types": "أنواع الإجازات المستحقة"
     },
     "leave_balance": {
-      "title": "أرصدة الإجازات"
+      "title": "أرصدة الإجازات",
+      "employee_name": "الموظف"
     },
     "employee_leave_balances": {
       "title": "أرصدة إجازات الموظفين"
     },
     "leave_request": {
       "title": "طلبات الإجازة",
-      "create_title":"طلب إجازة"
+      "create_title": "طلب إجازة",
+      "edit_title": "تعديل طلب الإجازة",
+      "show_title": "تفاصيل طلب الإجازة"
+    },
+    "employee_leave_requests": {
+      "title": "طلبات إجازة الموظفين"
     },
     "adjust_leave_balance": {
-    "title": "تعديل رصيد الإجازات"
+      "title": "تعديل رصيد الإجازات"
     }
   },
   "leave_request": {
@@ -77,17 +90,44 @@
     "process_success": "تمت معالجة طلب الإجازة بنجاح",
     "process_error": "فشلت معالجة طلب الإجازة",
     "create_title": "إنشاء طلب إجازة",
+    "edit_title": "تعديل طلب الإجازة",
     "select_leave_type": "اختيار نوع الإجازة",
     "request_details": "تفاصيل الطلب",
     "start_date": "تاريخ ووقت البداية",
     "end_date": "تاريخ ووقت النهاية",
     "requested_units": "عدد الوحدات المطلوبة",
     "requested_units_placeholder": "أدخل عدد الوحدات",
+    "my_requests": "طلبات الإجازة الخاصة بي",
+    "new_request": "طلب جديد",
+    "no_data": "لا توجد طلبات إجازة",
+    "leave_type": "نوع الإجازة",
+    "status": "الحالة",
+    "units": "الوحدات",
+    "status_draft": "مسودة",
+    "status_pending": "قيد الانتظار",
+    "status_approved": "تمت الموافقة",
+    "status_rejected": "مرفوض",
+    "status_cancelled": "ملغي",
+    "cancelled_by_user": "ملغي من قبل المستخدم",
+    "cancel_confirm_title": "إلغاء طلب الإجازة",
+    "cancel_confirm_message": "هل أنت متأكد من إلغاء طلب الإجازة؟",
+    "approve": "موافقة",
+    "reject": "رفض",
+    "approve_confirm_title": "الموافقة على طلب الإجازة",
+    "approve_confirm_message": "هل أنت متأكد من الموافقة على طلب الإجازة؟",
+    "reject_confirm_title": "رفض طلب الإجازة",
+    "reject_confirm_message": "هل أنت متأكد من رفض طلب الإجازة؟",
+    "from_date": "من تاريخ",
+    "to_date": "إلى تاريخ",
+    "employee_name": "الموظف",
     "reason": "السبب",
     "reason_placeholder": "أدخل سبب طلب الإجازة",
+    "review_notes": "ملاحظات المراجعة",
+    "review_notes_placeholder": "أدخل ملاحظات المراجعة...",
     "submit": "إرسال الطلب"
   },
   "leave_types": {
+    "title": "أنواع الإجازات",
     "type_name": "نوع الإجازة",
     "picker_title": "اختيار أنواع الإجازات",
     "no_data": "لا توجد أنواع إجازات",
@@ -182,6 +222,8 @@
     "job_status_logs": "سجل الحالات الوظيفية",
     "employee_status_logs_load_error": "فشل تحميل سجل حالات الموظف: {{message}}",
     "job_status_logs_load_error": "فشل تحميل سجل الحالات الوظيفية: {{message}}",
+    "has_sham_cash_account": "لديه حساب شام كاش",
+    "linked_to_user": "مرتبط بمستخدم",
     "picker_title": "اختيار الموظفين",
     "selected": "مختار",
     "load_error": "فشل تحميل الموظفين"
@@ -305,7 +347,9 @@
       "faculties": "الكليات",
       "specializations": "التخصصات",
       "job_statuses": "الحالة الوظيفية",
-      "employee_statuses": "حالة الموظف"
+      "employee_statuses": "حالة الموظف",
+      "chronic_diseases": "الأمراض المزمنة",
+      "organizational_levels": "المستويات التنظيمية"
     },
     "select_country_first": "الرجاء اختيار دولة لعرض مدنها",
     "select_city_first": "الرجاء اختيار مدينة أولاً",
@@ -323,6 +367,8 @@
     "no_specializations": "لا يوجد اختصاصات",
     "no_job_statuses": "لا يوجد حالات وظيفية",
     "no_employee_statuses": "لا يوجد حالات موظف",
+    "no_chronic_diseases": "لا يوجد أمراض مزمنة",
+    "no_organizational_levels": "لا يوجد مستويات تنظيمية",
     "updated": "تم تحديث {name} بنجاح",
     "update_error": "فشل تحديث {name}",
     "set_default_success": "تم تعيين {name} كافتراضي بنجاح",
@@ -451,11 +497,13 @@
     "proration_monthly_started": "شهري بدأ",
     "proration_monthly_completed": "شهري مكتمل",
     "proration_daily": "يومي",
+    "proration_undefined": "غير محدد",
     "proration_rounding": "تقريب التناسب",
     "proration_rounding_none": "بدون",
     "proration_rounding_floor": "تقريب لأسفل",
     "proration_rounding_ceil": "تقريب لأعلى",
     "proration_rounding_half": "نصف",
+    "proration_rounding_undefined": "غير محدد",
     "validation": {
       "name_required": "اسم الإجازة مطلوب",
       "description_required": "الوصف مطلوب",
@@ -501,6 +549,7 @@
     "my_balances": "أرصدة الإجازات",
     "overview": "نظرة عامة",
     "leave_type": "نوع الإجازة",
+    "employee_name" : "الموظف",
     "accrual_period": "الدورة",
     "yearly": "سنوي",
     "monthly": "شهري",
@@ -511,5 +560,74 @@
     "adjustment_added": "تعديل +",
     "adjustment_deducted": "تعديل -",
     "no_data": "لا توجد أرصدة إجازات"
+  },
+  "employee_leave_requests": {
+    "title": "طلبات إجازة الموظفين",
+    "select_prompt": "اختر موظفاً لعرض طلبات إجازاته",
+    "select_employee": "اختيار موظف"
+  },
+  "permissions": {
+    "hr": {
+      "leave-balance": {
+        "list": "قائمة أرصدة الإجازات",
+        "adjust": "تعديل رصيد الإجازة"
+      },
+      "leave-requests": {
+        "list": "قائمة طلبات الإجازات",
+        "manage": "إدارة طلبات الإجازات"
+      },
+      "leave-types": {
+        "list": "قائمة أنواع الإجازات",
+        "view": "عرض نوع إجازة",
+        "create": "إنشاء نوع إجازة",
+        "update": "تعديل نوع إجازة",
+        "delete": "حذف نوع إجازة"
+      },
+      "employees": {
+        "list": "قائمة الموظفين",
+        "view": "عرض موظف",
+        "create": "إنشاء موظف",
+        "update": "تحديث موظف",
+        "delete": "حذف موظف",
+        "view-eligible-leave-types": "عرض أنواع الإجازات المسموحة"
+      },
+      "job-statuses": {
+        "list": "قائمة الحالات الوظيفية",
+        "view": "عرض الحالة الوظيفية",
+        "create": "إنشاء حالة وظيفية",
+        "update": "تعديل الحالة الوظيفية",
+        "delete": "حذف الحالة الوظيفية"
+      },
+      "employee-statuses": {
+        "list": "قائمة حالات الموظفين",
+        "view": "عرض حالة الموظف",
+        "create": "إنشاء حالة موظف",
+        "update": "تعديل حالة الموظف",
+        "delete": "حذف حالة الموظف"
+      },
+      "chronic-diseases": {
+        "list": "قائمة الأمراض المزمنة",
+        "view": "عرض مرض مزمن",
+        "create": "إضافة مرض مزمن",
+        "update": "تحديث مرض مزمن",
+        "delete": "حذف مرض مزمن"
+      },
+      "organizational-levels": {
+        "list": "قائمة المستويات التنظيمية",
+        "view": "عرض مستوى تنظيمي",
+        "create": "إنشاء مستوى تنظيمي",
+        "update": "تعديل المستوى التنظيمي",
+        "delete": "حذف المستوى التنظيمي"
+      },
+      "eligible-leave-types": {
+        "list": "أنواع الإجازات المؤهلة"
+      },
+      "employee-status-logs": {
+        "list": "سجلات حالة الموظف"
+      },
+      "job-status-logs": {
+        "list": "سجلات الحالة الوظيفية"
+      }
+    }
   }
 }

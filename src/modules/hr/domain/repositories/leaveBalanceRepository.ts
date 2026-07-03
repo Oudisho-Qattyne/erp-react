@@ -3,7 +3,7 @@ import type { DpomainResponsePaginated } from "../entities/common/DomainResponse
 import type { LeaveBalance } from "../entities/leaveBalance/leaveBalance";
 
 export interface ILeaveBalanceRepository {
-    findAllEmployeeLeaveBalances(employeeId:number ,  filter?: any): Promise<DpomainResponsePaginated<LeaveBalance[]>>;
+    findAllEmployeeLeaveBalances(employeeId:number | undefined ,  filter?: any): Promise<DpomainResponsePaginated<LeaveBalance[]>>;
     findAllMyLeaveBalances(filter?: any): Promise<DpomainResponsePaginated<LeaveBalance[]>>;
     adjustLeaveBalance(adjust : any) : Promise<DpomainResponsePaginated<any>>
 }

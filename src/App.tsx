@@ -8,10 +8,13 @@ import { SidebarProvider } from './core/presentation/context/SidebarContext/Side
 import { LanguageProvider } from './core/presentation/context/i18n/I18nProvider'
 import { ApiClientProvider } from './core/presentation/context/api/ApiClinetProvider'
 import { StorageProvider } from './core/registry/storage/StorageProvider'
+import { HrProvider } from './core/registry/hr/HrProvider'
+import { UserProvider } from './core/registry/user/UserProvider'
 import { ProtectedRoute } from './core/infrastructure/auth/ProtectedRoute'
 import { AuthProvider } from './core/infrastructure/auth/AuthProvider'
 import { Spinner } from './core/presentation/layouts/ui/state/Spinner'
 import { NotFoundPage } from './core/presentation/pages/NotFoundPage'
+import { UnauthorizedPage } from './core/presentation/pages/UnauthorizedPage'
 import { Toaster } from 'sonner'
 import { Sandbox } from './Sabdbox'
 
@@ -60,15 +63,15 @@ function App() {
     };
   });
 
+  routeConfigs.push({
+    path: '/unauthorized',
+    element: <UnauthorizedPage />,
+  });
+
   // Add catch‑all route (404) at the end
   routeConfigs.push({
     path: '*',
-    element: (
-      // <LayoutSwitcher layout="default">
-      // <Navigate to={'/hr'}/>
-        <NotFoundPage />
-      // </LayoutSwitcher>
-    ),
+    element: <NotFoundPage />,
   });
 
   routeConfigs.push({
@@ -108,12 +111,16 @@ function App() {
           <ApiClientProvider>
             <AuthProvider>
               <StorageProvider>
-              <Toaster
+                <HrProvider>
+                <UserProvider>
+                  <Toaster
                     position="bottom-center"
                     dir="rtl"
                     richColors
                   />
-                <RouterProvider router={router} />
+                  <RouterProvider router={router} />
+                </UserProvider>
+                </HrProvider>
               </StorageProvider>
             </AuthProvider>
           </ApiClientProvider>

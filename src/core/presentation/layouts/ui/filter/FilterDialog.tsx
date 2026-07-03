@@ -1,11 +1,13 @@
 import { useEffect } from "react"
-import { useForm, FormProvider } from "react-hook-form"
+import { useForm, FormProvider, type UseFormReturn } from "react-hook-form"
 import { Dialog } from "../dialog/Dialog"
 import { Button } from "../buttons/Button"
 import { FormInput, type FormInputProps } from "../inputs/FormInput"
 import { useLanguage } from "../../../context/i18n/I18nProvider"
 
-export type FilterField = Omit<FormInputProps<any>, "name"> & { name: string }
+type BuiltInField = Omit<FormInputProps<any>, "name"> & { name: string }
+type CustomField = { name: string; render: (form: UseFormReturn) => React.ReactNode }
+export type FilterField = BuiltInField | CustomField
 
 interface FilterDialogProps {
   isOpen: boolean
@@ -53,9 +55,12 @@ export function FilterDialog({ isOpen, fields, initialValues = {}, onFilter, onC
     >
       <FormProvider {...form}>
         <div className="space-y-4">
-          {fields.map((field) => (
-            <FormInput key={field.name} {...field} name={field.name as any} />
-          ))}
+          {fields.map((field) => {
+            if ("render" in field) {
+              return <div key={field.name}>{field.render(form)}</div>
+            }
+            return <FormInput key={field.name} {...field} name={field.name as any} />
+          })}
         </div>
       </FormProvider>
     </Dialog>
