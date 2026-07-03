@@ -1,6 +1,7 @@
 export interface Plot {
   id: number;
   code: string;
+  identifier:string;
   status: string;
   area: number;
   plot_area_id: number;
@@ -14,4 +15,5 @@ export interface Plot {
   status_date?: string;
   created_at?: string;
   updated_at?: string;
+  folder_id?:string;
 }

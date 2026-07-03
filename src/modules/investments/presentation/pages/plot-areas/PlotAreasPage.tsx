@@ -24,7 +24,7 @@ export function PlotAreasPage() {
   const [confirmDelete, setConfirmDelete] = useState<PlotArea | null>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<PlotArea | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  
+
   const filtered = plotAreas.filter((c: any) => c.name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
   useEffect(() => { getAll(); }, []);
@@ -57,50 +57,51 @@ export function PlotAreasPage() {
   };
 
   const columns = [
-    { 
-      key: 'name', 
-      label: t('plot_areas.name', 'investments') || 'Area Name', 
+    {
+      key: 'name',
+      label: t('plot_areas.name', 'investments') || 'Area Name',
       width: 250,
-      render: (row: PlotArea) => row.name 
+      render: (row: PlotArea) => row.name
     },
-    { 
-      key: 'is_active', 
-      label: t('plot_areas.is_active', 'investments') || 'Is Active?', 
+    {
+      key: 'is_active',
+      label: t('plot_areas.is_active', 'investments') || 'Is Active?',
       width: 120,
-      render: (row: PlotArea) => row.is_active 
+      render: (row: PlotArea) => row.is_active
         ? <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full"><Check size={12} /> {t('common.yes', 'shared') || 'Yes'}</span>
-        : <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full"><X size={12} /> {t('common.no', 'shared') || 'No'}</span> 
+        : <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full"><X size={12} /> {t('common.no', 'shared') || 'No'}</span>
     },
-    { 
-      key: 'is_default', 
-      label: t('plot_areas.is_default', 'investments') || 'Default', 
+    {
+      key: 'is_default',
+      label: t('plot_areas.is_default', 'investments') || 'Default',
       width: 120,
       render: (row: PlotArea) => row.is_default
         ? <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full"><Star size={12} /> {t('common.yes', 'shared') || 'Yes'}</span>
-        : <span className="text-xs text-text-muted">—</span> 
+        : <span className="text-xs text-text-muted">—</span>
     },
-    { 
-      key: 'actions', 
-      label: t('common.actions', 'shared') || 'Actions', 
+    {
+      key: 'actions',
+      label: t('common.actions', 'shared') || 'Actions',
       width: 200,
       render: (row: PlotArea) => (
         <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
           {!row.is_default && (
             <Button variant="ghost" size="sm" onClick={() => setConfirmSetDefault(row)}
-              title={t('common.set_default', 'shared') || 'Set as default'}>
+              title={t('common.set_default', 'shared') || 'Set as default'} requiredPermission="investments.plot-areas.update">
               <Star size={16} />
             </Button>
           )}
           <Button variant="ghost" size="sm" onClick={() => setEditItem(row)}
-            title={t('common.edit', 'shared') || 'Edit'}>
+            title={t('common.edit', 'shared') || 'Edit'} requiredPermission="investments.plot-areas.update">
             <Pencil size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)}
-            title={t('common.delete', 'shared') || 'Delete'}>
+            title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.plot-areas.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
+       
         </div>
-      ) 
+      )
     },
   ];
 
@@ -109,10 +110,10 @@ export function PlotAreasPage() {
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-bold">{t('plot_areas.title', 'investments')}</h1>
         <div className="w-full flex gap-2">
-          <Input type="text" value={searchQuery} onChange={setSearchQuery} 
-            placeholder={t('common.search', 'shared') || 'Search...'} 
+          <Input type="text" value={searchQuery} onChange={setSearchQuery}
+            placeholder={t('common.search', 'shared') || 'Search...'}
             baseClasses={inputBaseClasses} className="w-60" />
-          <Button onClick={() => setIsCreateOpen(true)}>{t('plot_areas.add', 'investments')}</Button>
+            <Button onClick={() => setIsCreateOpen(true)} requiredPermission="investments.plot-areas.create">{t('plot_areas.add', 'investments')}</Button>
         </div>
       </div>
 
@@ -125,10 +126,10 @@ export function PlotAreasPage() {
           ]}
           schema={getCreatePlotAreaFormSchema(t)}
           onSubmit={async (data) => {
-            try { 
-              return await create(data); 
-            } catch { 
-              toast.error(t('plot_areas.create_error', 'investments').replace('{name}', entityName)); throw {}; 
+            try {
+              return await create(data);
+            } catch {
+              toast.error(t('plot_areas.create_error', 'investments').replace('{name}', entityName)); throw {};
             }
           }}
           onSuccess={() => { toast.success(t('plot_areas.created', 'investments').replace('{name}', entityName)); getAll(); setIsCreateOpen(false); }}
@@ -147,10 +148,10 @@ export function PlotAreasPage() {
           schema={getCreatePlotAreaFormSchema(t)}
           defaultValues={editItem ? { name: editItem.name, is_active: editItem.is_active, is_default: editItem.is_default } : undefined}
           onSubmit={async (data) => {
-            try { 
-              await update(editItem!.id, data); 
-            } catch { 
-              toast.error(t('common.update_error', 'shared')?.replace('{name}', entityName) || `Failed to update ${entityName}`); throw {}; 
+            try {
+              await update(editItem!.id, data);
+            } catch {
+              toast.error(t('common.update_error', 'shared')?.replace('{name}', entityName) || `Failed to update ${entityName}`); throw {};
             }
           }}
           onSuccess={() => { toast.success(t('common.updated', 'shared')?.replace('{name}', entityName) || `${entityName} updated successfully`); getAll(); setEditItem(null); }}
@@ -177,15 +178,15 @@ export function PlotAreasPage() {
         onCancel={() => setConfirmDelete(null)}
       />
 
-      <ConfirmDialog 
-        isOpen={!!confirmSetDefault} 
+      <ConfirmDialog
+        isOpen={!!confirmSetDefault}
         title={t('common.set_default_title', 'shared')?.replace('{entity}', entityName) || 'Set as default'}
         message={t('common.set_default_message', 'shared')?.replace('{entity}', entityName) || `Are you sure you want to set this ${entityName} as default?`}
         confirmLabel={t('common.set_default', 'shared') || 'Set as default'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
         confirmLoading={confirmLoading}
-        onConfirm={handleSetDefaultConfirm} 
-        onCancel={() => setConfirmSetDefault(null)} 
+        onConfirm={handleSetDefaultConfirm}
+        onCancel={() => setConfirmSetDefault(null)}
       />
     </div>
   );

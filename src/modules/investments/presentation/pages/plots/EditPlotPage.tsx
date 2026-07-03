@@ -8,15 +8,18 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
+import { useStorage } from '../../../../../core/registry/storage/StorageProvider';
 
 export function EditPlotPage() {
   const { t, direction } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
   const { getById, update } = useEntityCrud<Plot>('/investments/plots', '/investments/plots');
-  
+  const storage = useStorage();
+
   const [plot, setPlot] = useState<Plot | null>(null);
   const [loading, setLoading] = useState(true);
+  const [FileExplorerOpen, setFileExplorerOpen] = useState<boolean>(false)
 
   useEffect(() => {
     if (id) {
@@ -41,12 +44,20 @@ export function EditPlotPage() {
   if (!plot) return <div className="p-6 text-center text-danger">Plot not found</div>;
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={handleBack} className="rounded-full w-10 h-10 p-0">
-          <ArrowLeft size={20} className={direction === 'rtl' ? 'rotate-180' : ''} />
-        </Button>
-        <h1 className="text-2xl font-bold">{(t('common.edit', 'shared') || 'Edit') + ' ' + (t('plots.title', 'investments') || 'Plot')}</h1>
+    <div className="p-6 w-full mx-auto space-y-6">
+      <div className='relative w-full flex justify-between items-center'>
+
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" onClick={handleBack} className="rounded-full w-10 h-10 p-0">
+            <ArrowLeft size={20} className={direction === 'rtl' ? 'rotate-180' : ''} />
+          </Button>
+          <h1 className="text-2xl font-bold">{(t('common.edit', 'shared') || 'Edit') + ' ' + (t('plots.title', 'investments') || 'Plot')}</h1>
+        </div>
+        {storage?.FileExplorerDialogComponent && plot?.folder_id && (
+          <Button variant="outline" onClick={() => setFileExplorerOpen(true)} requiredPermission="storage.storage.view">
+            {t('plots.folder', 'investments') || 'مجلد المقسم'}
+          </Button>
+        )}
       </div>
 
       <PlotForm
@@ -54,6 +65,7 @@ export function EditPlotPage() {
         plot={plot}
         defaultValues={{
           code: plot.code,
+          identifier:plot.identifier,
           area: plot.area,
           plot_area_id: plot.plot_area_id,
           plot_classification_id: plot.plot_classification_id,
@@ -71,6 +83,9 @@ export function EditPlotPage() {
         onCancel={handleBack}
         submitLabel={t('common.save', 'shared') || 'Save'}
       />
+      {storage?.FileExplorerDialogComponent && plot?.folder_id &&
+        <storage.FileExplorerDialogComponent isOpen={FileExplorerOpen} onClose={() => { setFileExplorerOpen(false) }} folderId={plot.folder_id} />
+      }
     </div>
   );
 }

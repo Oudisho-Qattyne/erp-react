@@ -115,11 +115,11 @@ export function InvestorsPage() {
       render: (row: Investor) => (
         <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
           <Button variant="ghost" size="sm" onClick={() => navigate(`/investments/investors/${row.id}/edit`)}
-            title={t('common.view', 'shared') || 'View'}>
+            title={t('common.view', 'shared') || 'View'} requiredPermission="investments.investors.view">
             <Eye size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)}
-            title={t('common.delete', 'shared') || 'Delete'}>
+            title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.investors.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
         </div>
@@ -141,7 +141,7 @@ const entity = t('investors.investor') || "مستثمر"
           <h1 className="text-2xl font-bold text-text">{t('investors.title', 'investments') || 'Investors'}</h1>
         </div>
         <div className="flex items-center gap-3">
-          <Button onClick={() => navigate('/investments/investors/create')}>{t('investors.add', 'investments') || 'Add Investor'}</Button>
+          <Button onClick={() => navigate('/investments/investors/create')} requiredPermission="investments.investors.create">{t('investors.add', 'investments') || 'Add Investor'}</Button>
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-3  ">

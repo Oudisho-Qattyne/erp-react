@@ -34,6 +34,7 @@
     "title": "المقاسم",
     "add": "إضافة مقسم",
     "code": "رمز المقسم",
+    "identifier": "المعرف",
     "area": "المساحة (م²)",
     "plot_area_id": "المنطقة",
     "plot_classification_id": "التصنيف",
@@ -71,8 +72,10 @@
     "show_map": "عرض في الخريطة",
     "added_by": "أضيف بواسطة",
     "changed_by": "تم التغيير بواسطة",
+    "folder": "مجلد المقسم",
     "validation": {
       "code_required": "الرمز مطلوب",
+      "identifier_required": "المعرف مطلوب",
       "area_required": "المساحة مطلوبة",
       "area_invalid": "يجب أن تكون المساحة رقماً موجباً صحيحاً",
       "plot_area_id_invalid": "يجب أن تكون المنطقة رقماً",
@@ -105,6 +108,10 @@
     "phone": "رقم الهاتف",
     "whatsapp_number": "رقم الواتساب",
     "email": "البريد الإلكتروني",
+    "facebook": "فيسبوك",
+    "instagram": "انستغرام",
+    "x": "إكس (تويتر)",
+    "linkedin": "لينكد إن",
     "address": "العنوان",
     "created": "تم إنشاء المستثمر بنجاح",
     "create_error": "فشل في إنشاء المستثمر",
@@ -123,6 +130,7 @@
     "plot_classifications": "التصنيفات المستهدفة",
     "interest_created": "تم إضافة الاهتمام بنجاح",
     "interest_deleted": "تم حذف الاهتمام بنجاح",
+    "accounts": "حسابات التواصل",
     "no_interests": "لم تتم إضافة أي اهتمامات بعد",
     "validation": {
       "full_name_required": "الاسم الكامل مطلوب",
@@ -130,6 +138,7 @@
       "gender_required": "الجنس مطلوب",
       "whatsapp_max": "يجب ألا يتجاوز رقم الواتساب 20 حرفاً",
       "email_invalid": "البريد الإلكتروني غير صالح",
+      "url_invalid": "رابط غير صالح",
       "address_max": "يجب ألا يتجاوز العنوان 500 حرف",
       "max_area_min": "الحد الأقصى للمساحة لا يمكن أن يكون أقل من الحد الأدنى"
     }
@@ -141,7 +150,12 @@
         "view": "عرض مقسم",
         "create": "إنشاء مقسم",
         "update": "تعديل مقسم",
-        "delete": "حذف مقسم"
+        "delete": "حذف مقسم",
+        "set-unsold": "تعيين الحالة إلى غير مباعة",
+        "set-announced": "تعيين الحالة إلى معلن عنها",
+        "set-subscribed": "تعيين الحالة إلى مكتتب بها",
+        "set-allocated": "تعيين الحالة إلى مخصصة",
+        "set-separated": "تعيين الحالة إلى مغصول"
       },
       "investors": {
         "list": "قائمة المستثمرين",

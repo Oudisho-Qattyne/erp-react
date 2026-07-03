@@ -52,7 +52,7 @@ function InterestCard({ interest, onDelete, t }: any) {
             {t('investors.plot_classifications', 'investments') || 'Classifications'} ({interest.plot_classification_ids?.length || 0})
           </Button>
         </div>
-        <Button variant="ghost" size="sm" className="text-danger hover:bg-danger/10 p-1 h-auto" onClick={() => onDelete(interest.id)}>
+        <Button variant="ghost" size="sm" className="text-danger hover:bg-danger/10 p-1 h-auto" onClick={() => onDelete(interest.id)} requiredPermission="investments.investors.update">
           <Trash2 size={16} />
         </Button>
       </div>
@@ -110,6 +110,7 @@ export function EditInvestorPage() {
   const [error, setError] = useState<string | null>(null);
   const [showInterestModal, setShowInterestModal] = useState(false);
   const [interestToDelete, setInterestToDelete] = useState<number | null>(null);
+
   useEffect(() => {
     fetchInvestor();
   }, [id]);
@@ -163,6 +164,8 @@ export function EditInvestorPage() {
         <h1 className="text-2xl font-bold">{t('investors.edit', 'investments') || 'Edit Investor'}</h1>
       </div>
 
+
+
       <InvestorForm
         investor={investor}
         defaultValues={investor}
@@ -174,11 +177,11 @@ export function EditInvestorPage() {
         onCancel={handleBack}
         submitLabel={t('common.save', 'shared') || 'Save'}
       />
-
+    
       <div className="bg-surface rounded-xl border border-border p-6 mt-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-bold">{t('investors.interests', 'investments') || 'Interests'}</h2>
-          <Button onClick={() => setShowInterestModal(true)} variant="outline" size="sm">
+          <Button onClick={() => setShowInterestModal(true)} variant="outline" size="sm" requiredPermission="investments.investors.update">
             {t('investors.add_interest', 'investments') || 'Add Interest'}
           </Button>
         </div>

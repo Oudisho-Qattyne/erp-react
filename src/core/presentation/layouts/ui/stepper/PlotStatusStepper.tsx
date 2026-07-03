@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../../../context/i18n/I18nProvider';
 import { Check, Pencil } from 'lucide-react';
+import { useAuth } from '../../../../infrastructure/auth/AuthProvider';
 
 export const PLOT_STATUSES = [
   'unsold',
@@ -14,12 +15,21 @@ interface PlotStatusStepperProps {
   currentStatus: string;
   statusDate?: string;
   onStatusClick?: (status: string) => void;
+  permissions?: Record<string, string>;
 }
 
-export function PlotStatusStepper({ currentStatus, statusDate, onStatusClick }: PlotStatusStepperProps) {
+export function PlotStatusStepper({ currentStatus, statusDate, onStatusClick, permissions }: PlotStatusStepperProps) {
   const { t, direction } = useLanguage();
+  const { hasPermission } = useAuth();
   const currentIndex = PLOT_STATUSES.indexOf(currentStatus);
-  const activeIndex = currentIndex === -1 ? 0 : currentIndex; // Default to first if unknown
+  const activeIndex = currentIndex === -1 ? 0 : currentIndex;
+
+  const canClickStatus = (status: string) => {
+    if (!onStatusClick) return false;
+    const perm = permissions?.[status];
+    if (!perm) return true;
+    return hasPermission(perm);
+  };
 
   return (
     <div className="w-full py-6 px-4">
@@ -37,7 +47,8 @@ export function PlotStatusStepper({ currentStatus, statusDate, onStatusClick }: 
           const isCompleted = index < activeIndex;
           const isActive = index === activeIndex;
           const isPending = index > activeIndex;
-          const isClickable = onStatusClick && (index === activeIndex || index === activeIndex + 1);
+          const canClick = canClickStatus(status);
+          const isClickable = onStatusClick && (index === activeIndex || index === activeIndex + 1) && canClick;
 
           return (
             <div 
