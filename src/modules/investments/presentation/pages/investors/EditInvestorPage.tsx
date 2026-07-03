@@ -19,7 +19,7 @@ import type { PlotClassification } from '../../../domain/entities/plotClassifica
 function InterestCard({ interest, onDelete, t }: any) {
   const [showAreas, setShowAreas] = useState(false);
   const [showClassifications, setShowClassifications] = useState(false);
-  
+
   const { getAll: getAreas, entities: areas, loading: areasLoading } = useEntityCrud<PlotArea>('/investments/plot-areas', '/investments/plot-areas');
   const { getAll: getClassifications, entities: classifications, loading: classLoading } = useEntityCrud<PlotClassification>('/investments/plot-classifications', '/investments/plot-classifications');
 
@@ -52,7 +52,7 @@ function InterestCard({ interest, onDelete, t }: any) {
             {t('investors.plot_classifications', 'investments') || 'Classifications'} ({interest.plot_classification_ids?.length || 0})
           </Button>
         </div>
-        <Button variant="ghost" size="sm" className="text-danger hover:bg-danger/10 p-1 h-auto" onClick={() => onDelete(interest.id)}>
+        <Button variant="ghost" size="sm" className="text-danger hover:bg-danger/10 p-1 h-auto" onClick={() => onDelete(interest.id)} requiredPermission="investments.investors.update">
           <Trash2 size={16} />
         </Button>
       </div>
@@ -101,13 +101,13 @@ function InterestCard({ interest, onDelete, t }: any) {
 
 export function EditInvestorPage() {
   const { id } = useParams<{ id: string }>();
-  const { remove: removeInterest , getById , update } = useEntityCrud<Investor>(`/investments/investors`, `/investments/investors`);
+  const { remove: removeInterest, getById, update } = useEntityCrud<Investor>(`/investments/investors`, `/investments/investors`);
   const [investor, setInvestor] = useState<Investor | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showInterestModal, setShowInterestModal] = useState(false);
   const [interestToDelete, setInterestToDelete] = useState<number | null>(null);
-const {t  , direction} = useLanguage()
+  const { t, direction } = useLanguage()
   useEffect(() => {
     fetchInvestor();
   }, [id]);
@@ -162,6 +162,8 @@ const {t  , direction} = useLanguage()
         <h1 className="text-2xl font-bold">{t('investors.edit', 'investments') || 'Edit Investor'}</h1>
       </div>
 
+
+
       <InvestorForm
         investor={investor}
         defaultValues={investor}
@@ -173,15 +175,15 @@ const {t  , direction} = useLanguage()
         onCancel={handleBack}
         submitLabel={t('common.save', 'shared') || 'Save'}
       />
-
+    
       <div className="bg-surface rounded-xl border border-border p-6 mt-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-bold">{t('investors.interests', 'investments') || 'Interests'}</h2>
-          <Button onClick={() => setShowInterestModal(true)} variant="outline" size="sm">
+          <Button onClick={() => setShowInterestModal(true)} variant="outline" size="sm" requiredPermission="investments.investors.update">
             {t('investors.add_interest', 'investments') || 'Add Interest'}
           </Button>
         </div>
-        
+
         {investor.interests && investor.interests.length > 0 ? (
           <div className="space-y-4">
             {investor.interests.map((interest) => (
@@ -204,7 +206,7 @@ const {t  , direction} = useLanguage()
           fetchInvestor();
         }}
       />
-      
+
       <ConfirmDialog
         isOpen={interestToDelete !== null}
         title={t('common.confirm_delete_title', 'shared') || 'Delete item'}

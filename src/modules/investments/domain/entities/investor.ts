@@ -15,6 +15,10 @@ export interface Investor {
   } | null;
   is_possible_investor_in_future: boolean;
   interests?: InvestorInterest[];
+  facebook?: string;
+  instagram?: string;
+  x?: string;
+  linkedin?: string;
   created_at: string;
   updated_at?: string;
 }

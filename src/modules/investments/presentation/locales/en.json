@@ -34,6 +34,7 @@
     "title": "Plots",
     "add": "Add Plot",
     "code": "Plot Code",
+    "identifier": "Identifier",
     "area": "Area (㎡)",
     "plot_area_id": "Plot Area",
     "plot_classification_id": "Classification",
@@ -71,8 +72,10 @@
     "show_map": "Show in Map",
     "added_by": "Added By",
     "changed_by": "Changed By",
+    "folder": "Plot Folder",
     "validation": {
       "code_required": "Code is required",
+      "identifier_required": "Identifier is required",
       "area_required": "Area is required",
       "area_invalid": "Area must be a valid positive number",
       "plot_area_id_invalid": "Plot Area must be a number",
@@ -105,6 +108,10 @@
     "phone": "Phone",
     "whatsapp_number": "WhatsApp",
     "email": "Email",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "x": "X (Twitter)",
+    "linkedin": "LinkedIn",
     "address": "Address",
     "created": "Investor created successfully",
     "create_error": "Failed to create investor",
@@ -123,6 +130,7 @@
     "plot_classifications": "Target Classifications",
     "interest_created": "Interest added successfully",
     "interest_deleted": "Interest deleted successfully",
+    "accounts": "Social Accounts",
     "no_interests": "No interests added yet",
     "validation": {
       "full_name_required": "Full name is required",
@@ -130,6 +138,7 @@
       "gender_required": "Gender is required",
       "whatsapp_max": "WhatsApp number must be at most 20 characters",
       "email_invalid": "Invalid email address",
+      "url_invalid": "Invalid URL",
       "address_max": "Address must be at most 500 characters",
       "max_area_min": "Max area cannot be less than Min area"
     }
@@ -141,7 +150,12 @@
         "view": "View Plot",
         "create": "Create Plot",
         "update": "Edit Plot",
-        "delete": "Delete Plot"
+        "delete": "Delete Plot",
+        "set-unsold": "Set Status to Unsold",
+        "set-announced": "Set Status to Announced",
+        "set-subscribed": "Set Status to Subscribed",
+        "set-allocated": "Set Status to Allocated",
+        "set-separated": "Set Status to Separated"
       },
       "investors": {
         "list": "List Investors",

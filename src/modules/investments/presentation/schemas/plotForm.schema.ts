@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const getCreatePlotFormSchema = (t: (key: string, module?: string) => string) => z.object({
   code: z.string().min(1, t('plots.validation.code_required', 'investments') || 'الرمز مطلوب'),
+  identifier: z.string().min(1, t('plots.validation.identifier_required', 'investments') || 'المعرف مطلوب'),
   area: z.union([
     z.string().min(1, t('plots.validation.area_required', 'investments') || 'المساحة مطلوبة').regex(/^\d+(\.\d+)?$/, t('plots.validation.area_invalid', 'investments') || 'يجب أن تكون المساحة رقماً موجباً صحيحاً'),
     z.number().min(0, t('plots.validation.area_invalid', 'investments') || 'يجب أن تكون المساحة رقماً موجباً صحيحاً')

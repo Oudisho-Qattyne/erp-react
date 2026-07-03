@@ -87,16 +87,16 @@ export function PlotClassificationsPage() {
         <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
           {!row.is_default && (
             <Button variant="ghost" size="sm" onClick={() => setConfirmSetDefault(row)}
-              title={t('common.set_default', 'shared') || 'Set as default'}>
+              title={t('common.set_default', 'shared') || 'Set as default'} requiredPermission="investments.plot-classifications.update">
               <Star size={16} />
             </Button>
           )}
           <Button variant="ghost" size="sm" onClick={() => setEditItem(row)}
-            title={t('common.edit', 'shared') || 'Edit'}>
+            title={t('common.edit', 'shared') || 'Edit'} requiredPermission="investments.plot-classifications.update">
             <Pencil size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)}
-            title={t('common.delete', 'shared') || 'Delete'}>
+            title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.plot-classifications.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
         </div>
@@ -112,7 +112,7 @@ export function PlotClassificationsPage() {
           <Input type="text" value={searchQuery} onChange={setSearchQuery} 
             placeholder={t('common.search', 'shared') || 'Search...'} 
             baseClasses={inputBaseClasses} className="w-60" />
-          <Button onClick={() => setIsCreateOpen(true)}>{t('plot_classifications.add', 'investments')}</Button>
+          <Button onClick={() => setIsCreateOpen(true)} requiredPermission="investments.plot-classifications.create">{t('plot_classifications.add', 'investments')}</Button>
         </div>
       </div>
 

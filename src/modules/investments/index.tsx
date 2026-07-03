@@ -22,7 +22,6 @@ const investmentsModule: Module = {
       label: 'plots.title',
       nav: true,
       order: 5,
-      
       requiredPermission: 'investments.plots.list',
       moduleName: 'investments',
       icon: <MapPin size={18} />,
@@ -56,6 +55,7 @@ const investmentsModule: Module = {
       nav: true,
       order: 10,
       moduleName: 'investments',
+      requiredPermission: 'investments.plot-areas.list',
       icon: <Map size={18} />,
       group: 'investments',
     },
@@ -67,6 +67,7 @@ const investmentsModule: Module = {
       nav: true,
       order: 20,
       moduleName: 'investments',
+      requiredPermission: 'investments.plot-classifications.list',
       icon: <List size={18} />,
       group: 'investments',
     },
