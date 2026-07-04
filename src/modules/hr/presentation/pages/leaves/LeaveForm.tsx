@@ -11,8 +11,7 @@ import { Plus, Trash2 } from "lucide-react"
 import { getCreateLeaveSchema, type LeaveFormValues } from "../../schemas/leaveForm"
 import { getEligibilityFields } from "../../utils/RulesFields"
 import { cleanPayload } from "../../../../../core/utils/cleanPayload"
-import { useUnsavedChanges } from "../../../../../core/presentation/hooks/useUnsavedChanges"
-import { ConfirmDialog } from "../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog"
+
 
 type FieldConfig = Omit<FormInputProps<any>, "name"> & { name: string }
 
@@ -53,13 +52,11 @@ interface LeaveFormProps {
 export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubmit, onCancel, validateOnMount }: LeaveFormProps) {
   const { t } = useLanguage()
 
-  const { handleSubmit, isValid, isSubmitting, isDirty, form, setValue, trigger, errors, getValues } = useDynamicForm<LeaveFormValues>({
+  const { handleSubmit, isValid, isSubmitting, form, setValue, trigger, errors, getValues } = useDynamicForm<LeaveFormValues>({
     schema: getCreateLeaveSchema(t) as any,
     defaultValues,
     mode: "onChange",
   })
-
-  const { showConfirm, confirmNavigation, cancelNavigation, attemptNavigation } = useUnsavedChanges(isDirty)
 
   const errorCount = Object.keys(errors).length
   useEffect(() => {
@@ -140,11 +137,11 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
       options: [
         { value: "yearly", label: t("leave.accrual_yearly", "hr") },
         { value: "monthly", label: t("leave.accrual_monthly", "hr") },
-        { value: "none", label: t("leave.accrual_none", "hr") },
+        // { value: "none", label: t("leave.accrual_none", "hr") },
       ],
       dependsOn: ["balance_mode"],
       compute: (values) => {
-        if (values.balance_mode !== "accrual") return { disabled: true }
+        if (values.balance_mode !== "accrual") return { disabled: true , value : null }
         return { disabled: false }
       },
     },
@@ -160,10 +157,12 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
     },
     {
       name:'carry_forward_limit',label:t("leave.carry_forward_limit", "hr"), type:'number',
-      dependsOn: ["allow_carry_forward"],
+      dependsOn: ["allow_carry_forward" , "balance_mode"],
       compute: (values) => {
         if (values.allow_carry_forward == false) return { disabled: true , value:null}
+        if (values.balance_mode !== "accrual") return { disabled: true ,value:null}
         return { disabled: false }
+        
       },
     }
     
@@ -188,10 +187,10 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
         { value: "hire_date", label: t("leave.proration_hire_date", "hr") },
         // { value: "custom_date", label: t("leave.proration_custom_date", "hr") },
       ],
-      dependsOn: ['accrual_period'],
+      dependsOn: ["balance_mode"],
       compute: (values) => {
-        if (values.accrual_period == "yearly") return {  disabled: false }
-        return { disabled: true , value:null }
+        if (values.balance_mode !== "accrual") return { disabled: true ,value:null}
+        return { disabled: false }
       },
     },
     {
@@ -203,10 +202,10 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
         { value: "monthly_completed", label: t("leave.proration_monthly_completed", "hr") },
         // { value: "daily", label: t("leave.proration_daily", "hr") },
       ],
-      dependsOn: ['accrual_period'],
+      dependsOn: ["balance_mode"],
       compute: (values) => {
-        if (values.accrual_period == "yearly") return {  disabled: false }
-        return { disabled: true }
+        if (values.balance_mode !== "accrual") return { disabled: true ,value:null}
+        return { disabled: false }
       },
     },
     {
@@ -219,10 +218,10 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
         { value: "ceil", label: t("leave.proration_rounding_ceil", "hr") },
         // { value: "half", label: t("leave.proration_rounding_half", "hr") },
       ],
-      dependsOn: ['accrual_period'],
+      dependsOn: ["balance_mode"],
       compute: (values) => {
-        if (values.accrual_period == "yearly") return {  disabled: false }
-        return { disabled: true }
+        if (values.balance_mode !== "accrual") return { disabled: true ,value:null}
+        return { disabled: false }
       },
     },
   ]
@@ -331,7 +330,7 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
 
         <div className="flex items-center justify-end gap-3 pt-2">
           {onCancel && (
-            <Button variant="secondary" onClick={() => attemptNavigation(() => onCancel?.())} type="button">
+            <Button variant="secondary" onClick={() => onCancel?.()} type="button">
               {t("common.cancel", "shared")}
             </Button>
           )}
@@ -339,16 +338,6 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
             {t("common.save", "shared")}
           </Button>
         </div>
-        <ConfirmDialog
-          isOpen={showConfirm}
-          title={t("leave.unsaved_title", "hr") || "Unsaved Changes"}
-          message={t("leave.unsaved_message", "hr") || "You have unsaved changes. Are you sure you want to leave?"}
-          type="alert"
-          confirmLabel={t("leave.unsaved_leave", "hr") || "Leave"}
-          cancelLabel={t("leave.unsaved_stay", "hr") || "Stay"}
-          onConfirm={confirmNavigation}
-          onCancel={cancelNavigation}
-        />
       </form>
     </FormProvider>
   )

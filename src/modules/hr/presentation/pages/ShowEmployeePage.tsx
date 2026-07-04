@@ -418,8 +418,6 @@ function getStatusLabel(status: string | undefined, t: any) {
     case 'active': return t('show_employee.status_active', 'hr') || 'نشط';
     case 'inactive': return t('show_employee.status_inactive', 'hr') || 'غير نشط';
     case 'suspended': return t('show_employee.status_suspended', 'hr') || 'موقوف';
-    case 'terminated': return t('show_employee.status_terminated', 'hr') || 'منتهي';
-    case 'on_leave': return t('show_employee.status_on_leave', 'hr') || 'في إجازة';
     default: return status || t('show_employee.status_unknown', 'hr') || 'غير معروف';
   }
 }

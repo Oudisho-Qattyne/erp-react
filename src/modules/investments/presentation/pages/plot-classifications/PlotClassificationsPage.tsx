@@ -145,7 +145,7 @@ export function PlotClassificationsPage() {
             { name: 'is_default', type: 'checkbox', label: t('plot_classifications.is_default', 'investments') }
           ]}
           schema={getCreatePlotClassificationFormSchema(t)}
-          defaultValues={editItem ? { name: editItem.name, is_active: editItem.is_active, is_default: editItem.is_default } : undefined}
+          defaultValues={editItem ? { name: editItem.name, is_active: Boolean(editItem.is_active), is_default: Boolean(editItem.is_default) } : undefined}
           onSubmit={async (data) => {
             try { 
               await update(editItem!.id, data); 

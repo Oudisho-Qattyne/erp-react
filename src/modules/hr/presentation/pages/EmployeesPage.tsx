@@ -21,6 +21,7 @@ export function EmployeesPage() {
   const navigate = useNavigate();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [localSearch, setLocalSearch] = useState('');
 
   const genderOptions = [
     { value: '', label: t('employees.gender_all', 'hr') || 'الكل' },
@@ -154,14 +155,14 @@ export function EmployeesPage() {
           <Input
             type="text"
             placeholder={t('employees.search_placeholder', 'hr') || 'بحث...'}
-            value={search}
-            onChange={(val) => setSearch(val as string)}
+            value={localSearch}
+            onChange={(val) => setLocalSearch(val as string)}
             baseClasses={inputBaseClasses}
             className="w-56"
           />
 
                    {/* Search & Reset buttons */}
-          <Button variant="primary" onClick={() => refetch()} size="sm" leftIcon={<Search size={14} />}>
+          <Button variant="primary" onClick={() => { setSearch(localSearch); setPage(1) }} size="sm" leftIcon={<Search size={14} />}>
             {t('common.search', 'shared') || 'بحث'}
           </Button>
           <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>

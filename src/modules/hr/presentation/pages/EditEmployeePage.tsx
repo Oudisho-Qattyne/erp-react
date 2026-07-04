@@ -31,7 +31,6 @@ export function EditEmployeePage() {
         const result = await getById(Number(id))
         if (result) {
           const emp = result.data
-          console.log(emp);
           // Map API data to Form Values
           const mappedValues: Partial<EmployeeFormValues> = {
             internal_id: emp.internal_id,
@@ -108,14 +107,19 @@ export function EditEmployeePage() {
       fetchEmployee();
     }
   }, [id, apiClient]);
+  console.log(defaultValues);
 
   const handleSubmit = async (data: EmployeeFormValues) => {
     try {
       setSaving(true);
       setError(null);
-      await apiClient.put(`/hr/employees/${id}`, data);
-      navigate(`/hr/employees/${id}`);
+      const res = await apiClient.put(`/hr/employees/${id}`, data);
+      console.log("before navigation " , res);
+      
+      navigate('/hr/employees')
     } catch (err: any) {
+      console.log(err);
+      
       setError(err.message || t('edit_employee.update_error', 'hr') || 'فشل في تحديث بيانات الموظف');
       throw err
     } finally {

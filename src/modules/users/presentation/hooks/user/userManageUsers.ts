@@ -45,7 +45,7 @@ export interface UseManageUsersReturn {
 
 export const useManageUsers = (): UseManageUsersReturn => {
   const apiClient = useApiClient()
-  const { language } = useLanguage()
+  const { language, t } = useLanguage()
 
   const [users, setUsers] = useState<User[]>([])
   const [currentUser, setCurrentUser] = useState<User | null>(null)
@@ -69,7 +69,15 @@ export const useManageUsers = (): UseManageUsersReturn => {
   const resetFilter = useCallback(() => setFilterState(DEFAULT_FILTER), [])
 
   const setSearch = useCallback((search: string) => {
-    setFilterState((prev) => ({ ...prev, search: search as any, page: 1 }))
+    setFilterState((prev) => {
+      const next = { ...prev, page: 1 }
+      if (search.trim()) {
+        next.search = search as any
+      } else {
+        delete next.search
+      }
+      return next
+    })
   }, [])
 
   const setPage = useCallback((page: number) => {
@@ -91,11 +99,11 @@ export const useManageUsers = (): UseManageUsersReturn => {
     } catch (err: any) {
       const msg = err.message || "Failed to fetch users"
       setFnError("getAllUsers", msg)
-      toast.error(language === "ar" ? `فشل تحميل المستخدمين: ${msg}` : `Failed to load users: ${msg}`)
+      toast.error(t('load_error', 'users').replace('{message}', msg))
     } finally {
       setFnLoading("getAllUsers", false)
     }
-  }, [useCase, filter, language])
+  }, [useCase, filter, t])
 
   const getCurrentUser = useCallback(async () => {
     setFnLoading("getCurrentUser", true)
@@ -106,61 +114,61 @@ export const useManageUsers = (): UseManageUsersReturn => {
     } catch (err: any) {
       const msg = err.message || "Failed to fetch current user"
       setFnError("getCurrentUser", msg)
-      toast.error(language === "ar" ? `فشل تحميل بيانات المستخدم: ${msg}` : `Failed to load user data: ${msg}`)
+      toast.error(t('load_current_error', 'users').replace('{message}', msg))
     } finally {
       setFnLoading("getCurrentUser", false)
     }
-  }, [useCase, language])
+  }, [useCase, t])
 
   const createUser = useCallback(async (data: CreateUserDto) => {
     setFnLoading("createUser", true)
     setFnError("createUser", null)
     try {
       await useCase.createUser(data)
-      toast.success(language === "ar" ? "تم إنشاء المستخدم بنجاح" : "User created successfully")
+      toast.success(t('created', 'users'))
       await getAllUsers()
     } catch (err: any) {
       const msg = err.message || "Failed to create user"
       setFnError("createUser", msg)
-      toast.error(language === "ar" ? `فشل إنشاء المستخدم: ${msg}` : `Failed to create user: ${msg}`)
+      toast.error(t('create_error', 'users').replace('{message}', msg))
       throw err
     } finally {
       setFnLoading("createUser", false)
     }
-  }, [useCase, language, getAllUsers])
+  }, [useCase, t, getAllUsers])
 
   const updateUser = useCallback(async (id: number, data: UpdateuserDto) => {
     setFnLoading("updateUser", true)
     setFnError("updateUser", null)
     try {
       await useCase.updateUser(id, data)
-      toast.success(language === "ar" ? "تم تحديث المستخدم بنجاح" : "User updated successfully")
+      toast.success(t('updated', 'users'))
       await getAllUsers()
     } catch (err: any) {
       const msg = err.message || "Failed to update user"
       setFnError("updateUser", msg)
-      toast.error(language === "ar" ? `فشل تحديث المستخدم: ${msg}` : `Failed to update user: ${msg}`)
+      toast.error(t('update_error', 'users').replace('{message}', msg))
       throw err
     } finally {
       setFnLoading("updateUser", false)
     }
-  }, [useCase, language, getAllUsers])
+  }, [useCase, t, getAllUsers])
 
   const updateSignature = useCallback(async (file: File) => {
     setFnLoading("updateSignature", true)
     setFnError("updateSignature", null)
     try {
       await useCase.updateSignature(file)
-      toast.success(language === "ar" ? "تم تحديث التوقيع بنجاح" : "Signature updated successfully")
+      toast.success(t('signature_updated', 'users'))
     } catch (err: any) {
       const msg = err.message || "Failed to update signature"
       setFnError("updateSignature", msg)
-      toast.error(language === "ar" ? `فشل تحديث التوقيع: ${msg}` : `Failed to update signature: ${msg}`)
+      toast.error(t('signature_update_error', 'users').replace('{message}', msg))
       throw err
     } finally {
       setFnLoading("updateSignature", false)
     }
-  }, [useCase, language])
+  }, [useCase, t])
 
   const exportUsersExcel = useCallback(async () => {
     setFnLoading("exportUsersExcel", true)
@@ -176,16 +184,16 @@ export const useManageUsers = (): UseManageUsersReturn => {
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
-      toast.success(language === "ar" ? "تم تصدير المستخدمين بنجاح" : "Users exported successfully")
+      toast.success(t('exported', 'users'))
     } catch (err: any) {
       const msg = err.message || "Failed to export users"
       setFnError("exportUsersExcel", msg)
-      toast.error(language === "ar" ? `فشل تصدير المستخدمين: ${msg}` : `Failed to export users: ${msg}`)
+      toast.error(t('export_error', 'users').replace('{message}', msg))
       throw err
     } finally {
       setFnLoading("exportUsersExcel", false)
     }
-  }, [useCase, language])
+  }, [useCase, t])
 
   const exportUsersPdf = useCallback(async () => {
     setFnLoading("exportUsersPdf", true)
@@ -201,32 +209,32 @@ export const useManageUsers = (): UseManageUsersReturn => {
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
-      toast.success(language === "ar" ? "تم تصدير المستخدمين بنجاح" : "Users exported successfully")
+      toast.success(t('exported', 'users'))
     } catch (err: any) {
       const msg = err.message || "Failed to export users"
       setFnError("exportUsersPdf", msg)
-      toast.error(language === "ar" ? `فشل تصدير المستخدمين: ${msg}` : `Failed to export users: ${msg}`)
+      toast.error(t('export_error', 'users').replace('{message}', msg))
       throw err
     } finally {
       setFnLoading("exportUsersPdf", false)
     }
-  }, [useCase, language])
+  }, [useCase, t])
 
   const linkUserToEmployee = useCallback(async (userId: number, employeeId: number) => {
     setFnLoading("linkUserToEmployee", true)
     setFnError("linkUserToEmployee", null)
     try {
       await useCase.linkUserToEmployee(userId, employeeId)
-      toast.success(language === "ar" ? "تم ربط المستخدم بالموظف بنجاح" : "User linked to employee successfully")
+      toast.success(t('linked', 'users'))
     } catch (err: any) {
       const msg = err.message || "Failed to link user to employee"
       setFnError("linkUserToEmployee", msg)
-      toast.error(language === "ar" ? `فشل ربط المستخدم بالموظف: ${msg}` : `Failed to link user to employee: ${msg}`)
+      toast.error(t('link_error', 'users').replace('{message}', msg))
       throw err
     } finally {
       setFnLoading("linkUserToEmployee", false)
     }
-  }, [useCase, language])
+  }, [useCase, t])
 
 
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])

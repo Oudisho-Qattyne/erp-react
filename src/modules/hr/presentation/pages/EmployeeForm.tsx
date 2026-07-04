@@ -14,8 +14,7 @@ import { getCreateEmployeeSchema, type EmployeeFormValues } from '../schemas/emp
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
 import { GenericCreateForm, type FieldConfig } from '../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { FormProvider } from 'react-hook-form';
-import { useUnsavedChanges } from '../../../../core/presentation/hooks/useUnsavedChanges';
-import { ConfirmDialog } from '../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
+
 import type { Country } from '../../../../core/domain/entities/regions/Country';
 import { CountryFormSchema } from '../../../../core/presentation/schemas/regions/countryForm.schema';
 import { OrganizationalUnitTreeSelect } from '../components/OrganizationalUnitTreeSelect';
@@ -246,9 +245,7 @@ export function EmployeeForm({
   const [statusLogsOpen, setStatusLogsOpen] = useState<boolean>(false)
   const [jobStatusLogsOpen, setJobStatusLogsOpen] = useState<boolean>(false)
   const { handleSubmit, formState, watch, setValue } = methods;
-  const { isValid, isSubmitting, errors, isDirty } = formState;
-
-  const { showConfirm, confirmNavigation, cancelNavigation, attemptNavigation } = useUnsavedChanges(isDirty)
+  const { isValid, isSubmitting, errors } = formState;
 
   const prevErrorCount = useRef(0)
   useEffect(() => {
@@ -510,7 +507,7 @@ export function EmployeeForm({
       dependsOn: ['marital_status', 'number_of_children'],
       compute: (values) => {
         if (values.marital_status != 'married' || values.number_of_children <= 0)
-          return { disabled: true }
+          return { disabled: true , numberOfRows:0 , value:[]}
 
         return { disabled: false, numberOfRows: values.number_of_children }
       },
@@ -609,7 +606,7 @@ export function EmployeeForm({
       requiredPermission: 'hr.employee-statuses.list',
       createButtonPermission: 'hr.employee-statuses.create',
       labelPath: 'data.name',
-      infoButton:employee_id ? () => { setStatusLogsOpen(true) } : undefined,
+      infoButton: employee_id ? () => { setStatusLogsOpen(true) } : undefined,
       renderCreateForm: (onSuccess, onCancel) => <EmployeeStatusCreateForm onSuccess={(v, i) => {
         onSuccess(v, i)
       }} onCancel={onCancel} />,
@@ -639,8 +636,6 @@ export function EmployeeForm({
       options: [
         { value: 'active', label: t('show_employee.status_active', 'hr') || 'نشط' },
         { value: 'inactive', label: t('show_employee.status_inactive', 'hr') || 'غير نشط' },
-        { value: 'terminated', label: t('show_employee.status_terminated', 'hr') || 'منتهي' },
-        { value: 'on_leave', label: t('show_employee.status_on_leave', 'hr') || 'في إجازة' },
       ],
       required: true,
     },
@@ -675,7 +670,7 @@ export function EmployeeForm({
       type: 'select-or-create',
       requiredPermission: 'hr.job-statuses.list',
       createButtonPermission: 'hr.job-statuses.create',
-      infoButton:employee_id ? () => { setJobStatusLogsOpen(true) } : undefined,
+      infoButton: employee_id ? () => { setJobStatusLogsOpen(true) } : undefined,
       renderCreateForm: (onSuccess, onCancel) => <JobStatusCreateForm onSuccess={onSuccess} onCancel={onCancel} />,
       compute: async (values) => {
         const response = await loadJobStatus();
@@ -870,7 +865,7 @@ export function EmployeeForm({
         {/* Form Actions */}
         <div className="flex justify-end gap-3">
           {onCancel && (
-            <Button type="button" variant="outline" onClick={() => employee_id ? attemptNavigation(() => onCancel?.()) :onCancel?.() }>
+            <Button type="button" variant="outline" onClick={() => onCancel?.()}>
               {actualCancelLabel}
             </Button>
           )}
@@ -878,16 +873,6 @@ export function EmployeeForm({
             {isSubmitting || loading ? (t('employee_form.saving', 'hr') || 'جاري...') : actualSubmitLabel}
           </Button>
         </div>
-        <ConfirmDialog
-          isOpen={showConfirm}
-          title={t('employee_form.unsaved_title', 'hr') || 'Unsaved Changes'}
-          message={t('employee_form.unsaved_message', 'hr') || 'You have unsaved changes. Are you sure you want to leave?'}
-          type="alert"
-          confirmLabel={t('employee_form.unsaved_leave', 'hr') || 'Leave'}
-          cancelLabel={t('employee_form.unsaved_stay', 'hr') || 'Stay'}
-          onConfirm={confirmNavigation}
-          onCancel={cancelNavigation}
-        />
       </form>
     </FormProvider>
   );

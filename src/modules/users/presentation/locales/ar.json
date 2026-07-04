@@ -107,7 +107,19 @@
     "linked_to_employee": "مرتبط بموظف",
     "permissions": "الصلاحيات",
     "no_permissions": "لا توجد صلاحيات مخصصة",
-    "user_info": "معلومات المستخدم"
+    "user_info": "معلومات المستخدم",
+    "load_error": "فشل تحميل المستخدمين: {message}",
+    "load_current_error": "فشل تحميل بيانات المستخدم: {message}",
+    "created": "تم إنشاء المستخدم بنجاح",
+    "create_error": "فشل إنشاء المستخدم: {message}",
+    "updated": "تم تحديث المستخدم بنجاح",
+    "update_error": "فشل تحديث المستخدم: {message}",
+    "signature_updated": "تم تحديث التوقيع بنجاح",
+    "signature_update_error": "فشل تحديث التوقيع: {message}",
+    "exported": "تم تصدير المستخدمين بنجاح",
+    "export_error": "فشل تصدير المستخدمين: {message}",
+    "linked": "تم ربط المستخدم بالموظف بنجاح",
+    "link_error": "فشل ربط المستخدم بالموظف: {message}"
   },
   "show_user": {
     "title": "تفاصيل المستخدم",

@@ -62,5 +62,30 @@
   "file_explorer_dialog": {
     "title": "File Explorer"
   },
-  "error_message": "Something went wrong"
+  "error_message": "Something went wrong",
+  "toasts": {
+    "get_item_unauthorized": "You are not authorized to view this item",
+    "get_item_error": "Failed to view item: {message}",
+    "folder_created": "Folder \"{name}\" created successfully",
+    "folder_create_unauthorized": "You are not authorized to create a folder here",
+    "folder_create_error": "Failed to create folder: {message}",
+    "folder_deleted": "Folder deleted successfully",
+    "folder_delete_unauthorized": "You are not authorized to delete this folder",
+    "folder_delete_error": "Failed to delete folder: {message}",
+    "folder_renamed": "Renamed to \"{name}\" successfully",
+    "folder_rename_unauthorized": "You are not authorized to rename this item",
+    "folder_rename_error": "Failed to rename: {message}",
+    "file_uploaded": "File \"{name}\" uploaded successfully",
+    "file_upload_unauthorized": "You are not authorized to upload files here",
+    "file_upload_error": "Failed to upload file: {message}",
+    "file_deleted": "File deleted successfully",
+    "file_delete_unauthorized": "You are not authorized to delete this file",
+    "file_delete_error": "Failed to delete file: {message}",
+    "file_downloaded": "File downloaded successfully",
+    "file_download_unauthorized": "You are not authorized to download this file",
+    "file_download_error": "Failed to download file: {message}",
+    "item_moved": "Item moved successfully",
+    "item_move_unauthorized": "You are not authorized to move this item",
+    "item_move_error": "Failed to move item: {message}"
+  }
 }

@@ -141,7 +141,7 @@ export function SpecializationsPage() {
             <GenericCreateForm
               fields={[{ name: 'name', label: t('employees.specialization', 'hr') || 'Specialization name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
               schema={SpecializationFormSchema.omit({ Faculty_id: true })}
-              defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), is_default: editItem.is_default } : undefined}
+              defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), is_default: Boolean(editItem.is_default) } : undefined}
               onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: data.name }); } catch { toast.error(t('lookups.update_error', 'hr').replace('{name}', entity)); throw {}; } }}
               onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); selectedFaculty && getAllByFaculty(selectedFaculty); setEditItem(null); }}
               onCancel={() => setEditItem(null)}

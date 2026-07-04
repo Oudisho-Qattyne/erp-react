@@ -70,7 +70,7 @@ export const getCreateLeaveSchema = (t: (key: string, module?: string) => string
     min_request_units: z.number().min(0, t('leave.validation.min_request_units_min', 'hr') || 'الحد الأدنى لوحدات الطلب يجب أن يكون 0 أو أكثر'),
     max_request_units: z.number().min(0, t('leave.validation.max_request_units_min', 'hr') || 'الحد الأقصى لوحدات الطلب يجب أن يكون 0 أو أكثر'),
     balance_mode: z.enum(['accrual', 'fixed_grant', 'once_per_life', 'once_per_service', 'none'], t('leave.validation.balance_mode_invalid', 'hr') || 'نمط الرصيد غير صالح'),
-    accrual_period: z.enum(['yearly', 'monthly', 'none']).optional(),
+    accrual_period: z.enum(['yearly', 'monthly', 'none']).optional().nullable(),
     allow_carry_forward: z.boolean(),
     carry_forward_limit: z.number().min(0).nullable().optional(),
     eligibility_rules: RuleGroupContainerSchema,

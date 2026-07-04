@@ -84,7 +84,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
     const [rootFolder, setRootFolder] = useState<StorageItemDto | null>(null)
 
     const apiClient = useApiClient();
-    const { language } = useLanguage();
+    const { language, t } = useLanguage();
     const [data, setData] = useState<StorageItemDto[]>([]);
     const [loading, setLoading] = useState<Record<string, boolean>>(() => initRecord(false));
     const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null));
@@ -150,26 +150,18 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             switch (err.status) {
                 case 403:
                     setFunctionError("getItemById", "Forbiden");
-                    toast.error(
-                        language === 'ar'
-                            ? "غير مصرح لك بعرض هذا الملف"
-                            : "You are not authorized to rename this item"
-                    );
+                    toast.error(t('toasts.get_item_unauthorized', 'storage'));
                     break;
                 default:
                     setFunctionError("getItemById", errMsg);
-                    toast.error(
-                        language === 'ar'
-                            ? `فشل عرض الملف: ${errMsg}`
-                            : `Failed to rename: ${errMsg}`
-                    );
+                    toast.error(t('toasts.get_item_error', 'storage').replace('{message}', errMsg));
                     break;
             }
             throw err;
         } finally {
             setFunctionLoading("getItemById", false)
         }
-    }, [useCase, language]);
+    }, [useCase, language, t]);
 
     const loadFolderByPath = useCallback(async (path: string, api: any) => {
         setFunctionLoading("loadFolderByPath", true);
@@ -229,29 +221,17 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                 }
             }
             await loadFolderByPath(parent, api);
-            toast.success(
-                language === 'ar'
-                    ? `تم إنشاء المجلد "${name}" بنجاح`
-                    : `Folder "${name}" created successfully`
-            );
+            toast.success(t('toasts.folder_created', 'storage').replace('{name}', name));
         } catch (err: any) {
             const errMsg = err.message || `Failed to create folder`;
             switch (err.status) {
                 case 403:
                     setFunctionError("createFolder", "Forbiden");
-                    toast.error(
-                        language === 'ar'
-                            ? "غير مصرح لك بإنشاء مجلد هنا"
-                            : "You are not authorized to create a folder here"
-                    );
+                    toast.error(t('toasts.folder_create_unauthorized', 'storage'));
                     break;
                 default:
                     setFunctionError("createFolder", errMsg);
-                    toast.error(
-                        language === 'ar'
-                            ? `فشل إنشاء المجلد: ${errMsg}`
-                            : `Failed to create folder: ${errMsg}`
-                    );
+                    toast.error(t('toasts.folder_create_error', 'storage').replace('{message}', errMsg));
                     break;
             }
             throw err;
@@ -259,7 +239,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             setFunctionLoading("createFolder", false);
 
         }
-    }, [useCase, language, loadFolderByPath, rootFolder]);
+    }, [useCase, language, t, loadFolderByPath, rootFolder]);
 
     const deleteFolder = useCallback(async (parent: string, id: string, api: any) => {
         setFunctionLoading("deleteFolder", true);
@@ -272,29 +252,17 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             }
             await loadFolderByPath(parent, api);
 
-            toast.success(
-                language === 'ar'
-                    ? 'تم حذف المجلد بنجاح'
-                    : 'Folder deleted successfully'
-            );
+            toast.success(t('toasts.folder_deleted', 'storage'));
         } catch (err: any) {
             const errMsg = err.message || `Failed to delete folder`;
             switch (err.status) {
                 case 403:
                     setFunctionError("deleteFolder", "Forbiden");
-                    toast.error(
-                        language === 'ar'
-                            ? "غير مصرح لك بحذف هذا المجلد"
-                            : "You are not authorized to delete this folder"
-                    );
+                    toast.error(t('toasts.folder_delete_unauthorized', 'storage'));
                     break;
                 default:
                     setFunctionError("deleteFolder", errMsg);
-                    toast.error(
-                        language === 'ar'
-                            ? `فشل حذف المجلد: ${errMsg}`
-                            : `Failed to delete folder: ${errMsg}`
-                    );
+                    toast.error(t('toasts.folder_delete_error', 'storage').replace('{message}', errMsg));
                     break;
             }
             throw err;
@@ -302,7 +270,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             setFunctionLoading("deleteFolder", false);
 
         }
-    }, [useCase, language]);
+    }, [useCase, language, t]);
 
     const renameFolder = useCallback(async (parent: string, id: string, name: string, api: any) => {
         setFunctionLoading("renameFolder", true);
@@ -314,36 +282,24 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             }
             await loadFolderByPath(parent, api);
 
-            toast.success(
-                language === 'ar'
-                    ? `تم تغيير الاسم إلى "${name}" بنجاح`
-                    : `Renamed to "${name}" successfully`
-            );
+            toast.success(t('toasts.folder_renamed', 'storage').replace('{name}', name));
         } catch (err: any) {
             const errMsg = err.message || `Failed to rename`;
             switch (err.status) {
                 case 403:
                     setFunctionError("renameFolder", "Forbiden");
-                    toast.error(
-                        language === 'ar'
-                            ? "غير مصرح لك بإعادة التسمية"
-                            : "You are not authorized to rename this item"
-                    );
+                    toast.error(t('toasts.folder_rename_unauthorized', 'storage'));
                     break;
                 default:
                     setFunctionError("renameFolder", errMsg);
-                    toast.error(
-                        language === 'ar'
-                            ? `فشلت إعادة التسمية: ${errMsg}`
-                            : `Failed to rename: ${errMsg}`
-                    );
+                    toast.error(t('toasts.folder_rename_error', 'storage').replace('{message}', errMsg));
                     break;
             }
             throw err;
         } finally {
             setFunctionLoading("renameFolder", false);
         }
-    }, [useCase, language]);
+    }, [useCase, language, t]);
 
     const uploadFile = useCallback(async (parent: string, file: File, isSecure: boolean = true, name: string, api: IApi) => {
         setFunctionLoading("uploadFile", true);
@@ -369,37 +325,25 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             }
 
             await loadFolderByPath(parent, api);
-            toast.success(
-                language === 'ar'
-                    ? `تم رفع الملف "${name}" بنجاح`
-                    : `File "${name}" uploaded successfully`
-            );
+            toast.success(t('toasts.file_uploaded', 'storage').replace('{name}', name));
 
         } catch (err: any) {
             const errMsg = err.message || `Failed to upload file`;
             switch (err.status) {
                 case 403:
                     setFunctionError("uploadFile", "Forbiden");
-                    toast.error(
-                        language === 'ar'
-                            ? "غير مصرح لك برفع ملفات هنا"
-                            : "You are not authorized to upload files here"
-                    );
+                    toast.error(t('toasts.file_upload_unauthorized', 'storage'));
                     break;
                 default:
                     setFunctionError("uploadFile", errMsg);
-                    toast.error(
-                        language === 'ar'
-                            ? `فشل رفع الملف: ${errMsg}`
-                            : `Failed to upload file: ${errMsg}`
-                    );
+                    toast.error(t('toasts.file_upload_error', 'storage').replace('{message}', errMsg));
                     break;
             }
             throw err;
         } finally {
             setFunctionLoading("uploadFile", false);
         }
-    }, [useCase, language, loadFolderByPath]);
+    }, [useCase, language, t, loadFolderByPath]);
 
     const deleteFile = useCallback(async (parent: string, id: string, api: any) => {
         setFunctionLoading("deleteFile", true);
@@ -411,36 +355,24 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             }
             await loadFolderByPath(parent, api);
 
-            toast.success(
-                language === 'ar'
-                    ? 'تم حذف الملف بنجاح'
-                    : 'File deleted successfully'
-            );
+            toast.success(t('toasts.file_deleted', 'storage'));
         } catch (err: any) {
             const errMsg = err.message || `Failed to delete file`;
             switch (err.status) {
                 case 403:
                     setFunctionError("deleteFile", "Forbiden");
-                    toast.error(
-                        language === 'ar'
-                            ? "غير مصرح لك بحذف هذا الملف"
-                            : "You are not authorized to delete this file"
-                    );
+                    toast.error(t('toasts.file_delete_unauthorized', 'storage'));
                     break;
                 default:
                     setFunctionError("deleteFile", errMsg);
-                    toast.error(
-                        language === 'ar'
-                            ? `فشل حذف الملف: ${errMsg}`
-                            : `Failed to delete file: ${errMsg}`
-                    );
+                    toast.error(t('toasts.file_delete_error', 'storage').replace('{message}', errMsg));
                     break;
             }
             throw err;
         } finally {
             setFunctionLoading("deleteFile", false);
         }
-    }, [useCase, language]);
+    }, [useCase, language, t]);
 
     const downloadFile = useCallback(async (id: string, signedUrl: string, api: any) => {
         setFunctionLoading("downloadFile", true);
@@ -458,36 +390,24 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             }
-            toast.success(
-                language === 'ar'
-                    ? 'تم تحميل الملف بنجاح'
-                    : 'File download successfully'
-            );
+            toast.success(t('toasts.file_downloaded', 'storage'));
         } catch (err: any) {
             const errMsg = err.message || `Failed to download file`;
             switch (err.status) {
                 case 403:
                     setFunctionError("downloadFile", "Forbiden");
-                    toast.error(
-                        language === 'ar'
-                            ? "غير مصرح لك بتحميل هذا الملف"
-                            : "You are not authorized to download this file"
-                    );
+                    toast.error(t('toasts.file_download_unauthorized', 'storage'));
                     break;
                 default:
                     setFunctionError("downloadFile", errMsg);
-                    toast.error(
-                        language === 'ar'
-                            ? `فشل تحميل الملف: ${errMsg}`
-                            : `Failed to download file: ${errMsg}`
-                    );
+                    toast.error(t('toasts.file_download_error', 'storage').replace('{message}', errMsg));
                     break;
             }
             throw err;
         } finally {
             setFunctionLoading("downloadFile", false);
         }
-    }, [useCase, language]);
+    }, [useCase, language, t]);
 
     const moveStorageItem = useCallback(async (itemPath: string, newParentPath: string, api: IApi) => {
         setFunctionLoading("moveStorageItem", true);
@@ -521,30 +441,18 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                     }
                 }
             }
-            toast.success(
-                language === 'ar'
-                    ? 'تم نقل العنصر بنجاح'
-                    : 'Item moved successfully'
-            );
+            toast.success(t('toasts.item_moved', 'storage'));
             await loadFolderByPath(newParentPath, api)
         } catch (err: any) {
             const errMsg = err.message || `Failed to move item  `;
             switch (err.status) {
                 case 403:
                     setFunctionError("moveStorageItem", "Forbiden");
-                    toast.error(
-                        language === 'ar'
-                            ? "غير مصرح لك بنقل هذا العنصر"
-                            : "You are not authorized to move this item"
-                    );
+                    toast.error(t('toasts.item_move_unauthorized', 'storage'));
                     break;
                 default:
                     setFunctionError("moveStorageItem", errMsg);
-                    toast.error(
-                        language === 'ar'
-                            ? `فشل نقل العنصر: ${errMsg}`
-                            : `Failed to move Item: ${errMsg}`
-                    );
+                    toast.error(t('toasts.item_move_error', 'storage').replace('{message}', errMsg));
                     break;
             }
             throw err;
@@ -553,7 +461,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         }
     }
 
-        , [rootFolder]
+        , [rootFolder, t]
     )
 
     const loadRoot = useCallback(async (rootFolder?: StorageItemDto) => {

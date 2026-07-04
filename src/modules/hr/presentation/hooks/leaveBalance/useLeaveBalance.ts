@@ -40,7 +40,7 @@ export interface UseLeaveBalanceReturn {
 
 export const useLeaveBalance = (): UseLeaveBalanceReturn => {
   const apiClient = useApiClient()
-  const { language } = useLanguage()
+  const { language, t } = useLanguage()
 
   const [myLeaveBalances, setMyLeaveBalances] = useState<LeaveBalance[]>([])
   const [employeeLeaveBalances, setEmployeeLeaveBalances] = useState<LeaveBalance[]>([])
@@ -64,7 +64,15 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
   const resetFilter = useCallback(() => setFilterState(DEFAULT_FILTER), [])
 
   const setSearch = useCallback((search: string) => {
-    setFilterState((prev) => ({ ...prev, search, page: 1 }))
+    setFilterState((prev) => {
+      const next = { ...prev, page: 1 }
+      if (search.trim()) {
+        next.search = search
+      } else {
+        delete next.search
+      }
+      return next
+    })
   }, [])
 
   const setPage = useCallback((page: number) => {
@@ -86,11 +94,11 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
     } catch (err: any) {
       const msg = err.message || "Failed to fetch my leave balances"
       setFnError("findAllMyLeaveBalances", msg)
-      toast.error(language === "ar" ? `فشل تحميل أرصدة الإجازات: ${msg}` : `Failed to load leave balances: ${msg}`)
+      toast.error(t("leave_balance.load_error", "hr").replace("{message}", msg))
     } finally {
       setFnLoading("findAllMyLeaveBalances", false)
     }
-  }, [useCase, filter, language])
+  }, [useCase, filter, t])
 
   const findAllEmployeeLeaveBalances = useCallback(async (employeeId?: number) => {
     setFnLoading("findAllEmployeeLeaveBalances", true)
@@ -107,27 +115,27 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
     } catch (err: any) {
       const msg = err.message || "Failed to fetch employee leave balances"
       setFnError("findAllEmployeeLeaveBalances", msg)
-      toast.error(language === "ar" ? `فشل تحميل أرصدة إجازات الموظف: ${msg}` : `Failed to load employee leave balances: ${msg}`)
+      toast.error(t("leave_balance.employee_load_error", "hr").replace("{message}", msg))
     } finally {
       setFnLoading("findAllEmployeeLeaveBalances", false)
     }
-  }, [useCase, filter, language])
+  }, [useCase, filter, t])
 
   const adjustLeaveBalance = useCallback(async (adjust: AdjustLeaveBalanceDto) => {
     setFnLoading("adjustLeaveBalance", true)
     setFnError("adjustLeaveBalance", null)
     try {
       await useCase.adjustLeaveBalance(adjust)
-      toast.success(language === "ar" ? "تم تعديل الرصيد بنجاح" : "Leave balance adjusted successfully")
+      toast.success(t("leave_balance.adjusted", "hr"))
     } catch (err: any) {
       const msg = err.message || "Failed to adjust leave balance"
       setFnError("adjustLeaveBalance", msg)
-      toast.error(language === "ar" ? `فشل تعديل الرصيد: ${msg}` : `Failed to adjust leave balance: ${msg}`)
+      toast.error(t("leave_balance.adjust_error", "hr").replace("{message}", msg))
       throw err
     } finally {
       setFnLoading("adjustLeaveBalance", false)
     }
-  }, [useCase, language])
+  }, [useCase, t])
 
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])

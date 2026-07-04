@@ -6,11 +6,11 @@ import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Butt
 import Input from '../../../../../core/presentation/layouts/ui/inputs/Input';
 import { inputBaseClasses } from '../../../../../core/presentation/layouts/ui/inputs/styles';
 import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
-import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
+import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { toast } from 'sonner';
-import { Eye, Trash2, MapPin, History } from 'lucide-react';
+import { Eye, Trash2, MapPin, History, Filter, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { EntityWithNameOnly } from '../../../../../core/domain/entities/EntityWithNameOnly';
 import { PlotAuditLogModal } from './components/PlotAuditLogModal';
@@ -22,12 +22,10 @@ export function PlotsPage() {
   const { entities: plots, getAll, remove, loading, error, pagination } = useEntityCrud<Plot>('/investments/plots', '/investments/plots');
   const { entities: areas, getAll: getAreas } = useEntityCrud<EntityWithNameOnly>('/investments/plot-areas', '/investments/plot-areas');
   const { entities: classifications, getAll: getClassifications } = useEntityCrud<EntityWithNameOnly>('/investments/plot-classifications', '/investments/plot-classifications');
-  const { entities: users, getAll: getUsers } = useEntityCrud<EntityWithNameOnly>('/users', '/users');
-  
+
   const entityName = t('plots.title', 'investments') || 'Plot';
+  const [localSearch, setLocalSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<Plot | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
@@ -35,36 +33,41 @@ export function PlotsPage() {
   // Table State
   const [sortColumn, setSortColumn] = useState<string | undefined>(undefined);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [filters, setFilters] = useState<Record<string, string>>({});
   const [page, setPage] = useState(1);
+
+  // Filter State
+  const [extraFilters, setExtraFilters] = useState<Record<string, string>>({});
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Fetch Lookups
   useEffect(() => {
     getAreas();
     getClassifications();
-    getUsers();
   }, []);
 
   // Fetch Data (Server Side)
-  useEffect(() => { 
+  useEffect(() => {
     const params = new URLSearchParams();
     if (searchQuery) params.append('code', searchQuery);
-    if (fromDate) params.append('from_date', fromDate);
-    if (toDate) params.append('to_date', toDate);
-    
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) params.append(key, value);
-    });
-    
+
+    for (const [key, val] of Object.entries(extraFilters)) {
+      if (val) params.append(key, val);
+    }
+
     if (sortColumn) {
       params.append('sortColumn', sortColumn);
       params.append('sortOrder', sortOrder);
     }
-    
+
     params.append('page', String(page));
-    
+
     getAll(`/investments/plots?${params.toString()}`);
-  }, [searchQuery, fromDate, toDate, filters, sortColumn, sortOrder, page]);
+  }, [searchQuery, sortColumn, sortOrder, page, extraFilters]);
+
+  const handleSearch = () => {
+    setSearchQuery(localSearch);
+    setPage(1);
+  };
 
   const handleSort = (key: string) => {
     if (sortColumn === key) {
@@ -73,12 +76,23 @@ export function PlotsPage() {
       setSortColumn(key);
       setSortOrder('asc');
     }
-    setPage(1); // Reset page on sort
+    setPage(1);
   };
 
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-    setPage(1); // Reset page on filter
+  const handleApplyFilter = (values: Record<string, any>) => {
+    const parsed: Record<string, string> = {};
+    for (const [key, val] of Object.entries(values)) {
+      if (val !== '' && val !== undefined) parsed[key] = val;
+    }
+    setExtraFilters(parsed);
+    setPage(1);
+    setIsFilterOpen(false);
+  };
+
+  const handleResetFilter = () => {
+    setExtraFilters({});
+    setPage(1);
+    setIsFilterOpen(false);
   };
 
   const handleDeleteConfirm = async () => {
@@ -86,11 +100,10 @@ export function PlotsPage() {
     setConfirmLoading(true);
     try {
       await remove(confirmDelete.id);
-      toast.success(t('plots.deleted', 'investments') || 'Plot deleted');
-      // Refresh current page
+      toast.success((t('plots.deleted', 'investments') || 'Plot deleted').replace('{name}', entityName));
       setPage(prev => prev);
     } catch {
-      toast.error(t('plots.delete_error', 'investments') || 'Failed to delete plot');
+      toast.error((t('plots.delete_error', 'investments') || 'Failed to delete plot').replace('{name}', entityName));
     }
     setConfirmDelete(null);
     setConfirmLoading(false);
@@ -98,7 +111,6 @@ export function PlotsPage() {
 
   const areaOptions = useMemo(() => areas.map(a => ({ value: String(a.id), label: getLocalizedName(a.name) })), [areas]);
   const classificationOptions = useMemo(() => classifications.map(c => ({ value: String(c.id), label: getLocalizedName(c.name) })), [classifications]);
-  const userOptions = useMemo(() => users.map(u => ({ value: String(u.id), label: getLocalizedName(u.name) })), [users]);
   const statusOptions = useMemo(() => [
     { value: 'unsold', label: t('plot_status.unsold', 'investments') || 'Unsold' },
     { value: 'reserved', label: t('plot_status.reserved', 'investments') || 'Reserved' },
@@ -108,33 +120,34 @@ export function PlotsPage() {
     { value: 'shared', label: t('plot_status.shared', 'investments') || 'Shared' }
   ], [t]);
 
+  const filterFields: FilterField[] = useMemo(() => [
+    { name: 'status', label: t('plots.status', 'investments') || 'Status', type: 'select', options: statusOptions },
+    { name: 'plot_area_id', label: t('plots.plot_area_id', 'investments') || 'Region', type: 'select', options: areaOptions },
+    { name: 'plot_classification_id', label: t('plots.plot_classification_id', 'investments') || 'Classification', type: 'select', options: classificationOptions },
+    { name: 'from_date', label: t('plots.from_date', 'investments') || 'From Date', type: 'date' },
+    { name: 'to_date', label: t('plots.to_date', 'investments') || 'To Date', type: 'date' },
+  ], [t, areaOptions, classificationOptions, statusOptions]);
+
   const columns = [
-    { 
-      key: 'code', 
-      label: t('plots.code', 'investments') || 'Plot Code', 
+    {
+      key: 'code',
+      label: t('plots.code', 'investments') || 'Plot Code',
       width: 120,
       sortable: true,
-      filterable: true,
       render: (row: Plot) => <span className="font-medium">{row.code}</span>
     },
-    { 
-      key: 'identifier', 
-      label: t('plots.identifier', 'investments') || 'Plot Identifier', 
+    {
+      key: 'identifier',
+      label: t('plots.identifier', 'investments') || 'Plot Identifier',
       width: 120,
       sortable: true,
-      filterable: true,
       render: (row: Plot) => <span className="font-medium">{row.identifier}</span>
     },
-    { 
-      key: 'status', 
-      label: t('plots.status', 'investments') || 'Status', 
+    {
+      key: 'status',
+      label: t('plots.status', 'investments') || 'Status',
       width: 140,
       sortable: true,
-      filterable: true,
-      filter: {
-        type: 'select' as const,
-        options: statusOptions
-      },
       render: (row: Plot) => (
         <div className="flex flex-col gap-1 items-start">
           <span className="inline-flex items-center gap-1 text-xs font-medium text-primary-dark bg-primary-light/20 px-2 py-0.5 rounded-full">
@@ -146,61 +159,37 @@ export function PlotsPage() {
         </div>
       )
     },
-    { 
-      key: 'area', 
-      label: t('plots.area', 'investments') || 'Area', 
+    {
+      key: 'area',
+      label: t('plots.area', 'investments') || 'Area',
       width: 100,
       sortable: true,
-      filterable: true,
       render: (row: Plot) => `${row.area} ㎡`
     },
-    { 
-      key: 'plot_area_id', 
-      label: t('plots.plot_area_id', 'investments') || 'Region', 
+    {
+      key: 'plot_area_id',
+      label: t('plots.plot_area_id', 'investments') || 'Region',
       width: 150,
       sortable: true,
-      filterable: true,
-      filter: {
-        type: 'select' as const,
-        options: areaOptions
-      },
       render: (row: Plot) => row.plot_area_name || '—'
     },
-    { 
-      key: 'plot_classification_id', 
-      label: t('plots.plot_classification_id', 'investments') || 'Classification', 
+    {
+      key: 'plot_classification_id',
+      label: t('plots.plot_classification_id', 'investments') || 'Classification',
       width: 150,
       sortable: true,
-      filterable: true,
-      filter: {
-        type: 'select' as const,
-        options: classificationOptions
-      },
       render: (row: Plot) => row.plot_classification_name || '—'
     },
-    { 
-      key: 'created_at', 
-      label: t('plots.created_at', 'investments') || 'Created At', 
+    {
+      key: 'created_at',
+      label: t('plots.created_at', 'investments') || 'Created At',
       width: 110,
       sortable: true,
-      filterable: false,
       render: (row: Plot) => row.created_at ? new Date(row.created_at).toLocaleDateString() : '—'
     },
-    // { 
-    //   key: 'user_id', 
-    //   label: t('plots.added_by', 'investments') || 'Added By', 
-    //   width: 120,
-    //   sortable: false,
-    //   filterable: true,
-    //   filter: {
-    //     type: 'select' as const,
-    //     options: userOptions
-    //   },
-    //   render: (row: Plot) => row.user?.name || '—'
-    // },
-    { 
-      key: 'actions', 
-      label: t('common.actions', 'shared') || 'Actions', 
+    {
+      key: 'actions',
+      label: t('common.actions', 'shared') || 'Actions',
       width: 140,
       render: (row: Plot) => (
         <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
@@ -219,7 +208,7 @@ export function PlotsPage() {
             <Trash2 size={16} className="text-danger" />
           </Button>
         </div>
-      ) 
+      )
     },
   ];
 
@@ -245,35 +234,41 @@ export function PlotsPage() {
         </div>
       </div>
         <div className="flex flex-wrap items-center gap-3">
-          <Input type="text" value={searchQuery} onChange={setSearchQuery} 
-            placeholder={t('common.search', 'shared') || 'Search by code...'} 
+          <Input type="text" value={localSearch} onChange={setLocalSearch}
+            placeholder={t('common.search', 'shared') || 'Search by code...'}
             baseClasses={inputBaseClasses} className="w-64" />
-          
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-text-muted">{t('plots.from_date', 'investments') || 'From:'}</label>
-            <Input type="date" value={fromDate} onChange={(val) => setFromDate(val as string)} baseClasses={inputBaseClasses} className="w-40" />
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-text-muted">{t('plots.to_date', 'investments') || 'To:'}</label>
-            <Input type="date" value={toDate} onChange={(val) => setToDate(val as string)} baseClasses={inputBaseClasses} className="w-40" />
-          </div>
+          <Button variant="primary" onClick={handleSearch} size="sm" leftIcon={<Search size={14} />}>
+            {t('common.search', 'shared') || 'Search'}
+          </Button>
+          <Button variant="outline" onClick={() => setIsFilterOpen(true)} size="sm" leftIcon={<Filter size={14} />}>
+            {t('common.filter', 'shared') || 'Filter'}
+          </Button>
+          <Button variant="outline" onClick={handleResetFilter} size="sm">
+            {t('common.reset', 'shared') || 'Reset'}
+          </Button>
         </div>
 
+      <FilterDialog
+        isOpen={isFilterOpen}
+        fields={filterFields}
+        initialValues={extraFilters}
+        onFilter={handleApplyFilter}
+        onCancel={() => setIsFilterOpen(false)}
+        onReset={handleResetFilter}
+      />
+
       {error && <ErrorState message={error} onRetry={() => setPage(prev => prev)} />}
-      
+
       {!error && (
-        <DataTable 
-          columns={columns} 
-          data={plots} 
-          rowKey="id" 
+        <DataTable
+          columns={columns}
+          data={plots}
+          rowKey="id"
           loading={loading}
           emptyMessage={t('plots.no_records', 'investments') || 'No plots found'}
           sortColumn={sortColumn}
           sortOrder={sortOrder}
           onSort={handleSort}
-          filters={filters}
-          onFilterChange={handleFilterChange}
           pagination={tablePagination}
         />
       )}
@@ -286,11 +281,10 @@ export function PlotsPage() {
         onCancel={() => setConfirmDelete(null)}
         confirmLoading={confirmLoading}
       />
-      
-      <PlotAuditLogModal 
-        isOpen={isAuditModalOpen} 
-        onClose={() => setIsAuditModalOpen(false)} 
-        // plotId is explicitly omitted to fetch global logs
+
+      <PlotAuditLogModal
+        isOpen={isAuditModalOpen}
+        onClose={() => setIsAuditModalOpen(false)}
       />
     </div>
   );
