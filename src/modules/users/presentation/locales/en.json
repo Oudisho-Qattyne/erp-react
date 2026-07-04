@@ -92,6 +92,8 @@
     "add_form_placeholder": "User creation form",
     "no_data": "No users found",
     "name": "Name",
+    "search_placeholder": "Search by name or email",
+    "picker_title": "Select Users",
     "email": "Email",
     "mobile": "Mobile",
     "status": "Status",
