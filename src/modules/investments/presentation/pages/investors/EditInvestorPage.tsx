@@ -101,13 +101,16 @@ function InterestCard({ interest, onDelete, t }: any) {
 
 export function EditInvestorPage() {
   const { id } = useParams<{ id: string }>();
-  const { remove: removeInterest, getById, update } = useEntityCrud<Investor>(`/investments/investors`, `/investments/investors`);
+  const navigate = useNavigate();
+  const { t, direction } = useLanguage();
+  const { getById, update } = useEntityCrud<Investor>('/investments/investors', '/investments/investors');
+  const { remove: removeInterest } = useEntityCrud(`/investments/investors/${id || 0}/interests`, `/investments/investors/${id || 0}/interests`);
   const [investor, setInvestor] = useState<Investor | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showInterestModal, setShowInterestModal] = useState(false);
   const [interestToDelete, setInterestToDelete] = useState<number | null>(null);
-  const { t, direction } = useLanguage()
+
   useEffect(() => {
     fetchInvestor();
   }, [id]);
@@ -125,7 +128,6 @@ export function EditInvestorPage() {
       setLoading(false);
     }
   };
-  const navigate = useNavigate()
   const handleBack = () => navigate('/investments/investors');
 
   const handleSubmit = async (data: any) => {
