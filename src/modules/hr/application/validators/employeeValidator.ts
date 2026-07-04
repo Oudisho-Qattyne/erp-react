@@ -9,8 +9,8 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
     faculty_id: z.number().positive(t('employee_form.validation.faculty_required', 'hr') || 'Faculty ID must be positive'),
     specialization_id: z.number().positive(t('employee_form.validation.specialization_required', 'hr') || 'Specialization ID must be positive'),
     graduation_year: z.string().regex(/^\d{4}$/, t('employee_form.validation.graduation_year_invalid', 'hr') || 'Graduation year must be 4 digits'),
-    academic_stage: z.string().nullable().optional(),
-    study_status: z.string().nullable().optional(),
+    academic_stage: z.string().or(z.literal('')).nullable().optional(),
+    study_status: z.string().or(z.literal('')).nullable().optional(),
   });
 
   const EmployeeChildren = z.object({
@@ -44,8 +44,8 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
     residential_area_details: z.string().optional(),
     civil_registry_record: z.string().optional(),
     health_status: z.string().optional(),
-    injury_details: z.string().nullable().optional(),
-    injury_date: z.string().nullable().optional(),
+    injury_details: z.string().or(z.literal('')).nullable().optional(),
+    injury_date: z.string().or(z.literal('')).nullable().optional(),
     chronic_disease_ids: z.array(z.number()).optional().default([]),
 
     employment_details: z.object({
