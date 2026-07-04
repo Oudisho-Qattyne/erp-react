@@ -15,6 +15,7 @@ import type { UseFormReturn } from "react-hook-form"
 import { User, X, FileText, Filter, Search } from "lucide-react"
 import { MiniRing } from "../../../../../core/presentation/layouts/ui/statistics/MiniRing"
 import Input from "../../../../../core/presentation/layouts/ui/inputs/Input"
+import { inputBaseClasses } from "../../../../../core/presentation/layouts/ui/inputs/styles"
 import { ro } from "zod/locales"
 
 export const EmployeeLeaveBalances = () => {
@@ -189,6 +190,7 @@ export const EmployeeLeaveBalances = () => {
                                 placeholder={t("common.search", "shared") || "Search..."}
                                 value={localSearch}
                                 onChange={(val) => setLocalSearch(val as string)}
+                                baseClasses={inputBaseClasses}
                             />
                         </div>
                         <Button variant="primary" size="sm" onClick={handleSearch} leftIcon={<Search size={14} />}>

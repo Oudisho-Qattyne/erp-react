@@ -4,6 +4,7 @@ import { Button } from "../../../../../core/presentation/layouts/ui/buttons/Butt
 import { DataTable, type ColumnDef } from "../../../../../core/presentation/layouts/ui/tables/ResizableTable"
 import { Dialog } from "../../../../../core/presentation/layouts/ui/dialog/Dialog"
 import Input from "../../../../../core/presentation/layouts/ui/inputs/Input"
+import { inputBaseClasses } from "../../../../../core/presentation/layouts/ui/inputs/styles"
 import { LoadingState } from "../../../../../core/presentation/layouts/ui/state/LoadingState"
 import { ErrorState } from "../../../../../core/presentation/layouts/ui/state/ErrorState"
 import { FilterDialog, type FilterField } from "../../../../../core/presentation/layouts/ui/filter/FilterDialog"
@@ -173,6 +174,7 @@ export function AllUsers() {
                 placeholder={t("common.search", "shared") || "Search..."}
                 value={localSearch}
                 onChange={(val) => setLocalSearch(val as string)}
+                baseClasses={inputBaseClasses}
               />
             </div>
             <Button variant="primary" size="sm" onClick={handleSearch} leftIcon={<Search size={14} />}>
