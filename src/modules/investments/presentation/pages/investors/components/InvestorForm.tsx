@@ -14,9 +14,10 @@ interface InvestorFormProps {
   onCancel: () => void;
   submitLabel?: string;
   isCreate?: boolean;
+  edit?:boolean;
 }
 
-export function InvestorForm({ investor, defaultValues, onSubmit, onSuccess, onCancel, submitLabel, isCreate }: InvestorFormProps) {
+export function InvestorForm({ investor, defaultValues, onSubmit, onSuccess, onCancel, submitLabel, isCreate , edit = false}: InvestorFormProps) {
   const { t } = useLanguage();
   const [isEditing, setIsEditing] = React.useState(!!isCreate);
 
@@ -43,8 +44,14 @@ export function InvestorForm({ investor, defaultValues, onSubmit, onSuccess, onC
     { name: 'instagram', type: 'text', label: t('investors.instagram', 'investments') || 'Instagram' },
     { name: 'x', type: 'text', label: t('investors.x', 'investments') || 'Address' },
     { name: 'linkedin', type: 'text', label: t('investors.linkedin', 'investments') || 'Linkedin' },
-    { name: 'is_possible_investor_in_future', type: 'checkbox', label: t('investors.is_possible_investor_in_future', 'investments') || 'Is Possible Investor In Future' },
   ];
+  
+  if(edit){
+    formFields.push(
+      { name: 'is_possible_investor_in_future', type: 'checkbox', label: t('investors.is_possible_investor_in_future', 'investments') || 'Is Possible Investor In Future' },
+    )
+  }
+
 
   return (
     <div className="bg-surface rounded-xl border border-border overflow-hidden">

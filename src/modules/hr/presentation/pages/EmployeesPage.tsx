@@ -10,6 +10,7 @@ import type { EmployeeListItem } from '../../domain/entities/EmployeeListItem';
 import { EmployeeForm } from './EmployeeForm';
 import { FormInput } from '../../../../core/presentation/layouts/ui/inputs/FormInput';
 import Input from '../../../../core/presentation/layouts/ui/inputs/Input';
+import { inputBaseClasses } from '../../../../core/presentation/layouts/ui/inputs/styles';
 import { LoadingState } from '../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../core/presentation/layouts/ui/state/ErrorState';
 import { useManageEmployee } from '../hooks/useEmployees';
@@ -155,6 +156,7 @@ export function EmployeesPage() {
             placeholder={t('employees.search_placeholder', 'hr') || 'بحث...'}
             value={search}
             onChange={(val) => setSearch(val as string)}
+            baseClasses={inputBaseClasses}
             className="w-56"
           />
 

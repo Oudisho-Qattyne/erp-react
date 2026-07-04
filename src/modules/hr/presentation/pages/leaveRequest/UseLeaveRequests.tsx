@@ -12,6 +12,7 @@ import { LeaveTypePickerDialog } from "../../components/leaveTypes/LeaveTypePick
 import type { LeaveRequest } from "../../../domain/entities/leaveRequest/leaveRequest"
 import type { EntityWithNameOnly } from "../../../../../core/domain/entities/EntityWithNameOnly"
 import Input from "../../../../../core/presentation/layouts/ui/inputs/Input"
+import { inputBaseClasses } from "../../../../../core/presentation/layouts/ui/inputs/styles"
 import type { UseFormReturn } from "react-hook-form"
 import { Plus, Eye, Pencil, XCircle, Filter, Search, FileText, X } from "lucide-react"
 
@@ -211,6 +212,7 @@ export function UserLeaveRequests() {
                 placeholder={t("common.search", "shared") || "Search..."}
                 value={localSearch}
                 onChange={(val) => setLocalSearch(val as string)}
+                baseClasses={inputBaseClasses}
               />
             </div>
             <Button variant="primary" size="sm" onClick={handleSearch} leftIcon={<Search size={14} />}>
