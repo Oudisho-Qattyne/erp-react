@@ -65,7 +65,6 @@ export const EMPLOYEE_EMPTY_DEFAULTS = {
   employment_details: {
     job_title: null,
     org_unit_id: null,
-    status: 'active',
     appointment_date: null,
     contract_type: null,
     contract_nature: null,
@@ -629,16 +628,6 @@ export function EmployeeForm({
   const EMPLOYMENT_FIELDS: FieldConfig[] = [
     { name: 'employment_details.job_title', label: t('employees.job_title', 'hr') || 'المسمى الوظيفي' },
     { name: 'assigned_job', label: t('employees.assigned_job', 'hr') || 'العمل المكلف به', required: true },
-    {
-      name: 'employment_details.status',
-      type: 'select',
-      label: t('employees.status', 'hr') || 'حالة الموظف',
-      options: [
-        { value: 'active', label: t('show_employee.status_active', 'hr') || 'نشط' },
-        { value: 'inactive', label: t('show_employee.status_inactive', 'hr') || 'غير نشط' },
-      ],
-      required: true,
-    },
     { name: 'employment_details.appointment_date', type: 'date', label: t('employees.appointment_date', 'hr') || 'تاريخ التعيين' },
     {
       name: 'employment_details.contract_type',

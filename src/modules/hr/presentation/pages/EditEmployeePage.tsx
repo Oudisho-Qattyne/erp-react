@@ -64,7 +64,6 @@ export function EditEmployeePage() {
             employment_details: emp.employment_details ? {
               job_title: emp.employment_details.job_title,
               org_unit_id: emp.employment_details.org_unit_id,
-              status: emp.employment_details.status,
               appointment_date: emp.employment_details.appointment_date,
               contract_type: emp.employment_details.contract_type,
               contract_nature: emp.employment_details.contract_nature,
