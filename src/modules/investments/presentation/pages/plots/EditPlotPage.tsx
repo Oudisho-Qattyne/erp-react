@@ -16,6 +16,7 @@ export function EditPlotPage() {
   const navigate = useNavigate();
   const { getById, update } = useEntityCrud<Plot>('/investments/plots', '/investments/plots');
   const storage = useStorage();
+  const entityName = t('plots.title', 'investments') || 'Plot';
 
   const [plot, setPlot] = useState<Plot | null>(null);
   const [loading, setLoading] = useState(true);
@@ -35,7 +36,7 @@ export function EditPlotPage() {
     try {
       return await update(Number(id), data);
     } catch (err: any) {
-      toast.error(t('plots.update_error', 'investments') || 'Failed to update plot');
+      toast.error((t('plots.update_error', 'investments') || 'Failed to update plot').replace('{name}', entityName));
       throw err;
     }
   };
@@ -77,7 +78,7 @@ export function EditPlotPage() {
         }}
         onSubmit={handleSubmit}
         onSuccess={() => {
-          toast.success(t('plots.updated', 'investments') || 'Plot updated successfully');
+          toast.success((t('plots.updated', 'investments') || 'Plot updated successfully').replace('{name}', entityName));
           navigate('/investments/plots');
         }}
         onCancel={handleBack}

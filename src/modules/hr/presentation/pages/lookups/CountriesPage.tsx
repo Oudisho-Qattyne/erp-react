@@ -14,6 +14,7 @@ import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { toast } from 'sonner';
 import { Pencil, Trash2, Star } from 'lucide-react';
+import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 
 export function CountriesPage() {
   const { t } = useLanguage();
@@ -59,13 +60,18 @@ export function CountriesPage() {
   };
 
   const columns = [
-    { key: 'name', label: t('employees.country', 'hr') || 'Country', width: 300,
-      render: (row: any) => typeof row.name === 'string' ? row.name : (row.name?.ar || row.name?.en || '') },
-    { key: 'is_default', label: t('common.is_default', 'shared') || 'Default', width: 120,
+    {
+      key: 'name', label: t('employees.country', 'hr') || 'Country', width: 300,
+      render: (row: any) => typeof row.name === 'string' ? row.name : (row.name?.ar || row.name?.en || '')
+    },
+    {
+      key: 'is_default', label: t('common.is_default', 'shared') || 'Default', width: 120,
       render: (row: any) => row.is_default
         ? <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full"><Star size={12} /> {t('common.yes', 'shared') || 'Yes'}</span>
-        : <span className="text-xs text-text-muted">—</span> },
-    { key: 'actions', label: t('common.actions', 'shared') || 'Actions', width: 200,
+        : <span className="text-xs text-text-muted">—</span>
+    },
+    {
+      key: 'actions', label: t('common.actions', 'shared') || 'Actions', width: 200,
       render: (row: any) => (
         <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
           {!row.is_default && (
@@ -83,7 +89,8 @@ export function CountriesPage() {
             <Trash2 size={16} className="text-danger" />
           </Button>
         </div>
-      ) },
+      )
+    },
   ];
 
   return (
@@ -114,7 +121,7 @@ export function CountriesPage() {
         <GenericCreateForm
           fields={[{ name: 'name', label: t('employees.country', 'hr') || 'Country name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
           schema={CountryFormSchema}
-          defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), is_default: editItem.is_default } : undefined}
+          defaultValues={editItem ? { name: getLocalizedName(editItem.name), is_default: Boolean(editItem.is_default) } : undefined}
           onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: { ar: data.name } }); } catch { toast.error(t('lookups.update_error', 'hr').replace('{name}', entity)); throw {}; } }}
           onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); getAll(); setEditItem(null); }}
           onCancel={() => setEditItem(null)}
@@ -136,7 +143,7 @@ export function CountriesPage() {
         confirmLoading={confirmLoading}
         onConfirm={handleDeleteConfirm} onCancel={() => setConfirmDelete(null)} />
 
-      <ConfirmDialog isOpen={!!confirmSetDefault} 
+      <ConfirmDialog isOpen={!!confirmSetDefault}
         title={t('common.set_default_title', 'shared')?.replace('{entity}', entity) || 'Set as default'}
         message={t('common.set_default_message', 'shared')?.replace('{entity}', entity) || `Are you sure you want to set this ${entity} as default?`}
         confirmLabel={t('common.set_default', 'shared') || 'Set as default'}

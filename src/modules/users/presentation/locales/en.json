@@ -107,7 +107,19 @@
     "linked_to_employee": "Linked to Employee",
     "permissions": "Permissions",
     "no_permissions": "No permissions assigned",
-    "user_info": "User Information"
+    "user_info": "User Information",
+    "load_error": "Failed to load users: {message}",
+    "load_current_error": "Failed to load user data: {message}",
+    "created": "User created successfully",
+    "create_error": "Failed to create user: {message}",
+    "updated": "User updated successfully",
+    "update_error": "Failed to update user: {message}",
+    "signature_updated": "Signature updated successfully",
+    "signature_update_error": "Failed to update signature: {message}",
+    "exported": "Users exported successfully",
+    "export_error": "Failed to export users: {message}",
+    "linked": "User linked to employee successfully",
+    "link_error": "Failed to link user to employee: {message}"
   },
   "show_user": {
     "title": "User Details",

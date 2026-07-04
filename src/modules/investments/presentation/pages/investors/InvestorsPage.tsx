@@ -11,7 +11,7 @@ import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialo
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { toast } from 'sonner';
 import { YesNo } from '../../../../../core/presentation/layouts/ui/card/YesNo';
-import { Eye, Trash2, Filter } from 'lucide-react';
+import { Eye, Trash2, Filter, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function InvestorsPage() {
@@ -19,6 +19,7 @@ export function InvestorsPage() {
   const navigate = useNavigate();
   const { entities: investors, getAll, remove, loading, error, pagination } = useEntityCrud<Investor>('/investments/investors', '/investments/investors');
 
+  const [localSearch, setLocalSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<Investor | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -191,10 +192,10 @@ export function InvestorsPage() {
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-3">
-        <Input type="text" value={searchQuery} onChange={setSearchQuery}
+        <Input type="text" value={localSearch} onChange={setLocalSearch}
           placeholder={t('common.search', 'shared') || 'Search...'}
           baseClasses={inputBaseClasses} className="w-64" />
-        <Button variant="primary" onClick={() => {}} size="sm">
+        <Button variant="primary" onClick={() => { setSearchQuery(localSearch); setPage(1) }} size="sm" leftIcon={<Search size={14} />}>
           {t('common.search', 'shared') || 'Search'}
         </Button>
         <Button variant="outline" onClick={() => setIsFilterOpen(true)} size="sm" leftIcon={<Filter size={14} />}>

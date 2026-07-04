@@ -52,7 +52,6 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
     employment_details: z.object({
       job_title: z.string().nullable(),
       org_unit_id: z.number(t('employee_form.validation.org_unit_required', 'hr') || 'الوحدة التنظيمية مطلوبة').min(1, t('employee_form.validation.org_unit_required', 'hr') || 'الوحدة التنظيمية مطلوبة'),
-      status: z.enum(['active', 'inactive', 'terminated', 'on_leave'], t('employee_form.validation.status_invalid', 'hr') || 'الحالة الوظيفية غير صالحة'),
       appointment_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, t('employee_form.validation.appointment_date_invalid', 'hr') || 'تاريخ التعيين بصيغة YYYY-MM-DD').nullable(),
       contract_type: z.enum(['full-time', 'part-time', 'temporary', 'contract'], t('employee_form.validation.contract_type_invalid', 'hr') || 'نوع العقد غير صالح').nullable(),
       contract_nature: z.enum(['permanent', 'temporary', 'internship'], t('employee_form.validation.contract_nature_invalid', 'hr') || 'طبيعة العقد غير صالحة').nullable(),

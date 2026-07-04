@@ -38,7 +38,15 @@
     "notes": "ملاحظات",
     "confirm_delete": "هل أنت متأكد من الحذف؟",
     "error": "حدث خطأ",
-    "error_loading": "حدث خطأ أثناء تحميل البيانات"
+    "error_loading": "حدث خطأ أثناء تحميل البيانات",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل إنشاء {name}",
+    "updated": "تم تحديث {name} بنجاح",
+    "update_error": "فشل تحديث {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل حذف {name}",
+    "set_default_success": "تم تعيين {name} كافتراضي بنجاح",
+    "set_default_error": "فشل تعيين {name} كافتراضي"
   },
   "pagination": {
     "showing": "عرض",

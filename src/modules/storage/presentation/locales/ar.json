@@ -62,5 +62,30 @@
   "file_explorer_dialog": {
     "title": "مستكشف الملفات"
   },
-  "error_message": "حدث خطأ ما"
+  "error_message": "حدث خطأ ما",
+  "toasts": {
+    "get_item_unauthorized": "غير مصرح لك بعرض هذا العنصر",
+    "get_item_error": "فشل عرض العنصر: {message}",
+    "folder_created": "تم إنشاء المجلد \"{name}\" بنجاح",
+    "folder_create_unauthorized": "غير مصرح لك بإنشاء مجلد هنا",
+    "folder_create_error": "فشل إنشاء المجلد: {message}",
+    "folder_deleted": "تم حذف المجلد بنجاح",
+    "folder_delete_unauthorized": "غير مصرح لك بحذف هذا المجلد",
+    "folder_delete_error": "فشل حذف المجلد: {message}",
+    "folder_renamed": "تم تغيير الاسم إلى \"{name}\" بنجاح",
+    "folder_rename_unauthorized": "غير مصرح لك بإعادة تسمية هذا العنصر",
+    "folder_rename_error": "فشلت إعادة التسمية: {message}",
+    "file_uploaded": "تم رفع الملف \"{name}\" بنجاح",
+    "file_upload_unauthorized": "غير مصرح لك برفع ملفات هنا",
+    "file_upload_error": "فشل رفع الملف: {message}",
+    "file_deleted": "تم حذف الملف بنجاح",
+    "file_delete_unauthorized": "غير مصرح لك بحذف هذا الملف",
+    "file_delete_error": "فشل حذف الملف: {message}",
+    "file_downloaded": "تم تحميل الملف بنجاح",
+    "file_download_unauthorized": "غير مصرح لك بتحميل هذا الملف",
+    "file_download_error": "فشل تحميل الملف: {message}",
+    "item_moved": "تم نقل العنصر بنجاح",
+    "item_move_unauthorized": "غير مصرح لك بنقل هذا العنصر",
+    "item_move_error": "فشل نقل العنصر: {message}"
+  }
 }

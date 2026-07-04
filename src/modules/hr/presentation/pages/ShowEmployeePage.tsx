@@ -285,15 +285,6 @@ export function ShowEmployeePage() {
                 </div>
                 <InfoRow label={t('employees.job_status_note', 'hr') || 'ملاحظات الحالة الوظيفية'} value={employee.job_status_note} />
                 <InfoRow label={t('employees.assigned_job', 'hr') || 'العمل المكلف به'} value={employee.assigned_job} />
-
-                <div className="flex flex-col gap-1.5">
-                  <span className="text-sm text-text-muted">{t('employees.status', 'hr') || 'حالة الموظف'}</span>
-                  <div>
-                    <span className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-md border ${getStatusColor(employee.employment_details.status)}`}>
-                      {getStatusLabel(employee.employment_details.status, t)}
-                    </span>
-                  </div>
-                </div>
                 <InfoRow label={t('employees.appointment_date', 'hr') || 'تاريخ التعيين'} value={employee.employment_details.appointment_date} icon={<Calendar size={14} />} />
                 <InfoRow label={t('employees.contract_type', 'hr') || 'نوع العقد'} value={getContractType(employee.employment_details.contract_type, t)} />
                 <InfoRow label={t('employees.contract_nature', 'hr') || 'طبيعة العقد'} value={getContractNature(employee.employment_details.contract_nature, t)} />
@@ -418,8 +409,6 @@ function getStatusLabel(status: string | undefined, t: any) {
     case 'active': return t('show_employee.status_active', 'hr') || 'نشط';
     case 'inactive': return t('show_employee.status_inactive', 'hr') || 'غير نشط';
     case 'suspended': return t('show_employee.status_suspended', 'hr') || 'موقوف';
-    case 'terminated': return t('show_employee.status_terminated', 'hr') || 'منتهي';
-    case 'on_leave': return t('show_employee.status_on_leave', 'hr') || 'في إجازة';
     default: return status || t('show_employee.status_unknown', 'hr') || 'غير معروف';
   }
 }

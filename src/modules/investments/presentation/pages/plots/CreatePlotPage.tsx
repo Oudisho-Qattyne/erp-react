@@ -12,6 +12,7 @@ export function CreatePlotPage() {
   const { t, direction } = useLanguage();
   const navigate = useNavigate();
   const { create } = useEntityCrud<Plot>('/investments/plots', '/investments/plots');
+  const entityName = t('plots.title', 'investments') || 'Plot';
 
   const handleBack = () => navigate('/investments/plots');
 
@@ -19,7 +20,7 @@ export function CreatePlotPage() {
     try {
       return await create(data);
     } catch (err: any) {
-      toast.error(t('plots.create_error', 'investments') || 'Failed to create plot');
+      toast.error((t('plots.create_error', 'investments') || 'Failed to create plot').replace('{name}', entityName));
       throw err;
     }
   };
@@ -40,7 +41,7 @@ export function CreatePlotPage() {
         }}
         onSubmit={handleSubmit}
         onSuccess={() => {
-          toast.success(t('plots.created', 'investments') || 'Plot created successfully');
+          toast.success((t('plots.created', 'investments') || 'Plot created successfully').replace('{name}', entityName));
           navigate('/investments/plots');
         }}
         onCancel={handleBack}

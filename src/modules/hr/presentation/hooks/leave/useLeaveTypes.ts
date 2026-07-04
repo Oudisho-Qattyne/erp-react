@@ -64,7 +64,7 @@ export interface UseLeaveTypesReturn {
 
 export const useLeaveTypes = (): UseLeaveTypesReturn => {
   const apiClient = useApiClient()
-  const { language } = useLanguage()
+  const { language, t } = useLanguage()
 
   const [items, setItems] = useState<EntityWithNameOnly[]>([])
   const [userEligibleLeaveTypes, setUserEligibleLeaveTypes] = useState<EntityWithNameOnly[]>([])
@@ -89,7 +89,15 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
   const resetFilter = useCallback(() => setFilterState(DEFAULT_FILTER), [])
 
   const setSearch = useCallback((search: string) => {
-    setFilterState((prev) => ({ ...prev, search, page: 1 }))
+    setFilterState((prev) => {
+      const next = { ...prev, page: 1 }
+      if (search.trim()) {
+        next.search = search
+      } else {
+        delete next.search
+      }
+      return next
+    })
   }, [])
 
   const setPage = useCallback((page: number) => {
@@ -119,11 +127,11 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
     } catch (err: any) {
       const msg = err.message || "Failed to fetch leave types"
       setFnError("findAll", msg)
-      toast.error(language === "ar" ? `فشل تحميل أنواع الإجازات: ${msg}` : `Failed to load leave types: ${msg}`)
+      toast.error(t("leave_types.load_error", "hr").replace("{message}", msg))
     } finally {
       setFnLoading("findAll", false)
     }
-  }, [useCase, filter, language])
+  }, [useCase, filter, t])
 
   const findById = useCallback(async (id: number) => {
     setFnLoading("findById", true)
@@ -135,77 +143,77 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
     } catch (err: any) {
       const msg = err.message || "Failed to fetch leave type"
       setFnError("findById", msg)
-      toast.error(language === "ar" ? `فشل تحميل الإجازة: ${msg}` : `Failed to load leave type: ${msg}`)
+      toast.error(t("leave_types.load_single_error", "hr").replace("{message}", msg))
     } finally {
       setFnLoading("findById", false)
     }
-  }, [useCase, language])
+  }, [useCase, t])
 
   const create = useCallback(async (data: CreateLeaveTypeDto) => {
     setFnLoading("create", true)
     setFnError("create", null)
     try {
       await useCase.createLeaveType(data)
-      toast.success(language === "ar" ? "تم إنشاء الإجازة بنجاح" : "Leave type created successfully")
+      toast.success(t("leave_types.created", "hr"))
     } catch (err: any) {
       const msg = err.message || "Failed to create leave type"
       setFnError("create", msg)
-      toast.error(language === "ar" ? `فشل إنشاء الإجازة: ${msg}` : `Failed to create leave type: ${msg}`)
+      toast.error(t("leave_types.create_error", "hr").replace("{message}", msg))
       throw err
     } finally {
       setFnLoading("create", false)
     }
-  }, [useCase, language])
+  }, [useCase, t])
 
   const update = useCallback(async (id: number, data: UpdateLeaveTypeDto) => {
     setFnLoading("update", true)
     setFnError("update", null)
     try {
       await useCase.updateLeaveType(id, data)
-      toast.success(language === "ar" ? "تم تحديث الإجازة بنجاح" : "Leave type updated successfully")
+      toast.success(t("leave_types.updated", "hr"))
     } catch (err: any) {
       const msg = err.message || "Failed to update leave type"
       setFnError("update", msg)
-      toast.error(language === "ar" ? `فشل تحديث الإجازة: ${msg}` : `Failed to update leave type: ${msg}`)
+      toast.error(t("leave_types.update_error", "hr").replace("{message}", msg))
       throw err
     } finally {
       setFnLoading("update", false)
     }
-  }, [useCase, language])
+  }, [useCase, t])
 
   const archive = useCallback(async (id: number) => {
     setFnLoading("archive", true)
     setFnError("archive", null)
     try {
       await useCase.archiveLeaveType(id)
-      toast.success(language === "ar" ? "تم أرشفة الإجازة بنجاح" : "Leave type archived successfully")
+      toast.success(t("leave_types.archived", "hr"))
       await findAll()
     } catch (err: any) {
       const msg = err.message || "Failed to archive leave type"
       setFnError("archive", msg)
-      toast.error(language === "ar" ? `فشل أرشفة الإجازة: ${msg}` : `Failed to archive leave type: ${msg}`)
+      toast.error(t("leave_types.archive_error", "hr").replace("{message}", msg))
       throw err
     } finally {
       setFnLoading("archive", false)
     }
-  }, [useCase, language, findAll])
+  }, [useCase, t, findAll])
 
   const deleteFn = useCallback(async (id: number) => {
     setFnLoading("delete", true)
     setFnError("delete", null)
     try {
       await useCase.deleteLeaveType(id)
-      toast.success(language === "ar" ? "تم حذف الإجازة بنجاح" : "Leave type deleted successfully")
+      toast.success(t("leave_types.deleted", "hr"))
       await findAll()
     } catch (err: any) {
       const msg = err.message || "Failed to delete leave type"
       setFnError("delete", msg)
-      toast.error(language === "ar" ? `فشل حذف الإجازة: ${msg}` : `Failed to delete leave type: ${msg}`)
+      toast.error(t("leave_types.delete_error", "hr").replace("{message}", msg))
       throw err
     } finally {
       setFnLoading("delete", false)
     }
-  }, [useCase, language, findAll])
+  }, [useCase, t, findAll])
 
   const findUserEligibleLeaveTypesFn = useCallback(async () => {
     setFnLoading("findUserEligibleLeaveTypes", true)
@@ -216,11 +224,11 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
     } catch (err: any) {
       const msg = err.message || "Failed to fetch eligible leave types"
       setFnError("findUserEligibleLeaveTypes", msg)
-      toast.error(language === "ar" ? `فشل تحميل أنواع الإجازات المستحقة: ${msg}` : `Failed to load eligible leave types: ${msg}`)
+      toast.error(t("leave_types.eligible_load_error", "hr").replace("{message}", msg))
     } finally {
       setFnLoading("findUserEligibleLeaveTypes", false)
     }
-  }, [useCase, language])
+  }, [useCase, t])
 
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])

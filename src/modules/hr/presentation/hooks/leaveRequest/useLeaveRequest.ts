@@ -70,7 +70,15 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
   const resetFilter = useCallback(() => setFilterState(DEFAULT_FILTER), [])
 
   const setSearch = useCallback((search: string) => {
-    setFilterState((prev) => ({ ...prev, search, page: 1 }))
+    setFilterState((prev) => {
+      const next = { ...prev, page: 1 }
+      if (search.trim()) {
+        next.search = search
+      } else {
+        delete next.search
+      }
+      return next
+    })
   }, [])
 
   const setPage = useCallback((page: number) => {

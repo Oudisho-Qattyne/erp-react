@@ -131,7 +131,18 @@
     "type_name": "Leave Type",
     "picker_title": "Select Leave Types",
     "no_data": "No leave types found",
-    "selected": "selected"
+    "selected": "selected",
+    "load_error": "Failed to load leave types: {message}",
+    "load_single_error": "Failed to load leave type: {message}",
+    "created": "Leave type created successfully",
+    "create_error": "Failed to create leave type: {message}",
+    "updated": "Leave type updated successfully",
+    "update_error": "Failed to update leave type: {message}",
+    "archived": "Leave type archived successfully",
+    "archive_error": "Failed to archive leave type: {message}",
+    "deleted": "Leave type deleted successfully",
+    "delete_error": "Failed to delete leave type: {message}",
+    "eligible_load_error": "Failed to load eligible leave types: {message}"
   },
   "employee_leave_balances": {
     "title": "Employee Leave Balances",
@@ -559,7 +570,11 @@
     "carried_forward": "Carried Forward",
     "adjustment_added": "Adj +",
     "adjustment_deducted": "Adj -",
-    "no_data": "No leave balances found"
+    "no_data": "No leave balances found",
+    "load_error": "Failed to load leave balances: {message}",
+    "employee_load_error": "Failed to load employee leave balances: {message}",
+    "adjusted": "Leave balance adjusted successfully",
+    "adjust_error": "Failed to adjust leave balance: {message}"
   },
   "employee_leave_requests": {
     "title": "Employee Leave Requests",
