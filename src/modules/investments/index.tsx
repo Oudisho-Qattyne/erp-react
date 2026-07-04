@@ -9,6 +9,7 @@ import { CreatePlotPage } from './presentation/pages/plots/CreatePlotPage';
 import { EditPlotPage } from './presentation/pages/plots/EditPlotPage';
 import { InvestorsPage } from './presentation/pages/investors/InvestorsPage';
 import { CreateInvestorPage } from './presentation/pages/investors/CreateInvestorPage';
+import { CreateFuturePossibleInvestorPage } from './presentation/pages/investors/CreateFuturepossibleInvestorPage';
 import { EditInvestorPage } from './presentation/pages/investors/EditInvestorPage';
 import { MapPin, Users } from 'lucide-react';
 
@@ -88,6 +89,16 @@ const investmentsModule: Module = {
       element: <CreateInvestorPage />,
       layout: 'dashboard',
       label: 'investors.add',
+      nav: false,
+      requiredPermission: 'investments.investors.create',
+      moduleName: 'investments',
+      group: 'investments',
+    },
+    {
+      path: '/investments/investors/create-future-possible',
+      element: <CreateFuturePossibleInvestorPage />,
+      layout: 'dashboard',
+      label: 'investors.add_future_possible',
       nav: false,
       requiredPermission: 'investments.investors.create',
       moduleName: 'investments',

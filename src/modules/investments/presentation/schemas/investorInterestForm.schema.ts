@@ -5,7 +5,7 @@ export const getCreateInvestorInterestFormSchema = (t: (key: string, module?: st
   plot_classification_ids: z.array(z.coerce.number()).nullable().optional(),
   min_area: z.coerce.number().min(0).nullable().optional(),
   max_area: z.coerce.number().min(0).nullable().optional(),
-  notes: z.string().nullable().optional(),
+  notes: z.string().or(z.literal('')).nullable().optional(),
 }).refine((data) => {
   if (data.min_area != null && data.max_area != null && data.max_area < data.min_area) {
     return false;

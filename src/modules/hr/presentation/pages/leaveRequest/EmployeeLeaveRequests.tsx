@@ -15,6 +15,7 @@ import type { LeaveRequest } from "../../../domain/entities/leaveRequest/leaveRe
 import type { EmployeeListItem } from "../../../domain/entities/EmployeeListItem"
 import type { EntityWithNameOnly } from "../../../../../core/domain/entities/EntityWithNameOnly"
 import Input from "../../../../../core/presentation/layouts/ui/inputs/Input"
+import { inputBaseClasses } from "../../../../../core/presentation/layouts/ui/inputs/styles"
 import type { UseFormReturn } from "react-hook-form"
 import { User, X, FileText, Filter, Search, Eye, Check, X as XIcon } from "lucide-react"
 
@@ -259,6 +260,7 @@ export const EmployeeLeaveRequests = () => {
                                 placeholder={t("common.search", "shared") || "Search..."}
                                 value={localSearch}
                                 onChange={(val) => setLocalSearch(val as string)}
+                                baseClasses={inputBaseClasses}
                             />
                         </div>
                         <Button variant="primary" size="sm" onClick={handleSearch} leftIcon={<Search size={14} />}>

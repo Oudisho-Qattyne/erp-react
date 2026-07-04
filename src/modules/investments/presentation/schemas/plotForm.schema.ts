@@ -11,10 +11,10 @@ export const getCreatePlotFormSchema = (t: (key: string, module?: string) => str
   plot_classification_id: z.number(t('plots.validation.plot_classification_id_invalid', 'investments') || 'يجب أن يكون التصنيف رقماً'),
   latitude: z.string().min(1, t('plots.validation.latitude_required', 'investments') || 'خط العرض مطلوب'),
   longitude: z.string().min(1, t('plots.validation.longitude_required', 'investments') || 'خط الطول مطلوب'),
-  current_condition: z.string().optional().nullable(),
-  notes: z.string().optional().nullable(),
-  status_date: z.string().optional().nullable(),
-  created_at: z.string().optional().nullable(),
+  current_condition: z.string().or(z.literal('')).optional().nullable(),
+  notes: z.string().or(z.literal('')).optional().nullable(),
+  status_date: z.string().or(z.literal('')).optional().nullable(),
+  created_at: z.string().or(z.literal('')).optional().nullable(),
 });
 
 const dummyT = (() => '') as (key: string, module?: string) => string;

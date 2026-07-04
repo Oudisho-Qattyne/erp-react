@@ -7,6 +7,7 @@ import { Dialog } from "../../../../../core/presentation/layouts/ui/dialog/Dialo
 import { ConfirmDialog } from "../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog"
 import { FilterDialog, type FilterField } from "../../../../../core/presentation/layouts/ui/filter/FilterDialog"
 import Input from "../../../../../core/presentation/layouts/ui/inputs/Input"
+import { inputBaseClasses } from "../../../../../core/presentation/layouts/ui/inputs/styles"
 import { LoadingState } from "../../../../../core/presentation/layouts/ui/state/LoadingState"
 import { ErrorState } from "../../../../../core/presentation/layouts/ui/state/ErrorState"
 import { useLeaveTypes } from "../../hooks/leave/useLeaveTypes"
@@ -145,6 +146,7 @@ export default function LeavesTypesPage() {
             placeholder={t("common.search", "shared") || "بحث..."}
             value={filter.search}
             onChange={(val) => setSearch(val as string)}
+            baseClasses={inputBaseClasses}
             className="w-56"
           />
           <Button variant="primary" onClick={() => findAll()} size="sm">
@@ -161,7 +163,7 @@ export default function LeavesTypesPage() {
           + {t("leave.add", "hr") || "إضافة إجازة"}
         </Button>
       </div>
-
+ 
       {error.findAll && !loading.findAll && <ErrorState message={error.findAll} onRetry={findAll} />}
       {!error.findAll && (
         <DataTable loading={loading.findAll}

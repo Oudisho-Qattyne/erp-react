@@ -8,6 +8,7 @@ import { LoadingState } from "../state/LoadingState"
 import { ErrorState } from "../state/ErrorState"
 import { useLanguage } from "../../../context/i18n/I18nProvider"
 import { Filter, Search } from "lucide-react"
+import { inputBaseClasses } from "../inputs/styles"
 
 export interface SelectFromTableProps<T extends { id: number | string }> {
   isOpen: boolean
@@ -26,7 +27,7 @@ export interface SelectFromTableProps<T extends { id: number | string }> {
   error: string | null
   onRetry?: () => void
 
-  onSearch: (query: string) => void
+  onSearch?: (query: string) => void
   searchPlaceholder?: string
   searchInitialValue?: string
 
@@ -109,7 +110,11 @@ export function SelectFromTable<T extends { id: number | string }>({
     }
   }, [isOpen, defaultFilter])
 
-  const handleSearch = () => onSearch(localSearch)
+  const handleSearch = () => {
+    if (onSearch) {
+      return onSearch(localSearch)
+    }
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") handleSearch()
@@ -149,17 +154,23 @@ export function SelectFromTable<T extends { id: number | string }>({
     >
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2">
-          <div className="relative flex-1 max-w-sm">
-            <Input
-              type="text"
-              placeholder={searchPlaceholder || s("common.search", "Search...")}
-              value={localSearch}
-              onChange={(val) => setLocalSearch(val as string)}
-            />
-          </div>
-          <Button variant="primary" size="sm" onClick={handleSearch} leftIcon={<Search size={14} />}>
-            {s("common.search", "Search")}
-          </Button>
+          {
+            onSearch &&
+            <div className="relative flex-1 max-w-sm">
+              <Input
+                type="text"
+                placeholder={searchPlaceholder || s("common.search", "Search...")}
+                value={localSearch}
+                onChange={(val) => setLocalSearch(val as string)}
+                baseClasses={inputBaseClasses}
+              />
+            </div>
+          }
+          {onSearch &&
+            <Button variant="primary" size="sm" onClick={handleSearch} leftIcon={<Search size={14} />}>
+              {s("common.search", "Search")}
+            </Button>
+          }
           <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
             {s("common.filter", "Filter")}
           </Button>
@@ -170,7 +181,7 @@ export function SelectFromTable<T extends { id: number | string }>({
 
         {isLoading && <LoadingState />}
         {error && !isLoading && (
-          <ErrorState message={error} onRetry={onRetry || (() => {})} />
+          <ErrorState message={error} onRetry={onRetry || (() => { })} />
         )}
         {!isLoading && !error && (
           <DataTable
@@ -208,7 +219,7 @@ export function SelectFromTable<T extends { id: number | string }>({
         isOpen={isFilterOpen}
         fields={filterFields}
         initialValues={filterValues}
-        onFilter={onApplyFilter}
+        onFilter={(values) => { onApplyFilter(values); setIsFilterOpen(false) }}
         onCancel={() => setIsFilterOpen(false)}
         onReset={() => { onResetFilter(); setIsFilterOpen(false) }}
       />
