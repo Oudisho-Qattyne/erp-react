@@ -39,7 +39,6 @@ export interface UseManageUsersReturn {
   exportUsersExcel: () => Promise<void>
   exportUsersPdf: () => Promise<void>
   linkUserToEmployee: (userId: number, employeeId: number) => Promise<void>
-  setSearch: (search: string) => void
   setPage: (page: number) => void
 }
 
@@ -68,17 +67,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
 
   const resetFilter = useCallback(() => setFilterState(DEFAULT_FILTER), [])
 
-  const setSearch = useCallback((search: string) => {
-    setFilterState((prev) => {
-      const next = { ...prev, page: 1 }
-      if (search.trim()) {
-        next.search = search as any
-      } else {
-        delete next.search
-      }
-      return next
-    })
-  }, [])
+ 
 
   const setPage = useCallback((page: number) => {
     setFilterState((prev) => ({ ...prev, page }))
@@ -260,7 +249,6 @@ export const useManageUsers = (): UseManageUsersReturn => {
     exportUsersExcel,
     exportUsersPdf,
     linkUserToEmployee,
-    setSearch,
     setPage,
   }
 }

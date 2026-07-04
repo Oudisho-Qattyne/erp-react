@@ -29,7 +29,7 @@ export function UserPickerDialog({
   defaultFilter,
 }: UserPickerDialogProps) {
   const { t } = useLanguage()
-  const { users, loading, error, pagination, filter, setSearch, setPage, setFilter, resetFilter, getAllUsers } = useManageUsers()
+  const { users, loading, error, pagination, filter, setPage, setFilter, resetFilter, getAllUsers } = useManageUsers()
   const [sortBy, setSortBy] = useState<string | undefined>(undefined)
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
 
@@ -101,7 +101,6 @@ export function UserPickerDialog({
       isLoading={loading.getAllUsers}
       error={error.getAllUsers}
       onRetry={getAllUsers}
-      onSearch={(query) => setSearch(query)}
       searchPlaceholder={t("users.search_placeholder", "users") || "Search..."}
       sortColumn={sortBy}
       sortOrder={sortOrder}

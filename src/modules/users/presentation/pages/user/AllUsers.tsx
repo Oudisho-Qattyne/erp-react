@@ -168,7 +168,7 @@ export function AllUsers() {
       ) : (
         <div className="relative w-full">
           <div className="relative flex gap-3 py-3">
-            <div className="relative flex-1 max-w-sm">
+            {/* <div className="relative flex-1 max-w-sm">
               <Input
                 type="text"
                 placeholder={t("common.search", "shared") || "Search..."}
@@ -179,7 +179,7 @@ export function AllUsers() {
             </div>
             <Button variant="primary" size="sm" onClick={handleSearch} leftIcon={<Search size={14} />}>
               {t("common.search", "shared") || "Search"}
-            </Button>
+            </Button> */}
             <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
               {t("common.filter", "shared") || "Filter"}
             </Button>
