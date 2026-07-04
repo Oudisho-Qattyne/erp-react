@@ -161,7 +161,7 @@ export default function LeavesTypesPage() {
           + {t("leave.add", "hr") || "إضافة إجازة"}
         </Button>
       </div>
-
+ 
       {error.findAll && !loading.findAll && <ErrorState message={error.findAll} onRetry={findAll} />}
       {!error.findAll && (
         <DataTable loading={loading.findAll}

@@ -10,10 +10,10 @@ export const getCreateInvestorFormSchema = (t: (key: string, module?: string) =>
   whatsapp_number: z.string().max(20, t('investors.validation.whatsapp_max', 'investments') || 'يجب ألا يتجاوز رقم الواتساب 20 حرفاً').optional().nullable(),
   email: z.string(t('investors.validation.email_invalid', 'investments') || 'البريد الإلكتروني غير صالح').max(255).optional().nullable(),
   address: z.string().max(500, t('investors.validation.address_max', 'investments') || 'يجب ألا يتجاوز العنوان 500 حرف').optional().nullable(),
-  facebook: z.url(t('investors.validation.url_invalid', 'investments') || 'رابط غير صالح').or(z.literal('')).optional(),
-  instagram: z.url(t('investors.validation.url_invalid', 'investments') || 'رابط غير صالح').or(z.literal('')).optional(),
-  x: z.url(t('investors.validation.url_invalid', 'investments') || 'رابط غير صالح').or(z.literal('')).optional(),
-  linkedin: z.url(t('investors.validation.url_invalid', 'investments') || 'رابط غير صالح').or(z.literal('')).optional(),
+  facebook: z.url(t('investors.validation.url_invalid', 'investments') || 'رابط غير صالح').or(z.literal('')).optional().nullable(),
+  instagram: z.url(t('investors.validation.url_invalid', 'investments') || 'رابط غير صالح').or(z.literal('')).optional().nullable(),
+  x: z.url(t('investors.validation.url_invalid', 'investments') || 'رابط غير صالح').or(z.literal('')).optional().nullable(),
+  linkedin: z.url(t('investors.validation.url_invalid', 'investments') || 'رابط غير صالح').or(z.literal('')).optional().nullable(),
   is_possible_investor_in_future: z.boolean().default(false),
 });
 

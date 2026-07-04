@@ -22,7 +22,7 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
     internal_id: z.string(t('employee_form.validation.internal_id_required', 'hr') || 'الرقم الداخلي مطلوب').min(1, t('employee_form.validation.internal_id_required', 'hr') || 'الرقم الداخلي مطلوب'),
     national_id: z.string(t('employee_form.validation.national_id_required', 'hr') || 'الرقم الوطني مطلوب').min(1, t('employee_form.validation.national_id_required', 'hr') || 'الرقم الوطني مطلوب'),
     first_name: z.string(t('employee_form.validation.first_name_required', 'hr') || 'الاسم الأول مطلوب').min(1, t('employee_form.validation.first_name_required', 'hr') || 'الاسم الأول مطلوب'),
-    father_name: z.string().min(1, t('employee_form.validation.father_name_required', 'hr') || 'اسم الأب مطلوب').nullable().optional(),
+    father_name: z.string().min(1, t('employee_form.validation.father_name_required', 'hr') || 'اسم الأب مطلوب').nullable().optional().or(z.literal('')),
     grandfather_name: z.string().min(1, t('employee_form.validation.grandfather_name_required', 'hr') || 'اسم الجد مطلوب').nullable().optional(),
     last_name: z.string(t('employee_form.validation.last_name_required', 'hr') || 'اسم العائلة مطلوب').min(1, t('employee_form.validation.last_name_required', 'hr') || 'اسم العائلة مطلوب'),
     mother_name: z.string().min(1, t('employee_form.validation.mother_name_required', 'hr') || 'اسم الأم مطلوب').nullable().optional(),

@@ -53,10 +53,11 @@ export function GenericCreateForm({
   onCancel,
   submitLabel = 'حفظ',
 }: GenericCreateFormProps) {
-  const { form: methods } = useDynamicForm({ schema, defaultValues });
+  const { form: methods , errors , getValues} = useDynamicForm({ schema, defaultValues });
   const { handleSubmit, formState } = methods;
   const { isValid, isSubmitting } = formState;
   const formRef = useRef<HTMLDivElement>(null);
+console.log(errors , isValid , getValues());
 
   const handleFormSubmit = async (data: any) => {
     try {

@@ -165,6 +165,7 @@ export function EditInvestorPage() {
 
 
       <InvestorForm
+        edit={true}
         investor={investor}
         defaultValues={investor}
         onSubmit={handleSubmit}
@@ -175,7 +176,7 @@ export function EditInvestorPage() {
         onCancel={handleBack}
         submitLabel={t('common.save', 'shared') || 'Save'}
       />
-    
+
       <div className="bg-surface rounded-xl border border-border p-6 mt-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-bold">{t('investors.interests', 'investments') || 'Interests'}</h2>

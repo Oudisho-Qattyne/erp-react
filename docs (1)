@@ -2478,6 +2478,523 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
+  /investments/plot-areas:
+    get:
+      tags:
+        - 'Plot Areas'
+      summary: 'Get all Plot Areas'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: is_active
+          in: query
+          schema:
+            type: boolean
+        -
+          name: is_default
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'Successful operation'
+    post:
+      tags:
+        - 'Plot Areas'
+      summary: 'Create a Plot Area'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlotAreaDTO'
+      responses:
+        200:
+          description: 'Successful operation'
+  '/investments/plot-areas/{id}':
+    get:
+      tags:
+        - 'Plot Areas'
+      summary: 'Get a Plot Area by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Successful operation'
+        404:
+          description: 'Not found'
+    put:
+      tags:
+        - 'Plot Areas'
+      summary: 'Update a Plot Area'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlotAreaDTO'
+      responses:
+        200:
+          description: 'Successful operation'
+        404:
+          description: 'Not found'
+    delete:
+      tags:
+        - 'Plot Areas'
+      summary: 'Delete a Plot Area'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Successful operation'
+        400:
+          description: 'Bad request (Has related records)'
+        404:
+          description: 'Not found'
+  /investments/plot-classifications:
+    get:
+      tags:
+        - 'Plot Classifications'
+      summary: 'Get all Plot Classifications'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: is_active
+          in: query
+          schema:
+            type: boolean
+        -
+          name: is_default
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'Successful operation'
+    post:
+      tags:
+        - 'Plot Classifications'
+      summary: 'Create a Plot Classification'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlotClassificationDTO'
+      responses:
+        200:
+          description: 'Successful operation'
+  '/investments/plot-classifications/{id}':
+    get:
+      tags:
+        - 'Plot Classifications'
+      summary: 'Get a Plot Classification by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Successful operation'
+        404:
+          description: 'Not found'
+    put:
+      tags:
+        - 'Plot Classifications'
+      summary: 'Update a Plot Classification'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlotClassificationDTO'
+      responses:
+        200:
+          description: 'Successful operation'
+        404:
+          description: 'Not found'
+    delete:
+      tags:
+        - 'Plot Classifications'
+      summary: 'Delete a Plot Classification'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Successful operation'
+        400:
+          description: 'Bad request (Has related records)'
+        404:
+          description: 'Not found'
+  /investments/plots:
+    get:
+      tags:
+        - Plots
+      summary: 'Get all Plots'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Successful operation'
+    post:
+      tags:
+        - Plots
+      summary: 'Create a Plot'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlotDTO'
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlotInfoResource'
+  '/investments/plots/{id}':
+    get:
+      tags:
+        - Plots
+      summary: 'Get a Plot by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlotInfoResource'
+        404:
+          description: 'Not found'
+    put:
+      tags:
+        - Plots
+      summary: 'Update a Plot'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlotDTO'
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlotInfoResource'
+        404:
+          description: 'Not found'
+  '/investments/plots/{id}/status':
+    put:
+      tags:
+        - Plots
+      summary: 'Change Plot Status'
+      description: "Updates the plot status with linear progression enforcement and granular permission check.\n\nThe user must hold both:\n1. Route permission `investments.plots.update`\n2. The status-specific permission matching the target status (see ChangePlotStatusDTO.status)\n\nStatuses must follow a strict linear order – only same-status or exactly one step forward is allowed.\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePlotStatusDTO'
+      responses:
+        200:
+          description: 'Successful operation – returns the updated plot resource'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlotInfoResource'
+        404:
+          description: 'Plot not found'
+        422:
+          description: 'Invalid status progression or missing permission'
+    delete:
+      tags:
+        - Plots
+      summary: 'Delete a Plot'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Successful operation'
+        400:
+          description: 'Bad request (Has related records)'
+        404:
+          description: 'Not found'
+  /investments/investors:
+    get:
+      tags:
+        - Investors
+      summary: 'Get all Investors'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: has_social_account
+          in: query
+          schema:
+            type: boolean
+        -
+          name: has_facebook_account
+          in: query
+          schema:
+            type: boolean
+        -
+          name: has_instagram_account
+          in: query
+          schema:
+            type: boolean
+        -
+          name: has_x_account
+          in: query
+          schema:
+            type: boolean
+        -
+          name: has_linkedin_account
+          in: query
+          schema:
+            type: boolean
+        -
+          name: is_possible_investor_in_future
+          in: query
+          schema:
+            type: boolean
+        -
+          name: has_phone_number
+          in: query
+          schema:
+            type: boolean
+        -
+          name: has_whatsapp_number
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorInfoResource'
+    post:
+      tags:
+        - Investors
+      summary: 'Create an Investor'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvestorDTO'
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorInfoResource'
+  '/investments/investors/{id}':
+    get:
+      tags:
+        - Investors
+      summary: 'Get an Investor by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorInfoResource'
+        404:
+          description: 'Not found'
+    put:
+      tags:
+        - Investors
+      summary: 'Update an Investor'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvestorDTO'
+      responses:
+        200:
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvestorInfoResource'
+        404:
+          description: 'Not found'
+    delete:
+      tags:
+        - Investors
+      summary: 'Delete an Investor'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Successful operation'
+        400:
+          description: 'Bad request (Has related records)'
+        404:
+          description: 'Not found'
   /storage-management:
     get:
       summary: 'List root-level storage items'
@@ -4766,6 +5283,14 @@ components:
         employee_id:
           type: integer
           example: 1
+        employee_first_name:
+          type: string
+          nullable: true
+          example: John
+        employee_last_name:
+          type: string
+          nullable: true
+          example: Smith
         leave_type_id:
           type: integer
           example: 1
@@ -4976,6 +5501,328 @@ components:
           $ref: '#/components/schemas/proration_scheme'
         is_active:
           type: boolean
+    InvestorDTO:
+      type: object
+      required:
+        - full_name
+        - nationality
+        - gender
+      properties:
+        full_name:
+          type: string
+          example: 'John Doe'
+        national_id:
+          type: string
+          example: '1234567890'
+        passport_number:
+          type: string
+          example: A1234567
+        nationality:
+          type: string
+          example: Syrian
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+          example: male
+        phone:
+          type: string
+          example: '+963999999999'
+        whatsapp_number:
+          type: string
+          example: '+963999999999'
+        email:
+          type: string
+          example: johndoe@example.com
+        address:
+          type: string
+          example: 'Damascus, Syria'
+        facebook:
+          type: string
+          nullable: true
+          example: 'https://facebook.com/johndoe'
+        instagram:
+          type: string
+          nullable: true
+          example: 'https://instagram.com/johndoe'
+        x:
+          type: string
+          nullable: true
+          example: 'https://x.com/johndoe'
+        linkedin:
+          type: string
+          nullable: true
+          example: 'https://linkedin.com/in/johndoe'
+    InvestorInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        full_name:
+          type: string
+          example: 'John Doe'
+        national_id:
+          type: string
+          nullable: true
+          example: '1234567890'
+        passport_number:
+          type: string
+          nullable: true
+          example: A1234567
+        nationality:
+          type: string
+          example: Syrian
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+          example: male
+        phone:
+          type: string
+          nullable: true
+          example: '+963999999999'
+        whatsapp_number:
+          type: string
+          nullable: true
+          example: '+963999999999'
+        email:
+          type: string
+          nullable: true
+          example: johndoe@example.com
+        address:
+          type: string
+          nullable: true
+          example: 'Damascus, Syria'
+        facebook:
+          type: string
+          nullable: true
+          example: 'https://facebook.com/johndoe'
+        instagram:
+          type: string
+          nullable: true
+          example: 'https://instagram.com/johndoe'
+        x:
+          type: string
+          nullable: true
+          example: 'https://x.com/johndoe'
+        linkedin:
+          type: string
+          nullable: true
+          example: 'https://linkedin.com/in/johndoe'
+        is_possible_investor_in_future:
+          type: boolean
+          example: false
+        user:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: 'Admin User'
+        interests:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+              name:
+                type: string
+                example: 'Real Estate'
+        created_at:
+          type: string
+          format: date
+          example: '2026-06-27T00:00:00Z'
+        updated_at:
+          type: string
+          format: date
+          example: '2026-06-27T00:00:00Z'
+    PlotAreaDTO:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: 'North Region'
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+    PlotClassificationDTO:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Residential
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+    PlotDTO:
+      type: object
+      required:
+        - code
+        - identifier
+        - area
+        - plot_area_id
+        - plot_classification_id
+        - latitude
+        - longitude
+      properties:
+        code:
+          type: string
+          example: PLT-001
+        identifier:
+          type: string
+          example: PLT-2026-001
+          description: 'Unique plot identifier'
+        area:
+          type: number
+          example: 1000.5
+        plot_area_id:
+          type: integer
+          example: 1
+        plot_classification_id:
+          type: integer
+          example: 1
+        latitude:
+          type: string
+          example: '33.5138'
+        longitude:
+          type: string
+          example: '36.2765'
+        current_condition:
+          type: string
+          example: 'Empty land'
+        notes:
+          type: string
+          example: 'Test notes'
+        created_at:
+          type: string
+          format: date
+          example: '2026-06-27'
+        status_date:
+          type: string
+          format: date
+          example: '2026-06-27'
+    PlotInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        status:
+          type: string
+          enum:
+            - unsold
+            - announced
+            - subscribed
+            - allocated
+            - separated
+          example: unsold
+        code:
+          type: string
+          example: PLT-001
+        identifier:
+          type: string
+          example: PLT-2026-001
+        area:
+          type: number
+          example: 1000.5
+        plot_area_id:
+          type: integer
+          example: 1
+        plot_classification_id:
+          type: integer
+          example: 1
+        latitude:
+          type: string
+          example: '33.5138'
+        longitude:
+          type: string
+          example: '36.2765'
+        current_condition:
+          type: string
+          nullable: true
+          example: 'Empty land'
+        notes:
+          type: string
+          nullable: true
+          example: 'Test notes'
+        folder_id:
+          type: string
+          nullable: true
+          example: 0194f5a0-...
+          description: 'Storage folder ID (assigned after plot creation)'
+        user_id:
+          type: integer
+          nullable: true
+          example: 1
+        created_at:
+          type: string
+          format: date
+          example: '2026-06-27'
+        updated_at:
+          type: string
+          format: date
+          example: '2026-06-27'
+        user:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: 'Admin User'
+    ChangePlotStatusDTO:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - unsold
+            - announced
+            - subscribed
+            - allocated
+            - separated
+          example: announced
+          description: "Target status. The user must hold the corresponding granular permission:\n  - unsold     → investments.plots.set-unsold\n  - announced  → investments.plots.set-announced\n  - subscribed → investments.plots.set-subscribed\n  - allocated  → investments.plots.set-allocated\n  - separated  → investments.plots.set-separated\n"
+        status_date:
+          type: string
+          format: date
+          example: '2026-06-27'
+          description: 'Date the status takes effect (defaults to now)'
+        notes:
+          type: string
+          maxLength: 1000
+          example: 'Plot has been announced for public bidding'
+    PlotStatus:
+      type: string
+      enum:
+        - unsold
+        - announced
+        - subscribed
+        - allocated
+        - separated
+      description: "The status lifecycle follows a strict linear progression:\n  unsold → announced → subscribed → allocated → separated\nTransitions may only go to the same status (re-set) or exactly one step forward.\nSkipping a step or moving backward is rejected with 422.\n"
     StorageItemBase:
       type: object
       properties:
@@ -5231,6 +6078,18 @@ components:
           type: string
           nullable: true
           example: 'http://localhost/path/to/signature.png'
+        employee_id:
+          type: integer
+          nullable: true
+          example: 10
+        employee_first_name:
+          type: string
+          nullable: true
+          example: John
+        employee_last_name:
+          type: string
+          nullable: true
+          example: Smith
         role:
           $ref: '#/components/schemas/Role'
         created_at:
@@ -5792,6 +6651,18 @@ tags:
   -
     name: 'Employee Statuses'
     description: 'Manage employee status definitions'
+  -
+    name: 'Plot Areas'
+    description: 'Manage Plot Area definitions'
+  -
+    name: 'Plot Classifications'
+    description: 'Manage Plot Classification definitions'
+  -
+    name: Plots
+    description: 'Manage Plots'
+  -
+    name: Investors
+    description: 'Manage Investors'
   -
     name: Storage
     description: 'Resolve storage items by ID or list root-level items'
