@@ -91,6 +91,33 @@
     "allocated": "Allocated",
     "separated": "Separated"
   },
+  "dossier": {
+    "title": "Dossiers",
+    "add": "Add Dossier",
+    "number": "Dossier Number",
+    "number_placeholder": "Enter dossier number",
+    "date": "Dossier Date",
+    "status": "Status",
+    "status_draft": "Draft",
+    "status_canceled": "Canceled",
+    "status_active": "Active",
+    "view": "View Dossier",
+    "allocate": "Allocate",
+    "created": "Dossier created successfully",
+    "create_error": "Failed to create dossier",
+    "deleted": "Dossier deleted successfully",
+    "delete_error": "Failed to delete dossier",
+    "allocated": "Dossier allocated successfully",
+    "allocate_error": "Failed to allocate dossier",
+    "delete_title": "Delete Dossier",
+    "delete_message": "Are you sure you want to delete this dossier?",
+    "load_error": "Failed to load dossiers",
+    "no_records": "No dossiers found",
+    "validation": {
+      "date_required": "Dossier date is required",
+      "status_required": "Dossier status is required"
+    }
+  },
   "investors": {
     "title": "Investors",
     "invistor":"investor",

@@ -91,6 +91,33 @@
     "allocated": "مخصصة",
     "separated": "مغصول"
   },
+  "dossier": {
+    "title": "الإضبارات",
+    "add": "إضافة إضبارة",
+    "number": "رقم الإضبارة",
+    "number_placeholder": "أدخل رقم الإضبارة",
+    "date": "تاريخ الإضبارة",
+    "status": "الحالة",
+    "status_draft": "مسودة",
+    "status_canceled": "ملغي",
+    "status_active": "نشط",
+    "view": "عرض الإضبارة",
+    "allocate": "تخصيص",
+    "created": "تم إنشاء الإضبارة بنجاح",
+    "create_error": "فشل في إنشاء الإضبارة",
+    "deleted": "تم حذف الإضبارة بنجاح",
+    "delete_error": "فشل في حذف الإضبارة",
+    "allocated": "تم تخصيص الإضبارة بنجاح",
+    "allocate_error": "فشل في تخصيص الإضبارة",
+    "delete_title": "حذف الإضبارة",
+    "delete_message": "هل أنت متأكد من حذف هذه الإضبارة؟",
+    "load_error": "فشل تحميل الإضبارات",
+    "no_records": "لا توجد إضبارات",
+    "validation": {
+      "date_required": "تاريخ الإضبارة مطلوب",
+      "status_required": "حالة الإضبارة مطلوبة"
+    }
+  },
   "investors": {
     "title": "المستثمرين",
     "invistor":"مستثمر",

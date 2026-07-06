@@ -3,6 +3,7 @@ import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nP
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import type { Plot } from '../../../domain/entities/plot';
 import { PlotForm } from './components/PlotForm';
+import { DossiersSection } from './components/DossiersSection';
 import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
@@ -66,7 +67,7 @@ export function EditPlotPage() {
         plot={plot}
         defaultValues={{
           code: plot.code,
-          identifier:plot.identifier,
+          identifier: plot.identifier,
           area: plot.area,
           plot_area_id: plot.plot_area_id,
           plot_classification_id: plot.plot_classification_id,
@@ -86,6 +87,10 @@ export function EditPlotPage() {
       />
       {storage?.FileExplorerDialogComponent && plot?.folder_id &&
         <storage.FileExplorerDialogComponent isOpen={FileExplorerOpen} onClose={() => { setFileExplorerOpen(false) }} folderId={plot.folder_id} />
+      }
+      {
+        plot.status != "unsold" && plot.status != "announced" &&
+        <DossiersSection plotId={Number(id)} plotStatus={plot.status} />
       }
     </div>
   );
