@@ -159,7 +159,7 @@ export function PlotClassificationsPage() {
         />
       </Dialog>
 
-      {error && <ErrorState message={error} onRetry={getAll} />}
+      {error && <ErrorState message={error} onRetry={() => getAll()} />}
       {!error && (
         <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
           emptyMessage={t('plot_classifications.no_records', 'investments')} />

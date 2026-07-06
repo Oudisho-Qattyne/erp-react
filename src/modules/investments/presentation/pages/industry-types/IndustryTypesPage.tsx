@@ -160,7 +160,7 @@ export function IndustryTypesPage() {
         />
       </Dialog>
 
-      {error && <ErrorState message={error} onRetry={getAll} />}
+      {error && <ErrorState message={error} onRetry={() => getAll()} />}
       {!error && (
         <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
           emptyMessage={t('industry_types.no_records', 'investments')} />

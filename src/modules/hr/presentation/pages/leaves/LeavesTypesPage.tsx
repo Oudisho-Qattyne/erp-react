@@ -164,7 +164,7 @@ export default function LeavesTypesPage() {
         </Button>
       </div>
  
-      {error.findAll && !loading.findAll && <ErrorState message={error.findAll} onRetry={findAll} />}
+      {error.findAll && !loading.findAll && <ErrorState message={error.findAll} onRetry={() => findAll()} />}
       {!error.findAll && (
         <DataTable loading={loading.findAll}
           columns={columns}

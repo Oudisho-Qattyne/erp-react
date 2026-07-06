@@ -23,7 +23,7 @@ export const UserEligibleLeaveTypes = () => {
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-6">{t("leave.user_eligible_leave_types", "hr") || "User Eligible Leave Types"}</h1>
             {error.findUserEligibleLeaveTypes ? (
-                <ErrorState message={error.findUserEligibleLeaveTypes} onRetry={findUserEligibleLeaveTypes} />
+                <ErrorState message={error.findUserEligibleLeaveTypes} onRetry={() => findUserEligibleLeaveTypes()} />
             ) : (
                 <DataTable
                     columns={columns}

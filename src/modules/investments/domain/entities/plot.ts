@@ -1,8 +1,10 @@
+import type { PlotStatus } from "../valueObjects/plots/plotStatus";
+
 export interface Plot {
   id: number;
   code: string;
   identifier:string;
-  status: string;
+  status: PlotStatus;
   area: number;
   plot_area_id: number;
   plot_classification_id: number;

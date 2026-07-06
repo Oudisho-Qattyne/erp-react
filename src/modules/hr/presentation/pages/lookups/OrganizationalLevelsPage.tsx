@@ -167,7 +167,7 @@ export function OrganizationalLevelsPage() {
         />
       </Dialog>
 
-      {error && <ErrorState message={error} onRetry={getAll} />}
+      {error && <ErrorState message={error} onRetry={() => getAll()} />}
       {!error && (
         <DataTable columns={columns} data={flatRows.map(r => ({ ...r.node, _depth: r.depth }))} rowKey="id" loading={loading}
           emptyMessage={t('lookups.no_organizational_levels', 'hr') || 'No organizational levels found'} />

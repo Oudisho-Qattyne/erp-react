@@ -1,0 +1,1 @@
+export type PlotStatus = "unsold" | "announced" | "subscribed" | "allocated" | "separated"

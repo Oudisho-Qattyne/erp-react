@@ -153,7 +153,7 @@ export function EditInvestorPage() {
   };
 
   if (loading) return <LoadingState />;
-  if (error || !investor) return <ErrorState message={error || 'Investor not found'} onRetry={fetchInvestor} />;
+  if (error || !investor) return <ErrorState message={error || 'Investor not found'} onRetry={() => fetchInvestor()} />;
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">

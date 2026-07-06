@@ -123,7 +123,7 @@ export function ChronicDiseasesPage() {
         />
       </Dialog>
 
-      {error && <ErrorState message={error} onRetry={getAll} />}
+      {error && <ErrorState message={error} onRetry={() => getAll()} />}
       {!error && (
         <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
           emptyMessage={t('lookups.no_chronic_diseases', 'hr') || 'No chronic diseases found'} />

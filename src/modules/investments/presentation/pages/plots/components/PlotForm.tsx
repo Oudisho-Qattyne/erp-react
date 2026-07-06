@@ -146,7 +146,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
           {!isCreate && plot?.status_histories && plot.status_histories.length > 0 && (
             <Button variant="outline" size="sm" onClick={() => setIsHistoryModalOpen(true)} className="flex items-center gap-2">
               <History size={16} />
-              {t('plots.view_history', 'investments') || 'سحل الحالات'}
+              {t('plots.view_history', 'investments') || 'سجل الحالات'}
             </Button>
           )}
         </div>

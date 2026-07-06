@@ -135,7 +135,7 @@ export const UserLeaveBalances = () => {
       <h1 className="text-2xl font-bold">{t("leave_balance.my_balances", "hr") || "My Leave Balances"}</h1>
 
       {error.findAllMyLeaveBalances ? (
-        <ErrorState message={error.findAllMyLeaveBalances} onRetry={() => {}} />
+        <ErrorState message={error.findAllMyLeaveBalances} onRetry={() => findAllMyLeaveBalances()} />
       ) : (
         <>
           <div className="flex gap-3 py-3">

@@ -131,7 +131,18 @@
     "type_name": "نوع الإجازة",
     "picker_title": "اختيار أنواع الإجازات",
     "no_data": "لا توجد أنواع إجازات",
-    "selected": "مختار"
+    "selected": "مختار",
+    "load_error": "فشل تحميل أنواع الإجازات: {message}",
+    "load_single_error": "فشل تحميل نوع الإجازة: {message}",
+    "created": "تم إنشاء نوع الإجازة بنجاح",
+    "create_error": "فشل إنشاء نوع الإجازة: {message}",
+    "updated": "تم تحديث نوع الإجازة بنجاح",
+    "update_error": "فشل تحديث نوع الإجازة: {message}",
+    "archived": "تم أرشفة نوع الإجازة بنجاح",
+    "archive_error": "فشل أرشفة نوع الإجازة: {message}",
+    "deleted": "تم حذف نوع الإجازة بنجاح",
+    "delete_error": "فشل حذف نوع الإجازة: {message}",
+    "eligible_load_error": "فشل تحميل أنواع الإجازات المستحقة: {message}"
   },
   "employee_leave_balances": {
     "title": "أرصدة إجازات الموظفين",
@@ -557,7 +568,11 @@
     "carried_forward": "مرحل",
     "adjustment_added": "تعديل +",
     "adjustment_deducted": "تعديل -",
-    "no_data": "لا توجد أرصدة إجازات"
+    "no_data": "لا توجد أرصدة إجازات",
+    "load_error": "فشل تحميل أرصدة الإجازات: {message}",
+    "employee_load_error": "فشل تحميل أرصدة إجازات الموظف: {message}",
+    "adjusted": "تم تعديل رصيد الإجازات بنجاح",
+    "adjust_error": "فشل تعديل رصيد الإجازات: {message}"
   },
   "employee_leave_requests": {
     "title": "طلبات إجازة الموظفين",

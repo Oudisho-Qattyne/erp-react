@@ -160,7 +160,7 @@ export function LicensingStatusesPage() {
         />
       </Dialog>
 
-      {error && <ErrorState message={error} onRetry={getAll} />}
+      {error && <ErrorState message={error} onRetry={() => getAll()} />}
       {!error && (
         <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
           emptyMessage={t('licensing_statuses.no_records', 'investments')} />

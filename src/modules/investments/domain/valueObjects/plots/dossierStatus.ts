@@ -1,0 +1,1 @@
+export type DossierStatus = "draft" | "canceled" | "active"

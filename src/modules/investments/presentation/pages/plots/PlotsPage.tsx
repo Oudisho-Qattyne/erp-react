@@ -113,11 +113,10 @@ export function PlotsPage() {
   const classificationOptions = useMemo(() => classifications.map(c => ({ value: String(c.id), label: getLocalizedName(c.name) })), [classifications]);
   const statusOptions = useMemo(() => [
     { value: 'unsold', label: t('plot_status.unsold', 'investments') || 'Unsold' },
-    { value: 'reserved', label: t('plot_status.reserved', 'investments') || 'Reserved' },
-    { value: 'sold', label: t('plot_status.sold', 'investments') || 'Sold' },
-    { value: 'hold', label: t('plot_status.hold', 'investments') || 'Hold' },
-    { value: 'rented', label: t('plot_status.rented', 'investments') || 'Rented' },
-    { value: 'shared', label: t('plot_status.shared', 'investments') || 'Shared' }
+    { value: 'announced', label: t('plot_status.announced', 'investments') || 'Announced' },
+    { value: 'subscribed', label: t('plot_status.subscribed', 'investments') || 'Subscribed' },
+    { value: 'allocated', label: t('plot_status.allocated', 'investments') || 'Allocated' },
+    { value: 'separated', label: t('plot_status.separated', 'investments') || 'Separated' }
   ], [t]);
 
   const filterFields: FilterField[] = useMemo(() => [
