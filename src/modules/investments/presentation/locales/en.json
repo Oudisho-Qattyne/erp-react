@@ -175,6 +175,81 @@
       }
     }
   },
+  "industrial_decision_types": {
+    "title": "Industrial Decision Types",
+    "add": "Add Industrial Decision Type",
+    "name": "Decision Type Name",
+    "is_active": "Is Active",
+    "is_default": "Set as Default",
+    "created": "{name} created successfully",
+    "create_error": "Failed to create {name}",
+    "deleted": "{name} deleted successfully",
+    "delete_error": "Failed to delete {name}",
+    "no_records": "No Industrial Decision Types found",
+    "validation": {
+      "name_required": "Name is required"
+    }
+  },
+  "industrial_license_sources": {
+    "title": "Industrial License Sources",
+    "add": "Add Industrial License Source",
+    "name": "Source Name",
+    "is_active": "Is Active",
+    "is_default": "Set as Default",
+    "created": "{name} created successfully",
+    "create_error": "Failed to create {name}",
+    "deleted": "{name} deleted successfully",
+    "delete_error": "Failed to delete {name}",
+    "no_records": "No Industrial License Sources found",
+    "validation": {
+      "name_required": "Name is required"
+    }
+  },
+  "industry_categories": {
+    "title": "Industry Categories",
+    "add": "Add Industry Category",
+    "name": "Category Name",
+    "is_active": "Is Active",
+    "is_default": "Set as Default",
+    "created": "{name} created successfully",
+    "create_error": "Failed to create {name}",
+    "deleted": "{name} deleted successfully",
+    "delete_error": "Failed to delete {name}",
+    "no_records": "No Industry Categories found",
+    "validation": {
+      "name_required": "Name is required"
+    }
+  },
+  "industry_types": {
+    "title": "Industry Types",
+    "add": "Add Industry Type",
+    "name": "Type Name",
+    "is_active": "Is Active",
+    "is_default": "Set as Default",
+    "created": "{name} created successfully",
+    "create_error": "Failed to create {name}",
+    "deleted": "{name} deleted successfully",
+    "delete_error": "Failed to delete {name}",
+    "no_records": "No Industry Types found",
+    "validation": {
+      "name_required": "Name is required"
+    }
+  },
+  "licensing_statuses": {
+    "title": "Licensing Statuses",
+    "add": "Add Licensing Status",
+    "name": "Status Name",
+    "is_active": "Is Active",
+    "is_default": "Set as Default",
+    "created": "{name} created successfully",
+    "create_error": "Failed to create {name}",
+    "deleted": "{name} deleted successfully",
+    "delete_error": "Failed to delete {name}",
+    "no_records": "No Licensing Statuses found",
+    "validation": {
+      "name_required": "Name is required"
+    }
+  },
   "navigation": {
     "title": "Investments",
     "plot_areas": {
@@ -188,6 +263,24 @@
     },
     "investors": {
       "title": "Investors"
+    },
+  "industrial_management": {
+    "title": "Industrial Management"
+  },
+  "industrial_decision_types": {
+      "title": "Industrial Decision Types"
+    },
+    "industrial_license_sources": {
+      "title": "Industrial License Sources"
+    },
+    "industry_categories": {
+      "title": "Industry Categories"
+    },
+    "industry_types": {
+      "title": "Industry Types"
+    },
+    "licensing_statuses": {
+      "title": "Licensing Statuses"
     }
   }
 }

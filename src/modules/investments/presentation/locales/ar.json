@@ -175,6 +175,81 @@
       }
     }
   },
+  "industrial_decision_types": {
+    "title": "أنواع القرارات الصناعية",
+    "add": "إضافة نوع قرار صناعي",
+    "name": "اسم نوع القرار",
+    "is_active": "فعال",
+    "is_default": "تعيين كافتراضي",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا يوجد أنواع قرارات صناعية",
+    "validation": {
+      "name_required": "الاسم مطلوب"
+    }
+  },
+  "industrial_license_sources": {
+    "title": "مصادر الترخيص الصناعي",
+    "add": "إضافة مصدر ترخيص صناعي",
+    "name": "اسم المصدر",
+    "is_active": "فعال",
+    "is_default": "تعيين كافتراضي",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا يوجد مصادر ترخيص صناعي",
+    "validation": {
+      "name_required": "الاسم مطلوب"
+    }
+  },
+  "industry_categories": {
+    "title": "تصنيفات الصناعة",
+    "add": "إضافة تصنيف صناعة",
+    "name": "اسم التصنيف",
+    "is_active": "فعال",
+    "is_default": "تعيين كافتراضي",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا يوجد تصنيفات صناعة",
+    "validation": {
+      "name_required": "الاسم مطلوب"
+    }
+  },
+  "industry_types": {
+    "title": "أنواع الصناعة",
+    "add": "إضافة نوع صناعة",
+    "name": "اسم النوع",
+    "is_active": "فعال",
+    "is_default": "تعيين كافتراضي",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا يوجد أنواع صناعة",
+    "validation": {
+      "name_required": "الاسم مطلوب"
+    }
+  },
+  "licensing_statuses": {
+    "title": "حالات الترخيص",
+    "add": "إضافة حالة ترخيص",
+    "name": "اسم الحالة",
+    "is_active": "فعال",
+    "is_default": "تعيين كافتراضي",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا يوجد حالات ترخيص",
+    "validation": {
+      "name_required": "الاسم مطلوب"
+    }
+  },
   "navigation": {
     "title": "الإستثمارات",
     "plot_areas": {
@@ -188,6 +263,24 @@
     },
     "investors": {
       "title": "المستثمرين"
+    },
+  "industrial_management": {
+    "title": "إدارة الصناعة"
+  },
+  "industrial_decision_types": {
+      "title": "أنواع القرارات الصناعية"
+    },
+    "industrial_license_sources": {
+      "title": "مصادر الترخيص الصناعي"
+    },
+    "industry_categories": {
+      "title": "تصنيفات الصناعة"
+    },
+    "industry_types": {
+      "title": "أنواع الصناعة"
+    },
+    "licensing_statuses": {
+      "title": "حالات الترخيص"
     }
   }
 }

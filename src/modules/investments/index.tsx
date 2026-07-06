@@ -1,6 +1,6 @@
 import enLocales from './presentation/locales/en.json';
 import arLocales from './presentation/locales/ar.json';
-import { Map, List } from 'lucide-react';
+import { Map, List, FileCheck, BadgeCheck, Tags, Layers, Flag, SlidersHorizontal } from 'lucide-react';
 import type { Module } from '../../core/moduleRegistry';
 import { PlotAreasPage } from './presentation/pages/plot-areas/PlotAreasPage';
 import { PlotClassificationsPage } from './presentation/pages/plot-classifications/PlotClassificationsPage';
@@ -11,7 +11,13 @@ import { InvestorsPage } from './presentation/pages/investors/InvestorsPage';
 import { CreateInvestorPage } from './presentation/pages/investors/CreateInvestorPage';
 import { CreateFuturePossibleInvestorPage } from './presentation/pages/investors/CreateFuturepossibleInvestorPage';
 import { EditInvestorPage } from './presentation/pages/investors/EditInvestorPage';
+import { IndustrialDecisionTypesPage } from './presentation/pages/industrial-decision-types/IndustrialDecisionTypesPage';
+import { IndustrialLicenseSourcesPage } from './presentation/pages/industrial-license-sources/IndustrialLicenseSourcesPage';
+import { IndustryCategoriesPage } from './presentation/pages/industry-categories/IndustryCategoriesPage';
+import { IndustryTypesPage } from './presentation/pages/industry-types/IndustryTypesPage';
+import { LicensingStatusesPage } from './presentation/pages/licensing-statuses/LicensingStatusesPage';
 import { MapPin, Users } from 'lucide-react';
+import { Navigate } from 'react-router-dom';
 
 const investmentsModule: Module = {
   name: 'investments',
@@ -113,7 +119,84 @@ const investmentsModule: Module = {
       requiredPermission: 'investments.investors.update',
       moduleName: 'investments',
       group: 'investments',
-    }
+    },
+    {
+      path: '/investments/industrial-management',
+      element: <Navigate to="/investments/industry-categories" replace />,
+      layout: 'dashboard',
+      label: 'industrial_management.title',
+      nav: true,
+      order: 40,
+      moduleName: 'investments',
+      icon: <SlidersHorizontal size={18} />,
+      group: 'investments',
+      // requiredPermission: ['investments.industry-categories.list', 'investments.industry-types.list', 'investments.licensing-statuses.list', 'investments.industrial-decision-types.list', 'investments.industrial-license-sources.list'],
+    },
+    {
+      path: '/investments/industry-categories',
+      element: <IndustryCategoriesPage />,
+      layout: 'dashboard',
+      label: 'industry_categories.title',
+      nav: true,
+      order: 1,
+      moduleName: 'investments',
+      // requiredPermission: 'investments.industry-categories.list',
+      icon: <Tags size={18} />,
+      group: 'investments',
+      parentNav: '/investments/industrial-management',
+    },
+    {
+      path: '/investments/industry-types',
+      element: <IndustryTypesPage />,
+      layout: 'dashboard',
+      label: 'industry_types.title',
+      nav: true,
+      order: 2,
+      moduleName: 'investments',
+      // requiredPermission: 'investments.industry-types.list',
+      icon: <Layers size={18} />,
+      group: 'investments',
+      parentNav: '/investments/industrial-management',
+    },
+    {
+      path: '/investments/licensing-statuses',
+      element: <LicensingStatusesPage />,
+      layout: 'dashboard',
+      label: 'licensing_statuses.title',
+      nav: true,
+      order: 3,
+      moduleName: 'investments',
+      // requiredPermission: 'investments.licensing-statuses.list',
+      icon: <Flag size={18} />,
+      group: 'investments',
+      parentNav: '/investments/industrial-management',
+    },
+    {
+      path: '/investments/industrial-decision-types',
+      element: <IndustrialDecisionTypesPage />,
+      layout: 'dashboard',
+      label: 'industrial_decision_types.title',
+      nav: true,
+      order: 4,
+      moduleName: 'investments',
+      // requiredPermission: 'investments.industrial-decision-types.list',
+      icon: <FileCheck size={18} />,
+      group: 'investments',
+      parentNav: '/investments/industrial-management',
+    },
+    {
+      path: '/investments/industrial-license-sources',
+      element: <IndustrialLicenseSourcesPage />,
+      layout: 'dashboard',
+      label: 'industrial_license_sources.title',
+      nav: true,
+      order: 5,
+      moduleName: 'investments',
+      // requiredPermission: 'investments.industrial-license-sources.list',
+      icon: <BadgeCheck size={18} />,
+      group: 'investments',
+      parentNav: '/investments/industrial-management',
+    },
   ],
   locales: { en: enLocales, ar: arLocales },
   navGroups: [

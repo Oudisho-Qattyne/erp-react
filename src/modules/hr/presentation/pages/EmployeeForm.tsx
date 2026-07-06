@@ -21,7 +21,7 @@ import { OrganizationalUnitTreeSelect } from '../components/OrganizationalUnitTr
 import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicForm221';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import type { ChronicDiseases } from '../../../../core/domain/entities/chronicDiseases/chronicDiseases';
-import { EntityFormSchema } from '../../../../core/presentation/schemas/entityForm.schema copy';
+import { EntityFormSchema } from '../../../../core/presentation/schemas/entityForm.schema';
 import type { JobStatus } from '../../domain/entities/jobStatus/jobStatus';
 import type { EmployeeStatus } from '../../domain/entities/employeeStatus/employeeStatus';
 import { EmployeeStatusFormSchema } from '../schemas/employeeStatus/employeeStatus';

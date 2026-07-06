@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { EntityFormSchema } from '../entityForm.schema copy';
+import { EntityFormSchema } from '../entityForm.schema';
 
 export const RegionFormSchema = EntityFormSchema.extend({
   city_id:z.number().min(0)

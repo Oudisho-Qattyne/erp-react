@@ -1,5 +1,5 @@
 import type z from "zod";
-import { EntityFormSchema } from "../../../../../core/presentation/schemas/entityForm.schema copy";
+import { EntityFormSchema } from "../../../../../core/presentation/schemas/entityForm.schema";
 
 export const EmployeeStatusFormSchema = EntityFormSchema.extend({
 
