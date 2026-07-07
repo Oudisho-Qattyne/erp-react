@@ -11,6 +11,7 @@ import { InvestorsPage } from './presentation/pages/investors/InvestorsPage';
 import { CreateInvestorPage } from './presentation/pages/investors/CreateInvestorPage';
 import { CreateFuturePossibleInvestorPage } from './presentation/pages/investors/CreateFuturepossibleInvestorPage';
 import { EditInvestorPage } from './presentation/pages/investors/EditInvestorPage';
+import { ShowDossierPage } from './presentation/pages/plots/ShowDossierPage';
 import { IndustrialDecisionTypesPage } from './presentation/pages/industrial-decision-types/IndustrialDecisionTypesPage';
 import { IndustrialLicenseSourcesPage } from './presentation/pages/industrial-license-sources/IndustrialLicenseSourcesPage';
 import { IndustryCategoriesPage } from './presentation/pages/industry-categories/IndustryCategoriesPage';
@@ -41,6 +42,16 @@ const investmentsModule: Module = {
       label: 'plots.add',
       nav: false,
       requiredPermission: 'investments.plots.create',
+      moduleName: 'investments',
+      group: 'investments',
+    },
+    {
+      path: '/investments/plots/:plotId/dossiers/:dossierId',
+      element: <ShowDossierPage />,
+      layout: 'dashboard',
+      label: 'dossier.view_details',
+      nav: false,
+      requiredPermission: 'investments.plot-dossier.view',
       moduleName: 'investments',
       group: 'investments',
     },

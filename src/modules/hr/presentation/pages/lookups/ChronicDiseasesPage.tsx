@@ -17,14 +17,13 @@ import type { ChronicDiseases } from '../../../../../core/domain/entities/chroni
 
 export function ChronicDiseasesPage() {
   const { t } = useLanguage();
-  const { entities: items, getAll, create, update, remove, loading, error } = useEntityCrud<ChronicDiseases>('/hr/chronic-diseases', '/hr/chronic-diseases');
+  const { entities: items, getAll, create, update, remove, loadingMap, errorMap } = useEntityCrud<ChronicDiseases>('/hr/chronic-diseases', '/hr/chronic-diseases');
   const entity = t('lookups.tabs.chronic_diseases', 'hr') || 'Chronic Diseases';
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<any>(null);
-  const [confirmLoading, setConfirmLoading] = useState(false);
   const filtered = items.filter((item: any) =>
     (typeof item.name === 'string' ? item.name : item.name?.ar || item.name?.en || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -33,7 +32,6 @@ export function ChronicDiseasesPage() {
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
-    setConfirmLoading(true);
     try {
       await remove(confirmDelete.id);
       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
@@ -41,12 +39,10 @@ export function ChronicDiseasesPage() {
     } catch {
       toast.error(t('lookups.delete_error', 'hr').replace('{name}', entity));
     }
-    setConfirmLoading(false);
   };
 
   const handleSetDefaultConfirm = async () => {
     if (!confirmSetDefault) return;
-    setConfirmLoading(true);
     try {
       await update(confirmSetDefault.id, { is_default: true });
       toast.success(t('lookups.set_default_success', 'hr').replace('{name}', entity));
@@ -55,7 +51,6 @@ export function ChronicDiseasesPage() {
     } catch {
       toast.error(t('lookups.set_default_error', 'hr').replace('{name}', entity));
     }
-    setConfirmLoading(false);
   };
 
   const columns = [
@@ -123,9 +118,9 @@ export function ChronicDiseasesPage() {
         />
       </Dialog>
 
-      {error && <ErrorState message={error} onRetry={() => getAll()} />}
-      {!error && (
-        <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll()} />}
+      {!errorMap['getAll'] && (
+        <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
           emptyMessage={t('lookups.no_chronic_diseases', 'hr') || 'No chronic diseases found'} />
       )}
 
@@ -134,7 +129,7 @@ export function ChronicDiseasesPage() {
         message={t('common.confirm_delete_message', 'shared').replace('{entity}', entity)}
         confirmLabel={t('common.delete', 'shared') || 'Delete'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleDeleteConfirm} onCancel={() => setConfirmDelete(null)} />
 
       <ConfirmDialog isOpen={!!confirmSetDefault}
@@ -142,7 +137,7 @@ export function ChronicDiseasesPage() {
         message={t('common.set_default_message', 'shared')?.replace('{entity}', entity) || `Are you sure you want to set this ${entity} as default?`}
         confirmLabel={t('common.set_default', 'shared') || 'Set as default'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleSetDefaultConfirm} onCancel={() => setConfirmSetDefault(null)} />
     </div>
   );

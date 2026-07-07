@@ -19,14 +19,13 @@ import { toast } from 'sonner';
 export function FacultiesPage() {
   const { t } = useLanguage();
   const { entities: universities, getAll: loadUniversities } = useEntityCrud<University>('/shared-kernal/universities', '/shared-kernal/universities');
-  const { entities: faculties, getAllByUniversity, create, update, remove, loading, error } = useFaculties();
+  const { entities: faculties, getAllByUniversity, create, update, remove, loadingMap, errorMap } = useFaculties();
   const [selectedUniversity, setSelectedUniversity] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<any>(null);
-  const [confirmLoading, setConfirmLoading] = useState(false);
   const entity = t('lookups.tabs.faculties', 'hr') || 'Faculty';
 
   useEffect(() => { loadUniversities(); }, []);
@@ -34,7 +33,6 @@ export function FacultiesPage() {
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
-    setConfirmLoading(true);
     try {
       await remove(confirmDelete.id);
       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
@@ -42,12 +40,10 @@ export function FacultiesPage() {
     } catch {
       toast.error(t('lookups.delete_error', 'hr').replace('{name}', entity));
     }
-    setConfirmLoading(false);
   };
 
   const handleSetDefaultConfirm = async () => {
     if (!confirmSetDefault) return;
-    setConfirmLoading(true);
     try {
       await update(confirmSetDefault.id, { is_default: true });
       toast.success(t('lookups.set_default_success', 'hr').replace('{name}', entity));
@@ -56,7 +52,6 @@ export function FacultiesPage() {
     } catch {
       toast.error(t('lookups.set_default_error', 'hr').replace('{name}', entity));
     }
-    setConfirmLoading(false);
   };
 
   const filtered = faculties.filter((f: any) =>
@@ -138,12 +133,12 @@ export function FacultiesPage() {
             />
           </Dialog>
 
-          {error && <ErrorState message={error} onRetry={() => selectedUniversity && getAllByUniversity(selectedUniversity)} />}
-          {!error && !loading && filtered.length === 0 && (
+          {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => selectedUniversity && getAllByUniversity(selectedUniversity)} />}
+          {!errorMap['getAll'] && !loadingMap['getAll'] && filtered.length === 0 && (
             <EmptyState message={t('lookups.no_faculties', 'hr') || 'No faculties found'} />
           )}
-          {!error && (filtered.length > 0 || loading) && (
-            <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
+          {!errorMap['getAll'] && (filtered.length > 0 || loadingMap['getAll']) && (
+            <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
               emptyMessage={t('lookups.no_faculties', 'hr') || 'No faculties found'} />
           )}
         </>
@@ -156,7 +151,7 @@ export function FacultiesPage() {
         message={t('common.confirm_delete_message', 'shared').replace('{entity}', entity)}
         confirmLabel={t('common.delete', 'shared') || 'Delete'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleDeleteConfirm} onCancel={() => setConfirmDelete(null)} />
 
       <ConfirmDialog isOpen={!!confirmSetDefault} 
@@ -164,7 +159,7 @@ export function FacultiesPage() {
         message={t('common.set_default_message', 'shared')?.replace('{entity}', entity) || `Are you sure you want to set this ${entity} as default?`}
         confirmLabel={t('common.set_default', 'shared') || 'Set as default'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleSetDefaultConfirm} onCancel={() => setConfirmSetDefault(null)} />
     </div>
   );

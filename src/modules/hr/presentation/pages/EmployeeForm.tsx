@@ -178,7 +178,7 @@ function SpecializationCreateForm({ onSuccess, onCancel, facultyId }: { onSucces
 function JobStatusCreateForm({ onSuccess, onCancel, facultyId }: { onSuccess: (id: number, item: any) => void; onCancel: () => void; facultyId?: number }) {
   const { t } = useLanguage();
 
-  const { entities: items, getAll, create: createJobStatus, update, remove, loading, error } = useEntityCrud<JobStatus>('/hr/job-statuses', '/hr/job-statuses');
+  const { entities: items, getAll, create: createJobStatus, update, remove } = useEntityCrud<JobStatus>('/hr/job-statuses', '/hr/job-statuses');
   return <CreateEntityForm defaultValues={{ name: "" }} schema={UniversityFormSchema} fields={[{ name: 'name', label: t('employee_form.job_status', 'hr') || 'الحالة الوظيفية', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
     onSubmit={async (data) => {
       return await createJobStatus(data)
@@ -265,7 +265,7 @@ export function EmployeeForm({
   const { entities: faculties, getAllByUniversity: loadFacultiesByUniversity } = useFaculties();
   const { entities: specializations, getAllByFaculty: loadSpecializationsByFaculty } = useSpecializations();
   const { entities: orgUnits, getAll: loadOrgUnits } = useEntityCrud<OrganizationalLevels>('/hr/organizational-levels', '/hr/organizational-levels');
-  const { entities: jobStatus, getAll: loadJobStatus, error } = useEntityCrud<JobStatus>('/hr/job-statuses', '/hr/job-statuses');
+  const { entities: jobStatus, getAll: loadJobStatus } = useEntityCrud<JobStatus>('/hr/job-statuses', '/hr/job-statuses');
 
   // Country CRUD (you may need a useCountries hook)
 

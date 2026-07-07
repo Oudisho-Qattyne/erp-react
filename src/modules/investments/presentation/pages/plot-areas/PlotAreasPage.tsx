@@ -16,14 +16,13 @@ import { Pencil, Trash2, Star, Check, X } from 'lucide-react';
 
 export function PlotAreasPage() {
   const { t } = useLanguage();
-  const { entities: plotAreas, getAll, create, update, remove, loading, error } = useEntityCrud<PlotArea>('/investments/plot-areas', '/investments/plot-areas');
+  const { entities: plotAreas, getAll, create, update, remove, loadingMap, errorMap } = useEntityCrud<PlotArea>('/investments/plot-areas', '/investments/plot-areas');
   const entityName = t('plot_areas.title', 'investments') || 'Plot Area';
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<PlotArea | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<PlotArea | null>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<PlotArea | null>(null);
-  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const filtered = plotAreas.filter((c: any) => c.name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -31,7 +30,6 @@ export function PlotAreasPage() {
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
-    setConfirmLoading(true);
     try {
       await remove(confirmDelete.id);
       toast.success(t('plot_areas.deleted', 'investments').replace('{name}', entityName));
@@ -39,12 +37,10 @@ export function PlotAreasPage() {
       toast.error(t('plot_areas.delete_error', 'investments').replace('{name}', entityName));
     }
     setConfirmDelete(null);
-    setConfirmLoading(false);
   };
 
   const handleSetDefaultConfirm = async () => {
     if (!confirmSetDefault) return;
-    setConfirmLoading(true);
     try {
       await update(confirmSetDefault.id, { ...confirmSetDefault, is_default: true });
       toast.success(t('common.set_default_success', 'shared')?.replace('{name}', entityName) || `${entityName} set as default successfully`);
@@ -53,7 +49,6 @@ export function PlotAreasPage() {
       toast.error(t('common.set_default_error', 'shared')?.replace('{name}', entityName) || `Failed to set ${entityName} as default`);
     }
     setConfirmSetDefault(null);
-    setConfirmLoading(false);
   };
 
   const columns = [
@@ -160,9 +155,9 @@ export function PlotAreasPage() {
         />
       </Dialog>
 
-      {error && <ErrorState message={error} onRetry={() => getAll()} />}
-      {!error && (
-        <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll()} />}
+      {!errorMap['getAll'] && (
+        <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
           emptyMessage={t('plot_areas.no_records', 'investments')} />
       )}
 
@@ -173,7 +168,7 @@ export function PlotAreasPage() {
         message={t('common.confirm_delete_message', 'shared').replace('{entity}', entityName)}
         confirmLabel={t('common.delete', 'shared') || 'Delete'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setConfirmDelete(null)}
       />
@@ -184,7 +179,7 @@ export function PlotAreasPage() {
         message={t('common.set_default_message', 'shared')?.replace('{entity}', entityName) || `Are you sure you want to set this ${entityName} as default?`}
         confirmLabel={t('common.set_default', 'shared') || 'Set as default'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleSetDefaultConfirm}
         onCancel={() => setConfirmSetDefault(null)}
       />

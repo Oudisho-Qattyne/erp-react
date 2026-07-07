@@ -3,6 +3,7 @@
     "actions":"Actions",
     "reset": "Reset",
     "search": "Search",
+    "selected": "selected",
     "loading": "Loading...",
     "no_data": "No data available",
     "filter": "Filter",

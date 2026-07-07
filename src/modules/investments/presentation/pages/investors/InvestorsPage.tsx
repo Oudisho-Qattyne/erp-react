@@ -17,12 +17,11 @@ import { useNavigate } from 'react-router-dom';
 export function InvestorsPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { entities: investors, getAll, remove, loading, error, pagination } = useEntityCrud<Investor>('/investments/investors', '/investments/investors');
+  const { entities: investors, getAll, remove, loadingMap, errorMap, pagination } = useEntityCrud<Investor>('/investments/investors', '/investments/investors');
 
   const [localSearch, setLocalSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<Investor | null>(null);
-  const [confirmLoading, setConfirmLoading] = useState(false);
 
   // Table State
   const [sortColumn, setSortColumn] = useState<string | undefined>(undefined);
@@ -87,7 +86,6 @@ export function InvestorsPage() {
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
-    setConfirmLoading(true);
     try {
       await remove(confirmDelete.id);
       toast.success(t('investors.deleted', 'investments') || 'Investor deleted');
@@ -95,7 +93,6 @@ export function InvestorsPage() {
       toast.error(t('investors.delete_error', 'investments') || 'Failed to delete investor');
     }
     setConfirmDelete(null);
-    setConfirmLoading(false);
   };
 
   const filterFields: FilterField[] = [
@@ -215,14 +212,14 @@ export function InvestorsPage() {
         onReset={handleResetFilter}
       />
 
-      {error && <ErrorState message={error} onRetry={() => setPage(prev => prev)} />}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => setPage(prev => prev)} />}
 
-      {!error && (
+      {!errorMap['getAll'] && (
         <DataTable
           columns={columns}
           data={investors}
           rowKey="id"
-          loading={loading}
+          loading={loadingMap['getAll']}
           emptyMessage={t('investors.no_records', 'investments') || 'No investors found'}
           sortColumn={sortColumn}
           sortOrder={sortOrder}
@@ -245,7 +242,7 @@ export function InvestorsPage() {
         message={t('common.delete_confirm', 'shared').replace('{name}', entity) || 'Are you sure you want to delete this?'}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setConfirmDelete(null)}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
       />
     </div>
   );

@@ -20,7 +20,7 @@ export function RegionsPage() {
   const { t } = useLanguage();
   const { entities: countries, getAll: loadCountries } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
   const { entities: cities, getAllByCountry } = useCities();
-  const { entities: regions, getAllByCity, create, update, remove, loading, error } = useRegions();
+  const { entities: regions, getAllByCity, create, update, remove, loadingMap, errorMap } = useRegions();
   const entity = t('lookups.tabs.regions', 'hr') || 'Region';
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -29,7 +29,6 @@ export function RegionsPage() {
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<any>(null);
-  const [confirmLoading, setConfirmLoading] = useState(false);
 
   useEffect(() => { loadCountries(); }, []);
   useEffect(() => { if (selectedCountry) { getAllByCountry(selectedCountry); setSelectedCity(null); } }, [selectedCountry]);
@@ -37,7 +36,6 @@ export function RegionsPage() {
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
-    setConfirmLoading(true);
     try {
       await remove(confirmDelete.id);
       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
@@ -45,12 +43,10 @@ export function RegionsPage() {
     } catch {
       toast.error(t('lookups.delete_error', 'hr').replace('{name}', entity));
     }
-    setConfirmLoading(false);
   };
 
   const handleSetDefaultConfirm = async () => {
     if (!confirmSetDefault) return;
-    setConfirmLoading(true);
     try {
       await update(confirmSetDefault.id, { is_default: true });
       toast.success(t('lookups.set_default_success', 'hr').replace('{name}', entity));
@@ -59,7 +55,6 @@ export function RegionsPage() {
     } catch {
       toast.error(t('lookups.set_default_error', 'hr').replace('{name}', entity));
     }
-    setConfirmLoading(false);
   };
 
   const filtered = regions.filter((r: any) =>
@@ -150,12 +145,12 @@ export function RegionsPage() {
             />
           </Dialog>
 
-          {error && <ErrorState message={error} onRetry={() => selectedCity && getAllByCity(selectedCity)} />}
-          {!error && !loading && filtered.length === 0 && (
+          {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => selectedCity && getAllByCity(selectedCity)} />}
+          {!errorMap['getAll'] && !loadingMap['getAll'] && filtered.length === 0 && (
             <EmptyState message={t('lookups.no_regions', 'hr') || 'No regions found'} />
           )}
-          {!error && (filtered.length > 0 || loading) && (
-            <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
+          {!errorMap['getAll'] && (filtered.length > 0 || loadingMap['getAll']) && (
+            <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
               emptyMessage={t('lookups.no_regions', 'hr') || 'No regions found'} />
           )}
         </>
@@ -168,7 +163,7 @@ export function RegionsPage() {
         message={t('common.confirm_delete_message', 'shared').replace('{entity}', entity)}
         confirmLabel={t('common.delete', 'shared') || 'Delete'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleDeleteConfirm} onCancel={() => setConfirmDelete(null)} />
 
       <ConfirmDialog isOpen={!!confirmSetDefault} 
@@ -176,7 +171,7 @@ export function RegionsPage() {
         message={t('common.set_default_message', 'shared')?.replace('{entity}', entity) || `Are you sure you want to set this ${entity} as default?`}
         confirmLabel={t('common.set_default', 'shared') || 'Set as default'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleSetDefaultConfirm} onCancel={() => setConfirmSetDefault(null)} />
     </div>
   );

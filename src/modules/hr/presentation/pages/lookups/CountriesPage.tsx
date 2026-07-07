@@ -18,14 +18,13 @@ import { getLocalizedName } from '../../../../../core/presentation/utils/helpes'
 
 export function CountriesPage() {
   const { t } = useLanguage();
-  const { entities: countries, getAll, create, update, remove, loading, error } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
+  const { entities: countries, getAll, create, update, remove, loadingMap, errorMap } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
   const entity = t('lookups.tabs.countries', 'hr') || 'Country';
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<any>(null);
-  const [confirmLoading, setConfirmLoading] = useState(false);
   const filtered = countries.filter((c: any) =>
     (typeof c.name === 'string' ? c.name : c.name?.ar || c.name?.en || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -34,7 +33,6 @@ export function CountriesPage() {
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
-    setConfirmLoading(true);
     try {
       await remove(confirmDelete.id);
       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
@@ -42,12 +40,10 @@ export function CountriesPage() {
     } catch {
       toast.error(t('lookups.delete_error', 'hr').replace('{name}', entity));
     }
-    setConfirmLoading(false);
   };
 
   const handleSetDefaultConfirm = async () => {
     if (!confirmSetDefault) return;
-    setConfirmLoading(true);
     try {
       await update(confirmSetDefault.id, { is_default: true });
       toast.success(t('lookups.set_default_success', 'hr').replace('{name}', entity));
@@ -56,7 +52,6 @@ export function CountriesPage() {
     } catch {
       toast.error(t('lookups.set_default_error', 'hr').replace('{name}', entity));
     }
-    setConfirmLoading(false);
   };
 
   const columns = [
@@ -129,9 +124,9 @@ export function CountriesPage() {
         />
       </Dialog>
 
-      {error && <ErrorState message={error} onRetry={() => getAll()} />}
-      {!error && (
-        <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll()} />}
+      {!errorMap['getAll'] && (
+        <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
           emptyMessage={t('lookups.no_countries', 'hr') || 'No countries found'} />
       )}
 
@@ -140,7 +135,7 @@ export function CountriesPage() {
         message={t('common.confirm_delete_message', 'shared').replace('{entity}', entity)}
         confirmLabel={t('common.delete', 'shared') || 'Delete'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleDeleteConfirm} onCancel={() => setConfirmDelete(null)} />
 
       <ConfirmDialog isOpen={!!confirmSetDefault}
@@ -148,7 +143,7 @@ export function CountriesPage() {
         message={t('common.set_default_message', 'shared')?.replace('{entity}', entity) || `Are you sure you want to set this ${entity} as default?`}
         confirmLabel={t('common.set_default', 'shared') || 'Set as default'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleSetDefaultConfirm} onCancel={() => setConfirmSetDefault(null)} />
     </div>
   );

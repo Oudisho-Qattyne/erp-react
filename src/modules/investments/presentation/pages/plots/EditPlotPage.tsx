@@ -6,13 +6,13 @@ import { PlotForm } from './components/PlotForm';
 import { DossiersSection } from './components/DossiersSection';
 import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { useStorage } from '../../../../../core/registry/storage/StorageProvider';
 
 export function EditPlotPage() {
-  const { t, direction } = useLanguage();
+  const { t } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
   const { getById, update } = useEntityCrud<Plot>('/investments/plots', '/investments/plots');
@@ -50,8 +50,8 @@ export function EditPlotPage() {
       <div className='relative w-full flex justify-between items-center'>
 
         <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={handleBack} className="rounded-full w-10 h-10 p-0">
-            <ArrowLeft size={20} className={direction === 'rtl' ? 'rotate-180' : ''} />
+          <Button variant="outline" onClick={handleBack}>
+            <ArrowRight size={16} /> {t('plots.back_to_list', 'investments') || 'Back to Plots'}
           </Button>
           <h1 className="text-2xl font-bold">{(t('common.edit', 'shared') || 'Edit') + ' ' + (t('plots.title', 'investments') || 'Plot')}</h1>
         </div>
