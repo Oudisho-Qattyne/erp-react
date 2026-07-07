@@ -111,6 +111,8 @@
     "allocate_error": "فشل في تخصيص الإضبارة",
     "delete_title": "حذف الإضبارة",
     "delete_message": "هل أنت متأكد من حذف هذه الإضبارة؟",
+    "allocate_new_title": "تخصيص إضبارة جديدة",
+    "allocate_new_message": "هل أنت متأكد من إلغاء تخصيص الإضبارة المخصصة سابقاً؟",
     "load_error": "فشل تحميل الإضبارات",
     "no_records": "لا توجد إضبارات",
     "validation": {

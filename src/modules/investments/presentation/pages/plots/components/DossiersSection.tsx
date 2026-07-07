@@ -37,6 +37,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
   const [showView, setShowView] = useState<Dossier | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Dossier | null>(null);
 
+  const [confirmAllocateNewDossier, setConfirmAllocatedNewDossier] = useState<boolean>(false)
   const [localSearch, setLocalSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterValues, setFilterValues] = useState<Record<string, any>>({});
@@ -72,7 +73,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
     },
   });
 
-  const handleAdd = async (data: DossierFormData) => {
+  const addDossier = async (data: DossierFormData) => {
     try {
       await apiClient.post(`/investments/plots/${plotId}/dossiers`, data);
       toast.success(t('dossier.created', 'investments') || 'Dossier created successfully');
@@ -81,6 +82,15 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       fetchDossiers();
     } catch (err: any) {
       toast.error(t('dossier.create_error', 'investments') || 'Failed to create dossier');
+    }
+  }
+  const handleAdd = async (data: DossierFormData) => {
+    const allocatedDossier = dossiers.find(d => d.status == "active")
+    if ((plotStatus == "allocated" || data.status == "active") && allocatedDossier ) {
+      setConfirmAllocatedNewDossier(true)
+    }
+    else {
+      addDossier(data)
     }
   };
 
@@ -272,8 +282,21 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
         type="danger"
         title={t('dossier.delete_title', 'investments') || 'Delete Dossier'}
         message={t('dossier.delete_message', 'investments') || 'Are you sure you want to delete this dossier?'}
+        confirmLabel={t('common.delete', 'shared') || 'Delete'}
+        cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(null)}
+      />
+
+      <ConfirmDialog
+        isOpen={confirmAllocateNewDossier}
+        type="alert"
+        title={t('dossier.allocate_new_title', 'investments') || 'Allocate New Dossier'}
+        message={t('dossier.allocate_new_message', 'investments') || 'Are you sure you want to unallocate the previous allocated dossier?'}
+        confirmLabel={t('dossier.allocate', 'investments') || 'Allocate'}
+        cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
+        onConfirm={handleDelete}
+        onCancel={() => setConfirmAllocatedNewDossier(false)}
       />
 
       <FilterDialog

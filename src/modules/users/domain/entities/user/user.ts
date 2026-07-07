@@ -10,8 +10,11 @@ export interface User {
     photo?: string;
     signature?: string;
     role: Role;
-    created_at: string;
     permissions: string[];
     employee_first_name?: string;
     employee_last_name?: string;
+    email_verified_at?: string;
+    employee_id?: number;
+    created_at: string;
+    updated_at: string
 }

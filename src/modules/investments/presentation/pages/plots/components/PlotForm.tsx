@@ -6,7 +6,7 @@ import type { PlotArea } from '../../../../domain/entities/plotArea';
 import type { PlotClassification } from '../../../../domain/entities/plotClassification';
 import { GenericCreateForm, type FieldConfig } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { SelectOnMap } from '../../../../../../core/presentation/layouts/ui/inputs/SelectOnMap';
-import { PlotStatusStepper, PLOT_STATUSES } from '../../../../../../core/presentation/layouts/ui/stepper/PlotStatusStepper';
+import { PlotStatusStepper, PLOT_STATUSES } from './PlotStatusStepper';
 import { getCreatePlotAreaFormSchema } from '../../../schemas/plotAreaForm.schema';
 import { getCreatePlotClassificationFormSchema } from '../../../schemas/plotClassificationForm.schema';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
@@ -18,9 +18,11 @@ import { ChangePlotStatusModal } from './ChangePlotStatusModal';
 import { PlotStatusHistoryModal } from './PlotStatusHistoryModal';
 import { PlotAuditLogModal } from './PlotAuditLogModal';
 import { History, Pencil, MapPin } from 'lucide-react';
+import type { Plot } from '../../../../domain/entities/plot';
+import type { PlotStatus } from '../../../../domain/valueObjects/plots/plotStatus';
 
 interface PlotFormProps {
-  plot?: any;
+  plot?: Plot;
   defaultValues?: any;
   onSubmit: (data: any) => Promise<any>;
   onSuccess: () => void;
@@ -35,7 +37,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
   const { entities: classifications, getAll: getClassifications, create: createClassification } = useEntityCrud<PlotClassification>('/investments/plot-classifications', '/investments/plot-classifications');
 
   const [statusDate, setStatusDate] = React.useState(defaultValues?.status_date || new Date().toISOString().split('T')[0]);
-  const [clickedStatus, setClickedStatus] = React.useState<string | null>(null);
+  const [clickedStatus, setClickedStatus] = React.useState<PlotStatus | null>(null);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = React.useState(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = React.useState(false);
   const [isEditing, setIsEditing] = React.useState(!!isCreate);

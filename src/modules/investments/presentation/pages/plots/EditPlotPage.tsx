@@ -90,7 +90,7 @@ export function EditPlotPage() {
       }
       {
         plot.status != "unsold" && plot.status != "announced" &&
-        <DossiersSection plotId={Number(id)} plotStatus={plot.status} />
+        <DossiersSection plotId={Number(id)} plotStatus={plot.status}  />
       }
     </div>
   );

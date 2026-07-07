@@ -111,6 +111,8 @@
     "allocate_error": "Failed to allocate dossier",
     "delete_title": "Delete Dossier",
     "delete_message": "Are you sure you want to delete this dossier?",
+    "allocate_new_title": "Allocate New Dossier",
+    "allocate_new_message": "Are you sure you want to unallocate the previous allocated dossier?",
     "load_error": "Failed to load dossiers",
     "no_records": "No dossiers found",
     "validation": {
