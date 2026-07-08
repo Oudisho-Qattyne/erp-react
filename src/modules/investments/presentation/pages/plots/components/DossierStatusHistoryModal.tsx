@@ -25,8 +25,8 @@ export function DossierStatusHistoryModal({ isOpen, onClose, histories = [], loa
       render: (row: DossierStatusHistory) => (
         <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
           style={{
-            color: row.status === 'active' ? '#16a34a' : row.status === 'allocatable' ? '#2563eb' : '#ca8a04',
-            background: row.status === 'active' ? '#dcfce7' :  row.status === 'allocatable' ? '#dbeafe' : '#fefce8',
+            color: row.status === 'active' ? '#16a34a' : row.status === 'cancelled' ? '#dc2626' : row.status === 'allocatable' ? '#2563eb' : '#ca8a04',
+            background: row.status === 'active' ? '#dcfce7' : row.status === 'cancelled' ? '#fef2f2' : row.status === 'allocatable' ? '#dbeafe' : '#fefce8',
           }}>
           {t(`dossier.status_${row.status}`, 'investments') || row.status}
         </span>

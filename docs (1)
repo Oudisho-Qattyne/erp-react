@@ -3429,6 +3429,294 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
+  /investments/industrial-decision-types:
+    get:
+      tags:
+        - 'Industrial Decision Types'
+      summary: 'Get all Industrial Decision Types'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: is_default
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'List of industrial decision types'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/IndustrialDecisionTypeInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Industrial Decision Types'
+      summary: 'Create an Industrial Decision Type'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndustrialDecisionTypeDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustrialDecisionTypeInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/industrial-decision-types/{id}':
+    get:
+      tags:
+        - 'Industrial Decision Types'
+      summary: 'Get an Industrial Decision Type by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Industrial decision type details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustrialDecisionTypeInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Industrial Decision Types'
+      summary: 'Update an Industrial Decision Type'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndustrialDecisionTypeDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustrialDecisionTypeInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Industrial Decision Types'
+      summary: 'Delete an Industrial Decision Type'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /investments/industrial-license-sources:
+    get:
+      tags:
+        - 'Industrial License Sources'
+      summary: 'Get all Industrial License Sources'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: is_default
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'List of industrial license sources'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/IndustrialLicenseSourceInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Industrial License Sources'
+      summary: 'Create an Industrial License Source'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndustrialLicenseSourceDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustrialLicenseSourceInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/industrial-license-sources/{id}':
+    get:
+      tags:
+        - 'Industrial License Sources'
+      summary: 'Get an Industrial License Source by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Industrial license source details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustrialLicenseSourceInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Industrial License Sources'
+      summary: 'Update an Industrial License Source'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndustrialLicenseSourceDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustrialLicenseSourceInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Industrial License Sources'
+      summary: 'Delete an Industrial License Source'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
   '/investments/plots/{plotId}/dossiers':
     get:
       tags:
@@ -3602,11 +3890,11 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
-  '/investments/plots/{plotId}/dossiers/{dossierId}/status-history':
+  '/investments/plots/{plotId}/dossiers/{dossierId}/partners':
     get:
       tags:
-        - 'Plot Dossier Status History'
-      summary: 'Get all status history records for a dossier'
+        - 'Dossier Partners'
+      summary: 'List partners of a dossier'
       security:
         -
           sanctumAuth: {  }
@@ -3625,98 +3913,21 @@ paths:
             type: integer
       responses:
         200:
-          description: 'List of dossier status history records'
+          description: 'List of dossier partners'
           content:
             application/json:
               schema:
                 allOf:
                   - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/PlotDossierStatusHistoryInfoResource' } } } }
-        401:
-          $ref: '#/components/responses/Unauthenticated'
-    post:
-      tags:
-        - 'Plot Dossier Status History'
-      summary: 'Create a status history record for a dossier'
-      security:
-        -
-          sanctumAuth: {  }
-      parameters:
-        -
-          name: plotId
-          in: path
-          required: true
-          schema:
-            type: integer
-        -
-          name: dossierId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PlotDossierStatusHistoryDTO'
-      responses:
-        200:
-          description: 'Created successfully'
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierStatusHistoryInfoResource' } } }
-        401:
-          $ref: '#/components/responses/Unauthenticated'
-        422:
-          $ref: '#/components/responses/ValidationError'
-  '/investments/plots/{plotId}/dossiers/{dossierId}/status-history/{id}':
-    get:
-      tags:
-        - 'Plot Dossier Status History'
-      summary: 'Get a status history record by ID'
-      security:
-        -
-          sanctumAuth: {  }
-      parameters:
-        -
-          name: plotId
-          in: path
-          required: true
-          schema:
-            type: integer
-        -
-          name: dossierId
-          in: path
-          required: true
-          schema:
-            type: integer
-        -
-          name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: 'Status history record details'
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierStatusHistoryInfoResource' } } }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierInfoResource' } } }
         401:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
-    put:
+    post:
       tags:
-        - 'Plot Dossier Status History'
-      summary: 'Update a status history record'
+        - 'Dossier Partners'
+      summary: 'Add partners to a dossier'
       security:
         -
           sanctumAuth: {  }
@@ -3733,27 +3944,23 @@ paths:
           required: true
           schema:
             type: integer
-        -
-          name: id
-          in: path
-          required: true
-          schema:
-            type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PlotDossierStatusHistoryDTO'
+              $ref: '#/components/schemas/DossierPartnerDTO'
       responses:
         200:
-          description: 'Updated successfully'
+          description: 'Partners added successfully'
           content:
             application/json:
               schema:
                 allOf:
                   - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierStatusHistoryInfoResource' } } }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierInfoResource' } } }
+        400:
+          $ref: '#/components/responses/BadRequest'
         401:
           $ref: '#/components/responses/Unauthenticated'
         404:
@@ -3762,8 +3969,8 @@ paths:
           $ref: '#/components/responses/ValidationError'
     delete:
       tags:
-        - 'Plot Dossier Status History'
-      summary: 'Delete a status history record'
+        - 'Dossier Partners'
+      summary: 'Remove partners from a dossier'
       security:
         -
           sanctumAuth: {  }
@@ -3780,23 +3987,29 @@ paths:
           required: true
           schema:
             type: integer
-        -
-          name: id
-          in: path
-          required: true
-          schema:
-            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DossierPartnerDTO'
       responses:
         200:
-          description: 'Deleted successfully'
+          description: 'Partners removed successfully'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierInfoResource' } } }
+        400:
+          $ref: '#/components/responses/BadRequest'
         401:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
   /storage-management:
     get:
       summary: 'List root-level storage items'
@@ -6768,6 +6981,62 @@ components:
           type: string
           nullable: true
           example: 'Dossier status changed'
+    IndustrialDecisionTypeDTO:
+      type: object
+      required:
+        - name
+        - is_default
+      properties:
+        name:
+          type: string
+          example: Economic
+        is_default:
+          type: boolean
+          example: false
+    IndustrialDecisionTypeInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Economic
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date
+          example: 06-07-2026
+    IndustrialLicenseSourceDTO:
+      type: object
+      required:
+        - name
+        - is_default
+      properties:
+        name:
+          type: string
+          example: Ministry
+        is_default:
+          type: boolean
+          example: false
+    IndustrialLicenseSourceInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Ministry
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date
+          example: 06-07-2026
     PlotDossierStatusHistoryInfoResource:
       type: object
       properties:
@@ -6804,6 +7073,20 @@ components:
           type: string
           format: date
           example: 06-07-2026
+    DossierPartnerDTO:
+      type: object
+      required:
+        - investor_ids
+      properties:
+        investor_ids:
+          type: array
+          items:
+            type: integer
+          example:
+            - 1
+            - 2
+            - 3
+          description: 'Array of investor IDs to add or remove'
     PlotStatus:
       type: string
       enum:
@@ -7663,8 +7946,14 @@ tags:
     name: 'Plot Dossiers'
     description: 'Manage Plot Dossier definitions'
   -
-    name: 'Plot Dossier Status History'
-    description: 'Manage Plot Dossier status change history records'
+    name: 'Dossier Partners'
+    description: 'Manage partners assigned to a dossier'
+  -
+    name: 'Industrial Decision Types'
+    description: 'Manage Industrial Decision Type definitions'
+  -
+    name: 'Industrial License Sources'
+    description: 'Manage Industrial License Source definitions'
   -
     name: Storage
     description: 'Resolve storage items by ID or list root-level items'

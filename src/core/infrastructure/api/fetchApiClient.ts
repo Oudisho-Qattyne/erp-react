@@ -102,6 +102,10 @@ export function createFetchApiClient(
         method: 'PATCH',
         body: data instanceof FormData ? data : JSON.stringify(data),
       }),
-    delete: <T>(url: string, config?: RequestConfig) => request<T>(url, { ...config, method: 'DELETE' }),
+    delete: <T, U = any>(url: string, data?: U, config?: RequestConfig) => request<T>(url, {
+      ...config,
+      method: 'DELETE',
+      body: data ? (data instanceof FormData ? data : JSON.stringify(data)) : undefined,
+    }),
   };
 }

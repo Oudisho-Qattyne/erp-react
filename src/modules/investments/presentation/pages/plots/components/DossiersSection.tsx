@@ -66,7 +66,6 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       status: plotStatus == "allocated" ? "active" : 'allocatable',
     },
   });
-  console.log(plotStatus, plotStatus === "allocated");
 
 
   const handleAdd = async (data: DossierFormData) => {
@@ -186,8 +185,8 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       render: (row: Dossier) => (
         <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
           style={{
-            color: row.status === 'active' ? '#16a34a' : row.status === 'allocatable' ? '#2563eb' : '#ca8a04',
-            background: row.status === 'active' ? '#dcfce7' : row.status === 'allocatable' ? '#dbeafe' : '#fefce8',
+            color: row.status === 'active' ? '#16a34a' : row.status === 'cancelled' ? '#dc2626' : row.status === 'allocatable' ? '#2563eb' : '#ca8a04',
+            background: row.status === 'active' ? '#dcfce7' : row.status === 'cancelled' ? '#fef2f2' : row.status === 'allocatable' ? '#dbeafe' : '#fefce8',
           }}>
           {t(`dossier.status_${row.status}`, 'investments') || row.status}
         </span>
@@ -284,10 +283,13 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
                 { value: 'draft', label: t('dossier.status_draft', 'investments') || 'Draft' },
                 { value: 'active', label: t('dossier.status_active', 'investments') || 'Allocated' },
                 { value: 'allocatable', label: t('dossier.status_allocatable', 'investments') || 'Allocatable' },
+                { value: 'cancelled', label: t('dossier.status_cancelled', 'investments') || 'Cancelled' },
+                
               ] : [
                 { value: 'draft', label: t('dossier.status_draft', 'investments') || 'Draft' },
                 { value: 'active', label: t('dossier.status_active', 'investments') || 'Allocated' },
                 { value: 'allocatable', label: t('dossier.status_allocatable', 'investments') || 'Allocatable' },
+                { value: 'cancelled', label: t('dossier.status_cancelled', 'investments') || 'Cancelled' },
               ]}
             />
             <div className="flex justify-end gap-2">

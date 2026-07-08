@@ -8,4 +8,5 @@ export interface Dossier {
     subscription_date?: null,
     notes?: string;
     status: DossierStatus;
+    partners?:any[]
 }

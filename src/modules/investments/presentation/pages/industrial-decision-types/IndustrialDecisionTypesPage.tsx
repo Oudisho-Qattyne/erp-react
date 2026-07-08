@@ -60,14 +60,6 @@ export function IndustrialDecisionTypesPage() {
       render: (row: IndustrialDecisionType) => getLocalizedName(row.name) 
     },
     {
-      key: 'is_active',
-      label: t('industrial_decision_types.is_active', 'investments') || 'Is Active?',
-      width: 120,
-      render: (row: IndustrialDecisionType) => row.is_active
-        ? <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full"><Check size={12} /> {t('common.yes', 'shared') || 'Yes'}</span>
-        : <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full"><X size={12} /> {t('common.no', 'shared') || 'No'}</span>
-    },
-    {
       key: 'is_default',
       label: t('industrial_decision_types.is_default', 'investments') || 'Default',
       width: 120,
@@ -116,7 +108,6 @@ export function IndustrialDecisionTypesPage() {
         <GenericCreateForm
           fields={[
             { name: 'name', label: t('industrial_decision_types.name', 'investments'), required: true },
-            { name: 'is_active', type: 'checkbox', label: t('industrial_decision_types.is_active', 'investments') },
             { name: 'is_default', type: 'checkbox', label: t('industrial_decision_types.is_default', 'investments') }
           ]}
           schema={getCreateIndustrialDecisionTypeFormSchema(t)}
@@ -137,11 +128,10 @@ export function IndustrialDecisionTypesPage() {
         <GenericCreateForm
           fields={[
             { name: 'name', label: t('industrial_decision_types.name', 'investments'), required: true },
-            { name: 'is_active', type: 'checkbox', label: t('industrial_decision_types.is_active', 'investments') },
             { name: 'is_default', type: 'checkbox', label: t('industrial_decision_types.is_default', 'investments') }
           ]}
           schema={getCreateIndustrialDecisionTypeFormSchema(t)}
-          defaultValues={editItem ? { name: editItem.name, is_active: Boolean(editItem.is_active), is_default: Boolean(editItem.is_default) } : undefined}
+          defaultValues={editItem ? { name: editItem.name, is_default: Boolean(editItem.is_default) } : undefined}
           onSubmit={async (data) => {
             try {
               await update(editItem!.id, data);

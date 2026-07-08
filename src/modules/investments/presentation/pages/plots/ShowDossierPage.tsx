@@ -4,14 +4,13 @@ import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nP
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import type { Dossier } from '../../../domain/entities/dossier';
 import type { DossierStatusHistory } from '../../../domain/entities/dossierStatusHistory';
-import type { Investor } from '../../../domain/entities/investor';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
-import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { DossierStatusHistoryModal } from './components/DossierStatusHistoryModal';
-import { InvestorPickerDialog } from './components/InvestorPickerDialog';
-import { ArrowRight, History, Trash2, Plus, Users, FileText } from 'lucide-react';
+import { PartnersSection } from './components/PartnersSection';
+import { FacilitiesSection } from './components/FacilitiesSection';
+import { ArrowRight, History, FileText } from 'lucide-react';
 import { SectionCard } from '../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { InfoRow } from '../../../../../core/presentation/layouts/ui/card/InfoRow';
 
@@ -38,10 +37,6 @@ export function ShowDossierPage() {
   const [histories, setHistories] = useState<DossierStatusHistory[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState<string | null>(null);
-
-  const [selectedPartners, setSelectedPartners] = useState<Investor[]>([]);
-  const [isInvestorPickerOpen, setIsInvestorPickerOpen] = useState(false);
-  const [selectedPartnerIds, setSelectedPartnerIds] = useState<(string | number)[]>([]);
 
   useEffect(() => {
     if (!dossierId) return;
@@ -71,29 +66,6 @@ export function ShowDossierPage() {
   }, [getHistory, t]);
 
   const handleBack = () => navigate(`/investments/plots/${plotId}/edit`);
-
-  const handlePartnerPicked = (investors: Investor[]) => {
-    setSelectedPartners((prev) => {
-      const existingIds = new Set(prev.map((p) => p.id))
-      const newOnes = investors.filter((p) => !existingIds.has(p.id))
-      return [...prev, ...newOnes]
-    })
-    setIsInvestorPickerOpen(false)
-  }
-
-  const handleRemoveSelected = () => {
-    const removeIds = new Set(selectedPartnerIds)
-    setSelectedPartners((prev) => prev.filter((p) => !removeIds.has(p.id)))
-    setSelectedPartnerIds([])
-  }
-
-  const partnerColumns = [
-    { key: "id", label: "#", width: 60 },
-    { key: "full_name", label: t("investors.full_name", "investments") || "Full Name", width: 200 },
-    { key: "national_id", label: t("investors.national_id", "investments") || "National ID", width: 150 },
-    { key: "phone", label: t("investors.phone", "investments") || "Phone", width: 140 },
-    { key: "nationality", label: t("investors.nationality", "investments") || "Nationality", width: 130 },
-  ]
 
   if (loading) return <div className="p-6"><LoadingState /></div>;
   if (error) return <div className="p-6"><ErrorState message={error} onRetry={() => handleBack()} /></div>;
@@ -138,8 +110,8 @@ export function ShowDossierPage() {
             value={
               <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full"
                 style={{
-                  color: dossier.status === 'active' ? '#16a34a' : dossier.status === 'allocatable' ? '#2563eb' : '#ca8a04',
-                  background: dossier.status === 'active' ? '#dcfce7' : dossier.status === 'allocatable' ? '#dbeafe' : '#fefce8',
+                  color: dossier.status === 'active' ? '#16a34a' : dossier.status === 'cancelled' ? '#dc2626' : dossier.status === 'allocatable' ? '#2563eb' : '#ca8a04',
+                  background: dossier.status === 'active' ? '#dcfce7' : dossier.status === 'cancelled' ? '#fef2f2' : dossier.status === 'allocatable' ? '#dbeafe' : '#fefce8',
                 }}>
                 {t(`dossier.status_${dossier.status}`, 'investments') || dossier.status}
               </span>
@@ -156,39 +128,12 @@ export function ShowDossierPage() {
         </div>
       </SectionCard>
 
-      <SectionCard
-        title={t('dossier.partners', 'investments') || 'Partners'}
-        icon={<Users size={20} />}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <div />
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => setIsInvestorPickerOpen(true)} leftIcon={<Plus size={16} />}>
-              {t('dossier.add_investors', 'investments') || 'Add Investors'}
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleRemoveSelected} disabled={selectedPartnerIds.length === 0} leftIcon={<Trash2 size={16} />}>
-              {t('dossier.remove_selected', 'investments') || 'Remove Selected'}
-            </Button>
-          </div>
-        </div>
-        <DataTable
-          columns={partnerColumns}
-          data={selectedPartners}
-          rowKey="id"
-          selectable
-          selectedRows={selectedPartnerIds}
-          onSelectionChange={setSelectedPartnerIds}
-          emptyMessage={t('dossier.no_partners', 'investments') || 'No partners added'}
-        />
-      </SectionCard>
-
-      <InvestorPickerDialog
-        isOpen={isInvestorPickerOpen}
-        onClose={() => setIsInvestorPickerOpen(false)}
-        onConfirm={handlePartnerPicked}
-        multiple
-        initialSelected={selectedPartners}
-      />
+      {dossierId &&plotId &&
+        <PartnersSection plotId={plotId} dossierId={dossierId} />
+      }
+      {dossierId && plotId &&
+        <FacilitiesSection plotId={plotId} dossierId={dossierId} />
+      }
 
       <DossierStatusHistoryModal
         isOpen={historyOpen}
@@ -204,14 +149,128 @@ export function ShowDossierPage() {
 
 
 // "permissions": [
-//   "investments.plot-dossier.list",
-//   "investments.plot-dossier.view",
-//   "investments.plot-dossier.create",
-//   "investments.plot-dossier.update",
-//   "investments.plot-dossier.delete",
-//   "investments.plot-dossier-status-histories.list",
-//   "investments.plot-dossier-status-histories.view",
-//   "investments.plot-dossier-status-histories.create",
-//   "investments.plot-dossier-status-histories.update",
-//   "investments.plot-dossier-status-histories.delete",
-// ]
+//         "hr.employees.list",
+//         "hr.employees.view",
+//         "hr.employees.create",
+//         "hr.employees.update",
+//         "hr.employees.delete",
+//         "hr.employees.view-eligible-leave-types",
+//         "hr.organizational-levels.list",
+//         "hr.organizational-levels.view",
+//         "hr.organizational-levels.create",
+//         "hr.organizational-levels.update",
+//         "hr.organizational-levels.delete",
+//         "hr.chronic-diseases.list",
+//         "hr.chronic-diseases.view",
+//         "hr.chronic-diseases.create",
+//         "hr.chronic-diseases.update",
+//         "hr.chronic-diseases.delete",
+//         "hr.leave-types.list",
+//         "hr.leave-types.view",
+//         "hr.leave-types.create",
+//         "hr.leave-types.update",
+//         "hr.leave-types.delete",
+//         "hr.leave-balance.adjust",
+//         "hr.leave-balance.list",
+//         "hr.leave-requests.list",
+//         "hr.leave-requests.manage",
+//         "hr.job-statuses.list",
+//         "hr.job-statuses.view",
+//         "hr.job-statuses.create",
+//         "hr.job-statuses.update",
+//         "hr.job-statuses.delete",
+//         "hr.employee-statuses.list",
+//         "hr.employee-statuses.view",
+//         "hr.employee-statuses.create",
+//         "hr.employee-statuses.update",
+//         "hr.employee-statuses.delete",
+//         "investments.plot-areas.list",
+//         "investments.plot-areas.view",
+//         "investments.plot-areas.create",
+//         "investments.plot-areas.update",
+//         "investments.plot-areas.delete",
+//         "investments.plot-classifications.list",
+//         "investments.plot-classifications.view",
+//         "investments.plot-classifications.create",
+//         "investments.plot-classifications.update",
+//         "investments.plot-classifications.delete",
+//         "investments.plots.list",
+//         "investments.plots.view",
+//         "investments.plots.create",
+//         "investments.plots.update",
+//         "investments.plots.delete",
+//         "investments.plots.set-unsold",
+//         "investments.plots.set-announced",
+//         "investments.plots.set-subscribed",
+//         "investments.plots.set-allocated",
+//         "investments.plots.set-separated",
+//         "investments.investors.list",
+//         "investments.investors.view",
+//         "investments.investors.create",
+//         "investments.investors.update",
+//         "investments.investors.delete",
+//         "investments.industry-categories.list",
+//         "investments.industry-categories.view",
+//         "investments.industry-categories.create",
+//         "investments.industry-categories.update",
+//         "investments.industry-categories.delete",
+//         "investments.industry-types.list",
+//         "investments.industry-types.view",
+//         "investments.industry-types.create",
+//         "investments.industry-types.update",
+//         "investments.industry-types.delete",
+//         "investments.plot-dossier.list",
+//         "investments.plot-dossier.view",
+//         "investments.plot-dossier.create",
+//         "investments.plot-dossier.update",
+//         "investments.plot-dossier.delete",
+//         "investments.plot-dossier-status-histories.list",
+//         "investments.plot-dossier-status-histories.view",
+//         "investments.plot-dossier-status-histories.create",
+//         "investments.plot-dossier-status-histories.update",
+//         "investments.plot-dossier-status-histories.delete",
+//         "investments.plot-dossier.list-partners",
+//         "investments.plot-dossier.add-partner",
+//         "investments.plot-dossier.remove-partner",
+//         "investments.industrial-decision-types.list",
+//         "investments.industrial-decision-types.view",
+//         "investments.industrial-decision-types.create",
+//         "investments.industrial-decision-types.update",
+//         "investments.industrial-decision-types.delete",
+//         "investments.industrial-license-sources.list",
+//         "investments.industrial-license-sources.view",
+//         "investments.industrial-license-sources.create",
+//         "investments.industrial-license-sources.update",
+//         "investments.industrial-license-sources.delete",
+//         "investments.facilities.list",
+//         "investments.facilities.view",
+//         "investments.facilities.create",
+//         "investments.facilities.update",
+//         "investments.facilities.delete",
+//         "investments.facility-industrial-licenses.list",
+//         "investments.facility-industrial-licenses.view",
+//         "investments.facility-industrial-licenses.create",
+//         "investments.facility-industrial-licenses.update",
+//         "investments.facility-industrial-licenses.delete",
+//         "storage.storage.view",
+//         "storage.folder.create",
+//         "storage.folder.rename",
+//         "storage.folder.move",
+//         "storage.folder.delete",
+//         "storage.file.upload",
+//         "storage.file.download",
+//         "storage.file.rename",
+//         "storage.file.move",
+//         "storage.file.delete",
+//         "users.users.view",
+//         "users.users.add",
+//         "users.users.edit",
+//         "users.users.export",
+//         "users.roles.view",
+//         "users.roles.add",
+//         "users.roles.edit",
+//         "users.roles.delete",
+//         "users.settings.change",
+//         "users.users.link-to-employee",
+//         "shared.audit-logs.view"
+//       ]
