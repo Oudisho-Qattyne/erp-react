@@ -19,6 +19,7 @@ import { IndustryTypesPage } from './presentation/pages/industry-types/IndustryT
 import { LicensingStatusesPage } from './presentation/pages/licensing-statuses/LicensingStatusesPage';
 import { MapPin, Users } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
+import { ShowFacilityPage } from './presentation/pages/plots/ShowFacilityPage';
 
 const investmentsModule: Module = {
   name: 'investments',
@@ -52,6 +53,16 @@ const investmentsModule: Module = {
       label: 'dossier.view_details',
       nav: false,
       requiredPermission: 'investments.plot-dossier.view',
+      moduleName: 'investments',
+      group: 'investments',
+    },
+    {
+      path: '/investments/plots/:plotId/dossiers/:dossierId/facilities/:facilityId',
+      element: <ShowFacilityPage />,
+      layout: 'dashboard',
+      label: 'facilities.view',
+      nav: false,
+      requiredPermission: 'investments.facilities.view',
       moduleName: 'investments',
       group: 'investments',
     },
@@ -169,19 +180,19 @@ const investmentsModule: Module = {
       group: 'investments',
       parentNav: '/investments/industrial-management',
     },
-    // {
-    //   path: '/investments/licensing-statuses',
-    //   element: <LicensingStatusesPage />,
-    //   layout: 'dashboard',
-    //   label: 'licensing_statuses.title',
-    //   nav: true,
-    //   order: 3,
-    //   moduleName: 'investments',
-    //   // requiredPermission: 'investments.licensing-statuses.list',
-    //   icon: <Flag size={18} />,
-    //   group: 'investments',
-    //   parentNav: '/investments/industrial-management',
-    // },
+    {
+      path: '/investments/licensing-statuses',
+      element: <LicensingStatusesPage />,
+      layout: 'dashboard',
+      label: 'licensing_statuses.title',
+      nav: true,
+      order: 3,
+      moduleName: 'investments',
+      requiredPermission: 'investments.licensing-statuses.list',
+      icon: <Flag size={18} />,
+      group: 'investments',
+      parentNav: '/investments/industrial-management',
+    },
     {
       path: '/investments/industrial-decision-types',
       element: <IndustrialDecisionTypesPage />,

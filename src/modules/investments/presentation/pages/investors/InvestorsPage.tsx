@@ -243,6 +243,8 @@ export function InvestorsPage() {
         onConfirm={handleDeleteConfirm}
         onCancel={() => setConfirmDelete(null)}
         confirmLoading={loadingMap['remove']}
+        confirmLabel={t('common.delete', 'shared') || 'Delete'}
+        cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
       />
     </div>
   );

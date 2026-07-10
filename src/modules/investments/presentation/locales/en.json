@@ -148,19 +148,19 @@
     "name": "Name",
     "address": "Address",
     "city": "City",
-    "phone1": "Phone",
-    "phone2": "Phone 2",
+    "first_phone_number": "Phone",
+    "second_phone_number": "Phone 2",
     "email": "Email",
-    "capitalSYP": "Capital (SYP)",
-    "capitalUSD": "Capital (USD)",
-    "machineryValueSYP": "Machinery Value (SYP)",
-    "machineryValueUSD": "Machinery Value (USD)",
-    "employeeCount": "Employees",
-    "dailyProductionCapacity": "Daily Capacity",
-    "monthlyProductionCapacity": "Monthly Capacity",
-    "annualProductionCapacity": "Annual Capacity",
-    "powerCapacity": "Power Capacity",
-    "waterConsumption": "Water Consumption",
+    "capital_in_usd": "Capital (USD)",
+    "capital_in_syp": "Capital (SYP)",
+    "value_of_machines_in_usd": "Machinery Value (USD)",
+    "value_of_machines_in_syp": "Machinery Value (SYP)",
+    "number_of_workers": "Workers",
+    "daily_production_capacity": "Daily Capacity",
+    "monthly_production_capacity": "Monthly Capacity",
+    "yearly_production_capacity": "Annual Capacity",
+    "electrical_power_capacity": "Power Capacity",
+    "yearly_estimated_water_consumption": "Water Consumption",
     "created": "Facility created successfully",
     "create_error": "Failed to create facility",
     "updated": "Facility updated successfully",
@@ -170,12 +170,25 @@
     "no_records": "No facilities found",
     "delete_title": "Delete Facility",
     "delete_message": "Are you sure you want to delete this facility?",
+    "not_found": "Facility not found",
+    "load_error": "Failed to load facility",
+    "back_to_dossier": "Back to Dossier",
     "validation": {
       "name_required": "Name is required",
       "address_required": "Address is required",
       "city_required": "City is required",
-      "phone1_required": "Phone is required",
-      "email_invalid": "Invalid email address"
+      "first_phone_number_required": "Phone is required",
+      "email_invalid": "Invalid email address",
+      "capital_in_usd_positive": "Must be a positive number",
+      "capital_in_syp_positive": "Must be a positive number",
+      "value_of_machines_in_usd_positive": "Must be a positive number",
+      "value_of_machines_in_syp_positive": "Must be a positive number",
+      "number_of_workers_positive": "Must be a positive number",
+      "daily_production_capacity_positive": "Must be a positive number",
+      "monthly_production_capacity_positive": "Must be a positive number",
+      "yearly_production_capacity_positive": "Must be a positive number",
+      "electrical_power_capacity_required": "This field is required",
+      "yearly_estimated_water_consumption_positive": "Must be a positive number"
     }
   },
   "investors": {
@@ -265,12 +278,29 @@
         "update": "Edit Investor",
         "delete": "Delete Investor"
       },
+      "plot-areas": {
+        "list": "List Plot Areas",
+        "view": "View Plot Area",
+        "create": "Create Plot Area",
+        "update": "Edit Plot Area",
+        "delete": "Delete Plot Area"
+      },
+      "plot-classifications": {
+        "list": "List Plot Classifications",
+        "view": "View Plot Classification",
+        "create": "Create Plot Classification",
+        "update": "Edit Plot Classification",
+        "delete": "Delete Plot Classification"
+      },
       "plot-dossier": {
         "list": "List Dossiers",
         "view": "View Dossier",
         "create": "Create Dossier",
         "update": "Edit Dossier",
-        "delete": "Delete Dossier"
+        "delete": "Delete Dossier",
+        "list-partners": "List Partners",
+        "add-partner": "Add Partner",
+        "remove-partner": "Remove Partner"
       },
       "plot-dossier-status-histories": {
         "list": "List Dossier Status Histories",
@@ -278,13 +308,64 @@
         "create": "Create Dossier Status History",
         "update": "Edit Dossier Status History",
         "delete": "Delete Dossier Status History"
+      },
+      "industry-categories": {
+        "list": "List Industry Categories",
+        "view": "View Industry Category",
+        "create": "Create Industry Category",
+        "update": "Edit Industry Category",
+        "delete": "Delete Industry Category"
+      },
+      "industry-types": {
+        "list": "List Industry Types",
+        "view": "View Industry Type",
+        "create": "Create Industry Type",
+        "update": "Edit Industry Type",
+        "delete": "Delete Industry Type"
+      },
+      "industrial-decision-types": {
+        "list": "List Industrial Decision Types",
+        "view": "View Industrial Decision Type",
+        "create": "Create Industrial Decision Type",
+        "update": "Edit Industrial Decision Type",
+        "delete": "Delete Industrial Decision Type"
+      },
+      "industrial-license-sources": {
+        "list": "List Industrial License Sources",
+        "view": "View Industrial License Source",
+        "create": "Create Industrial License Source",
+        "update": "Edit Industrial License Source",
+        "delete": "Delete Industrial License Source"
+      },
+      "facilities": {
+        "list": "List Facilities",
+        "view": "View Facility",
+        "create": "Create Facility",
+        "update": "Edit Facility",
+        "delete": "Delete Facility"
+      },
+      "facility-industrial-licenses": {
+        "list": "List Industrial Licenses",
+        "view": "View Industrial License",
+        "create": "Create Industrial License",
+        "update": "Edit Industrial License",
+        "delete": "Delete Industrial License"
+      },
+      "licensing-statuses": {
+        "list": "List Licensing Statuses",
+        "view": "View Licensing Status",
+        "create": "Create Licensing Status",
+        "update": "Edit Licensing Status",
+        "delete": "Delete Licensing Status"
       }
     }
   },
   "industrial_decision_types": {
     "title": "Industrial Decision Types",
     "add": "Add Industrial Decision Type",
+    "create": "Create Industrial Decision Type",
     "name": "Decision Type Name",
+    "is_active": "Is Active",
     "is_default": "Set as Default",
     "created": "{name} created successfully",
     "create_error": "Failed to create {name}",
@@ -298,7 +379,9 @@
   "industrial_license_sources": {
     "title": "Industrial License Sources",
     "add": "Add Industrial License Source",
+    "create": "Create Industrial License Source",
     "name": "Source Name",
+    "is_active": "Is Active",
     "is_default": "Set as Default",
     "created": "{name} created successfully",
     "create_error": "Failed to create {name}",
@@ -309,9 +392,40 @@
       "name_required": "Name is required"
     }
   },
+  "facility_industrial_licenses": {
+    "title": "Industrial Licenses",
+    "add": "Add License",
+    "edit": "Edit License",
+    "view": "View License",
+    "decision_number": "Decision Number",
+    "decision_date": "Decision Date",
+    "industry_category": "Industry Category",
+    "industry_type": "Industry Type",
+    "decision_type": "Decision Type",
+    "license_source": "License Source",
+    "is_active": "Is Active",
+    "created": "License created successfully",
+    "create_error": "Failed to create license",
+    "updated": "License updated successfully",
+    "update_error": "Failed to update license",
+    "deleted": "License deleted successfully",
+    "delete_error": "Failed to delete license",
+    "no_records": "No licenses found",
+    "delete_title": "Delete License",
+    "delete_message": "Are you sure you want to delete this license?",
+    "validation": {
+      "industry_category_required": "Industry category is required",
+      "industry_type_required": "Industry type is required",
+      "decision_number_required": "Decision number is required",
+      "decision_date_required": "Decision date is required",
+      "decision_type_required": "Decision type is required",
+      "license_source_required": "License source is required"
+    }
+  },
   "industry_categories": {
     "title": "Industry Categories",
     "add": "Add Industry Category",
+    "create": "Create Industry Category",
     "name": "Category Name",
     "is_active": "Is Active",
     "is_default": "Set as Default",
@@ -327,6 +441,7 @@
   "industry_types": {
     "title": "Industry Types",
     "add": "Add Industry Type",
+    "create": "Create Industry Type",
     "name": "Type Name",
     "is_active": "Is Active",
     "is_default": "Set as Default",

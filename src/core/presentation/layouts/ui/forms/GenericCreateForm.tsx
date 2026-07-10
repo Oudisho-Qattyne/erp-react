@@ -57,7 +57,6 @@ export function GenericCreateForm({
   const { handleSubmit, formState } = methods;
   const { isValid, isSubmitting } = formState;
   const formRef = useRef<HTMLDivElement>(null);
-console.log(errors , isValid , getValues());
 
   const handleFormSubmit = async (data: any) => {
     try {

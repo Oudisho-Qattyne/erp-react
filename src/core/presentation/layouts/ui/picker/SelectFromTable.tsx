@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext, useMemo } from "react"
 import { Dialog } from "../dialog/Dialog"
 import { Button } from "../buttons/Button"
 import { DataTable, type ColumnDef } from "../tables/ResizableTable"
@@ -11,6 +11,7 @@ import { GenericCreateForm, type FieldConfig } from "../forms/GenericCreateForm"
 import type { ZodSchema } from "zod"
 import { Filter, Search, Plus } from "lucide-react"
 import { inputBaseClasses } from "../inputs/styles"
+import { AuthContext } from "../../../../infrastructure/auth/AuthProvider"
 
 export interface SelectFromTableProps<T extends { id: number | string }> {
   isOpen: boolean
@@ -21,6 +22,7 @@ export interface SelectFromTableProps<T extends { id: number | string }> {
   initialSelected?: T[]
   defaultFilter?: Record<string, any>
   onApplyDefaultFilter: (filter: Record<string, any>) => void
+  requiredPermission?: string | string[]
 
   data: T[]
   columns: ColumnDef<T>[]
@@ -60,6 +62,7 @@ export interface SelectFromTableProps<T extends { id: number | string }> {
     dialogTitle?: string
     buttonLabel?: string
     submitLabel?: string
+    createButtonPermission?: string | string[]
   }
 }
 
@@ -72,6 +75,7 @@ export function SelectFromTable<T extends { id: number | string }>({
   initialSelected = [],
   defaultFilter,
   onApplyDefaultFilter,
+  requiredPermission,
 
   data,
   columns,
@@ -104,6 +108,13 @@ export function SelectFromTable<T extends { id: number | string }>({
   createConfig,
 }: SelectFromTableProps<T>) {
   const { t } = useLanguage()
+  const auth = useContext(AuthContext)
+  const hasPermission = useMemo(() => {
+    if (!requiredPermission) return true
+    return auth?.hasPermission(requiredPermission) ?? false
+  }, [requiredPermission, auth])
+
+  if (!hasPermission) return null
   const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(initialSelected.map((e) => e.id))
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
@@ -168,6 +179,7 @@ export function SelectFromTable<T extends { id: number | string }>({
       }
     >
       <div className="flex flex-col gap-4">
+        <div className="relative flex justify-between items-center">
         <div className="flex items-center gap-2">
           {
             onSearch &&
@@ -186,11 +198,6 @@ export function SelectFromTable<T extends { id: number | string }>({
               {s("common.search", "Search")}
             </Button>
           }
-          {createConfig && (
-            <Button variant="primary" size="sm" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={14} />}>
-              {createConfig.buttonLabel || s("common.create", "Create")}
-            </Button>
-          )}
           <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
             {s("common.filter", "Filter")}
           </Button>
@@ -198,7 +205,12 @@ export function SelectFromTable<T extends { id: number | string }>({
             {s("common.reset", "Reset")}
           </Button>
         </div>
-
+        {createConfig && (
+            <Button variant="primary" size="sm" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={14} />} requiredPermission={createConfig.createButtonPermission}>
+              {createConfig.buttonLabel || s("common.create", "Create")}
+            </Button>
+          )}
+          </div>
         {isLoading && <LoadingState />}
         {error && !isLoading && (
           <ErrorState message={error} onRetry={onRetry || (() => { })} />
