@@ -17,14 +17,13 @@ import { getLocalizedName } from '../../../../../core/presentation/utils/helpes'
 
 export function IndustrialDecisionTypesPage() {
   const { t } = useLanguage();
-  const { entities: items, getAll, create, update, remove, loading, error } = useEntityCrud<IndustrialDecisionType>('/investments/industrial-decision-types', '/investments/industrial-decision-types');
+  const { entities: items, getAll, create, update, remove, loadingMap, errorMap } = useEntityCrud<IndustrialDecisionType>('/investments/industrial-decision-types', '/investments/industrial-decision-types');
   const entityName = t('industrial_decision_types.title', 'investments') || 'Industrial Decision Type';
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<IndustrialDecisionType | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<IndustrialDecisionType | null>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<IndustrialDecisionType | null>(null);
-  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const filtered = items.filter((c: any) => c.name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -32,7 +31,6 @@ export function IndustrialDecisionTypesPage() {
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
-    setConfirmLoading(true);
     try {
       await remove(confirmDelete.id);
       toast.success(t('industrial_decision_types.deleted', 'investments').replace('{name}', entityName));
@@ -40,12 +38,10 @@ export function IndustrialDecisionTypesPage() {
       toast.error(t('industrial_decision_types.delete_error', 'investments').replace('{name}', entityName));
     }
     setConfirmDelete(null);
-    setConfirmLoading(false);
   };
 
   const handleSetDefaultConfirm = async () => {
     if (!confirmSetDefault) return;
-    setConfirmLoading(true);
     try {
       await update(confirmSetDefault.id, { ...confirmSetDefault, is_default: true });
       toast.success(t('common.set_default_success', 'shared')?.replace('{name}', entityName) || `${entityName} set as default successfully`);
@@ -54,7 +50,6 @@ export function IndustrialDecisionTypesPage() {
       toast.error(t('common.set_default_error', 'shared')?.replace('{name}', entityName) || `Failed to set ${entityName} as default`);
     }
     setConfirmSetDefault(null);
-    setConfirmLoading(false);
   };
 
   const columns = [
@@ -63,14 +58,6 @@ export function IndustrialDecisionTypesPage() {
       label: t('industrial_decision_types.name', 'investments') || 'Decision Type Name',
       width: 250,
       render: (row: IndustrialDecisionType) => getLocalizedName(row.name) 
-    },
-    {
-      key: 'is_active',
-      label: t('industrial_decision_types.is_active', 'investments') || 'Is Active?',
-      width: 120,
-      render: (row: IndustrialDecisionType) => row.is_active
-        ? <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full"><Check size={12} /> {t('common.yes', 'shared') || 'Yes'}</span>
-        : <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full"><X size={12} /> {t('common.no', 'shared') || 'No'}</span>
     },
     {
       key: 'is_default',
@@ -121,7 +108,6 @@ export function IndustrialDecisionTypesPage() {
         <GenericCreateForm
           fields={[
             { name: 'name', label: t('industrial_decision_types.name', 'investments'), required: true },
-            { name: 'is_active', type: 'checkbox', label: t('industrial_decision_types.is_active', 'investments') },
             { name: 'is_default', type: 'checkbox', label: t('industrial_decision_types.is_default', 'investments') }
           ]}
           schema={getCreateIndustrialDecisionTypeFormSchema(t)}
@@ -142,11 +128,10 @@ export function IndustrialDecisionTypesPage() {
         <GenericCreateForm
           fields={[
             { name: 'name', label: t('industrial_decision_types.name', 'investments'), required: true },
-            { name: 'is_active', type: 'checkbox', label: t('industrial_decision_types.is_active', 'investments') },
             { name: 'is_default', type: 'checkbox', label: t('industrial_decision_types.is_default', 'investments') }
           ]}
           schema={getCreateIndustrialDecisionTypeFormSchema(t)}
-          defaultValues={editItem ? { name: editItem.name, is_active: Boolean(editItem.is_active), is_default: Boolean(editItem.is_default) } : undefined}
+          defaultValues={editItem ? { name: editItem.name, is_default: Boolean(editItem.is_default) } : undefined}
           onSubmit={async (data) => {
             try {
               await update(editItem!.id, data);
@@ -160,9 +145,9 @@ export function IndustrialDecisionTypesPage() {
         />
       </Dialog>
 
-      {error && <ErrorState message={error} onRetry={() => getAll()} />}
-      {!error && (
-        <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll()} />}
+      {!errorMap['getAll'] && (
+        <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
           emptyMessage={t('industrial_decision_types.no_records', 'investments')} />
       )}
 
@@ -173,7 +158,7 @@ export function IndustrialDecisionTypesPage() {
         message={t('common.confirm_delete_message', 'shared').replace('{entity}', entityName)}
         confirmLabel={t('common.delete', 'shared') || 'Delete'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setConfirmDelete(null)}
       />
@@ -184,7 +169,7 @@ export function IndustrialDecisionTypesPage() {
         message={t('common.set_default_message', 'shared')?.replace('{entity}', entityName) || `Are you sure you want to set this ${entityName} as default?`}
         confirmLabel={t('common.set_default', 'shared') || 'Set as default'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleSetDefaultConfirm}
         onCancel={() => setConfirmSetDefault(null)}
       />

@@ -43,12 +43,11 @@ function flattenTree(nodes: OrgLevelNode[], depth: number, expanded: Set<number>
 
 export function OrganizationalLevelsPage() {
   const { t } = useLanguage();
-  const { entities: items, getAll, create, update, remove, loading, error } = useEntityCrud<OrganizationalLevels>('/hr/organizational-levels', '/hr/organizational-levels');
+  const { entities: items, getAll, create, update, remove, loadingMap, errorMap } = useEntityCrud<OrganizationalLevels>('/hr/organizational-levels', '/hr/organizational-levels');
   const entity = t('lookups.tabs.organizational_levels', 'hr') || 'Organizational Levels';
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
-  const [confirmLoading, setConfirmLoading] = useState(false);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   useEffect(() => { getAll(); }, []);
@@ -67,7 +66,6 @@ export function OrganizationalLevelsPage() {
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
-    setConfirmLoading(true);
     try {
       await remove(confirmDelete.id);
       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
@@ -76,7 +74,6 @@ export function OrganizationalLevelsPage() {
       toast.error(t('lookups.delete_error', 'hr').replace('{name}', entity));
       getAll();
     }
-    setConfirmLoading(false);
   };
 
   const parentOptions = items.map(item => ({
@@ -167,9 +164,9 @@ export function OrganizationalLevelsPage() {
         />
       </Dialog>
 
-      {error && <ErrorState message={error} onRetry={() => getAll()} />}
-      {!error && (
-        <DataTable columns={columns} data={flatRows.map(r => ({ ...r.node, _depth: r.depth }))} rowKey="id" loading={loading}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll()} />}
+      {!errorMap['getAll'] && (
+        <DataTable columns={columns} data={flatRows.map(r => ({ ...r.node, _depth: r.depth }))} rowKey="id" loading={loadingMap['getAll']}
           emptyMessage={t('lookups.no_organizational_levels', 'hr') || 'No organizational levels found'} />
       )}
 
@@ -178,7 +175,7 @@ export function OrganizationalLevelsPage() {
         message={t('common.confirm_delete_message', 'shared').replace('{entity}', entity)}
         confirmLabel={t('common.delete', 'shared') || 'Delete'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleDeleteConfirm} onCancel={() => setConfirmDelete(null)} />
     </div>
   );

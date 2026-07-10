@@ -2,15 +2,9 @@ import React from 'react';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
 import { DataTable } from '../../../../../../core/presentation/layouts/ui/tables/ResizableTable';
+import type { PlotStatusHistory } from '../../../../domain/entities/plotStatusHistory';
 
-interface PlotStatusHistory {
-  id: number;
-  status: string;
-  status_date: string;
-  notes?: string;
-  created_at: string;
-  user?: { name: string };
-}
+
 
 interface PlotStatusHistoryModalProps {
   isOpen: boolean;

@@ -17,14 +17,13 @@ import { getLocalizedName } from '../../../../../core/presentation/utils/helpes'
 
 export function LicensingStatusesPage() {
   const { t } = useLanguage();
-  const { entities: items, getAll, create, update, remove, loading, error } = useEntityCrud<LicensingStatus>('/investments/licensing-statuses', '/investments/licensing-statuses');
+  const { entities: items, getAll, create, update, remove, loadingMap, errorMap } = useEntityCrud<LicensingStatus>('/investments/licensing-statuses', '/investments/licensing-statuses');
   const entityName = t('licensing_statuses.title', 'investments') || 'Licensing Status';
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<LicensingStatus | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<LicensingStatus | null>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<LicensingStatus | null>(null);
-  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const filtered = items.filter((c: any) => c.name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -32,7 +31,6 @@ export function LicensingStatusesPage() {
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
-    setConfirmLoading(true);
     try {
       await remove(confirmDelete.id);
       toast.success(t('licensing_statuses.deleted', 'investments').replace('{name}', entityName));
@@ -40,12 +38,10 @@ export function LicensingStatusesPage() {
       toast.error(t('licensing_statuses.delete_error', 'investments').replace('{name}', entityName));
     }
     setConfirmDelete(null);
-    setConfirmLoading(false);
   };
 
   const handleSetDefaultConfirm = async () => {
     if (!confirmSetDefault) return;
-    setConfirmLoading(true);
     try {
       await update(confirmSetDefault.id, { ...confirmSetDefault, is_default: true });
       toast.success(t('common.set_default_success', 'shared')?.replace('{name}', entityName) || `${entityName} set as default successfully`);
@@ -54,7 +50,6 @@ export function LicensingStatusesPage() {
       toast.error(t('common.set_default_error', 'shared')?.replace('{name}', entityName) || `Failed to set ${entityName} as default`);
     }
     setConfirmSetDefault(null);
-    setConfirmLoading(false);
   };
 
   const columns = [
@@ -160,9 +155,9 @@ export function LicensingStatusesPage() {
         />
       </Dialog>
 
-      {error && <ErrorState message={error} onRetry={() => getAll()} />}
-      {!error && (
-        <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll()} />}
+      {!errorMap['getAll'] && (
+        <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
           emptyMessage={t('licensing_statuses.no_records', 'investments')} />
       )}
 
@@ -173,7 +168,7 @@ export function LicensingStatusesPage() {
         message={t('common.confirm_delete_message', 'shared').replace('{entity}', entityName)}
         confirmLabel={t('common.delete', 'shared') || 'Delete'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setConfirmDelete(null)}
       />
@@ -184,7 +179,7 @@ export function LicensingStatusesPage() {
         message={t('common.set_default_message', 'shared')?.replace('{entity}', entityName) || `Are you sure you want to set this ${entityName} as default?`}
         confirmLabel={t('common.set_default', 'shared') || 'Set as default'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleSetDefaultConfirm}
         onCancel={() => setConfirmSetDefault(null)}
       />

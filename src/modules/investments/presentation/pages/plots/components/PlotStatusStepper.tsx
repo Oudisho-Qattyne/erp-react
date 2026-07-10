@@ -1,9 +1,9 @@
-import React from 'react';
-import { useLanguage } from '../../../context/i18n/I18nProvider';
+import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
 import { Check, Pencil } from 'lucide-react';
-import { useAuth } from '../../../../infrastructure/auth/AuthProvider';
+import { useAuth } from '../../../../../../core/infrastructure/auth/AuthProvider';
+import type { PlotStatus } from '../../../../domain/valueObjects/plots/plotStatus';
 
-export const PLOT_STATUSES = [
+export const PLOT_STATUSES : PlotStatus[] = [
   'unsold',
   'announced',
   'subscribed',
@@ -12,9 +12,9 @@ export const PLOT_STATUSES = [
 ];
 
 interface PlotStatusStepperProps {
-  currentStatus: string;
+  currentStatus: PlotStatus;
   statusDate?: string;
-  onStatusClick?: (status: string) => void;
+  onStatusClick?: (status: PlotStatus) => void;
   permissions?: Record<string, string>;
 }
 

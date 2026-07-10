@@ -5,7 +5,7 @@ import type { Investor } from '../../../domain/entities/investor';
 import { InvestorForm } from './components/InvestorForm';
 import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
@@ -102,7 +102,7 @@ function InterestCard({ interest, onDelete, t }: any) {
 export function EditInvestorPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t, direction } = useLanguage();
+  const { t } = useLanguage();
   const { getById, update } = useEntityCrud<Investor>('/investments/investors', '/investments/investors');
   const { remove: removeInterest } = useEntityCrud(`/investments/investors/${id || 0}/interests`, `/investments/investors/${id || 0}/interests`);
   const [investor, setInvestor] = useState<Investor | null>(null);
@@ -158,8 +158,8 @@ export function EditInvestorPage() {
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={handleBack} className="rounded-full w-10 h-10 p-0">
-          <ArrowLeft size={20} className={direction === 'rtl' ? 'rotate-180' : ''} />
+        <Button variant="outline" onClick={handleBack}>
+          <ArrowRight size={16} /> {t('investors.back_to_list', 'investments') || 'Back to Investors'}
         </Button>
         <h1 className="text-2xl font-bold">{t('investors.edit', 'investments') || 'Edit Investor'}</h1>
       </div>

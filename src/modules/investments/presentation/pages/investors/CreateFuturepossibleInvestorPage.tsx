@@ -6,11 +6,11 @@ import { InvestorForm } from './components/InvestorForm';
 import { InvestorInterestFormModal } from './components/InvestorInterestFormModal';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 
 export function CreateFuturePossibleInvestorPage() {
-  const { t, direction } = useLanguage();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { create } = useEntityCrud<Investor>('/investments/investors', '/investments/investors');
   const [createdInvestorId, setCreatedInvestorId] = useState<number | null>(null);
@@ -39,8 +39,8 @@ export function CreateFuturePossibleInvestorPage() {
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={handleBack} className="rounded-full w-10 h-10 p-0">
-          <ArrowLeft size={20} className={direction === 'rtl' ? 'rotate-180' : ''} />
+        <Button variant="outline" onClick={handleBack}>
+          <ArrowRight size={16} /> {t('investors.back_to_list', 'investments') || 'Back to Investors'}
         </Button>
         <h1 className="text-2xl font-bold">{t('investors.add', 'investments') || 'Add Possible Investor'}</h1>
       </div>

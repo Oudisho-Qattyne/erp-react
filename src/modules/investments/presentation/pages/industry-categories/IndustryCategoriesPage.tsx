@@ -17,14 +17,13 @@ import { getLocalizedName } from '../../../../../core/presentation/utils/helpes'
 
 export function IndustryCategoriesPage() {
   const { t } = useLanguage();
-  const { entities: items, getAll, create, update, remove, loading, error } = useEntityCrud<IndustryCategory>('/investments/industry-categories', '/investments/industry-categories');
+  const { entities: items, getAll, create, update, remove, loadingMap, errorMap } = useEntityCrud<IndustryCategory>('/investments/industry-categories', '/investments/industry-categories');
   const entityName = t('industry_categories.title', 'investments') || 'Industry Category';
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<IndustryCategory | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<IndustryCategory | null>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<IndustryCategory | null>(null);
-  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const filtered = items.filter((c: any) => c.name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -32,7 +31,6 @@ export function IndustryCategoriesPage() {
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
-    setConfirmLoading(true);
     try {
       await remove(confirmDelete.id);
       toast.success(t('industry_categories.deleted', 'investments').replace('{name}', entityName));
@@ -40,12 +38,10 @@ export function IndustryCategoriesPage() {
       toast.error(t('industry_categories.delete_error', 'investments').replace('{name}', entityName));
     }
     setConfirmDelete(null);
-    setConfirmLoading(false);
   };
 
   const handleSetDefaultConfirm = async () => {
     if (!confirmSetDefault) return;
-    setConfirmLoading(true);
     try {
       await update(confirmSetDefault.id, { ...confirmSetDefault, is_default: true });
       toast.success(t('common.set_default_success', 'shared')?.replace('{name}', entityName) || `${entityName} set as default successfully`);
@@ -54,7 +50,6 @@ export function IndustryCategoriesPage() {
       toast.error(t('common.set_default_error', 'shared')?.replace('{name}', entityName) || `Failed to set ${entityName} as default`);
     }
     setConfirmSetDefault(null);
-    setConfirmLoading(false);
   };
 
   const columns = [
@@ -160,9 +155,9 @@ export function IndustryCategoriesPage() {
         />
       </Dialog>
 
-      {error && <ErrorState message={error} onRetry={() => getAll()} />}
-      {!error && (
-        <DataTable columns={columns} data={filtered} rowKey="id" loading={loading}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll()} />}
+      {!errorMap['getAll'] && (
+        <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
           emptyMessage={t('industry_categories.no_records', 'investments')} />
       )}
 
@@ -173,7 +168,7 @@ export function IndustryCategoriesPage() {
         message={t('common.confirm_delete_message', 'shared').replace('{entity}', entityName)}
         confirmLabel={t('common.delete', 'shared') || 'Delete'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setConfirmDelete(null)}
       />
@@ -184,7 +179,7 @@ export function IndustryCategoriesPage() {
         message={t('common.set_default_message', 'shared')?.replace('{entity}', entityName) || `Are you sure you want to set this ${entityName} as default?`}
         confirmLabel={t('common.set_default', 'shared') || 'Set as default'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
         onConfirm={handleSetDefaultConfirm}
         onCancel={() => setConfirmSetDefault(null)}
       />

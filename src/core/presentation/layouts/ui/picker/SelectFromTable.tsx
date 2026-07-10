@@ -7,7 +7,9 @@ import Input from "../inputs/Input"
 import { LoadingState } from "../state/LoadingState"
 import { ErrorState } from "../state/ErrorState"
 import { useLanguage } from "../../../context/i18n/I18nProvider"
-import { Filter, Search } from "lucide-react"
+import { GenericCreateForm, type FieldConfig } from "../forms/GenericCreateForm"
+import type { ZodSchema } from "zod"
+import { Filter, Search, Plus } from "lucide-react"
 import { inputBaseClasses } from "../inputs/styles"
 
 export interface SelectFromTableProps<T extends { id: number | string }> {
@@ -48,6 +50,17 @@ export interface SelectFromTableProps<T extends { id: number | string }> {
   onPerPageChange: (perPage: number) => void
 
   emptyMessage: string
+
+  createConfig?: {
+    schema: ZodSchema<any>
+    fields?: FieldConfig[]
+    defaultValues?: Record<string, any>
+    onSubmit: (data: any) => Promise<any>
+    onError?: (error: any) => void
+    dialogTitle?: string
+    buttonLabel?: string
+    submitLabel?: string
+  }
 }
 
 export function SelectFromTable<T extends { id: number | string }>({
@@ -88,10 +101,12 @@ export function SelectFromTable<T extends { id: number | string }>({
   onPerPageChange,
 
   emptyMessage,
+  createConfig,
 }: SelectFromTableProps<T>) {
   const { t } = useLanguage()
   const [selectedKeys, setSelectedKeys] = useState<(string | number)[]>(initialSelected.map((e) => e.id))
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [localSearch, setLocalSearch] = useState(searchInitialValue)
 
   useEffect(() => {
@@ -171,6 +186,11 @@ export function SelectFromTable<T extends { id: number | string }>({
               {s("common.search", "Search")}
             </Button>
           }
+          {createConfig && (
+            <Button variant="primary" size="sm" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={14} />}>
+              {createConfig.buttonLabel || s("common.create", "Create")}
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
             {s("common.filter", "Filter")}
           </Button>
@@ -223,6 +243,27 @@ export function SelectFromTable<T extends { id: number | string }>({
         onCancel={() => setIsFilterOpen(false)}
         onReset={() => { onResetFilter(); setIsFilterOpen(false) }}
       />
+
+      {createConfig && (
+        <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={createConfig.dialogTitle || s("common.create", "Create")}>
+          <GenericCreateForm
+            schema={createConfig.schema}
+            fields={createConfig.fields}
+            defaultValues={createConfig.defaultValues}
+            onSubmit={async (data) => {
+              try {
+                return await createConfig.onSubmit(data)
+              } catch (error) {
+                createConfig.onError?.(error)
+                throw error
+              }
+            }}
+            onSuccess={() => setIsCreateOpen(false)}
+            onCancel={() => setIsCreateOpen(false)}
+            submitLabel={createConfig.submitLabel || s("common.create", "Create")}
+          />
+        </Dialog>
+      )}
     </Dialog>
   )
 }

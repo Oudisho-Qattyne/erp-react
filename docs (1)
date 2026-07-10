@@ -2504,7 +2504,15 @@ paths:
             type: boolean
       responses:
         200:
-          description: 'Successful operation'
+          description: 'List of plot areas'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/PlotAreaDTO' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
     post:
       tags:
         - 'Plot Areas'
@@ -2520,7 +2528,17 @@ paths:
               $ref: '#/components/schemas/PlotAreaDTO'
       responses:
         200:
-          description: 'Successful operation'
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotAreaDTO' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
   '/investments/plot-areas/{id}':
     get:
       tags:
@@ -2538,9 +2556,17 @@ paths:
             type: string
       responses:
         200:
-          description: 'Successful operation'
+          description: 'Plot area details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotAreaDTO' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
         404:
-          description: 'Not found'
+          $ref: '#/components/responses/NotFound'
     put:
       tags:
         - 'Plot Areas'
@@ -2563,9 +2589,19 @@ paths:
               $ref: '#/components/schemas/PlotAreaDTO'
       responses:
         200:
-          description: 'Successful operation'
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotAreaDTO' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
         404:
-          description: 'Not found'
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
     delete:
       tags:
         - 'Plot Areas'
@@ -2582,11 +2618,15 @@ paths:
             type: string
       responses:
         200:
-          description: 'Successful operation'
-        400:
-          description: 'Bad request (Has related records)'
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
         404:
-          description: 'Not found'
+          $ref: '#/components/responses/NotFound'
   /investments/plot-classifications:
     get:
       tags:
@@ -2613,7 +2653,15 @@ paths:
             type: boolean
       responses:
         200:
-          description: 'Successful operation'
+          description: 'List of plot classifications'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/PlotClassificationDTO' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
     post:
       tags:
         - 'Plot Classifications'
@@ -2629,7 +2677,17 @@ paths:
               $ref: '#/components/schemas/PlotClassificationDTO'
       responses:
         200:
-          description: 'Successful operation'
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotClassificationDTO' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
   '/investments/plot-classifications/{id}':
     get:
       tags:
@@ -2647,9 +2705,17 @@ paths:
             type: string
       responses:
         200:
-          description: 'Successful operation'
+          description: 'Plot classification details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotClassificationDTO' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
         404:
-          description: 'Not found'
+          $ref: '#/components/responses/NotFound'
     put:
       tags:
         - 'Plot Classifications'
@@ -2672,9 +2738,19 @@ paths:
               $ref: '#/components/schemas/PlotClassificationDTO'
       responses:
         200:
-          description: 'Successful operation'
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotClassificationDTO' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
         404:
-          description: 'Not found'
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
     delete:
       tags:
         - 'Plot Classifications'
@@ -2691,11 +2767,15 @@ paths:
             type: string
       responses:
         200:
-          description: 'Successful operation'
-        400:
-          description: 'Bad request (Has related records)'
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
         404:
-          description: 'Not found'
+          $ref: '#/components/responses/NotFound'
   /investments/plots:
     get:
       tags:
@@ -2712,7 +2792,15 @@ paths:
             type: string
       responses:
         200:
-          description: 'Successful operation'
+          description: 'List of plots'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/PlotInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
     post:
       tags:
         - Plots
@@ -2728,11 +2816,17 @@ paths:
               $ref: '#/components/schemas/PlotDTO'
       responses:
         200:
-          description: 'Successful operation'
+          description: 'Created successfully'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlotInfoResource'
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
   '/investments/plots/{id}':
     get:
       tags:
@@ -2750,13 +2844,17 @@ paths:
             type: string
       responses:
         200:
-          description: 'Successful operation'
+          description: 'Plot details'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlotInfoResource'
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
         404:
-          description: 'Not found'
+          $ref: '#/components/responses/NotFound'
     put:
       tags:
         - Plots
@@ -2779,13 +2877,44 @@ paths:
               $ref: '#/components/schemas/PlotDTO'
       responses:
         200:
-          description: 'Successful operation'
+          description: 'Updated successfully'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlotInfoResource'
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
         404:
-          description: 'Not found'
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - Plots
+      summary: 'Delete a Plot'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
   '/investments/plots/{id}/status':
     put:
       tags:
@@ -2810,36 +2939,19 @@ paths:
               $ref: '#/components/schemas/ChangePlotStatusDTO'
       responses:
         200:
-          description: 'Successful operation – returns the updated plot resource'
+          description: 'Status changed successfully'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlotInfoResource'
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
         404:
-          description: 'Plot not found'
+          $ref: '#/components/responses/NotFound'
         422:
-          description: 'Invalid status progression or missing permission'
-    delete:
-      tags:
-        - Plots
-      summary: 'Delete a Plot'
-      security:
-        -
-          sanctumAuth: {  }
-      parameters:
-        -
-          name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: 'Successful operation'
-        400:
-          description: 'Bad request (Has related records)'
-        404:
-          description: 'Not found'
+          $ref: '#/components/responses/ValidationError'
   /investments/investors:
     get:
       tags:
@@ -2896,11 +3008,15 @@ paths:
             type: boolean
       responses:
         200:
-          description: 'Successful operation'
+          description: 'List of investors'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvestorInfoResource'
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/InvestorInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
     post:
       tags:
         - Investors
@@ -2916,11 +3032,17 @@ paths:
               $ref: '#/components/schemas/InvestorDTO'
       responses:
         200:
-          description: 'Successful operation'
+          description: 'Created successfully'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvestorInfoResource'
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/InvestorInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
   '/investments/investors/{id}':
     get:
       tags:
@@ -2938,13 +3060,17 @@ paths:
             type: string
       responses:
         200:
-          description: 'Successful operation'
+          description: 'Investor details'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvestorInfoResource'
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/InvestorInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
         404:
-          description: 'Not found'
+          $ref: '#/components/responses/NotFound'
     put:
       tags:
         - Investors
@@ -2967,13 +3093,19 @@ paths:
               $ref: '#/components/schemas/InvestorDTO'
       responses:
         200:
-          description: 'Successful operation'
+          description: 'Updated successfully'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvestorInfoResource'
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/InvestorInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
         404:
-          description: 'Not found'
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
     delete:
       tags:
         - Investors
@@ -2990,11 +3122,894 @@ paths:
             type: string
       responses:
         200:
-          description: 'Successful operation'
-        400:
-          description: 'Bad request (Has related records)'
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
         404:
-          description: 'Not found'
+          $ref: '#/components/responses/NotFound'
+  /investments/industry-categories:
+    get:
+      tags:
+        - 'Industry Categories'
+      summary: 'Get all Industry Categories'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: is_active
+          in: query
+          schema:
+            type: boolean
+        -
+          name: is_default
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'List of industry categories'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/IndustryCategoryInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Industry Categories'
+      summary: 'Create an Industry Category'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndustryCategoryDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustryCategoryInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/industry-categories/{id}':
+    get:
+      tags:
+        - 'Industry Categories'
+      summary: 'Get an Industry Category by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Industry category details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustryCategoryInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Industry Categories'
+      summary: 'Update an Industry Category'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndustryCategoryDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustryCategoryInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Industry Categories'
+      summary: 'Delete an Industry Category'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /investments/industry-types:
+    get:
+      tags:
+        - 'Industry Types'
+      summary: 'Get all Industry Types'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: is_active
+          in: query
+          schema:
+            type: boolean
+        -
+          name: is_default
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'List of industry types'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/IndustryTypeInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Industry Types'
+      summary: 'Create an Industry Type'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndustryTypeDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustryTypeInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/industry-types/{id}':
+    get:
+      tags:
+        - 'Industry Types'
+      summary: 'Get an Industry Type by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Industry type details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustryTypeInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Industry Types'
+      summary: 'Update an Industry Type'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndustryTypeDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustryTypeInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Industry Types'
+      summary: 'Delete an Industry Type'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /investments/industrial-decision-types:
+    get:
+      tags:
+        - 'Industrial Decision Types'
+      summary: 'Get all Industrial Decision Types'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: is_default
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'List of industrial decision types'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/IndustrialDecisionTypeInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Industrial Decision Types'
+      summary: 'Create an Industrial Decision Type'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndustrialDecisionTypeDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustrialDecisionTypeInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/industrial-decision-types/{id}':
+    get:
+      tags:
+        - 'Industrial Decision Types'
+      summary: 'Get an Industrial Decision Type by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Industrial decision type details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustrialDecisionTypeInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Industrial Decision Types'
+      summary: 'Update an Industrial Decision Type'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndustrialDecisionTypeDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustrialDecisionTypeInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Industrial Decision Types'
+      summary: 'Delete an Industrial Decision Type'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /investments/industrial-license-sources:
+    get:
+      tags:
+        - 'Industrial License Sources'
+      summary: 'Get all Industrial License Sources'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: is_default
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'List of industrial license sources'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/IndustrialLicenseSourceInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Industrial License Sources'
+      summary: 'Create an Industrial License Source'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndustrialLicenseSourceDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustrialLicenseSourceInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/industrial-license-sources/{id}':
+    get:
+      tags:
+        - 'Industrial License Sources'
+      summary: 'Get an Industrial License Source by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Industrial license source details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustrialLicenseSourceInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Industrial License Sources'
+      summary: 'Update an Industrial License Source'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndustrialLicenseSourceDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/IndustrialLicenseSourceInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Industrial License Sources'
+      summary: 'Delete an Industrial License Source'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  '/investments/plots/{plotId}/dossiers':
+    get:
+      tags:
+        - 'Plot Dossiers'
+      summary: 'Get all dossiers for a plot'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+      responses:
+        200:
+          description: 'List of dossiers'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/PlotDossierInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Plot Dossiers'
+      summary: 'Create a dossier for a plot'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlotDossierDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/plots/{plotId}/dossiers/{dossierId}':
+    get:
+      tags:
+        - 'Plot Dossiers'
+      summary: 'Get a dossier by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: dossierId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Dossier details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Plot Dossiers'
+      summary: 'Update a dossier'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: dossierId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlotDossierDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Plot Dossiers'
+      summary: 'Delete a dossier'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: dossierId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  '/investments/plots/{plotId}/dossiers/{dossierId}/partners':
+    get:
+      tags:
+        - 'Dossier Partners'
+      summary: 'List partners of a dossier'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: dossierId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'List of dossier partners'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags:
+        - 'Dossier Partners'
+      summary: 'Add partners to a dossier'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: dossierId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DossierPartnerDTO'
+      responses:
+        200:
+          description: 'Partners added successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierInfoResource' } } }
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Dossier Partners'
+      summary: 'Remove partners from a dossier'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: dossierId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DossierPartnerDTO'
+      responses:
+        200:
+          description: 'Partners removed successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierInfoResource' } } }
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
   /storage-management:
     get:
       summary: 'List root-level storage items'
@@ -4091,13 +5106,6 @@ components:
         org_unit_id:
           type: integer
           example: 1
-        status:
-          type: string
-          enum:
-            - active
-            - inactive
-            - suspended
-          example: active
         appointment_date:
           type: string
           format: date
@@ -5501,149 +6509,6 @@ components:
           $ref: '#/components/schemas/proration_scheme'
         is_active:
           type: boolean
-    InvestorDTO:
-      type: object
-      required:
-        - full_name
-        - nationality
-        - gender
-      properties:
-        full_name:
-          type: string
-          example: 'John Doe'
-        national_id:
-          type: string
-          example: '1234567890'
-        passport_number:
-          type: string
-          example: A1234567
-        nationality:
-          type: string
-          example: Syrian
-        gender:
-          type: string
-          enum:
-            - male
-            - female
-          example: male
-        phone:
-          type: string
-          example: '+963999999999'
-        whatsapp_number:
-          type: string
-          example: '+963999999999'
-        email:
-          type: string
-          example: johndoe@example.com
-        address:
-          type: string
-          example: 'Damascus, Syria'
-        facebook:
-          type: string
-          nullable: true
-          example: 'https://facebook.com/johndoe'
-        instagram:
-          type: string
-          nullable: true
-          example: 'https://instagram.com/johndoe'
-        x:
-          type: string
-          nullable: true
-          example: 'https://x.com/johndoe'
-        linkedin:
-          type: string
-          nullable: true
-          example: 'https://linkedin.com/in/johndoe'
-    InvestorInfoResource:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        full_name:
-          type: string
-          example: 'John Doe'
-        national_id:
-          type: string
-          nullable: true
-          example: '1234567890'
-        passport_number:
-          type: string
-          nullable: true
-          example: A1234567
-        nationality:
-          type: string
-          example: Syrian
-        gender:
-          type: string
-          enum:
-            - male
-            - female
-          example: male
-        phone:
-          type: string
-          nullable: true
-          example: '+963999999999'
-        whatsapp_number:
-          type: string
-          nullable: true
-          example: '+963999999999'
-        email:
-          type: string
-          nullable: true
-          example: johndoe@example.com
-        address:
-          type: string
-          nullable: true
-          example: 'Damascus, Syria'
-        facebook:
-          type: string
-          nullable: true
-          example: 'https://facebook.com/johndoe'
-        instagram:
-          type: string
-          nullable: true
-          example: 'https://instagram.com/johndoe'
-        x:
-          type: string
-          nullable: true
-          example: 'https://x.com/johndoe'
-        linkedin:
-          type: string
-          nullable: true
-          example: 'https://linkedin.com/in/johndoe'
-        is_possible_investor_in_future:
-          type: boolean
-          example: false
-        user:
-          type: object
-          nullable: true
-          properties:
-            id:
-              type: integer
-              example: 1
-            name:
-              type: string
-              example: 'Admin User'
-        interests:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-                example: 1
-              name:
-                type: string
-                example: 'Real Estate'
-        created_at:
-          type: string
-          format: date
-          example: '2026-06-27T00:00:00Z'
-        updated_at:
-          type: string
-          format: date
-          example: '2026-06-27T00:00:00Z'
     PlotAreaDTO:
       type: object
       required:
@@ -5814,6 +6679,414 @@ components:
           type: string
           maxLength: 1000
           example: 'Plot has been announced for public bidding'
+    InvestorDTO:
+      type: object
+      required:
+        - full_name
+        - nationality
+        - gender
+      properties:
+        full_name:
+          type: string
+          example: 'John Doe'
+        national_id:
+          type: string
+          example: '1234567890'
+        passport_number:
+          type: string
+          example: A1234567
+        nationality:
+          type: string
+          example: Syrian
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+          example: male
+        phone:
+          type: string
+          example: '+963999999999'
+        whatsapp_number:
+          type: string
+          example: '+963999999999'
+        email:
+          type: string
+          example: johndoe@example.com
+        address:
+          type: string
+          example: 'Damascus, Syria'
+        facebook:
+          type: string
+          nullable: true
+          example: 'https://facebook.com/johndoe'
+        instagram:
+          type: string
+          nullable: true
+          example: 'https://instagram.com/johndoe'
+        x:
+          type: string
+          nullable: true
+          example: 'https://x.com/johndoe'
+        linkedin:
+          type: string
+          nullable: true
+          example: 'https://linkedin.com/in/johndoe'
+    InvestorInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        full_name:
+          type: string
+          example: 'John Doe'
+        national_id:
+          type: string
+          nullable: true
+          example: '1234567890'
+        passport_number:
+          type: string
+          nullable: true
+          example: A1234567
+        nationality:
+          type: string
+          example: Syrian
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+          example: male
+        phone:
+          type: string
+          nullable: true
+          example: '+963999999999'
+        whatsapp_number:
+          type: string
+          nullable: true
+          example: '+963999999999'
+        email:
+          type: string
+          nullable: true
+          example: johndoe@example.com
+        address:
+          type: string
+          nullable: true
+          example: 'Damascus, Syria'
+        facebook:
+          type: string
+          nullable: true
+          example: 'https://facebook.com/johndoe'
+        instagram:
+          type: string
+          nullable: true
+          example: 'https://instagram.com/johndoe'
+        x:
+          type: string
+          nullable: true
+          example: 'https://x.com/johndoe'
+        linkedin:
+          type: string
+          nullable: true
+          example: 'https://linkedin.com/in/johndoe'
+        is_possible_investor_in_future:
+          type: boolean
+          example: false
+        user:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: 'Admin User'
+        interests:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+              name:
+                type: string
+                example: 'Real Estate'
+        created_at:
+          type: string
+          format: date
+          example: '2026-06-27T00:00:00Z'
+        updated_at:
+          type: string
+          format: date
+          example: '2026-06-27T00:00:00Z'
+    IndustryCategoryDTO:
+      type: object
+      required:
+        - name
+        - is_active
+        - is_default
+      properties:
+        name:
+          type: string
+          example: 'Real Estate'
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+    IndustryCategoryInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Real Estate'
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date
+          example: 06-07-2026
+        updated_at:
+          type: string
+          format: date
+          example: 06-07-2026
+    IndustryTypeDTO:
+      type: object
+      required:
+        - name
+        - is_active
+        - is_default
+      properties:
+        name:
+          type: string
+          example: Industrial
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+    IndustryTypeInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Industrial
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date
+          example: 06-07-2026
+        updated_at:
+          type: string
+          format: date
+          example: 06-07-2026
+    PlotDossierDTO:
+      type: object
+      properties:
+        dossier_number:
+          type: string
+          nullable: true
+          example: DOS-001
+        dossier_date:
+          type: string
+          format: date
+          example: '2026-07-06'
+        status:
+          type: string
+          enum:
+            - allocatable
+            - draft
+            - active
+          example: allocatable
+    PlotDossierInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        plot_id:
+          type: integer
+          example: 1
+        dossier_number:
+          type: string
+          nullable: true
+          example: DOS-001
+        status:
+          type: string
+          enum:
+            - active
+            - allocatable
+            - cancelled
+            - draft
+          example: allocatable
+        dossier_date:
+          type: string
+          format: date
+          example: 06-07-2026
+        allocated_date:
+          type: string
+          format: date
+          nullable: true
+          example: 06-07-2026
+        subscription_date:
+          type: string
+          nullable: true
+          example: '2026-07-06'
+        notes:
+          type: string
+          nullable: true
+          example: 'Additional notes'
+        created_at:
+          type: string
+          format: date
+          example: 06-07-2026
+        updated_at:
+          type: string
+          format: date
+          example: 06-07-2026
+    PlotDossierStatusHistoryDTO:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - active
+            - allocatable
+            - cancelled
+            - draft
+          example: active
+        note:
+          type: string
+          nullable: true
+          example: 'Dossier status changed'
+    IndustrialDecisionTypeDTO:
+      type: object
+      required:
+        - name
+        - is_default
+      properties:
+        name:
+          type: string
+          example: Economic
+        is_default:
+          type: boolean
+          example: false
+    IndustrialDecisionTypeInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Economic
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date
+          example: 06-07-2026
+    IndustrialLicenseSourceDTO:
+      type: object
+      required:
+        - name
+        - is_default
+      properties:
+        name:
+          type: string
+          example: Ministry
+        is_default:
+          type: boolean
+          example: false
+    IndustrialLicenseSourceInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Ministry
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date
+          example: 06-07-2026
+    PlotDossierStatusHistoryInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        plot_id:
+          type: integer
+          example: 1
+        plot_dossier_id:
+          type: integer
+          example: 1
+        status:
+          type: string
+          enum:
+            - active
+            - allocatable
+            - cancelled
+            - draft
+          example: active
+        note:
+          type: string
+          nullable: true
+          example: 'Dossier status changed'
+        user_id:
+          type: integer
+          nullable: true
+          example: 1
+        created_at:
+          type: string
+          format: date
+          example: 06-07-2026
+        updated_at:
+          type: string
+          format: date
+          example: 06-07-2026
+    DossierPartnerDTO:
+      type: object
+      required:
+        - investor_ids
+      properties:
+        investor_ids:
+          type: array
+          items:
+            type: integer
+          example:
+            - 1
+            - 2
+            - 3
+          description: 'Array of investor IDs to add or remove'
     PlotStatus:
       type: string
       enum:
@@ -6663,6 +7936,24 @@ tags:
   -
     name: Investors
     description: 'Manage Investors'
+  -
+    name: 'Industry Categories'
+    description: 'Manage Industry Category definitions'
+  -
+    name: 'Industry Types'
+    description: 'Manage Industry Type definitions'
+  -
+    name: 'Plot Dossiers'
+    description: 'Manage Plot Dossier definitions'
+  -
+    name: 'Dossier Partners'
+    description: 'Manage partners assigned to a dossier'
+  -
+    name: 'Industrial Decision Types'
+    description: 'Manage Industrial Decision Type definitions'
+  -
+    name: 'Industrial License Sources'
+    description: 'Manage Industrial License Source definitions'
   -
     name: Storage
     description: 'Resolve storage items by ID or list root-level items'

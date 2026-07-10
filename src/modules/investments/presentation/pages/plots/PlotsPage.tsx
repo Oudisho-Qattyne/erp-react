@@ -19,7 +19,7 @@ import { getLocalizedName } from '../../../../../core/presentation/utils/helpes'
 export function PlotsPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { entities: plots, getAll, remove, loading, error, pagination } = useEntityCrud<Plot>('/investments/plots', '/investments/plots');
+  const { entities: plots, getAll, remove, loadingMap, errorMap, pagination } = useEntityCrud<Plot>('/investments/plots', '/investments/plots');
   const { entities: areas, getAll: getAreas } = useEntityCrud<EntityWithNameOnly>('/investments/plot-areas', '/investments/plot-areas');
   const { entities: classifications, getAll: getClassifications } = useEntityCrud<EntityWithNameOnly>('/investments/plot-classifications', '/investments/plot-classifications');
 
@@ -27,7 +27,6 @@ export function PlotsPage() {
   const [localSearch, setLocalSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<Plot | null>(null);
-  const [confirmLoading, setConfirmLoading] = useState(false);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
 
   // Table State
@@ -97,7 +96,6 @@ export function PlotsPage() {
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
-    setConfirmLoading(true);
     try {
       await remove(confirmDelete.id);
       toast.success((t('plots.deleted', 'investments') || 'Plot deleted').replace('{name}', entityName));
@@ -106,7 +104,6 @@ export function PlotsPage() {
       toast.error((t('plots.delete_error', 'investments') || 'Failed to delete plot').replace('{name}', entityName));
     }
     setConfirmDelete(null);
-    setConfirmLoading(false);
   };
 
   const areaOptions = useMemo(() => areas.map(a => ({ value: String(a.id), label: getLocalizedName(a.name) })), [areas]);
@@ -256,14 +253,14 @@ export function PlotsPage() {
         onReset={handleResetFilter}
       />
 
-      {error && <ErrorState message={error} onRetry={() => setPage(prev => prev)} />}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => setPage(prev => prev)} />}
 
-      {!error && (
+      {!errorMap['getAll'] && (
         <DataTable
           columns={columns}
           data={plots}
           rowKey="id"
-          loading={loading}
+          loading={loadingMap['getAll']}
           emptyMessage={t('plots.no_records', 'investments') || 'No plots found'}
           sortColumn={sortColumn}
           sortOrder={sortOrder}
@@ -278,7 +275,7 @@ export function PlotsPage() {
         message={t('common.delete_confirm', 'shared').replace("{name}" , "") || 'Are you sure you want to delete this?'}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setConfirmDelete(null)}
-        confirmLoading={confirmLoading}
+        confirmLoading={loadingMap['remove']}
       />
 
       <PlotAuditLogModal
