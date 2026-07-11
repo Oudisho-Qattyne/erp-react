@@ -1,8 +1,11 @@
 import { useEffect } from 'react';
 import { Dialog } from '../dialog/Dialog';
 import { DataTable } from '../tables/ResizableTable';
+import { ErrorState } from '../state/ErrorState';
 import { useAuditLogs } from '../../../hooks/data/auditLogs/useAuditLogs';
+import { useLanguage } from '../../../context/i18n/I18nProvider';
 import type { AuditLog as AuditLogEntity } from '../../../../domain/entities/auditLog/auditLog';
+import { LoadingState } from '../state/LoadingState';
 
 interface AuditLogLabels {
   title?: string;
@@ -15,6 +18,8 @@ interface AuditLogLabels {
   new_value?: string;
   no_records?: string;
   subject_id?: string;
+  error?: string;
+  loading?: string;
 }
 
 interface AuditLogProps {
@@ -22,12 +27,15 @@ interface AuditLogProps {
   onClose: () => void;
   model: string;
   modelId?: number;
+  module?: string;
   labels?: AuditLogLabels;
   translateField?: (key: string) => string;
+  translateValues?: (fieldKey: string, value: string) => string;
 }
 
-export function AuditLog({ isOpen, onClose, model, modelId, labels, translateField }: AuditLogProps) {
-  const { auditLogs, loading, getAuditLogs } = useAuditLogs();
+export function AuditLog({ isOpen, onClose, model, modelId, module = 'shared', labels, translateField, translateValues }: AuditLogProps) {
+  const { auditLogs, loading, error, getAuditLogs } = useAuditLogs();
+  const { t: langT } = useLanguage();
 
   useEffect(() => {
     if (isOpen) {
@@ -35,7 +43,7 @@ export function AuditLog({ isOpen, onClose, model, modelId, labels, translateFie
     }
   }, [isOpen, model, modelId]);
 
-  const t = (key: keyof AuditLogLabels, fallback: string) => labels?.[key] || fallback;
+  const t = (key: keyof AuditLogLabels, fallback: string) => labels?.[key] || langT(key, module) || fallback;
 
   const columns = [
     ...(!modelId ? [{
@@ -98,12 +106,12 @@ export function AuditLog({ isOpen, onClose, model, modelId, labels, translateFie
                     <td className="px-2 py-1.5 font-medium text-text-muted break-all max-w-25">{translateField ? translateField(k) : k}</td>
                     {hasOld && (
                       <td className="px-2 py-1.5 border-l border-border text-danger/80 break-all max-w-37.5">
-                        {oldProps[k] !== undefined && oldProps[k] !== null ? String(oldProps[k]) : '—'}
+                        {oldProps[k] !== undefined && oldProps[k] !== null ? (translateValues?.(k, String(oldProps[k])) || String(oldProps[k])) : '—'}
                       </td>
                     )}
                     {hasNew && (
                       <td className="px-2 py-1.5 border-l border-border text-success/90 break-all max-w-37.5">
-                        {newProps[k] !== undefined && newProps[k] !== null ? String(newProps[k]) : '—'}
+                        {newProps[k] !== undefined && newProps[k] !== null ? (translateValues?.(k, String(newProps[k])) || String(newProps[k])) : '—'}
                       </td>
                     )}
                   </tr>
@@ -121,11 +129,13 @@ export function AuditLog({ isOpen, onClose, model, modelId, labels, translateFie
       isOpen={isOpen}
       onClose={onClose}
       title={t('title', 'Audit Log')}
-      size="xl"
+      size="2xl"
     >
       <div className="mt-4 ">
         {loading ? (
-          <div className="flex justify-center p-8 text-sm text-text-muted">Loading...</div>
+          <LoadingState message={langT('common.loading', 'shared') || 'Loading...'} />
+        ) : error ? (
+          <ErrorState message={error} onRetry={() => getAuditLogs(model, modelId)} />
         ) : (
           <DataTable
             columns={columns}

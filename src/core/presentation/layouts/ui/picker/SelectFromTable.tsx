@@ -211,7 +211,7 @@ export function SelectFromTable<T extends { id: number | string }>({
             </Button>
           )}
           </div>
-        {isLoading && <LoadingState />}
+        {isLoading && <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />}
         {error && !isLoading && (
           <ErrorState message={error} onRetry={onRetry || (() => { })} />
         )}

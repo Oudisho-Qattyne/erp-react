@@ -9,7 +9,8 @@ import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/Er
 import { SectionCard } from '../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { InfoRow } from '../../../../../core/presentation/layouts/ui/card/InfoRow';
 import { FacilityIndustrialLicensesSection } from './components/FacilityIndustrialLicensesSection';
-import { ArrowRight, Factory } from 'lucide-react';
+import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
+import { ArrowRight, Factory, History } from 'lucide-react';
 
 export function ShowFacilityPage() {
   const { t } = useLanguage();
@@ -21,6 +22,7 @@ export function ShowFacilityPage() {
   const [facility, setFacility] = useState<Facility | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
 
   useEffect(() => {
     if (!facilityId) return;
@@ -35,9 +37,16 @@ export function ShowFacilityPage() {
 
   const handleBack = () => navigate(`/investments/plots/${plotId}/dossiers/${dossierId}`);
 
-  if (loading) return <div className="p-6"><LoadingState /></div>;
+  if (loading) return <div className="p-6"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>;
   if (error) return <div className="p-6"><ErrorState message={error} onRetry={() => window.location.reload()} /></div>;
   if (!facility) return null;
+
+  const handleTranslateValues = (field: string, value: string) => {
+    if (field === 'is_active') {
+      return value === 'true' ? (t('common.yes', 'shared') || 'Yes') : value === 'false' ? (t('common.no', 'shared') || 'No') : value;
+    }
+    return value;
+  };
 
   return (
     <div className="p-6 w-full mx-auto space-y-6">
@@ -53,9 +62,19 @@ export function ShowFacilityPage() {
       </div>
 
       <SectionCard
-        title={facility.name}
-        icon={<Factory size={20} />}
+        // title={facility.name}
+        // icon={<Factory size={20} />}
       >
+        <div className='relative w-full flex justify-between items-center mb-6 pb-4'>
+          <h2 className="text-lg font-bold text-text flex items-center gap-2 border-b border-border/50">
+            <span className="text-primary"><Factory size={20} /></span>
+            {t('facilities.view', 'investments') || 'View Facility'}
+          </h2>
+          <Button onClick={() => setIsAuditModalOpen(true)} variant="outline" size="sm" className="flex items-center gap-2" requiredPermission="shared.audit-logs.view">
+            <History size={16} />
+            {t('facilities.edit_log', 'investments') || 'سجل التعديل'}
+          </Button>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InfoRow label={t('facilities.name', 'investments') || 'Name'} value={facility.name} />
           <InfoRow label={t('facilities.city', 'investments') || 'City'} value={facility.city} />
@@ -79,6 +98,28 @@ export function ShowFacilityPage() {
         facilityId &&
         <FacilityIndustrialLicensesSection facilityId={facilityId} />
       }
+
+      <AuditLog
+        isOpen={isAuditModalOpen}
+        onClose={() => setIsAuditModalOpen(false)}
+        model="facility"
+        modelId={Number(facilityId)}
+        module="investments"
+        labels={{
+          title: t('facilities.edit_log', 'investments') || 'Edit Log',
+          event: t('facilities.event', 'investments') || 'Event',
+          created_at: t('facilities.created_at', 'investments') || 'Created At',
+          changed_by: t('facilities.changed_by', 'investments') || 'Changed By',
+          changes: t('facilities.changes', 'investments') || 'Changes',
+          field: t('facilities.field', 'investments') || 'Field',
+          old_value: t('facilities.old_value', 'investments') || 'Old Value',
+          new_value: t('facilities.new_value', 'investments') || 'New Value',
+          no_records: t('facilities.no_edit_log', 'investments') || 'No edit logs found',
+          subject_id: t('facilities.subject_id', 'investments') || 'Facility ID',
+        }}
+        translateField={(key) => t(`facilities.${key}`, 'investments') || key}
+        translateValues={handleTranslateValues}
+      />
     </div>
   );
 }

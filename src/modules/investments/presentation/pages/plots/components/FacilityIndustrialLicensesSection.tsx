@@ -18,7 +18,8 @@ import { getCreateIndustryCategoryFormSchema } from '../../../schemas/industryCa
 import { getCreateIndustryTypeFormSchema } from '../../../schemas/industryTypeForm.schema';
 import { getCreateIndustrialDecisionTypeFormSchema } from '../../../schemas/industrialDecisionTypeForm.schema';
 import { getCreateIndustrialLicenseSourceFormSchema } from '../../../schemas/industrialLicenseSourceForm.schema';
-import { FileCheck, Plus, Pencil, Trash2, Eye, Check, X } from 'lucide-react';
+import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
+import { FileCheck, Plus, Pencil, Trash2, Eye, Check, X, History } from 'lucide-react';
 import { toast } from 'sonner';
 import { getLocalizedName } from '../../../../../../core/presentation/utils/helpes';
 
@@ -41,6 +42,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
   const [editingLicense, setEditingLicense] = useState<FacilityIndustrialLicense | null>(null);
   const [viewingLicense, setViewingLicense] = useState<FacilityIndustrialLicense | null>(null);
   const [deletingLicense, setDeletingLicense] = useState<FacilityIndustrialLicense | null>(null);
+  const [auditItem, setAuditItem] = useState<FacilityIndustrialLicense | null>(null);
 
   const listUrl = `/investments/facility-industrial-licenses?facility_id=${facilityId}`;
 
@@ -240,10 +242,20 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
               <Trash2 size={16} className="text-danger" />
             </Button>
           }
+          <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)} title={t('facility_industrial_licenses.edit_log', 'investments') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
+            <History size={16} />
+          </Button>
         </div>
       ),
     },
   ];
+
+  const handleTranslateValues = (field: string, value: string) => {
+    if (field === 'is_active') {
+      return value === 'true' ? (t('common.yes', 'shared') || 'Yes') : value === 'false' ? (t('common.no', 'shared') || 'No') : value;
+    }
+    return value;
+  };
 
   return (
     <>
@@ -338,6 +350,28 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
           </div>
         )}
       </Dialog>
+
+      <AuditLog
+        isOpen={!!auditItem}
+        onClose={() => setAuditItem(null)}
+        model="facility_industrial_license"
+        modelId={auditItem?.id}
+        module="investments"
+        labels={{
+          title: t('facility_industrial_licenses.edit_log', 'investments') || 'Edit Log',
+          event: t('facility_industrial_licenses.event', 'investments') || 'Event',
+          created_at: t('facility_industrial_licenses.created_at', 'investments') || 'Created At',
+          changed_by: t('facility_industrial_licenses.changed_by', 'investments') || 'Changed By',
+          changes: t('facility_industrial_licenses.changes', 'investments') || 'Changes',
+          field: t('facility_industrial_licenses.field', 'investments') || 'Field',
+          old_value: t('facility_industrial_licenses.old_value', 'investments') || 'Old Value',
+          new_value: t('facility_industrial_licenses.new_value', 'investments') || 'New Value',
+          no_records: t('facility_industrial_licenses.no_edit_log', 'investments') || 'No edit logs found',
+          subject_id: t('facility_industrial_licenses.subject_id', 'investments') || 'License ID',
+        }}
+        translateField={(key) => t(`facility_industrial_licenses.${key}`, 'investments') || key}
+        translateValues={handleTranslateValues}
+      />
 
       <ConfirmDialog
         isOpen={!!deletingLicense}

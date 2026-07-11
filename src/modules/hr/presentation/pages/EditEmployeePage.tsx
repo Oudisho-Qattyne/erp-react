@@ -123,7 +123,7 @@ export function EditEmployeePage() {
     }
   };
 
-  if (loading) return <LoadingState />;
+  if (loading) return <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />;
 
   if (error && !defaultValues) {
     return (

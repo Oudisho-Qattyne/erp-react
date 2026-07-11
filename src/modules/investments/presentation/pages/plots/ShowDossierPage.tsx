@@ -67,7 +67,7 @@ export function ShowDossierPage() {
 
   const handleBack = () => navigate(`/investments/plots/${plotId}/edit`);
 
-  if (loading) return <div className="p-6"><LoadingState /></div>;
+  if (loading) return <div className="p-6"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>;
   if (error) return <div className="p-6"><ErrorState message={error} onRetry={() => handleBack()} /></div>;
   if (!dossier) return null;
 
@@ -89,9 +89,15 @@ export function ShowDossierPage() {
       </div>
 
       <SectionCard
-        title={t('dossier.view_details', 'investments') || 'Dossier Details'}
-        icon={<FileText size={20} />}
+      // title={t('dossier.view_details', 'investments') || 'Dossier Details'}
+      // icon={<FileText size={20} />}
       >
+        <div className='relative w-full flex justify-between items-center mb-6 pb-4'>
+          <h2 className="text-lg font-bold text-text flex items-center gap-2 border-b border-border/50">
+            <span className="text-primary"><FileText size={20} /></span>
+            {t('dossier.view_details', 'investments') || 'Dossier Details'}
+          </h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InfoRow
             label={t('dossier.number', 'investments') || 'Dossier Number'}
@@ -128,7 +134,7 @@ export function ShowDossierPage() {
         </div>
       </SectionCard>
 
-      {dossierId &&plotId &&
+      {dossierId && plotId &&
         <PartnersSection plotId={plotId} dossierId={dossierId} />
       }
       {dossierId && plotId &&
@@ -143,6 +149,7 @@ export function ShowDossierPage() {
         error={historyError}
         onRetry={handleOpenHistory}
       />
+
     </div>
   );
 }

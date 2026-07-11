@@ -229,7 +229,6 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
     }] : []),
   ], [t, canManage, handleAllocate]);
 
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -266,7 +265,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
         />
       )}
 
-      {loadingMap['getAll'] && dossiers.length === 0 && !errorMap['getAll'] && <LoadingState />}
+      {loadingMap['getAll'] && dossiers.length === 0 && !errorMap['getAll'] && <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />}
 
       <Dialog isOpen={showAdd || !!editDossier} onClose={closeFormDialog} title={isEditing ? (t('dossier.edit', 'investments') || 'Edit Dossier') : (t('dossier.add', 'investments') || 'Add Dossier')}>
         <FormProvider {...form}>

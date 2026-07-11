@@ -12,7 +12,8 @@ import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/Re
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { toast } from 'sonner';
-import { Pencil, Trash2, Star, Check, X } from 'lucide-react';
+import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
+import { Pencil, Trash2, Star, Check, X, History } from 'lucide-react';
 
 export function PlotClassificationsPage() {
   const { t } = useLanguage();
@@ -23,6 +24,7 @@ export function PlotClassificationsPage() {
   const [editItem, setEditItem] = useState<PlotClassification | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<PlotClassification | null>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<PlotClassification | null>(null);
+  const [auditItem, setAuditItem] = useState<PlotClassification | null>(null);
   
   const filtered = classifications.filter((c: any) => c.name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -94,10 +96,21 @@ export function PlotClassificationsPage() {
             title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.plot-classifications.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
+          <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)}
+            title={t('plot_classifications.edit_log', 'investments') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
+            <History size={16} />
+          </Button>
         </div>
       ) 
     },
   ];
+
+  const handleTranslateValues = (field: string, value: string) => {
+    if (field === 'is_active' || field === 'is_default') {
+      return value === 'true' ? (t('common.yes', 'shared') || 'Yes') : value === 'false' ? (t('common.no', 'shared') || 'No') : value;
+    }
+    return value;
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -159,6 +172,28 @@ export function PlotClassificationsPage() {
         <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
           emptyMessage={t('plot_classifications.no_records', 'investments')} />
       )}
+
+      <AuditLog
+        isOpen={!!auditItem}
+        onClose={() => setAuditItem(null)}
+        model="plot_classification"
+        modelId={auditItem?.id}
+        module="investments"
+        labels={{
+          title: t('plot_classifications.edit_log', 'investments') || 'Edit Log',
+          event: t('plot_classifications.event', 'investments') || 'Event',
+          created_at: t('plot_classifications.created_at', 'investments') || 'Created At',
+          changed_by: t('plot_classifications.changed_by', 'investments') || 'Changed By',
+          changes: t('plot_classifications.changes', 'investments') || 'Changes',
+          field: t('plot_classifications.field', 'investments') || 'Field',
+          old_value: t('plot_classifications.old_value', 'investments') || 'Old Value',
+          new_value: t('plot_classifications.new_value', 'investments') || 'New Value',
+          no_records: t('plot_classifications.no_edit_log', 'investments') || 'No edit logs found',
+          subject_id: t('plot_classifications.subject_id', 'investments') || 'Classification ID',
+        }}
+        translateField={(key) => t(`plot_classifications.${key}`, 'investments') || key}
+        translateValues={handleTranslateValues}
+      />
 
       <ConfirmDialog
         isOpen={!!confirmDelete}

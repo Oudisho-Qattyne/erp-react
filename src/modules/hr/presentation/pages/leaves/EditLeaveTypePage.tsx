@@ -50,7 +50,7 @@ export function EditLeaveTypePage() {
     }
   }
 
-  if (loading.findById && !defaultValues) return <LoadingState />
+  if (loading.findById && !defaultValues) return <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />
   if (error && !defaultValues) {
     return (
       <ErrorState

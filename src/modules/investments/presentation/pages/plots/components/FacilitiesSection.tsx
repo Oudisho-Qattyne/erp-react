@@ -11,7 +11,8 @@ import { ConfirmDialog } from '../../../../../../core/presentation/layouts/ui/di
 import { GenericCreateForm, type FieldConfig } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { getCreateFacilityFormSchema } from '../../../schemas/facilityForm.schema';
-import { Factory, Plus, Eye, Pencil, Trash2 } from 'lucide-react';
+import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
+import { Factory, Plus, Eye, Pencil, Trash2, History } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface FacilitiesSectionProps {
@@ -29,6 +30,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingFacility, setEditingFacility] = useState<Facility | null>(null);
   const [deletingFacility, setDeletingFacility] = useState<Facility | null>(null);
+  const [auditItem, setAuditItem] = useState<Facility | null>(null);
 
   const listUrl = `/investments/facilities?plot_id=${plotId}&plot_dossier_id=${dossierId}`;
 
@@ -115,10 +117,20 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
           <Button variant="ghost" size="sm" onClick={() => setDeletingFacility(row)} title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.facilities.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
+          <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)} title={t('facilities.edit_log', 'investments') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
+            <History size={16} />
+          </Button>
         </div>
       )
     },
   ];
+
+  const handleTranslateValues = (field: string, value: string) => {
+    if (field === 'is_active') {
+      return value === 'true' ? (t('common.yes', 'shared') || 'Yes') : value === 'false' ? (t('common.no', 'shared') || 'No') : value;
+    }
+    return value;
+  };
 
   return (
     <>
@@ -186,6 +198,28 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
           />
         )}
       </Dialog>
+
+      <AuditLog
+        isOpen={!!auditItem}
+        onClose={() => setAuditItem(null)}
+        model="facility"
+        modelId={auditItem?.id}
+        module="investments"
+        labels={{
+          title: t('facilities.edit_log', 'investments') || 'Edit Log',
+          event: t('facilities.event', 'investments') || 'Event',
+          created_at: t('facilities.created_at', 'investments') || 'Created At',
+          changed_by: t('facilities.changed_by', 'investments') || 'Changed By',
+          changes: t('facilities.changes', 'investments') || 'Changes',
+          field: t('facilities.field', 'investments') || 'Field',
+          old_value: t('facilities.old_value', 'investments') || 'Old Value',
+          new_value: t('facilities.new_value', 'investments') || 'New Value',
+          no_records: t('facilities.no_edit_log', 'investments') || 'No edit logs found',
+          subject_id: t('facilities.subject_id', 'investments') || 'Facility ID',
+        }}
+        translateField={(key) => t(`facilities.${key}`, 'investments') || key}
+        translateValues={handleTranslateValues}
+      />
 
       <ConfirmDialog
         isOpen={!!deletingFacility}

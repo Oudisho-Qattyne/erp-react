@@ -69,7 +69,7 @@ export function DossierStatusHistoryModal({ isOpen, onClose, histories = [], loa
     >
       <div className="mt-4 min-h-25">
         {loading ? (
-          <LoadingState />
+          <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />
         ) : error ? (
           <ErrorState message={error} onRetry={onRetry} />
         ) : (
