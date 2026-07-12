@@ -2,17 +2,20 @@ import React from 'react';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
 import { DataTable } from '../../../../../../core/presentation/layouts/ui/tables/ResizableTable';
+import { LoadingState } from '../../../../../../core/presentation/layouts/ui/state/LoadingState';
+import { ErrorState } from '../../../../../../core/presentation/layouts/ui/state/ErrorState';
 import type { PlotStatusHistory } from '../../../../domain/entities/plotStatusHistory';
-
-
 
 interface PlotStatusHistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
   histories?: PlotStatusHistory[];
+  loading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
 }
 
-export function PlotStatusHistoryModal({ isOpen, onClose, histories = [] }: PlotStatusHistoryModalProps) {
+export function PlotStatusHistoryModal({ isOpen, onClose, histories = [], loading, error, onRetry }: PlotStatusHistoryModalProps) {
   const { t } = useLanguage();
 
   const columns = [
@@ -55,19 +58,27 @@ export function PlotStatusHistoryModal({ isOpen, onClose, histories = [] }: Plot
   ];
 
   return (
-    <Dialog 
-      isOpen={isOpen} 
-      onClose={onClose} 
+    <Dialog
+      isOpen={isOpen}
+      onClose={onClose}
       title={t('plots.status_history', 'investments') || 'Status History'}
       size="xl"
     >
-      <div className="mt-4 max-h-[60vh] overflow-y-auto">
-        <DataTable
-          columns={columns}
-          data={[...histories].reverse()}
-          rowKey="id"
-          emptyMessage={t('plots.no_history', 'investments') || 'No status history found'}
-        />
+      <div className="mt-4 min-h-25">
+        {loading ? (
+          <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />
+        ) : error ? (
+          <ErrorState message={error} onRetry={onRetry} />
+        ) : (
+          <div className="max-h-[60vh] overflow-y-auto">
+            <DataTable
+              columns={columns}
+              data={[...histories].reverse()}
+              rowKey="id"
+              emptyMessage={t('plots.no_history', 'investments') || 'No status history found'}
+            />
+          </div>
+        )}
       </div>
     </Dialog>
   );

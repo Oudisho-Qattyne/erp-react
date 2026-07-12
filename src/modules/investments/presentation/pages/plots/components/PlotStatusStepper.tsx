@@ -21,6 +21,7 @@ interface PlotStatusStepperProps {
 export function PlotStatusStepper({ currentStatus, statusDate, onStatusClick, permissions }: PlotStatusStepperProps) {
   const { t, direction } = useLanguage();
   const { hasPermission } = useAuth();
+
   const currentIndex = PLOT_STATUSES.indexOf(currentStatus);
   const activeIndex = currentIndex === -1 ? 0 : currentIndex;
 

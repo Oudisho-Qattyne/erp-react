@@ -28,7 +28,7 @@ export function PlotsPage() {
   const [localSearch, setLocalSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<Plot | null>(null);
-  const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+  // const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [auditItem, setAuditItem] = useState<Plot | null>(null);
 
   // Table State
@@ -237,10 +237,10 @@ export function PlotsPage() {
           <h1 className="text-2xl font-bold text-text">{t('plots.title', 'investments') || 'Plots'}</h1>
         </div>
         <div className="flex items-center gap-3">
-          <Button onClick={() => setIsAuditModalOpen(true)} variant="outline" className="flex items-center gap-2" requiredPermission="shared.audit-logs.view">
+          {/* <Button onClick={() => setIsAuditModalOpen(true)} variant="outline" className="flex items-center gap-2" requiredPermission="shared.audit-logs.view">
             <History size={16} />
             {t('plots.edit_log', 'investments') || 'سجل التعديلات'}
-          </Button>
+          </Button> */}
           <Button onClick={() => navigate('/investments/plots/create')} requiredPermission="investments.plots.create">{t('plots.add', 'investments') || 'Add Plot'}</Button>
         </div>
       </div>
@@ -317,10 +317,10 @@ export function PlotsPage() {
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
       />
 
-      <PlotAuditLogModal
+      {/* <PlotAuditLogModal
         isOpen={isAuditModalOpen}
         onClose={() => setIsAuditModalOpen(false)}
-      />
+      /> */}
     </div>
   );
 }
