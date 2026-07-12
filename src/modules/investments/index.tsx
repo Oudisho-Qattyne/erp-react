@@ -12,12 +12,15 @@ import { CreateInvestorPage } from './presentation/pages/investors/CreateInvesto
 import { CreateFuturePossibleInvestorPage } from './presentation/pages/investors/CreateFuturepossibleInvestorPage';
 import { EditInvestorPage } from './presentation/pages/investors/EditInvestorPage';
 import { ShowDossierPage } from './presentation/pages/plots/ShowDossierPage';
+import { ShowContractPage } from './presentation/pages/contracts/ShowContractPage';
 import { IndustrialDecisionTypesPage } from './presentation/pages/industrial-decision-types/IndustrialDecisionTypesPage';
 import { IndustrialLicenseSourcesPage } from './presentation/pages/industrial-license-sources/IndustrialLicenseSourcesPage';
 import { IndustryCategoriesPage } from './presentation/pages/industry-categories/IndustryCategoriesPage';
 import { IndustryTypesPage } from './presentation/pages/industry-types/IndustryTypesPage';
 import { LicensingStatusesPage } from './presentation/pages/licensing-statuses/LicensingStatusesPage';
-import { MapPin, Users } from 'lucide-react';
+import { ByDurationLicensesPage } from './presentation/pages/by-duration-licenses/ByDurationLicensesPage';
+import { ByIndustryLicensesPage } from './presentation/pages/by-industry-licenses/ByIndustryLicensesPage';
+import { MapPin, Users, Clock, Building2 } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { ShowFacilityPage } from './presentation/pages/plots/ShowFacilityPage';
 
@@ -53,6 +56,16 @@ const investmentsModule: Module = {
       label: 'dossier.view_details',
       nav: false,
       requiredPermission: 'investments.plot-dossier.view',
+      moduleName: 'investments',
+      group: 'investments',
+    },
+    {
+      path: '/investments/contracts/:id',
+      element: <ShowContractPage />,
+      layout: 'dashboard',
+      label: 'contract.title',
+      nav: false,
+      requiredPermission: 'investments.contracts.view',
       moduleName: 'investments',
       group: 'investments',
     },
@@ -152,7 +165,7 @@ const investmentsModule: Module = {
       moduleName: 'investments',
       icon: <SlidersHorizontal size={18} />,
       group: 'investments',
-      requiredPermission: ['investments.industry-categories.list', 'investments.industry-types.list', 'investments.licensing-statuses.list', 'investments.industrial-decision-types.list', 'investments.industrial-license-sources.list'],
+      requiredPermission: ['investments.industry-categories.list', 'investments.industry-types.list', 'investments.licensing-statuses.list', 'investments.industrial-decision-types.list', 'investments.industrial-license-sources.list', 'investments.by-duration-licenses.list', 'investments.by-industry-licenses.list'],
     },
     {
       path: '/investments/industry-categories',
@@ -188,8 +201,34 @@ const investmentsModule: Module = {
       nav: true,
       order: 3,
       moduleName: 'investments',
-      requiredPermission: 'investments.licensing-statuses.list',
+      // requiredPermission: 'investments.licensing-statuses.list',
       icon: <Flag size={18} />,
+      group: 'investments',
+      parentNav: '/investments/industrial-management',
+    },
+    {
+      path: '/investments/by-duration-licenses',
+      element: <ByDurationLicensesPage />,
+      layout: 'dashboard',
+      label: 'by_duration_licenses.title',
+      nav: true,
+      order: 6,
+      moduleName: 'investments',
+      requiredPermission: 'investments.by-duration-licenses.list',
+      icon: <Clock size={18} />,
+      group: 'investments',
+      parentNav: '/investments/industrial-management',
+    },
+    {
+      path: '/investments/by-industry-licenses',
+      element: <ByIndustryLicensesPage />,
+      layout: 'dashboard',
+      label: 'by_industry_licenses.title',
+      nav: true,
+      order: 7,
+      moduleName: 'investments',
+      requiredPermission: 'investments.by-industry-licenses.list',
+      icon: <Building2 size={18} />,
       group: 'investments',
       parentNav: '/investments/industrial-management',
     },

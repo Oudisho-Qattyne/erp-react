@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useState } from 'react';
 import type { CreateEntityDTO, UpdateEntityDTO } from '../../../../modules/hr/application/dtos/entityDto';
-import type { DomainResponse } from '../../../domain/common/responce/DomainResponse';
+import type { DpomainResponsePaginated } from '../../../../modules/hr/domain/entities/common/DomainResponsePaginated';
 import { createCrufRepository } from '../../../infrastructure/repositories/CrudRepository';
 import { createManageEntityUsecase } from '../../../application/usecases/manageEntityUseCase';
 import type { EntityWithNameOnly } from '../../../domain/entities/EntityWithNameOnly';
@@ -12,8 +12,46 @@ function initRecord<T>(value: T): Record<string, T> {
   return Object.fromEntries(OP_KEYS.map((k) => [k, value]));
 }
 
+export interface QueryParams {
+  page?: number;
+  perPage?: number;
+  search?: string;
+  sort?: string;
+  filter?: Record<string, string | boolean | number>;
+}
+
+function buildFlatParams(params: QueryParams): Record<string, string | boolean | number> {
+  const flat: Record<string, string | boolean | number> = {};
+  if (params.page != null) flat.page = params.page;
+  if (params.perPage != null) flat.perPage = params.perPage;
+  if (params.search != null) flat.search = params.search;
+  if (params.sort != null) flat.sort = params.sort;
+  if (params.filter) {
+    for (const [key, value] of Object.entries(params.filter)) {
+      flat[`filter[${key}]`] = value;
+    }
+  }
+  return flat;
+}
+
+interface PaginationInfo {
+  lastPage: number;
+  currentPage: number;
+  hasMore: boolean;
+  total: number;
+}
+
+function extractPagination(res: DpomainResponsePaginated<unknown>): PaginationInfo | undefined {
+  if (res.lastPage == null) return undefined;
+  return {
+    lastPage: res.lastPage,
+    currentPage: res.currentPage ?? 1,
+    hasMore: res.hasMore ?? false,
+    total: Number((res as any).total ?? 0),
+  };
+}
+
 export interface UseEntityCrudReturn<T> {
-  // State
   entities: T[];
   loading: boolean;
   loadingMap: Record<string, boolean>;
@@ -21,16 +59,14 @@ export interface UseEntityCrudReturn<T> {
   error: string | null;
   errorMap: Record<string, string | null>;
   hasErrors: () => boolean;
-  pagination?: DomainResponse<T>['pagination']; // optional
+  pagination?: PaginationInfo;
   
-  // Actions — pass listUrlOverride when list endpoint differs from the default getUrl
-  getAll: (listUrlOverride?: string) => Promise<DomainResponse<T[]>>;
-  getById: (id: number) => Promise<DomainResponse<T> | null>;
-  create: (data: CreateEntityDTO<T>) => Promise<DomainResponse<T>>;
-  update: (id: number, data: UpdateEntityDTO<T>) => Promise<DomainResponse<T>>;
+  getAll: (listUrlOverride?: string, params?: QueryParams) => Promise<DpomainResponsePaginated<T[]>>;
+  getById: (id: number) => Promise<DpomainResponsePaginated<T> | null>;
+  create: (data: CreateEntityDTO<T>) => Promise<DpomainResponsePaginated<T>>;
+  update: (id: number, data: UpdateEntityDTO<T>) => Promise<DpomainResponsePaginated<T>>;
   remove: (id: number) => Promise<void>;
   
-  // Helpers
   clearError: () => void;
 }
 
@@ -38,7 +74,7 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
   const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>(() => initRecord(false));
   const [errorMap, setErrorMap] = useState<Record<string, string | null>>(() => initRecord(null));
   const [entities, setEntities] = useState<T[]>([]);
-  const [pagination, setPagination] = useState<DomainResponse<T>['pagination']>(); // optional
+  const [pagination, setPagination] = useState<PaginationInfo>();
   const apiClient = useApiClient();
 
   const loading = Object.values(loadingMap).some(Boolean);
@@ -67,7 +103,7 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
   const isLoading = useCallback(() => Object.values(loadingMap).some(Boolean), [loadingMap]);
   const hasErrors = useCallback(() => Object.values(errorMap).some((e) => e !== null), [errorMap]);
 
-  const getAll = useCallback(async (listUrlOverride?: string) => {
+  const getAll = useCallback(async (listUrlOverride?: string, params?: QueryParams) => {
     const effectiveListUrl = listUrlOverride ?? getUrl;
     if (!effectiveListUrl) {
       const msg = 'List URL is required (provide a parent id first)';
@@ -89,10 +125,10 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
             )
           : usecase;
 
-      const response = await activeUsecase.getAll();
-
+      const flatParams = params ? buildFlatParams(params) : undefined;
+      const response = await activeUsecase.getAll(flatParams);
       setEntities(response.data);
-      setPagination(response.pagination);
+      setPagination(extractPagination(response));
       return response;
     } catch (err: unknown) {
       const msg =
@@ -174,7 +210,7 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
     error,
     errorMap,
     hasErrors,
-    pagination,   // may be undefined
+    pagination,
     getAll,
     getById,
     create,

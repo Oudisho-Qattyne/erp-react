@@ -2478,6 +2478,592 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
+  /investments/building-licenses:
+    get:
+      tags:
+        - 'Building Licenses'
+      summary: 'Get all Building Licenses'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: dossier_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'List of building licenses'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/BuildingLicenseCollectionResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Building Licenses'
+      summary: 'Create a Building License'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuildingLicenseDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/BuildingLicenseInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/building-licenses/{id}':
+    get:
+      tags:
+        - 'Building Licenses'
+      summary: 'Get a Building License by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Building license details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/BuildingLicenseInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Building Licenses'
+      summary: 'Update a Building License'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuildingLicenseDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/BuildingLicenseInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Building Licenses'
+      summary: 'Delete a Building License'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /investments/by-duration-licenses:
+    get:
+      tags:
+        - 'By Duration Licenses'
+      summary: 'Get all By Duration Licenses'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: is_active
+          in: query
+          schema:
+            type: boolean
+        -
+          name: is_default
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'List of By Duration Licenses'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/ByDurationLicenseInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'By Duration Licenses'
+      summary: 'Create a By Duration License'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ByDurationLicenseDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ByDurationLicenseInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/by-duration-licenses/{id}':
+    get:
+      tags:
+        - 'By Duration Licenses'
+      summary: 'Get a By Duration License by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'By Duration License details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ByDurationLicenseInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'By Duration Licenses'
+      summary: 'Update a By Duration License'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ByDurationLicenseDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ByDurationLicenseInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'By Duration Licenses'
+      summary: 'Delete a By Duration License'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /investments/by-industry-licenses:
+    get:
+      tags:
+        - 'By Industry Licenses'
+      summary: 'Get all By Industry Licenses'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: is_active
+          in: query
+          schema:
+            type: boolean
+        -
+          name: is_default
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'List of By Industry Licenses'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/ByIndustryLicenseInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'By Industry Licenses'
+      summary: 'Create a By Industry License'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ByIndustryLicenseDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ByIndustryLicenseInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/by-industry-licenses/{id}':
+    get:
+      tags:
+        - 'By Industry Licenses'
+      summary: 'Get a By Industry License by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'By Industry License details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ByIndustryLicenseInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'By Industry Licenses'
+      summary: 'Update a By Industry License'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ByIndustryLicenseDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ByIndustryLicenseInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'By Industry Licenses'
+      summary: 'Delete a By Industry License'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /investments/contracts:
+    get:
+      tags:
+        - Contracts
+      summary: 'Get all Contracts'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: dossier_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'List of contracts'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/ContractInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - Contracts
+      summary: 'Create a Contract'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ContractInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/contracts/{id}':
+    get:
+      tags:
+        - Contracts
+      summary: 'Get a Contract by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Contract details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ContractInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Contracts
+      summary: 'Update a Contract'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ContractInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - Contracts
+      summary: 'Delete a Contract'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
   /investments/plot-areas:
     get:
       tags:
@@ -2510,7 +3096,7 @@ paths:
               schema:
                 allOf:
                   - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/PlotAreaDTO' } } } }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/PlotAreaInfoResource' } } } }
         401:
           $ref: '#/components/responses/Unauthenticated'
     post:
@@ -2534,7 +3120,7 @@ paths:
               schema:
                 allOf:
                   - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotAreaDTO' } } }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotAreaInfoResource' } } }
         401:
           $ref: '#/components/responses/Unauthenticated'
         422:
@@ -2562,7 +3148,7 @@ paths:
               schema:
                 allOf:
                   - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotAreaDTO' } } }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotAreaInfoResource' } } }
         401:
           $ref: '#/components/responses/Unauthenticated'
         404:
@@ -2595,7 +3181,7 @@ paths:
               schema:
                 allOf:
                   - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotAreaDTO' } } }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotAreaInfoResource' } } }
         401:
           $ref: '#/components/responses/Unauthenticated'
         404:
@@ -2659,7 +3245,7 @@ paths:
               schema:
                 allOf:
                   - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/PlotClassificationDTO' } } } }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/PlotClassificationInfoResource' } } } }
         401:
           $ref: '#/components/responses/Unauthenticated'
     post:
@@ -2683,7 +3269,7 @@ paths:
               schema:
                 allOf:
                   - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotClassificationDTO' } } }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotClassificationInfoResource' } } }
         401:
           $ref: '#/components/responses/Unauthenticated'
         422:
@@ -2711,7 +3297,7 @@ paths:
               schema:
                 allOf:
                   - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotClassificationDTO' } } }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotClassificationInfoResource' } } }
         401:
           $ref: '#/components/responses/Unauthenticated'
         404:
@@ -2744,7 +3330,7 @@ paths:
               schema:
                 allOf:
                   - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotClassificationDTO' } } }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotClassificationInfoResource' } } }
         401:
           $ref: '#/components/responses/Unauthenticated'
         404:
@@ -2952,6 +3538,174 @@ paths:
           $ref: '#/components/responses/NotFound'
         422:
           $ref: '#/components/responses/ValidationError'
+  '/investments/plots/{plotId}/status-history':
+    get:
+      tags:
+        - 'Plot Status Histories'
+      summary: 'List status history for a plot'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        -
+          name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        200:
+          description: 'List of plot status history records'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/PlotStatusHistoryInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /investments/plot-status-histories:
+    get:
+      tags:
+        - 'Plot Status Histories'
+      summary: 'Get all Plot Status Histories'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+      responses:
+        200:
+          description: 'List of plot status histories'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/PlotStatusHistoryInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Plot Status Histories'
+      summary: 'Create a Plot Status History'
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotStatusHistoryInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/plot-status-histories/{id}':
+    get:
+      tags:
+        - 'Plot Status Histories'
+      summary: 'Get a Plot Status History by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Plot status history details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotStatusHistoryInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Plot Status Histories'
+      summary: 'Update a Plot Status History'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotStatusHistoryInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Plot Status Histories'
+      summary: 'Delete a Plot Status History'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
   /investments/investors:
     get:
       tags:
@@ -3890,7 +4644,375 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
+  /investments/facilities:
+    get:
+      tags:
+        - Facilities
+      summary: 'Get all Facilities'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: plot_id
+          in: query
+          schema:
+            type: integer
+        -
+          name: ids
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+          description: 'Filter by specific facility IDs'
+      responses:
+        200:
+          description: 'List of facilities'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/FacilityInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - Facilities
+      summary: 'Create a Facility'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacilityDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/FacilityInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/facilities/{id}':
+    get:
+      tags:
+        - Facilities
+      summary: 'Get a Facility by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Facility details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/FacilityInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - Facilities
+      summary: 'Update a Facility'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacilityDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/FacilityInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - Facilities
+      summary: 'Delete a Facility'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /investments/facility-industrial-licenses:
+    get:
+      tags:
+        - 'Facility Industrial Licenses'
+      summary: 'Get all Facility Industrial Licenses'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: facility_id
+          in: query
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'List of facility industrial licenses'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/FacilityIndustrialLicenseInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Facility Industrial Licenses'
+      summary: 'Create a Facility Industrial License'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacilityIndustrialLicenseDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/FacilityIndustrialLicenseInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/facility-industrial-licenses/{id}':
+    get:
+      tags:
+        - 'Facility Industrial Licenses'
+      summary: 'Get a Facility Industrial License by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Facility industrial license details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/FacilityIndustrialLicenseInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Facility Industrial Licenses'
+      summary: 'Update a Facility Industrial License'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacilityIndustrialLicenseDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/FacilityIndustrialLicenseInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Facility Industrial Licenses'
+      summary: 'Delete a Facility Industrial License'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  '/investments/plots/{plotId}/dossiers/{dossierId}/partners-history':
+    get:
+      tags:
+        - 'Dossier Partners'
+      summary: 'List partners history for a dossier'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: dossierId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: 'List of partner history records'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/DossierPartnerLogInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
   '/investments/plots/{plotId}/dossiers/{dossierId}/partners':
+    put:
+      tags:
+        - 'Dossier Partners'
+      summary: 'Sync partners of a dossier (replaces all partners with the given IDs)'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: dossierId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DossierPartnerDTO'
+      responses:
+        200:
+          description: 'Partners synced successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierInfoResource' } } }
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
     get:
       tags:
         - 'Dossier Partners'
@@ -3924,10 +5046,11 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
-    post:
+  '/investments/plots/{plotId}/dossiers/{dossierId}/status-history':
+    get:
       tags:
-        - 'Dossier Partners'
-      summary: 'Add partners to a dossier'
+        - 'Plot Dossier Status Histories'
+      summary: 'List status history for a dossier'
       security:
         -
           sanctumAuth: {  }
@@ -3944,23 +5067,137 @@ paths:
           required: true
           schema:
             type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DossierPartnerDTO'
       responses:
         200:
-          description: 'Partners added successfully'
+          description: 'List of dossier status history records'
           content:
             application/json:
               schema:
                 allOf:
                   - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierInfoResource' } } }
-        400:
-          $ref: '#/components/responses/BadRequest'
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/PlotDossierStatusHistoryInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /investments/license-statuses:
+    get:
+      tags:
+        - 'License Statuses'
+      summary: 'Get all License Statuses'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: is_active
+          in: query
+          schema:
+            type: boolean
+        -
+          name: is_default
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'List of license statuses'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/LicenseStatusInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'License Statuses'
+      summary: 'Create a License Status'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LicenseStatusDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/LicenseStatusInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/license-statuses/{id}':
+    get:
+      tags:
+        - 'License Statuses'
+      summary: 'Get a License Status by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'License status details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/LicenseStatusInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'License Statuses'
+      summary: 'Update a License Status'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LicenseStatusDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/LicenseStatusInfoResource' } } }
         401:
           $ref: '#/components/responses/Unauthenticated'
         404:
@@ -3969,47 +5206,29 @@ paths:
           $ref: '#/components/responses/ValidationError'
     delete:
       tags:
-        - 'Dossier Partners'
-      summary: 'Remove partners from a dossier'
+        - 'License Statuses'
+      summary: 'Delete a License Status'
       security:
         -
           sanctumAuth: {  }
       parameters:
         -
-          name: plotId
+          name: id
           in: path
           required: true
           schema:
-            type: integer
-        -
-          name: dossierId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DossierPartnerDTO'
+            type: string
       responses:
         200:
-          description: 'Partners removed successfully'
+          description: 'Deleted successfully'
           content:
             application/json:
               schema:
-                allOf:
-                  - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierInfoResource' } } }
-        400:
-          $ref: '#/components/responses/BadRequest'
+                $ref: '#/components/schemas/SuccessResponse'
         401:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
-        422:
-          $ref: '#/components/responses/ValidationError'
   /storage-management:
     get:
       summary: 'List root-level storage items'
@@ -6509,6 +7728,315 @@ components:
           $ref: '#/components/schemas/proration_scheme'
         is_active:
           type: boolean
+    BuildingLicenseDTO:
+      type: object
+      required:
+        - dossier_id
+        - date_of_displaying_license_info
+        - building_license_number
+        - building_license_date
+        - licensed_area
+        - current_plot_status
+        - licensing_status_id
+        - administrative_license_decision_number
+        - administrative_license_decision_date
+        - by_duration_license_id
+        - by_industry_license_id
+        - temp_administrative_license_expiration_date
+      properties:
+        dossier_id:
+          type: integer
+          example: 1
+        date_of_displaying_license_info:
+          type: string
+          format: date
+          example: '2026-07-12'
+        building_license_number:
+          type: string
+          example: BL-001
+        building_license_date:
+          type: string
+          format: date
+          example: '2026-07-12'
+        licensed_area:
+          type: number
+          format: float
+          example: 100.5
+        current_plot_status:
+          type: string
+          example: allocated
+        licensing_status_id:
+          type: integer
+          example: 1
+        administrative_license_decision_number:
+          type: string
+          example: ALD-001
+        administrative_license_decision_date:
+          type: string
+          format: date
+          example: '2026-07-12'
+        by_duration_license_id:
+          type: integer
+          example: 1
+        by_industry_license_id:
+          type: integer
+          example: 1
+        temp_administrative_license_expiration_date:
+          type: string
+          format: date
+          example: '2027-07-12'
+    BuildingLicenseInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        dossier_id:
+          type: integer
+          example: 1
+        date_of_displaying_license_info:
+          type: string
+          format: date
+          example: 12-07-2026
+        building_license_number:
+          type: string
+          example: BL-001
+        building_license_date:
+          type: string
+          format: date
+          example: 12-07-2026
+        licensed_area:
+          type: number
+          format: float
+          example: 100.5
+        current_plot_status:
+          type: string
+          example: allocated
+        licensing_status_id:
+          type: integer
+          example: 1
+        administrative_license_decision_number:
+          type: string
+          example: ALD-001
+        administrative_license_decision_date:
+          type: string
+          format: date
+          example: 12-07-2026
+        by_duration_license_id:
+          type: integer
+          example: 1
+        by_industry_license_id:
+          type: integer
+          example: 1
+        temp_administrative_license_expiration_date:
+          type: string
+          format: date
+          example: 12-07-2027
+        created_at:
+          type: string
+          format: date
+          example: 12-07-2026
+        updated_at:
+          type: string
+          format: date
+          example: 12-07-2026
+        dossier:
+          $ref: '#/components/schemas/PlotDossierInfoResource'
+        licensing_status:
+          $ref: '#/components/schemas/LicenseStatusInfoResource'
+        by_duration_license:
+          $ref: '#/components/schemas/ByDurationLicenseInfoResource'
+        by_industry_license:
+          $ref: '#/components/schemas/ByIndustryLicenseInfoResource'
+    BuildingLicenseCollectionResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        dossier_id:
+          type: integer
+          example: 1
+        building_license_number:
+          type: string
+          example: BL-001
+        building_license_date:
+          type: string
+          format: date
+          example: 12-07-2026
+        licensed_area:
+          type: number
+          format: float
+          example: 100.5
+        current_plot_status:
+          type: string
+          example: allocated
+        licensing_status_id:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          format: date
+          example: 12-07-2026
+        updated_at:
+          type: string
+          format: date
+          example: 12-07-2026
+    ByDurationLicenseDTO:
+      type: object
+      required:
+        - name
+        - is_default
+        - is_active
+      properties:
+        name:
+          type: string
+          example: Annual
+        is_default:
+          type: boolean
+          example: false
+        is_active:
+          type: boolean
+          example: true
+    ByDurationLicenseInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Annual
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date
+          example: 12-07-2026
+        updated_at:
+          type: string
+          format: date
+          example: 12-07-2026
+    ByIndustryLicenseDTO:
+      type: object
+      required:
+        - name
+        - is_default
+        - is_active
+      properties:
+        name:
+          type: string
+          example: Manufacturing
+        is_default:
+          type: boolean
+          example: false
+        is_active:
+          type: boolean
+          example: true
+    ByIndustryLicenseInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Manufacturing
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date
+          example: 12-07-2026
+        updated_at:
+          type: string
+          format: date
+          example: 12-07-2026
+    ContractDTO:
+      type: object
+      required:
+        - dossier_id
+        - contract_number
+        - contract_date
+        - unit_price_per_square_meter
+        - weighting_factor
+        - payment_method
+      properties:
+        dossier_id:
+          type: integer
+          example: 1
+        contract_number:
+          type: string
+          example: CTR-2026-001
+        contract_date:
+          type: string
+          format: date
+          example: '2026-07-12'
+        unit_price_per_square_meter:
+          type: number
+          example: 150.0
+        weighting_factor:
+          type: number
+          example: 1.25
+        payment_method:
+          type: string
+          enum:
+            - cash
+            - installment
+          example: cash
+    ContractInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        dossier_id:
+          type: integer
+          nullable: true
+          example: null
+        dossier:
+          type: object
+          nullable: true
+          allOf:
+            -
+              $ref: '#/components/schemas/PlotDossierInfoResource'
+        contract_number:
+          type: string
+          example: CTR-2026-001
+        contract_date:
+          type: string
+          format: date
+          example: 12-07-2026
+        unit_price_per_square_meter:
+          type: number
+          example: 150.0
+        weighting_factor:
+          type: number
+          example: 1.25
+        final_price_per_square_meter:
+          type: number
+          example: 187.5
+        total_price:
+          type: number
+          example: 187500.0
+        payment_method:
+          type: string
+          enum:
+            - cash
+            - installment
+          example: cash
+        created_at:
+          type: string
+          format: date
+          example: 12-07-2026
     PlotAreaDTO:
       type: object
       required:
@@ -6523,6 +8051,33 @@ components:
         is_default:
           type: boolean
           example: false
+    PlotAreaInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'North Region'
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date
+          example: 06-07-2026
+        updated_at:
+          type: string
+          format: date
+          example: 06-07-2026
+        plots:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlotInfoResource'
     PlotClassificationDTO:
       type: object
       required:
@@ -6537,6 +8092,33 @@ components:
         is_default:
           type: boolean
           example: false
+    PlotClassificationInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Residential
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date
+          example: 06-07-2026
+        updated_at:
+          type: string
+          format: date
+          example: 06-07-2026
+        plots:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlotInfoResource'
     PlotDTO:
       type: object
       required:
@@ -6655,6 +8237,16 @@ components:
             name:
               type: string
               example: 'Admin User'
+        allocated_dossier_id:
+          type: integer
+          nullable: true
+          example: null
+        allocated_dossier:
+          type: object
+          nullable: true
+          allOf:
+            -
+              $ref: '#/components/schemas/PlotDossierInfoResource'
     ChangePlotStatusDTO:
       type: object
       required:
@@ -6679,6 +8271,22 @@ components:
           type: string
           maxLength: 1000
           example: 'Plot has been announced for public bidding'
+        allocated_dossier_id:
+          type: integer
+          nullable: true
+          example: 1
+          description: 'Dossier ID to allocate when setting status to "allocated"'
+        dossier_number:
+          type: string
+          nullable: true
+          example: DOS-001
+          description: 'Dossier number for the new dossier when no allocated_dossier_id is provided'
+        dossier_date:
+          type: string
+          format: date
+          nullable: true
+          example: '2026-07-09'
+          description: 'Dossier date for the new dossier when no allocated_dossier_id is provided'
     InvestorDTO:
       type: object
       required:
@@ -6814,6 +8422,10 @@ components:
               name:
                 type: string
                 example: 'Real Estate'
+        dossier_partners:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlotDossierInfoResource'
         created_at:
           type: string
           format: date
@@ -6926,7 +8538,14 @@ components:
           example: 1
         plot_id:
           type: integer
-          example: 1
+          nullable: true
+          example: null
+        plot:
+          type: object
+          nullable: true
+          allOf:
+            -
+              $ref: '#/components/schemas/PlotInfoResource'
         dossier_number:
           type: string
           nullable: true
@@ -6964,6 +8583,14 @@ components:
           type: string
           format: date
           example: 06-07-2026
+        partners:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvestorInfoResource'
+        facilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/FacilityInfoResource'
     PlotDossierStatusHistoryDTO:
       type: object
       required:
@@ -6977,7 +8604,7 @@ components:
             - cancelled
             - draft
           example: active
-        note:
+        notes:
           type: string
           nullable: true
           example: 'Dossier status changed'
@@ -7057,7 +8684,7 @@ components:
             - cancelled
             - draft
           example: active
-        note:
+        notes:
           type: string
           nullable: true
           example: 'Dossier status changed'
@@ -7087,6 +8714,338 @@ components:
             - 2
             - 3
           description: 'Array of investor IDs to add or remove'
+    DossierPartnerLogInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        plot_dossier_id:
+          type: integer
+          example: 1
+        investor_id:
+          type: integer
+          example: 1
+        investor:
+          $ref: '#/components/schemas/InvestorInfoResource'
+        plot_dossier:
+          $ref: '#/components/schemas/PlotDossierInfoResource'
+        action:
+          type: string
+          enum:
+            - attached
+            - detached
+          example: attached
+        causer_id:
+          type: integer
+          nullable: true
+          example: 1
+        created_at:
+          type: string
+          format: date
+          example: 06-07-2026
+        updated_at:
+          type: string
+          format: date
+          example: 06-07-2026
+    FacilityDTO:
+      type: object
+      required:
+        - plot_id
+        - name
+        - address
+        - city
+        - first_phone_number
+        - capital_in_usd
+        - capital_in_syp
+        - value_of_machines_in_usd
+        - value_of_machines_in_syp
+        - number_of_workers
+        - daily_production_capacity
+        - monthly_production_capacity
+        - yearly_production_capacity
+        - electrical_power_capacity
+        - yearly_estimated_water_consumption
+      properties:
+        plot_id:
+          type: integer
+          example: 1
+        plot_dossier_id:
+          type: integer
+          nullable: true
+          example: 1
+        name:
+          type: string
+          example: 'Main Factory'
+        address:
+          type: string
+          example: '123 Industrial Zone'
+        city:
+          type: string
+          example: Damascus
+        first_phone_number:
+          type: string
+          example: '+963111111111'
+        second_phone_number:
+          type: string
+          nullable: true
+          example: '+963222222222'
+        email:
+          type: string
+          nullable: true
+          example: factory@example.com
+        capital_in_usd:
+          type: number
+          example: 500000.0
+        capital_in_syp:
+          type: number
+          example: 250000000.0
+        value_of_machines_in_usd:
+          type: number
+          example: 200000.0
+        value_of_machines_in_syp:
+          type: number
+          example: 100000000.0
+        number_of_workers:
+          type: integer
+          example: 50
+        daily_production_capacity:
+          type: number
+          example: 1000.0
+        monthly_production_capacity:
+          type: number
+          example: 30000.0
+        yearly_production_capacity:
+          type: number
+          example: 365000.0
+        electrical_power_capacity:
+          type: number
+          example: 500.0
+        yearly_estimated_water_consumption:
+          type: number
+          example: 10000.0
+    FacilityInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        plot_id:
+          type: integer
+          nullable: true
+          example: null
+        plot:
+          type: object
+          nullable: true
+          allOf:
+            -
+              $ref: '#/components/schemas/PlotInfoResource'
+        plot_dossier_id:
+          type: integer
+          nullable: true
+          example: null
+        plot_dossier:
+          type: object
+          nullable: true
+          allOf:
+            -
+              $ref: '#/components/schemas/PlotDossierInfoResource'
+        name:
+          type: string
+          example: 'Main Factory'
+        address:
+          type: string
+          example: '123 Industrial Zone'
+        city:
+          type: string
+          example: Damascus
+        first_phone_number:
+          type: string
+          example: '+963111111111'
+        second_phone_number:
+          type: string
+          nullable: true
+          example: '+963222222222'
+        email:
+          type: string
+          nullable: true
+          example: factory@example.com
+        capital_in_usd:
+          type: number
+          example: 500000.0
+        capital_in_syp:
+          type: number
+          example: 250000000.0
+        value_of_machines_in_usd:
+          type: number
+          example: 200000.0
+        value_of_machines_in_syp:
+          type: number
+          example: 100000000.0
+        number_of_workers:
+          type: integer
+          example: 50
+        daily_production_capacity:
+          type: number
+          example: 1000.0
+        monthly_production_capacity:
+          type: number
+          example: 30000.0
+        yearly_production_capacity:
+          type: number
+          example: 365000.0
+        electrical_power_capacity:
+          type: number
+          example: 500.0
+        yearly_estimated_water_consumption:
+          type: number
+          example: 10000.0
+        created_at:
+          type: string
+          format: date
+          example: 06-07-2026
+        facility_industrial_licenses:
+          type: array
+          items:
+            $ref: '#/components/schemas/FacilityIndustrialLicenseInfoResource'
+    FacilityIndustrialLicenseDTO:
+      type: object
+      required:
+        - facility_id
+        - industry_category_id
+        - industry_type_id
+        - industrial_decision_number
+        - industrial_decision_date
+        - industrial_decision_type_id
+        - industrial_license_source_id
+      properties:
+        facility_id:
+          type: integer
+          example: 1
+        industry_category_id:
+          type: integer
+          example: 1
+        industry_type_id:
+          type: integer
+          example: 1
+        industrial_decision_number:
+          type: string
+          example: DEC-2026-001
+        industrial_decision_date:
+          type: string
+          format: date
+          example: '2026-07-08'
+        industrial_decision_type_id:
+          type: integer
+          example: 1
+        industrial_license_source_id:
+          type: integer
+          example: 1
+    FacilityIndustrialLicenseInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        facility_id:
+          type: integer
+          nullable: true
+          example: null
+        facility:
+          type: object
+          nullable: true
+          allOf:
+            -
+              $ref: '#/components/schemas/FacilityInfoResource'
+        industry_category_id:
+          type: integer
+          nullable: true
+          example: null
+        industry_category:
+          type: object
+          nullable: true
+          allOf:
+            -
+              $ref: '#/components/schemas/IndustryCategoryInfoResource'
+        industry_type_id:
+          type: integer
+          nullable: true
+          example: null
+        industry_type:
+          type: object
+          nullable: true
+          allOf:
+            -
+              $ref: '#/components/schemas/IndustryTypeInfoResource'
+        industrial_decision_number:
+          type: string
+          example: DEC-2026-001
+        industrial_decision_date:
+          type: string
+          format: date
+          example: 06-07-2026
+        industrial_decision_type_id:
+          type: integer
+          nullable: true
+          example: null
+        industrial_decision_type:
+          type: object
+          nullable: true
+          allOf:
+            -
+              $ref: '#/components/schemas/IndustrialDecisionTypeInfoResource'
+        industrial_license_source_id:
+          type: integer
+          nullable: true
+          example: null
+        industrial_license_source:
+          type: object
+          nullable: true
+          allOf:
+            -
+              $ref: '#/components/schemas/IndustrialLicenseSourceInfoResource'
+        created_at:
+          type: string
+          format: date
+          example: 06-07-2026
+    PlotStatusHistoryInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        plot_id:
+          type: integer
+          example: 1
+        status:
+          type: string
+          enum:
+            - unsold
+            - announced
+            - subscribed
+            - allocated
+            - separated
+          example: announced
+        status_date:
+          type: string
+          format: date
+          example: 06-07-2026
+        notes:
+          type: string
+          nullable: true
+          example: 'Plot has been announced'
+        user_id:
+          type: integer
+          nullable: true
+          example: 1
+        created_at:
+          type: string
+          format: date
+          example: 06-07-2026
+        updated_at:
+          type: string
+          format: date
+          example: 06-07-2026
     PlotStatus:
       type: string
       enum:
@@ -7096,6 +9055,45 @@ components:
         - allocated
         - separated
       description: "The status lifecycle follows a strict linear progression:\n  unsold → announced → subscribed → allocated → separated\nTransitions may only go to the same status (re-set) or exactly one step forward.\nSkipping a step or moving backward is rejected with 422.\n"
+    LicenseStatusDTO:
+      type: object
+      required:
+        - name
+        - is_default
+        - is_active
+      properties:
+        name:
+          type: string
+          example: New
+        is_default:
+          type: boolean
+          example: false
+        is_active:
+          type: boolean
+          example: true
+    LicenseStatusInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: New
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date
+          example: 12-07-2026
+        updated_at:
+          type: string
+          format: date
+          example: 12-07-2026
     StorageItemBase:
       type: object
       properties:
@@ -7881,6 +9879,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
+    BadRequest:
+      description: 'Bad request'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
 tags:
   -
     name: Countries
@@ -7925,6 +9929,18 @@ tags:
     name: 'Employee Statuses'
     description: 'Manage employee status definitions'
   -
+    name: 'Building Licenses'
+    description: 'Manage Building Licenses'
+  -
+    name: 'By Duration Licenses'
+    description: 'Manage By Duration License definitions'
+  -
+    name: 'By Industry Licenses'
+    description: 'Manage By Industry License definitions'
+  -
+    name: Contracts
+    description: 'Manage Contract definitions'
+  -
     name: 'Plot Areas'
     description: 'Manage Plot Area definitions'
   -
@@ -7954,6 +9970,21 @@ tags:
   -
     name: 'Industrial License Sources'
     description: 'Manage Industrial License Source definitions'
+  -
+    name: 'Plot Status Histories'
+    description: 'Manage Plot Status Histories'
+  -
+    name: Facilities
+    description: 'Manage Facility definitions'
+  -
+    name: 'Facility Industrial Licenses'
+    description: 'Manage Facility Industrial License definitions'
+  -
+    name: 'Plot Dossier Status Histories'
+    description: 'Manage Plot Dossier Status Histories'
+  -
+    name: 'License Statuses'
+    description: 'Manage License Status definitions'
   -
     name: Storage
     description: 'Resolve storage items by ID or list root-level items'

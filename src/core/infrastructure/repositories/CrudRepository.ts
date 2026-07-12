@@ -1,20 +1,20 @@
+import type { DpomainResponsePaginated } from "../../../modules/hr/domain/entities/common/DomainResponsePaginated";
 import type { ApiClient } from "../../domain/common/api/ApiClient";
-import { type DomainResponse } from "../../domain/common/responce/DomainResponse";
 import type { ICrudRepository } from "../../domain/repositories/ICrudRepository";
 
 export function createCrufRepository<T,TCreate , TUpdate, ID = number>(apiClieint: ApiClient, getUrl: string , restUrl:string): ICrudRepository<T,TCreate , TUpdate, ID> {
     return {
-        findAll: async() => {
-            return apiClieint.get<DomainResponse<T[]>>(`${getUrl}`)
+        findAll: async(params?: Record<string, string | boolean | number>) => {
+            return apiClieint.get<DpomainResponsePaginated<T[]>>(`${getUrl}`, params ? { params } : undefined)
         },
         findById:async (id: ID) => {
-            return apiClieint.get<DomainResponse<T>>(`${restUrl}/${id}`)
+            return apiClieint.get<DpomainResponsePaginated<T>>(`${restUrl}/${id}`)
         },
         create: async(data: TCreate) => {
-            return apiClieint.post<DomainResponse<T>,TCreate>(`${restUrl}`, data)
+            return apiClieint.post<DpomainResponsePaginated<T>,TCreate>(`${restUrl}`, data)
         },
         update: async(id: ID, data: TUpdate) => {
-            return apiClieint.put<DomainResponse<T>,TUpdate>(`${restUrl}/${id}`, data)
+            return apiClieint.put<DpomainResponsePaginated<T>,TUpdate>(`${restUrl}/${id}`, data)
         },
         delete: async(id: ID) => {
             return apiClieint.delete(`${restUrl}/${id}`)

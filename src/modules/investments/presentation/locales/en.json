@@ -177,6 +177,51 @@
       "status_required": "Dossier status is required"
     }
   },
+  "contract": {
+    "title": "Contracts",
+    "add": "Add Contract",
+    "edit": "Edit Contract",
+    "contract_number": "Contract Number",
+    "contract_date": "Contract Date",
+    "dossier_id": "Dossier",
+    "unit_price_per_square_meter": "Unit Price / m²",
+    "weighting_factor": "Weighting Factor",
+    "final_price_per_square_meter": "Final Price / m²",
+    "total_price": "Total Price",
+    "payment_method": "Payment Method",
+    "payment_method_cash": "Cash",
+    "payment_method_installment": "Installment",
+    "created": "Contract created successfully",
+    "create_error": "Failed to create contract",
+    "updated": "Contract updated successfully",
+    "update_error": "Failed to update contract",
+    "deleted": "Contract deleted successfully",
+    "delete_error": "Failed to delete contract",
+    "no_records": "No contracts found",
+    "not_found": "Contract not found",
+    "load_error": "Failed to load contract",
+    "edit_log": "Edit Log",
+    "event": "Event",
+    "created_at": "Created At",
+    "changed_by": "Changed By",
+    "changes": "Changes",
+    "field": "Field",
+    "old_value": "Old Value",
+    "new_value": "New Value",
+    "no_edit_log": "No edit logs found",
+    "subject_id": "Contract ID",
+    "delete_title": "Delete Contract",
+    "delete_message": "Are you sure you want to delete this contract?",
+    "id": "ID",
+    "validation": {
+      "dossier_id_required": "Dossier is required",
+      "contract_number_required": "Contract number is required",
+      "contract_date_required": "Contract date is required",
+      "unit_price_positive": "Unit price must be positive",
+      "weighting_factor_positive": "Weighting factor must be positive",
+      "payment_method_required": "Payment method is required"
+    }
+  },
   "facilities": {
     "title": "Facilities",
     "add": "Add Facility",
@@ -577,6 +622,58 @@
       "name_required": "Name is required"
     }
   },
+  "by_duration_licenses": {
+    "title": "By Duration Licenses",
+    "add": "Add By Duration License",
+    "name": "Name",
+    "is_active": "Is Active",
+    "is_default": "Is Default",
+    "created": "{name} created successfully",
+    "create_error": "Failed to create {name}",
+    "deleted": "{name} deleted successfully",
+    "delete_error": "Failed to delete {name}",
+    "no_records": "No By Duration Licenses found",
+    "edit_log": "Edit Log",
+    "event": "Event",
+    "created_at": "Created At",
+    "changed_by": "Changed By",
+    "changes": "Changes",
+    "field": "Field",
+    "old_value": "Old Value",
+    "new_value": "New Value",
+    "no_edit_log": "No edit logs found",
+    "subject_id": "By Duration License ID",
+    "id": "ID",
+    "validation": {
+      "name_required": "Name is required"
+    }
+  },
+  "by_industry_licenses": {
+    "title": "By Industry Licenses",
+    "add": "Add By Industry License",
+    "name": "Name",
+    "is_active": "Is Active",
+    "is_default": "Is Default",
+    "created": "{name} created successfully",
+    "create_error": "Failed to create {name}",
+    "deleted": "{name} deleted successfully",
+    "delete_error": "Failed to delete {name}",
+    "no_records": "No By Industry Licenses found",
+    "edit_log": "Edit Log",
+    "event": "Event",
+    "created_at": "Created At",
+    "changed_by": "Changed By",
+    "changes": "Changes",
+    "field": "Field",
+    "old_value": "Old Value",
+    "new_value": "New Value",
+    "no_edit_log": "No edit logs found",
+    "subject_id": "By Industry License ID",
+    "id": "ID",
+    "validation": {
+      "name_required": "Name is required"
+    }
+  },
   "licensing_statuses": {
     "title": "Licensing Statuses",
     "add": "Add Licensing Status",
@@ -588,6 +685,17 @@
     "deleted": "{name} deleted successfully",
     "delete_error": "Failed to delete {name}",
     "no_records": "No Licensing Statuses found",
+    "edit_log": "Edit Log",
+    "event": "Event",
+    "created_at": "Created At",
+    "changed_by": "Changed By",
+    "changes": "Changes",
+    "field": "Field",
+    "old_value": "Old Value",
+    "new_value": "New Value",
+    "no_edit_log": "No edit logs found",
+    "subject_id": "License Status ID",
+    "id": "ID",
     "validation": {
       "name_required": "Name is required"
     }
@@ -623,6 +731,15 @@
     },
     "licensing_statuses": {
       "title": "Licensing Statuses"
+    },
+    "by_duration_licenses": {
+      "title": "By Duration Licenses"
+    },
+    "by_industry_licenses": {
+      "title": "By Industry Licenses"
+    },
+    "contract": {
+      "title": "Contracts"
     }
   }
 }

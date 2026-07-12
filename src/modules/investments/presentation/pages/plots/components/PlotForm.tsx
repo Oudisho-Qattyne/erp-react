@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../../core/presentation/hooks/data/useEntity';
 import { getCreatePlotFormSchema } from '../../../schemas/plotForm.schema';
@@ -20,7 +20,6 @@ import { PlotAuditLogModal } from './PlotAuditLogModal';
 import { History, Pencil, MapPin } from 'lucide-react';
 import type { Plot } from '../../../../domain/entities/plot';
 import type { PlotStatus } from '../../../../domain/valueObjects/plots/plotStatus';
-import type { PlotStatusHistory } from '../../../../domain/entities/plotStatusHistory';
 
 interface PlotFormProps {
   plot?: Plot;
@@ -40,9 +39,6 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
   const [statusDate, setStatusDate] = React.useState(defaultValues?.status_date || new Date().toISOString().split('T')[0]);
   const [clickedStatus, setClickedStatus] = React.useState<PlotStatus | null>(null);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = React.useState(false);
-  const [histories, setHistories] = useState<PlotStatusHistory[]>([]);
-  const [historyLoading, setHistoryLoading] = useState(false);
-  const [historyError, setHistoryError] = useState<string | null>(null);
   const [isAuditModalOpen, setIsAuditModalOpen] = React.useState(false);
   const [isEditing, setIsEditing] = React.useState(!!isCreate);
 
@@ -52,28 +48,6 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
     getPlotAreas();
     getClassifications();
   }, []);
-
-  const { getAll: getHistory } = useEntityCrud<PlotStatusHistory>(
-    `/investments/plots/${plot?.id}/status-history`,
-    `/investments/plots/${plot?.id}/status-history`
-  );
-
-  const handleOpenHistory = useCallback(async () => {
-    if (!plot?.id) return;
-    setIsHistoryModalOpen(true);
-    setHistoryLoading(true);
-    setHistoryError(null);
-    try {
-      const res = await getHistory();
-      if (res?.data) setHistories(res.data);
-      else setHistories([]);
-    } catch {
-      setHistories([]);
-      setHistoryError(t('dossier.load_error', 'investments') || 'Failed to load status history');
-    } finally {
-      setHistoryLoading(false);
-    }
-  }, [getHistory, t, plot?.id]);
 
   const formFields: FieldConfig[] = [
     { name: 'code', label: t('plots.code', 'investments') || 'Code', required: true },
@@ -172,7 +146,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold">{t('plots.status', 'investments') || 'Status'}</h2>
           {!isCreate && plot?.id && (
-            <Button variant="outline" size="sm" onClick={handleOpenHistory} className="flex items-center gap-2" requiredPermission="investments.plot-dossier-status-histories.list">
+            <Button variant="outline" size="sm" onClick={() => setIsHistoryModalOpen(true)} className="flex items-center gap-2" requiredPermission="investments.plot-dossier-status-histories.list">
               <History size={16} />
               {t('plots.view_history', 'investments') || 'Status History'}
             </Button>
@@ -286,14 +260,11 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
         />
       )}
 
-      {plot && (
+      {plot && plot.id && (
         <PlotStatusHistoryModal
           isOpen={isHistoryModalOpen}
           onClose={() => setIsHistoryModalOpen(false)}
-          histories={histories}
-          loading={historyLoading}
-          error={historyError}
-          onRetry={handleOpenHistory}
+          plotId={plot.id}
         />
       )}
 

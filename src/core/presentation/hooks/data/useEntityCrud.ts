@@ -1,12 +1,29 @@
 import { useState, useCallback } from 'react';
-import type { DomainResponse } from '../../../domain/common/responce/DomainResponse';
+import type { DpomainResponsePaginated } from '../../../../modules/hr/domain/entities/common/DomainResponsePaginated';
 import type { ManageEntityUsecase } from '../../../domain/usecase/IManageUseCase';
+
+interface PaginationInfo {
+  lastPage: number;
+  currentPage: number;
+  hasMore: boolean;
+  total: number;
+}
+
+function extractPagination(res: DpomainResponsePaginated<unknown>): PaginationInfo | undefined {
+  if (res.lastPage == null) return undefined;
+  return {
+    lastPage: res.lastPage,
+    currentPage: res.currentPage ?? 1,
+    hasMore: res.hasMore ?? false,
+    total: Number((res as any).total ?? 0),
+  };
+}
 
 interface UseEntityCrudState<T> {
   data: T[];
   loading: boolean;
   error: string | null;
-  pagination?: DomainResponse<T>['pagination'];
+  pagination?: PaginationInfo;
 }
 
 export function useEntityCrud<T, TCreate, TUpdate, ID = number>(
@@ -18,15 +35,15 @@ export function useEntityCrud<T, TCreate, TUpdate, ID = number>(
     error: null,
   });
 
-  const getAll = useCallback(async () => {
+  const getAll = useCallback(async (params?: Record<string, string | boolean | number>) => {
     setState(prev => ({ ...prev, loading: true, error: null }));
     try {
-      const response = await usecase.getAll();
+      const response = await usecase.getAll(params);
       setState({
         data: response.data,
         loading: false,
         error: null,
-        pagination: response.pagination,
+        pagination: extractPagination(response),
       });
       return response;
     } catch (err: any) {

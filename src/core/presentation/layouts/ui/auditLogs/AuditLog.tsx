@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Dialog } from '../dialog/Dialog';
 import { DataTable } from '../tables/ResizableTable';
 import { ErrorState } from '../state/ErrorState';
@@ -34,14 +34,28 @@ interface AuditLogProps {
 }
 
 export function AuditLog({ isOpen, onClose, model, modelId, module = 'shared', labels, translateField, translateValues }: AuditLogProps) {
-  const { auditLogs, loading, error, getAuditLogs } = useAuditLogs();
+  const { auditLogs, loading, error, pagination, getAuditLogs } = useAuditLogs();
   const { t: langT } = useLanguage();
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
 
   useEffect(() => {
     if (isOpen) {
-      getAuditLogs(model, modelId);
+      setPage(1);
+      getAuditLogs(model, modelId, 1, perPage);
     }
   }, [isOpen, model, modelId]);
+
+  const handlePageChange = useCallback((p: number) => {
+    setPage(p);
+    getAuditLogs(model, modelId, p, perPage);
+  }, [model, modelId, perPage, getAuditLogs]);
+
+  const handlePerPageChange = useCallback((size: number) => {
+    setPerPage(size);
+    setPage(1);
+    getAuditLogs(model, modelId, 1, size);
+  }, [model, modelId, getAuditLogs]);
 
   const t = (key: keyof AuditLogLabels, fallback: string) => labels?.[key] || langT(key, module) || fallback;
 
@@ -142,6 +156,14 @@ export function AuditLog({ isOpen, onClose, model, modelId, module = 'shared', l
             data={auditLogs}
             rowKey="id"
             emptyMessage={t('no_records', 'No audit logs found')}
+            pagination={pagination ? {
+              page,
+              totalPages: pagination.lastPage,
+              totalItems: pagination.total,
+              onPageChange: handlePageChange,
+              itemsPerPage: perPage,
+              onItemsPerPageChange: handlePerPageChange,
+            } : undefined}
           />
         )}
       </div>

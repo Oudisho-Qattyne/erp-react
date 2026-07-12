@@ -2,6 +2,6 @@ import type { IAuditLogsRepository } from "../../domain/repositories/IAuditLogsR
 
 export const createAuditLogsUseCase = (repository: IAuditLogsRepository) => {
     return {
-        getAuditLogs: (model: string, modelId?: number) => repository.getAuditLogs(model, modelId)
+        getAuditLogs: (model: string, modelId?: number, page?: number, perPage?: number) => repository.getAuditLogs(model, modelId, page, perPage)
     }
 }

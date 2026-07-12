@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import type { DomainResponse } from '../../../domain/common/responce/DomainResponse';
+import type { DpomainResponsePaginated } from '../../../../modules/hr/domain/entities/common/DomainResponsePaginated';
 import type { EntityWithNameOnly } from '../../../domain/entities/EntityWithNameOnly';
-import { useEntityCrud, type UseEntityCrudReturn } from './useEntity';
+import { useEntityCrud, type UseEntityCrudReturn, type QueryParams } from './useEntity';
 
 export interface NestedEntityConfig {
   /** Nested list endpoint, e.g. `shared-kernal/countries/${countryId}/cities` */
@@ -15,9 +15,9 @@ export interface UseNestedEntityCrudReturn<T>
   parentId: number | null;
   setParentId: (id: number | null) => void;
   /** Fetch list for a parent id (create/update/delete still use restUrl) */
-  getAllForParent: (parentId: number) => Promise<DomainResponse<T[]>>;
+  getAllForParent: (parentId: number, params?: QueryParams) => Promise<DpomainResponsePaginated<T[]>>;
   /** Pass parent id, or use parentId already set via setParentId / getAllForParent */
-  getAll: (parentId?: number) => Promise<DomainResponse<T[]>>;
+  getAll: (parentId?: number, params?: QueryParams) => Promise<DpomainResponsePaginated<T[]>>;
 }
 
 /**
@@ -35,15 +35,15 @@ export function useNestedEntityCrud<T extends EntityWithNameOnly>(
   const crud = useEntityCrud<T>(listUrl, config.restUrl);
 
   const getAllForParent = useCallback(
-    async (id: number) => {
+    async (id: number, params?: QueryParams) => {
       setParentId(id);
-      return crud.getAll(config.buildListUrl(id));
+      return crud.getAll(config.buildListUrl(id), params);
     },
     [crud, config.buildListUrl]
   );
 
   const getAll = useCallback(
-    async (parentIdOverride?: number) => {
+    async (parentIdOverride?: number, params?: QueryParams) => {
       const id = parentIdOverride ?? parentId;
       if (id == null) {
         throw new Error('Parent id is required to fetch the list');
@@ -51,7 +51,7 @@ export function useNestedEntityCrud<T extends EntityWithNameOnly>(
       if (parentIdOverride != null) {
         setParentId(parentIdOverride);
       }
-      return crud.getAll(config.buildListUrl(id));
+      return crud.getAll(config.buildListUrl(id), params);
     },
     [crud, parentId, config.buildListUrl]
   );

@@ -177,6 +177,51 @@
       "status_required": "حالة الإضبارة مطلوبة"
     }
   },
+  "contract": {
+    "title": "العقود",
+    "add": "إضافة عقد",
+    "edit": "تعديل العقد",
+    "contract_number": "رقم العقد",
+    "contract_date": "تاريخ العقد",
+    "dossier_id": "الإضبارة",
+    "unit_price_per_square_meter": "سعر الوحدة / م²",
+    "weighting_factor": "معامل الترجيح",
+    "final_price_per_square_meter": "السعر النهائي / م²",
+    "total_price": "السعر الإجمالي",
+    "payment_method": "طريقة الدفع",
+    "payment_method_cash": "نقداً",
+    "payment_method_installment": "بالأقساط",
+    "created": "تم إنشاء العقد بنجاح",
+    "create_error": "فشل في إنشاء العقد",
+    "updated": "تم تحديث العقد بنجاح",
+    "update_error": "فشل في تحديث العقد",
+    "deleted": "تم حذف العقد بنجاح",
+    "delete_error": "فشل في حذف العقد",
+    "no_records": "لا توجد عقود",
+    "not_found": "العقد غير موجود",
+    "load_error": "فشل في تحميل العقد",
+    "edit_log": "سجل التعديل",
+    "event": "الحدث",
+    "created_at": "تاريخ الإنشاء",
+    "changed_by": "تم التغيير بواسطة",
+    "changes": "التغييرات",
+    "field": "الحقل",
+    "old_value": "القيمة القديمة",
+    "new_value": "القيمة الجديدة",
+    "no_edit_log": "لا توجد سجلات تعديل",
+    "subject_id": "معرف العقد",
+    "delete_title": "حذف العقد",
+    "delete_message": "هل أنت متأكد من حذف هذا العقد؟",
+    "id": "المعرف",
+    "validation": {
+      "dossier_id_required": "الإضبارة مطلوبة",
+      "contract_number_required": "رقم العقد مطلوب",
+      "contract_date_required": "تاريخ العقد مطلوب",
+      "unit_price_positive": "يجب أن يكون سعر الوحدة موجباً",
+      "weighting_factor_positive": "يجب أن يكون معامل الترجيح موجباً",
+      "payment_method_required": "طريقة الدفع مطلوبة"
+    }
+  },
   "facilities": {
     "title": "المنشآت",
     "add": "إضافة منشأة",
@@ -577,6 +622,58 @@
       "name_required": "الاسم مطلوب"
     }
   },
+  "by_duration_licenses": {
+    "title": "تراخيص حسب المدة",
+    "add": "إضافة ترخيص حسب المدة",
+    "name": "الاسم",
+    "is_active": "فعال",
+    "is_default": "افتراضي",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا توجد تراخيص حسب المدة",
+    "edit_log": "سجل التعديل",
+    "event": "الحدث",
+    "created_at": "تاريخ الإنشاء",
+    "changed_by": "تم التغيير بواسطة",
+    "changes": "التغييرات",
+    "field": "الحقل",
+    "old_value": "القيمة القديمة",
+    "new_value": "القيمة الجديدة",
+    "no_edit_log": "لا توجد سجلات تعديل",
+    "subject_id": "معرف الترخيص حسب المدة",
+    "id": "المعرف",
+    "validation": {
+      "name_required": "الاسم مطلوب"
+    }
+  },
+  "by_industry_licenses": {
+    "title": "تراخيص حسب الصناعة",
+    "add": "إضافة ترخيص حسب الصناعة",
+    "name": "الاسم",
+    "is_active": "فعال",
+    "is_default": "افتراضي",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا توجد تراخيص حسب الصناعة",
+    "edit_log": "سجل التعديل",
+    "event": "الحدث",
+    "created_at": "تاريخ الإنشاء",
+    "changed_by": "تم التغيير بواسطة",
+    "changes": "التغييرات",
+    "field": "الحقل",
+    "old_value": "القيمة القديمة",
+    "new_value": "القيمة الجديدة",
+    "no_edit_log": "لا توجد سجلات تعديل",
+    "subject_id": "معرف الترخيص حسب الصناعة",
+    "id": "المعرف",
+    "validation": {
+      "name_required": "الاسم مطلوب"
+    }
+  },
   "licensing_statuses": {
     "title": "حالات الترخيص",
     "add": "إضافة حالة ترخيص",
@@ -588,6 +685,17 @@
     "deleted": "تم حذف {name} بنجاح",
     "delete_error": "فشل في حذف {name}",
     "no_records": "لا يوجد حالات ترخيص",
+    "edit_log": "سجل التعديل",
+    "event": "الحدث",
+    "created_at": "تاريخ الإنشاء",
+    "changed_by": "تم التغيير بواسطة",
+    "changes": "التغييرات",
+    "field": "الحقل",
+    "old_value": "القيمة القديمة",
+    "new_value": "القيمة الجديدة",
+    "no_edit_log": "لا توجد سجلات تعديل",
+    "subject_id": "معرف حالة الترخيص",
+    "id": "المعرف",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -623,6 +731,15 @@
     },
     "licensing_statuses": {
       "title": "حالات الترخيص"
+    },
+    "by_duration_licenses": {
+      "title": "تراخيص حسب المدة"
+    },
+    "by_industry_licenses": {
+      "title": "تراخيص حسب الصناعة"
+    },
+    "contract": {
+      "title": "العقود"
     }
   }
 }
