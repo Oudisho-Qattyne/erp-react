@@ -123,7 +123,7 @@ export function EditInvestorPage() {
       const response = await getById(Number(id));
       setInvestor(response?.data || null);
     } catch (err: any) {
-      setError(t('common.error_loading', 'shared') || 'Error loading data');
+      setError(err?.message || t('common.error_loading', 'shared') || 'Error loading data');
     } finally {
       setLoading(false);
     }
@@ -135,7 +135,7 @@ export function EditInvestorPage() {
     try {
       return await update(Number(id), data);
     } catch (err: any) {
-      toast.error(t('investors.update_error', 'investments') || 'Failed to update investor');
+      toast.error(err?.message || t('investors.update_error', 'investments') || 'Failed to update investor');
       throw err;
     }
   };
@@ -147,8 +147,8 @@ export function EditInvestorPage() {
       toast.success(t('investors.interest_deleted', 'investments') || 'Interest deleted successfully');
       setInterestToDelete(null);
       fetchInvestor();
-    } catch (e) {
-      toast.error(t('common.error', 'shared') || 'An error occurred');
+    } catch (e : any) {
+      toast.error(e?.message || t('common.error', 'shared') || 'An error occurred');
     }
   };
 

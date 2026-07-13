@@ -22,7 +22,7 @@ export function CreateFuturePossibleInvestorPage() {
       const newdata = {...data , is_possible_investor_in_future : true}
       return await create(newdata);
     } catch (err: any) {
-      toast.error(t('investors.create_error', 'investments') || 'Failed to create possible investor');
+      toast.error(err?.message || t('investors.create_error', 'investments') || 'Failed to create possible investor');
       throw err;
     }
   };

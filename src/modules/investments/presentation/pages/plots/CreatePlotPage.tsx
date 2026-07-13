@@ -20,7 +20,7 @@ export function CreatePlotPage() {
     try {
       return await create(data);
     } catch (err: any) {
-      toast.error((t('plots.create_error', 'investments') || 'Failed to create plot').replace('{name}', entityName));
+      toast.error(err?.message || (t('plots.create_error', 'investments') || 'Failed to create plot').replace('{name}', entityName));
       throw err;
     }
   };

@@ -45,9 +45,9 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
       getContracts(listUrl);
       setIsCreateOpen(false);
       return res;
-    } catch {
-      toast.error(t('contract.create_error', 'investments') || 'Failed to create contract');
-      throw {};
+    } catch (err: any) {
+      toast.error(err?.message || t('contract.create_error', 'investments') || 'Failed to create contract');
+      throw err;
     }
   };
 
@@ -59,9 +59,9 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
       getContracts(listUrl);
       setEditingContract(null);
       return res;
-    } catch {
-      toast.error(t('contract.update_error', 'investments') || 'Failed to update contract');
-      throw {};
+    } catch (err: any) {
+      toast.error(err?.message || t('contract.update_error', 'investments') || 'Failed to update contract');
+      throw err;
     }
   };
 
@@ -71,8 +71,8 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
       await deleteContract(deletingContract.id);
       toast.success(t('contract.deleted', 'investments') || 'Contract deleted successfully');
       getContracts(listUrl);
-    } catch {
-      toast.error(t('contract.delete_error', 'investments') || 'Failed to delete contract');
+    } catch (err: any) {
+      toast.error(err?.message || t('contract.delete_error', 'investments') || 'Failed to delete contract');
     }
     setDeletingContract(null);
   };

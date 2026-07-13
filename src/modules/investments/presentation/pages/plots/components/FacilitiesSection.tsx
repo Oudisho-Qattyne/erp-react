@@ -45,9 +45,9 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
       getFacilities(listUrl);
       setIsCreateOpen(false);
       return res;
-    } catch {
-      toast.error(t('facilities.create_error', 'investments') || 'Failed to create facility');
-      throw {};
+    } catch (err: any) {
+      toast.error(err?.message || t('facilities.create_error', 'investments') || 'Failed to create facility');
+      throw err;
     }
   };
 
@@ -59,9 +59,9 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
       getFacilities(listUrl);
       setEditingFacility(null);
       return res;
-    } catch {
-      toast.error(t('facilities.update_error', 'investments') || 'Failed to update facility');
-      throw {};
+    } catch (err: any) {
+      toast.error(err?.message || t('facilities.update_error', 'investments') || 'Failed to update facility');
+      throw err;
     }
   };
 
@@ -71,8 +71,8 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
       await deleteFacility(deletingFacility.id);
       toast.success(t('facilities.deleted', 'investments') || 'Facility deleted successfully');
       getFacilities(listUrl);
-    } catch {
-      toast.error(t('facilities.delete_error', 'investments') || 'Failed to delete facility');
+    } catch (err: any) {
+      toast.error(err?.message || t('facilities.delete_error', 'investments') || 'Failed to delete facility');
     }
     setDeletingFacility(null);
   };

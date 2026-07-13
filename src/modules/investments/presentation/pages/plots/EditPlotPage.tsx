@@ -37,7 +37,7 @@ export function EditPlotPage() {
     try {
       return await update(Number(id), data);
     } catch (err: any) {
-      toast.error((t('plots.update_error', 'investments') || 'Failed to update plot').replace('{name}', entityName));
+      toast.error(err?.message || (t('plots.update_error', 'investments') || 'Failed to update plot').replace('{name}', entityName));
       throw err;
     }
   };

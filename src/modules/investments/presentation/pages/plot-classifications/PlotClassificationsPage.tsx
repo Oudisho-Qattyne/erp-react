@@ -35,8 +35,8 @@ export function PlotClassificationsPage() {
     try {
       await remove(confirmDelete.id);
       toast.success(t('plot_classifications.deleted', 'investments').replace('{name}', entityName));
-    } catch {
-      toast.error(t('plot_classifications.delete_error', 'investments').replace('{name}', entityName));
+    } catch (err: any) {
+      toast.error(err?.message || t('plot_classifications.delete_error', 'investments').replace('{name}', entityName));
     }
     setConfirmDelete(null);
   };
@@ -47,8 +47,8 @@ export function PlotClassificationsPage() {
       await update(confirmSetDefault.id, { ...confirmSetDefault, is_default: true });
       toast.success(t('common.set_default_success', 'shared')?.replace('{name}', entityName) || `${entityName} set as default successfully`);
       getAll();
-    } catch {
-      toast.error(t('common.set_default_error', 'shared')?.replace('{name}', entityName) || `Failed to set ${entityName} as default`);
+    } catch (err: any) {
+      toast.error(err?.message || t('common.set_default_error', 'shared')?.replace('{name}', entityName) || `Failed to set ${entityName} as default`);
     }
     setConfirmSetDefault(null);
   };
@@ -135,9 +135,9 @@ export function PlotClassificationsPage() {
           onSubmit={async (data) => {
             try { 
               return await create(data); 
-            } catch { 
-              toast.error(t('plot_classifications.create_error', 'investments').replace('{name}', entityName)); throw {}; 
-            }
+    } catch (err: any) { 
+      toast.error(err?.message || t('plot_classifications.create_error', 'investments').replace('{name}', entityName)); throw err; 
+    }
           }}
           onSuccess={() => { toast.success(t('plot_classifications.created', 'investments').replace('{name}', entityName)); getAll(); setIsCreateOpen(false); }}
           onCancel={() => setIsCreateOpen(false)}
@@ -157,9 +157,9 @@ export function PlotClassificationsPage() {
           onSubmit={async (data) => {
             try { 
               await update(editItem!.id, data); 
-            } catch { 
-              toast.error(t('common.update_error', 'shared')?.replace('{name}', entityName) || `Failed to update ${entityName}`); throw {}; 
-            }
+    } catch (err: any) { 
+      toast.error(err?.message || t('common.update_error', 'shared')?.replace('{name}', entityName) || `Failed to update ${entityName}`); throw err; 
+    }
           }}
           onSuccess={() => { toast.success(t('common.updated', 'shared')?.replace('{name}', entityName) || `${entityName} updated successfully`); getAll(); setEditItem(null); }}
           onCancel={() => setEditItem(null)}

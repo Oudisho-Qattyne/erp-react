@@ -41,7 +41,7 @@ export function InvestorInterestFormModal({ isOpen, onClose, investorId, onSucce
       type: 'multi-select-or-create',
       label: t('investors.plot_areas', 'investments') || 'Plot Areas',
       searchable: true,
-      options: plotAreas.map(a => ({ value: a.id, label: a.name })),
+      options: plotAreas.map(a => ({ value: a.id, label: a.name, is_default: a.is_default })),
       createTitle: t('common.new', 'shared') || 'New',
       labelPath: 'data.name',
       renderCreateForm: (onSuccess, onCancel) => (
@@ -62,7 +62,7 @@ export function InvestorInterestFormModal({ isOpen, onClose, investorId, onSucce
       type: 'multi-select-or-create',
       label: t('investors.plot_classifications', 'investments') || 'Plot Classifications',
       searchable: true,
-      options: plotClassifications.map(c => ({ value: c.id, label: c.name })),
+      options: plotClassifications.map(c => ({ value: c.id, label: c.name, is_default: c.is_default })),
       createTitle: t('common.new', 'shared') || 'New',
       labelPath: 'data.name',
       renderCreateForm: (onSuccess, onCancel) => (

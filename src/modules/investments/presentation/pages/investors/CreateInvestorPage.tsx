@@ -21,7 +21,7 @@ export function CreateInvestorPage() {
     try {
       return await create(data);
     } catch (err: any) {
-      toast.error(t('investors.create_error', 'investments') || 'Failed to create investor');
+      toast.error(err?.message || t('investors.create_error', 'investments') || 'Failed to create investor');
       throw err;
     }
   };

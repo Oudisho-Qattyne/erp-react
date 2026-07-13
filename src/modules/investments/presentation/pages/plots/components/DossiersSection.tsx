@@ -37,6 +37,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
   const [confirmDelete, setConfirmDelete] = useState<Dossier | null>(null);
 
   const [confirmAllocateNewDossier, setConfirmAllocatedNewDossier] = useState<DossierFormData | null>(null)
+  const [confirmAllocate, setConfirmAllocate] = useState<Dossier | null>(null)
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
 
@@ -77,8 +78,8 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
         setConfirmAllocatedNewDossier(null)
       }
       getAll(fetchUrl());
-    } catch {
-      toast.error(t('dossier.create_error', 'investments') || 'Failed to create dossier');
+    } catch (err: any) {
+      toast.error(err?.message || t('dossier.create_error', 'investments') || 'Failed to create dossier');
     }
   }
   const handleAdd = async (data: DossierFormData) => {
@@ -88,7 +89,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       return
     }
     await addDossier(data)
-   
+    
   };
 
   const handleEdit = async (data: DossierFormData) => {
@@ -99,8 +100,8 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       setEditDossier(null);
       form.reset();
       getAll(fetchUrl());
-    } catch {
-      toast.error(t('dossier.update_error', 'investments') || 'Failed to update dossier');
+    } catch (err: any) {
+      toast.error(err?.message || t('dossier.update_error', 'investments') || 'Failed to update dossier');
     }
   };
 
@@ -146,8 +147,8 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       toast.success(t('dossier.deleted', 'investments') || 'Dossier deleted successfully');
       setConfirmDelete(null);
       getAll(fetchUrl());
-    } catch {
-      toast.error(t('dossier.delete_error', 'investments') || 'Failed to delete dossier');
+    } catch (err: any) {
+      toast.error(err?.message || t('dossier.delete_error', 'investments') || 'Failed to delete dossier');
     }
   };
 
@@ -156,8 +157,8 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       await update(dossier.id, { status: "active" });
       toast.success(t('dossier.allocated', 'investments') || 'Dossier allocated successfully');
       getAll(fetchUrl());
-    } catch {
-      toast.error(t('dossier.allocate_error', 'investments') || 'Failed to allocate dossier');
+    } catch (err: any) {
+      toast.error(err?.message || t('dossier.allocate_error', 'investments') || 'Failed to allocate dossier');
     }
   };
 
@@ -214,7 +215,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
             requiredPermission="investments.plot-dossier.update">
             <Pencil size={16} />
           </Button>
-          <Button disabled={row.status == 'active'} variant="ghost" size="sm" onClick={() => handleAllocate(row)}
+          <Button disabled={row.status == 'active'} variant="ghost" size="sm" onClick={() => setConfirmAllocate(row)}
             title={t('dossier.allocate', 'investments') || 'Allocate'}
             requiredPermission="investments.plot-dossier.update">
             <CheckCircle size={16} className="text-success" />
@@ -332,6 +333,17 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
         onConfirm={() => {if(confirmAllocateNewDossier) addDossier(confirmAllocateNewDossier)}}
         onCancel={() => setConfirmAllocatedNewDossier(null)}
         confirmLoading={loadingMap['create']}
+      />
+
+      <ConfirmDialog
+        isOpen={!!confirmAllocate}
+        title={t('dossier.allocate_title', 'investments') || 'Allocate Dossier'}
+        message={t('dossier.allocate_message', 'investments') || 'Are you sure you want to allocate this dossier?'}
+        confirmLabel={t('dossier.allocate', 'investments') || 'Allocate'}
+        cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
+        onConfirm={async () => { if (confirmAllocate) { await handleAllocate(confirmAllocate); setConfirmAllocate(null); } }}
+        onCancel={() => setConfirmAllocate(null)}
+        confirmLoading={loadingMap['update']}
       />
     </div>
   );
