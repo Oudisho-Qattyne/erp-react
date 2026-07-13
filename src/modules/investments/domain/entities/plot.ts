@@ -2,7 +2,6 @@ import type { User } from "../../../users/domain/entities/user/user";
 import type { PlotStatus } from "../valueObjects/plots/plotStatus";
 import type { PlotArea } from "./plotArea";
 import type { PlotClassification } from "./plotClassification";
-import type { PlotStatusHistory } from "./plotStatusHistory";
 
 export interface Plot {
   id: number;
@@ -24,6 +23,5 @@ export interface Plot {
   created_at?: string;
   updated_at?: string;
   folder_id?: string;
-  status_histories?: PlotStatusHistory[]
   user: User
 }

@@ -1,6 +1,7 @@
 {
   "common": {
     "actions":"العمليات",
+    "name": "الاسم",
     "reset": "مسح",
     "search": "بحث",
     "selected": "محدد",
@@ -36,6 +37,7 @@
     "select_on_map": "تحديد على الخريطة",
     "click_map_to_select": "انقر على الخريطة لتحديد الموقع",
     "new": "جديد",
+    "create": "إنشاء",
     "notes": "ملاحظات",
     "confirm_delete": "هل أنت متأكد من الحذف؟",
     "error": "حدث خطأ",
@@ -47,7 +49,8 @@
     "deleted": "تم حذف {name} بنجاح",
     "delete_error": "فشل حذف {name}",
     "set_default_success": "تم تعيين {name} كافتراضي بنجاح",
-    "set_default_error": "فشل تعيين {name} كافتراضي"
+    "set_default_error": "فشل تعيين {name} كافتراضي",
+    "retry": "إعادة المحاولة"
   },
   "pagination": {
     "showing": "عرض",

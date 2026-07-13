@@ -1,15 +1,16 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import type { Dossier } from '../../../domain/entities/dossier';
-import type { DossierStatusHistory } from '../../../domain/entities/dossierStatusHistory';
+import type { Plot } from '../../../domain/entities/plot';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { DossierStatusHistoryModal } from './components/DossierStatusHistoryModal';
 import { PartnersSection } from './components/PartnersSection';
 import { FacilitiesSection } from './components/FacilitiesSection';
+import { ContractsSection } from './components/ContractsSection';
 import { ArrowRight, History, FileText } from 'lucide-react';
 import { SectionCard } from '../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { InfoRow } from '../../../../../core/presentation/layouts/ui/card/InfoRow';
@@ -24,50 +25,38 @@ export function ShowDossierPage() {
     `/investments/plots/${plotId}/dossiers`
   );
 
-  const { getAll: getHistory } = useEntityCrud<DossierStatusHistory>(
-    `/investments/plots/${plotId}/dossiers/${dossierId}/status-history`,
-    `/investments/plots/${plotId}/dossiers/${dossierId}/status-history`
+  const { getById: getPlotById } = useEntityCrud<Plot>(
+    `/investments/plots`,
+    `/investments/plots`
   );
 
   const [dossier, setDossier] = useState<Dossier | null>(null);
+  const [plotStatus, setPlotStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [histories, setHistories] = useState<DossierStatusHistory[]>([]);
-  const [historyLoading, setHistoryLoading] = useState(false);
-  const [historyError, setHistoryError] = useState<string | null>(null);
+
+  const canShowContracts = plotStatus === 'allocated' && dossier?.status === 'active';
 
   useEffect(() => {
-    if (!dossierId) return;
-    getById(Number(dossierId))
-      .then((res) => {
-        if (res?.data) setDossier(res.data);
+    if (!dossierId || !plotId) return;
+    Promise.all([
+      getById(Number(dossierId)),
+      getPlotById(Number(plotId)),
+    ])
+      .then(([dossierRes, plotRes]) => {
+        if (dossierRes?.data) setDossier(dossierRes.data);
         else setError(t('dossier.not_found', 'investments') || 'Dossier not found');
+        if (plotRes?.data) setPlotStatus(plotRes.data.status);
       })
       .catch(() => setError(t('dossier.load_error', 'investments') || 'Failed to load dossier'))
       .finally(() => setLoading(false));
-  }, [dossierId]);
-
-  const handleOpenHistory = useCallback(async () => {
-    setHistoryOpen(true);
-    setHistoryLoading(true);
-    setHistoryError(null);
-    try {
-      const res = await getHistory();
-      if (res?.data) setHistories(res.data);
-      else setHistories([]);
-    } catch {
-      setHistories([]);
-      setHistoryError(t('dossier.load_error', 'investments') || 'Failed to load status history');
-    } finally {
-      setHistoryLoading(false);
-    }
-  }, [getHistory, t]);
+  }, [dossierId, plotId]);
 
   const handleBack = () => navigate(`/investments/plots/${plotId}/edit`);
 
-  if (loading) return <div className="p-6"><LoadingState /></div>;
+  if (loading) return <div className="p-6"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>;
   if (error) return <div className="p-6"><ErrorState message={error} onRetry={() => handleBack()} /></div>;
   if (!dossier) return null;
 
@@ -82,16 +71,22 @@ export function ShowDossierPage() {
             {t('dossier.view_details', 'investments') || 'View Dossier Details'}
           </h1>
         </div>
-        <Button variant="outline" size="sm" onClick={handleOpenHistory} requiredPermission="investments.plot-dossier-status-histories.list">
+        <Button variant="outline" size="sm" onClick={() => setHistoryOpen(true)} requiredPermission="investments.plot-dossier-status-histories.list">
           <History size={16} className="mr-1 rtl:ml-1 rtl:mr-0" />
           {t('dossier.status_history', 'investments') || 'Status History'}
         </Button>
       </div>
 
       <SectionCard
-        title={t('dossier.view_details', 'investments') || 'Dossier Details'}
-        icon={<FileText size={20} />}
+      // title={t('dossier.view_details', 'investments') || 'Dossier Details'}
+      // icon={<FileText size={20} />}
       >
+        <div className='relative w-full flex justify-between items-center mb-6 pb-4'>
+          <h2 className="text-lg font-bold text-text flex items-center gap-2 border-b border-border/50">
+            <span className="text-primary"><FileText size={20} /></span>
+            {t('dossier.view_details', 'investments') || 'Dossier Details'}
+          </h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InfoRow
             label={t('dossier.number', 'investments') || 'Dossier Number'}
@@ -128,21 +123,25 @@ export function ShowDossierPage() {
         </div>
       </SectionCard>
 
-      {dossierId &&plotId &&
+      {dossierId && plotId &&
         <PartnersSection plotId={plotId} dossierId={dossierId} />
       }
       {dossierId && plotId &&
         <FacilitiesSection plotId={plotId} dossierId={dossierId} />
       }
+      {dossierId && plotId && canShowContracts &&
+        <ContractsSection plotId={plotId} dossierId={dossierId} />
+      }
 
-      <DossierStatusHistoryModal
-        isOpen={historyOpen}
-        onClose={() => setHistoryOpen(false)}
-        histories={histories}
-        loading={historyLoading}
-        error={historyError}
-        onRetry={handleOpenHistory}
-      />
+      {plotId && dossierId && (
+        <DossierStatusHistoryModal
+          isOpen={historyOpen}
+          onClose={() => setHistoryOpen(false)}
+          plotId={plotId}
+          dossierId={dossierId}
+        />
+      )}
+
     </div>
   );
 }

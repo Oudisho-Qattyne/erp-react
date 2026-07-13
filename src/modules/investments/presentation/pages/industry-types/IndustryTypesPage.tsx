@@ -12,7 +12,8 @@ import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/Re
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { toast } from 'sonner';
-import { Pencil, Trash2, Star, Check, X } from 'lucide-react';
+import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
+import { Pencil, Trash2, Star, Check, X, History } from 'lucide-react';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 
 export function IndustryTypesPage() {
@@ -24,6 +25,7 @@ export function IndustryTypesPage() {
   const [editItem, setEditItem] = useState<IndustryType | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<IndustryType | null>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<IndustryType | null>(null);
+  const [auditItem, setAuditItem] = useState<IndustryType | null>(null);
 
   const filtered = items.filter((c: any) => c.name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -95,10 +97,21 @@ export function IndustryTypesPage() {
             title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.industry-types.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
+          <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)}
+            title={t('industry_types.edit_log', 'investments') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
+            <History size={16} />
+          </Button>
         </div>
       )
     },
   ];
+
+  const handleTranslateValues = (field: string, value: string) => {
+    if (field === 'is_active' || field === 'is_default') {
+      return value === 'true' ? (t('common.yes', 'shared') || 'Yes') : value === 'false' ? (t('common.no', 'shared') || 'No') : value;
+    }
+    return value;
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -160,6 +173,28 @@ export function IndustryTypesPage() {
         <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
           emptyMessage={t('industry_types.no_records', 'investments')} />
       )}
+
+      <AuditLog
+        isOpen={!!auditItem}
+        onClose={() => setAuditItem(null)}
+        model="industry_type"
+        modelId={auditItem?.id}
+        module="investments"
+        labels={{
+          title: t('industry_types.edit_log', 'investments') || 'Edit Log',
+          event: t('industry_types.event', 'investments') || 'Event',
+          created_at: t('industry_types.created_at', 'investments') || 'Created At',
+          changed_by: t('industry_types.changed_by', 'investments') || 'Changed By',
+          changes: t('industry_types.changes', 'investments') || 'Changes',
+          field: t('industry_types.field', 'investments') || 'Field',
+          old_value: t('industry_types.old_value', 'investments') || 'Old Value',
+          new_value: t('industry_types.new_value', 'investments') || 'New Value',
+          no_records: t('industry_types.no_edit_log', 'investments') || 'No edit logs found',
+          subject_id: t('industry_types.subject_id', 'investments') || 'Industry Type ID',
+        }}
+        translateField={(key) => t(`industry_types.${key}`, 'investments') || key}
+        translateValues={handleTranslateValues}
+      />
 
       <ConfirmDialog
         isOpen={!!confirmDelete}

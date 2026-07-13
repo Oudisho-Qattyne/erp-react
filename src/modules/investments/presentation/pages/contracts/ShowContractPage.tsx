@@ -1,0 +1,122 @@
+import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
+import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
+import type { Contract } from '../../../domain/entities/contract';
+import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
+import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
+import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
+import { SectionCard } from '../../../../../core/presentation/layouts/ui/card/SectionCard';
+import { InfoRow } from '../../../../../core/presentation/layouts/ui/card/InfoRow';
+import { ArrowLeft, FileSignature } from 'lucide-react';
+
+export function ShowContractPage() {
+  const { t } = useLanguage();
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
+  const { getById } = useEntityCrud<Contract>(
+    '/investments/contracts',
+    '/investments/contracts'
+  );
+
+  const [contract, setContract] = useState<Contract | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+    getById(Number(id))
+      .then((res) => {
+        if (res?.data) setContract(res.data);
+        else setError(t('contract.not_found', 'investments') || 'Contract not found');
+      })
+      .catch(() => setError(t('contract.load_error', 'investments') || 'Failed to load contract'))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  if (loading) return <div className="p-6"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>;
+  if (error) return <div className="p-6"><ErrorState message={error} onRetry={() => navigate(-1)} /></div>;
+  if (!contract) return null;
+
+  return (
+    <div className="p-6 w-full mx-auto space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" onClick={() => navigate(-1)}>
+            <ArrowLeft size={16} /> {t('common.back', 'shared') || 'Back'}
+          </Button>
+          <h1 className="text-2xl font-bold">
+            {t('contract.title', 'investments') || 'Contract'} — {contract.contract_number}
+          </h1>
+        </div>
+      </div>
+
+      <SectionCard>
+        <div className="relative w-full flex justify-between items-center mb-6 pb-4">
+          <h2 className="text-lg font-bold text-text flex items-center gap-2 border-b border-border/50">
+            <span className="text-primary"><FileSignature size={20} /></span>
+            {t('contract.title', 'investments') || 'Contracts'}
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <InfoRow
+            label={t('contract.contract_number', 'investments') || 'Contract Number'}
+            value={contract.contract_number}
+          />
+          <InfoRow
+            label={t('contract.contract_date', 'investments') || 'Contract Date'}
+            value={contract.contract_date}
+          />
+          <InfoRow
+            label={t('contract.unit_price_per_square_meter', 'investments') || 'Unit Price / m²'}
+            value={contract.unit_price_per_square_meter}
+          />
+          <InfoRow
+            label={t('contract.weighting_factor', 'investments') || 'Weighting Factor'}
+            value={contract.weighting_factor}
+          />
+          <InfoRow
+            label={t('contract.final_price_per_square_meter', 'investments') || 'Final Price / m²'}
+            value={contract.final_price_per_square_meter}
+          />
+          <InfoRow
+            label={t('contract.total_price', 'investments') || 'Total Price'}
+            value={contract.total_price}
+          />
+          <InfoRow
+            label={t('contract.payment_method', 'investments') || 'Payment Method'}
+            value={t(`contract.payment_method_${contract.payment_method}`, 'investments') || contract.payment_method}
+          />
+        </div>
+      </SectionCard>
+
+      {contract.dossier && (
+        <SectionCard>
+          <div className="relative w-full flex justify-between items-center mb-6 pb-4">
+            <h2 className="text-lg font-bold text-text flex items-center gap-2 border-b border-border/50">
+              <span className="text-primary"><FileSignature size={20} /></span>
+              {t('dossier.title', 'investments') || 'Dossier'}
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <InfoRow
+              label={t('dossier.number', 'investments') || 'Dossier Number'}
+              value={contract.dossier.dossier_number}
+            />
+            <InfoRow
+              label={t('dossier.status', 'investments') || 'Status'}
+              value={t(`dossier.status_${contract.dossier.status}`, 'investments') || contract.dossier.status}
+            />
+            {contract.dossier.notes && (
+              <InfoRow
+                label={t('plots.notes', 'investments') || 'Notes'}
+                value={contract.dossier.notes}
+              />
+            )}
+          </div>
+        </SectionCard>
+      )}
+    </div>
+  );
+}

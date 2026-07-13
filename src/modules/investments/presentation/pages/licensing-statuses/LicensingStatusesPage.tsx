@@ -12,18 +12,20 @@ import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/Re
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { toast } from 'sonner';
-import { Pencil, Trash2, Star, Check, X } from 'lucide-react';
+import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
+import { Pencil, Trash2, Star, Check, X, History } from 'lucide-react';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 
 export function LicensingStatusesPage() {
   const { t } = useLanguage();
-  const { entities: items, getAll, create, update, remove, loadingMap, errorMap } = useEntityCrud<LicensingStatus>('/investments/licensing-statuses', '/investments/licensing-statuses');
-  const entityName = t('licensing_statuses.title', 'investments') || 'Licensing Status';
+  const { entities: items, getAll, create, update, remove, loadingMap, errorMap } = useEntityCrud<LicensingStatus>('/investments/license-statuses', '/investments/license-statuses');
+  const entityName = t('licensing_statuses.title', 'investments') || 'License Status';
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<LicensingStatus | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<LicensingStatus | null>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<LicensingStatus | null>(null);
+  const [auditItem, setAuditItem] = useState<LicensingStatus | null>(null);
 
   const filtered = items.filter((c: any) => c.name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -38,6 +40,13 @@ export function LicensingStatusesPage() {
       toast.error(t('licensing_statuses.delete_error', 'investments').replace('{name}', entityName));
     }
     setConfirmDelete(null);
+  };
+
+  const handleTranslateValues = (field: string, value: string) => {
+    if (field === 'is_active' || field === 'is_default') {
+      return value === 'true' ? (t('common.yes', 'shared') || 'Yes') : value === 'false' ? (t('common.no', 'shared') || 'No') : value;
+    }
+    return value;
   };
 
   const handleSetDefaultConfirm = async () => {
@@ -83,17 +92,21 @@ export function LicensingStatusesPage() {
         <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
           {!row.is_default && (
             <Button variant="ghost" size="sm" onClick={() => setConfirmSetDefault(row)}
-              title={t('common.set_default', 'shared') || 'Set as default'} requiredPermission="investments.licensing-statuses.update">
+              title={t('common.set_default', 'shared') || 'Set as default'} requiredPermission="investments.license-statuses.update">
               <Star size={16} />
             </Button>
           )}
           <Button variant="ghost" size="sm" onClick={() => setEditItem(row)}
-            title={t('common.edit', 'shared') || 'Edit'} requiredPermission="investments.licensing-statuses.update">
+            title={t('common.edit', 'shared') || 'Edit'} requiredPermission="investments.license-statuses.update">
             <Pencil size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)}
-            title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.licensing-statuses.delete">
+            title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.license-statuses.delete">
             <Trash2 size={16} className="text-danger" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)}
+            title={t('licensing_statuses.edit_log', 'investments') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
+            <History size={16} />
           </Button>
         </div>
       )
@@ -108,7 +121,7 @@ export function LicensingStatusesPage() {
           <Input type="text" value={searchQuery} onChange={setSearchQuery}
             placeholder={t('common.search', 'shared') || 'Search...'}
             baseClasses={inputBaseClasses} className="w-60" />
-            <Button onClick={() => setIsCreateOpen(true)} requiredPermission="investments.licensing-statuses.create">{t('licensing_statuses.add', 'investments')}</Button>
+            <Button onClick={() => setIsCreateOpen(true)} requiredPermission="investments.license-statuses.create">{t('licensing_statuses.add', 'investments')}</Button>
         </div>
       </div>
 
@@ -160,6 +173,28 @@ export function LicensingStatusesPage() {
         <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
           emptyMessage={t('licensing_statuses.no_records', 'investments')} />
       )}
+
+      <AuditLog
+        isOpen={!!auditItem}
+        onClose={() => setAuditItem(null)}
+        model="license_status"
+        modelId={auditItem?.id}
+        module="investments"
+        labels={{
+          title: t('licensing_statuses.edit_log', 'investments') || 'Edit Log',
+          event: t('licensing_statuses.event', 'investments') || 'Event',
+          created_at: t('licensing_statuses.created_at', 'investments') || 'Created At',
+          changed_by: t('licensing_statuses.changed_by', 'investments') || 'Changed By',
+          changes: t('licensing_statuses.changes', 'investments') || 'Changes',
+          field: t('licensing_statuses.field', 'investments') || 'Field',
+          old_value: t('licensing_statuses.old_value', 'investments') || 'Old Value',
+          new_value: t('licensing_statuses.new_value', 'investments') || 'New Value',
+          no_records: t('licensing_statuses.no_edit_log', 'investments') || 'No edit logs found',
+          subject_id: t('licensing_statuses.subject_id', 'investments') || 'License Status ID',
+        }}
+        translateField={(key) => t(`licensing_statuses.${key}`, 'investments') || key}
+        translateValues={handleTranslateValues}
+      />
 
       <ConfirmDialog
         isOpen={!!confirmDelete}

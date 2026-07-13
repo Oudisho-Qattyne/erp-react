@@ -152,7 +152,7 @@ export function EditInvestorPage() {
     }
   };
 
-  if (loading) return <LoadingState />;
+  if (loading) return <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />;
   if (error || !investor) return <ErrorState message={error || 'Investor not found'} onRetry={() => fetchInvestor()} />;
 
   return (

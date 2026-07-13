@@ -42,7 +42,7 @@ export function EditPlotPage() {
     }
   };
 
-  if (loading) return <div className="p-6"><LoadingState /></div>;
+  if (loading) return <div className="p-6"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>;
   if (!plot) return <div className="p-6 text-center text-danger">Plot not found</div>;
 
   return (

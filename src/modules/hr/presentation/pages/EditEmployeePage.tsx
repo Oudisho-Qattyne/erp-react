@@ -106,18 +106,15 @@ export function EditEmployeePage() {
       fetchEmployee();
     }
   }, [id, apiClient]);
-  console.log(defaultValues);
 
   const handleSubmit = async (data: EmployeeFormValues) => {
     try {
       setSaving(true);
       setError(null);
       const res = await apiClient.put(`/hr/employees/${id}`, data);
-      console.log("before navigation " , res);
       
       navigate('/hr/employees')
     } catch (err: any) {
-      console.log(err);
       
       setError(err.message || t('edit_employee.update_error', 'hr') || 'فشل في تحديث بيانات الموظف');
       throw err
@@ -126,7 +123,7 @@ export function EditEmployeePage() {
     }
   };
 
-  if (loading) return <LoadingState />;
+  if (loading) return <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />;
 
   if (error && !defaultValues) {
     return (

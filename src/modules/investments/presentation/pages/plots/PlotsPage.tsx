@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { Eye, Trash2, MapPin, History, Filter, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { EntityWithNameOnly } from '../../../../../core/domain/entities/EntityWithNameOnly';
+import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { PlotAuditLogModal } from './components/PlotAuditLogModal';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 
@@ -27,7 +28,8 @@ export function PlotsPage() {
   const [localSearch, setLocalSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<Plot | null>(null);
-  const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+  // const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+  const [auditItem, setAuditItem] = useState<Plot | null>(null);
 
   // Table State
   const [sortColumn, setSortColumn] = useState<string | undefined>(undefined);
@@ -203,6 +205,10 @@ export function PlotsPage() {
             title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.plots.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
+          <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)}
+            title={t('plots.edit_log', 'investments') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
+            <History size={16} />
+          </Button>
         </div>
       )
     },
@@ -215,6 +221,15 @@ export function PlotsPage() {
     onPageChange: (newPage: number) => setPage(newPage),
   };
 
+  const handleTranslateValues = (field: string, value: string) => {
+    if (field === 'status') {
+      const statusKey = `plot_status.${value}`;
+      const translated = t(statusKey, 'investments');
+      if (translated && translated !== statusKey) return translated;
+    }
+    return value;
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -222,10 +237,10 @@ export function PlotsPage() {
           <h1 className="text-2xl font-bold text-text">{t('plots.title', 'investments') || 'Plots'}</h1>
         </div>
         <div className="flex items-center gap-3">
-          <Button onClick={() => setIsAuditModalOpen(true)} variant="outline" className="flex items-center gap-2" requiredPermission="shared.audit-logs.view">
+          {/* <Button onClick={() => setIsAuditModalOpen(true)} variant="outline" className="flex items-center gap-2" requiredPermission="shared.audit-logs.view">
             <History size={16} />
             {t('plots.edit_log', 'investments') || 'سجل التعديلات'}
-          </Button>
+          </Button> */}
           <Button onClick={() => navigate('/investments/plots/create')} requiredPermission="investments.plots.create">{t('plots.add', 'investments') || 'Add Plot'}</Button>
         </div>
       </div>
@@ -269,6 +284,28 @@ export function PlotsPage() {
         />
       )}
 
+      <AuditLog
+        isOpen={!!auditItem}
+        onClose={() => setAuditItem(null)}
+        model="plot"
+        modelId={auditItem?.id}
+        module="investments"
+        labels={{
+          title: t('plots.edit_log', 'investments') || 'Edit Log',
+          event: t('plots.event', 'investments') || 'Event',
+          created_at: t('plots.created_at', 'investments') || 'Created At',
+          changed_by: t('plots.changed_by', 'investments') || 'Changed By',
+          changes: t('plots.changes', 'investments') || 'Changes',
+          field: t('plots.field', 'investments') || 'Field',
+          old_value: t('plots.old_value', 'investments') || 'Old Value',
+          new_value: t('plots.new_value', 'investments') || 'New Value',
+          no_records: t('plots.no_edit_log', 'investments') || 'No edit logs found',
+          subject_id: t('plots.plot_id', 'investments') || 'Plot ID',
+        }}
+        translateField={(key) => t(`plots.${key}`, 'investments') || key}
+        translateValues={handleTranslateValues}
+      />
+
       <ConfirmDialog
         isOpen={!!confirmDelete}
         title={t('common.delete', 'shared') || 'Delete'}
@@ -276,12 +313,14 @@ export function PlotsPage() {
         onConfirm={handleDeleteConfirm}
         onCancel={() => setConfirmDelete(null)}
         confirmLoading={loadingMap['remove']}
+        confirmLabel={t('common.delete', 'shared') || 'Delete'}
+        cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
       />
 
-      <PlotAuditLogModal
+      {/* <PlotAuditLogModal
         isOpen={isAuditModalOpen}
         onClose={() => setIsAuditModalOpen(false)}
-      />
+      /> */}
     </div>
   );
 }

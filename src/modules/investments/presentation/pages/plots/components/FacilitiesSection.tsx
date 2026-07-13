@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../../core/presentation/hooks/data/useEntity';
 import type { Facility } from '../../../../domain/entities/facility';
@@ -9,9 +10,9 @@ import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Di
 import { ConfirmDialog } from '../../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { GenericCreateForm, type FieldConfig } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
-import { InfoRow } from '../../../../../../core/presentation/layouts/ui/card/InfoRow';
 import { getCreateFacilityFormSchema } from '../../../schemas/facilityForm.schema';
-import { Factory, Plus, Eye, Pencil, Trash2 } from 'lucide-react';
+import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
+import { Factory, Plus, Eye, Pencil, Trash2, History } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface FacilitiesSectionProps {
@@ -21,24 +22,27 @@ interface FacilitiesSectionProps {
 
 export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps) {
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   const baseUrl = `/investments/facilities`;
   const { entities: facilities, getAll: getFacilities, create: createFacility, update: updateFacility, remove: deleteFacility, loadingMap: facLoading, errorMap: facError } = useEntityCrud<Facility>(baseUrl, baseUrl);
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingFacility, setEditingFacility] = useState<Facility | null>(null);
-  const [viewingFacility, setViewingFacility] = useState<Facility | null>(null);
   const [deletingFacility, setDeletingFacility] = useState<Facility | null>(null);
+  const [auditItem, setAuditItem] = useState<Facility | null>(null);
+
+  const listUrl = `/investments/facilities?plot_id=${plotId}&plot_dossier_id=${dossierId}`;
 
   useEffect(() => {
-    if (dossierId) getFacilities();
-  }, [dossierId]);
+    if (dossierId && plotId) getFacilities(listUrl);
+  }, [dossierId, plotId]);
 
   const handleCreate = async (data: any) => {
     try {
-      const res = await createFacility(data);
+      const res = await createFacility({ ...data, plot_id: Number(plotId), plot_dossier_id: Number(dossierId) });
       toast.success(t('facilities.created', 'investments') || 'Facility created successfully');
-      getFacilities();
+      getFacilities(listUrl);
       setIsCreateOpen(false);
       return res;
     } catch {
@@ -52,7 +56,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
     try {
       const res = await updateFacility(editingFacility.id, data);
       toast.success(t('facilities.updated', 'investments') || 'Facility updated successfully');
-      getFacilities();
+      getFacilities(listUrl);
       setEditingFacility(null);
       return res;
     } catch {
@@ -66,7 +70,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
     try {
       await deleteFacility(deletingFacility.id);
       toast.success(t('facilities.deleted', 'investments') || 'Facility deleted successfully');
-      getFacilities();
+      getFacilities(listUrl);
     } catch {
       toast.error(t('facilities.delete_error', 'investments') || 'Failed to delete facility');
     }
@@ -77,46 +81,56 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
     { name: 'name', type: 'text', label: t('facilities.name', 'investments') || 'Name', required: true },
     { name: 'address', type: 'text', label: t('facilities.address', 'investments') || 'Address', required: true },
     { name: 'city', type: 'text', label: t('facilities.city', 'investments') || 'City', required: true },
-    { name: 'phone1', type: 'text', label: t('facilities.phone1', 'investments') || 'Phone', required: true },
-    { name: 'phone2', type: 'text', label: t('facilities.phone2', 'investments') || 'Phone 2' },
+    { name: 'first_phone_number', type: 'text', label: t('facilities.first_phone_number', 'investments') || 'Phone', required: true },
+    { name: 'second_phone_number', type: 'text', label: t('facilities.second_phone_number', 'investments') || 'Phone 2' },
     { name: 'email', type: 'email', label: t('facilities.email', 'investments') || 'Email' },
-    { name: 'capitalSYP', type: 'number', label: t('facilities.capitalSYP', 'investments') || 'Capital (SYP)' },
-    { name: 'capitalUSD', type: 'number', label: t('facilities.capitalUSD', 'investments') || 'Capital (USD)' },
-    { name: 'machineryValueSYP', type: 'number', label: t('facilities.machineryValueSYP', 'investments') || 'Machinery Value (SYP)' },
-    { name: 'machineryValueUSD', type: 'number', label: t('facilities.machineryValueUSD', 'investments') || 'Machinery Value (USD)' },
-    { name: 'employeeCount', type: 'number', label: t('facilities.employeeCount', 'investments') || 'Employees' },
-    { name: 'dailyProductionCapacity', type: 'number', label: t('facilities.dailyProductionCapacity', 'investments') || 'Daily Capacity' },
-    { name: 'monthlyProductionCapacity', type: 'number', label: t('facilities.monthlyProductionCapacity', 'investments') || 'Monthly Capacity' },
-    { name: 'annualProductionCapacity', type: 'number', label: t('facilities.annualProductionCapacity', 'investments') || 'Annual Capacity' },
-    { name: 'powerCapacity', type: 'text', label: t('facilities.powerCapacity', 'investments') || 'Power Capacity' },
-    { name: 'waterConsumption', type: 'text', label: t('facilities.waterConsumption', 'investments') || 'Water Consumption' },
+    { name: 'capital_in_syp', type: 'number', label: t('facilities.capital_in_syp', 'investments') || 'Capital (SYP)', required: true },
+    { name: 'capital_in_usd', type: 'number', label: t('facilities.capital_in_usd', 'investments') || 'Capital (USD)', required: true },
+    { name: 'value_of_machines_in_syp', type: 'number', label: t('facilities.value_of_machines_in_syp', 'investments') || 'Machinery Value (SYP)', required: true },
+    { name: 'value_of_machines_in_usd', type: 'number', label: t('facilities.value_of_machines_in_usd', 'investments') || 'Machinery Value (USD)', required: true },
+    { name: 'number_of_workers', type: 'number', label: t('facilities.number_of_workers', 'investments') || 'Workers', required: true },
+    { name: 'daily_production_capacity', type: 'number', label: t('facilities.daily_production_capacity', 'investments') || 'Daily Capacity', required: true },
+    { name: 'monthly_production_capacity', type: 'number', label: t('facilities.monthly_production_capacity', 'investments') || 'Monthly Capacity', required: true },
+    { name: 'yearly_production_capacity', type: 'number', label: t('facilities.yearly_production_capacity', 'investments') || 'Annual Capacity', required: true },
+    { name: 'electrical_power_capacity', type: 'text', label: t('facilities.electrical_power_capacity', 'investments') || 'Power Capacity', required: true },
+    { name: 'yearly_estimated_water_consumption', type: 'number', label: t('facilities.yearly_estimated_water_consumption', 'investments') || 'Water Consumption', required: true },
   ];
 
   const columns = [
     { key: "name", label: t("facilities.name", "investments") || "Name", width: 180 },
     { key: "city", label: t("facilities.city", "investments") || "City", width: 120 },
-    { key: "phone1", label: t("facilities.phone1", "investments") || "Phone", width: 130 },
+    { key: "first_phone_number", label: t("facilities.first_phone_number", "investments") || "Phone", width: 130 },
     { key: "email", label: t("facilities.email", "investments") || "Email", width: 180 },
-    { key: "employeeCount", label: t("facilities.employeeCount", "investments") || "Employees", width: 100 },
+    { key: "number_of_workers", label: t("facilities.number_of_workers", "investments") || "Workers", width: 100 },
     {
       key: "actions",
       label: t("common.actions", "shared") || "Actions",
       width: 130,
       render: (row: Facility) => (
         <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
-          <Button variant="ghost" size="sm" onClick={() => setViewingFacility(row)} title={t('common.view', 'shared') || 'View'}>
+          <Button variant="ghost" size="sm" onClick={() => navigate(`/investments/plots/${plotId}/dossiers/${dossierId}/facilities/${row.id}`)} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.facilities.view">
             <Eye size={16} />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => setEditingFacility(row)} title={t('common.edit', 'shared') || 'Edit'}>
+          <Button variant="ghost" size="sm" onClick={() => setEditingFacility(row)} title={t('common.edit', 'shared') || 'Edit'} requiredPermission="investments.facilities.update">
             <Pencil size={16} />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => setDeletingFacility(row)} title={t('common.delete', 'shared') || 'Delete'}>
+          <Button variant="ghost" size="sm" onClick={() => setDeletingFacility(row)} title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.facilities.delete">
             <Trash2 size={16} className="text-danger" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)} title={t('facilities.edit_log', 'investments') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
+            <History size={16} />
           </Button>
         </div>
       )
     },
   ];
+
+  const handleTranslateValues = (field: string, value: string) => {
+    if (field === 'is_active') {
+      return value === 'true' ? (t('common.yes', 'shared') || 'Yes') : value === 'false' ? (t('common.no', 'shared') || 'No') : value;
+    }
+    return value;
+  };
 
   return (
     <>
@@ -126,12 +140,12 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
       >
         <div className="flex items-center justify-between mb-4">
           <div />
-          <Button variant="outline" size="sm" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={16} />}>
+          <Button variant="outline" size="sm" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="investments.facilities.create">
             {t('facilities.add', 'investments') || 'Add Facility'}
           </Button>
         </div>
         {facError["getAll"] ? (
-          <ErrorState message={facError["getAll"]} onRetry={getFacilities} />
+          <ErrorState message={facError["getAll"]} onRetry={() => getFacilities(listUrl)} />
         ) : (
           <DataTable
             columns={columns}
@@ -163,19 +177,19 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
               name: editingFacility.name,
               address: editingFacility.address,
               city: editingFacility.city,
-              phone1: editingFacility.phone1,
-              phone2: editingFacility.phone2,
+              first_phone_number: editingFacility.first_phone_number,
+              second_phone_number: editingFacility.second_phone_number ?? null,
               email: editingFacility.email || '',
-              capitalSYP: editingFacility.capitalSYP,
-              capitalUSD: editingFacility.capitalUSD,
-              machineryValueSYP: editingFacility.machineryValueSYP,
-              machineryValueUSD: editingFacility.machineryValueUSD,
-              employeeCount: editingFacility.employeeCount,
-              dailyProductionCapacity: editingFacility.dailyProductionCapacity,
-              monthlyProductionCapacity: editingFacility.monthlyProductionCapacity,
-              annualProductionCapacity: editingFacility.annualProductionCapacity,
-              powerCapacity: editingFacility.powerCapacity,
-              waterConsumption: editingFacility.waterConsumption,
+              capital_in_syp: editingFacility.capital_in_syp,
+              capital_in_usd: editingFacility.capital_in_usd,
+              value_of_machines_in_syp: editingFacility.value_of_machines_in_syp,
+              value_of_machines_in_usd: editingFacility.value_of_machines_in_usd,
+              number_of_workers: editingFacility.number_of_workers,
+              daily_production_capacity: editingFacility.daily_production_capacity,
+              monthly_production_capacity: editingFacility.monthly_production_capacity,
+              yearly_production_capacity: editingFacility.yearly_production_capacity,
+              electrical_power_capacity: String(editingFacility.electrical_power_capacity ?? ''),
+              yearly_estimated_water_consumption: editingFacility.yearly_estimated_water_consumption,
             }}
             onSubmit={handleUpdate}
             onSuccess={() => setEditingFacility(null)}
@@ -185,28 +199,27 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
         )}
       </Dialog>
 
-      <Dialog isOpen={!!viewingFacility} onClose={() => setViewingFacility(null)} title={t('facilities.view', 'investments') || 'View Facility'} size="lg">
-        {viewingFacility && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <InfoRow label={t('facilities.name', 'investments') || 'Name'} value={viewingFacility.name} />
-            <InfoRow label={t('facilities.city', 'investments') || 'City'} value={viewingFacility.city} />
-            <InfoRow label={t('facilities.address', 'investments') || 'Address'} value={viewingFacility.address} />
-            <InfoRow label={t('facilities.phone1', 'investments') || 'Phone'} value={viewingFacility.phone1} />
-            <InfoRow label={t('facilities.phone2', 'investments') || 'Phone 2'} value={viewingFacility.phone2 || '—'} />
-            <InfoRow label={t('facilities.email', 'investments') || 'Email'} value={viewingFacility.email || '—'} />
-            <InfoRow label={t('facilities.employeeCount', 'investments') || 'Employees'} value={viewingFacility.employeeCount ?? '—'} />
-            <InfoRow label={t('facilities.capitalSYP', 'investments') || 'Capital (SYP)'} value={viewingFacility.capitalSYP ?? '—'} />
-            <InfoRow label={t('facilities.capitalUSD', 'investments') || 'Capital (USD)'} value={viewingFacility.capitalUSD ?? '—'} />
-            <InfoRow label={t('facilities.machineryValueSYP', 'investments') || 'Machinery Value (SYP)'} value={viewingFacility.machineryValueSYP ?? '—'} />
-            <InfoRow label={t('facilities.machineryValueUSD', 'investments') || 'Machinery Value (USD)'} value={viewingFacility.machineryValueUSD ?? '—'} />
-            <InfoRow label={t('facilities.dailyProductionCapacity', 'investments') || 'Daily Capacity'} value={viewingFacility.dailyProductionCapacity ?? '—'} />
-            <InfoRow label={t('facilities.monthlyProductionCapacity', 'investments') || 'Monthly Capacity'} value={viewingFacility.monthlyProductionCapacity ?? '—'} />
-            <InfoRow label={t('facilities.annualProductionCapacity', 'investments') || 'Annual Capacity'} value={viewingFacility.annualProductionCapacity ?? '—'} />
-            <InfoRow label={t('facilities.powerCapacity', 'investments') || 'Power Capacity'} value={viewingFacility.powerCapacity || '—'} />
-            <InfoRow label={t('facilities.waterConsumption', 'investments') || 'Water Consumption'} value={viewingFacility.waterConsumption ?? '—'} />
-          </div>
-        )}
-      </Dialog>
+      <AuditLog
+        isOpen={!!auditItem}
+        onClose={() => setAuditItem(null)}
+        model="facility"
+        modelId={auditItem?.id}
+        module="investments"
+        labels={{
+          title: t('facilities.edit_log', 'investments') || 'Edit Log',
+          event: t('facilities.event', 'investments') || 'Event',
+          created_at: t('facilities.created_at', 'investments') || 'Created At',
+          changed_by: t('facilities.changed_by', 'investments') || 'Changed By',
+          changes: t('facilities.changes', 'investments') || 'Changes',
+          field: t('facilities.field', 'investments') || 'Field',
+          old_value: t('facilities.old_value', 'investments') || 'Old Value',
+          new_value: t('facilities.new_value', 'investments') || 'New Value',
+          no_records: t('facilities.no_edit_log', 'investments') || 'No edit logs found',
+          subject_id: t('facilities.subject_id', 'investments') || 'Facility ID',
+        }}
+        translateField={(key) => t(`facilities.${key}`, 'investments') || key}
+        translateValues={handleTranslateValues}
+      />
 
       <ConfirmDialog
         isOpen={!!deletingFacility}
@@ -215,6 +228,8 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
         onConfirm={handleDelete}
         onCancel={() => setDeletingFacility(null)}
         confirmLoading={facLoading["remove"]}
+        confirmLabel={t('common.delete', 'shared') || 'Delete'}
+        cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
       />
     </>
   );

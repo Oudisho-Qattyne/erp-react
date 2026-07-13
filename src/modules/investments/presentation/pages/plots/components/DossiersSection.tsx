@@ -36,7 +36,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
   const [editDossier, setEditDossier] = useState<Dossier | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Dossier | null>(null);
 
-  const [confirmAllocateNewDossier, setConfirmAllocatedNewDossier] = useState<boolean>(false)
+  const [confirmAllocateNewDossier, setConfirmAllocatedNewDossier] = useState<DossierFormData | null>(null)
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
 
@@ -67,22 +67,28 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
     },
   });
 
-
-  const handleAdd = async (data: DossierFormData) => {
-    const allocatedDossier = dossiers.find(d => d.status == "active")
-    if ((plotStatus == "allocated" || data.status == "active") && allocatedDossier) {
-      setConfirmAllocatedNewDossier(true)
-      return
-    }
+  const addDossier = async (data : DossierFormData) => {
     try {
       await create(data as any);
       toast.success(t('dossier.created', 'investments') || 'Dossier created successfully');
       setShowAdd(false);
       form.reset();
+      if(confirmAllocateNewDossier){
+        setConfirmAllocatedNewDossier(null)
+      }
       getAll(fetchUrl());
     } catch {
       toast.error(t('dossier.create_error', 'investments') || 'Failed to create dossier');
     }
+  }
+  const handleAdd = async (data: DossierFormData) => {
+    const allocatedDossier = dossiers.find(d => d.status == "active")
+    if ((plotStatus == "allocated" || data.status == "active") && allocatedDossier) {
+      setConfirmAllocatedNewDossier(data)
+      return
+    }
+    await addDossier(data)
+   
   };
 
   const handleEdit = async (data: DossierFormData) => {
@@ -208,7 +214,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
             requiredPermission="investments.plot-dossier.update">
             <Pencil size={16} />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => handleAllocate(row)}
+          <Button disabled={row.status == 'active'} variant="ghost" size="sm" onClick={() => handleAllocate(row)}
             title={t('dossier.allocate', 'investments') || 'Allocate'}
             requiredPermission="investments.plot-dossier.update">
             <CheckCircle size={16} className="text-success" />
@@ -223,14 +229,13 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
     }] : []),
   ], [t, canManage, handleAllocate]);
 
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">{t('dossier.title', 'investments') || 'Dossiers'}</h2>
         <div className="flex items-center gap-2">
           {canManage && (
-            <Button size="sm" onClick={() => { form.reset({ dossier_number: '', dossier_date: new Date().toISOString().split('T')[0], status: 'allocatable' }); setShowAdd(true); }}
+            <Button size="sm" onClick={() => { form.reset({ dossier_number: '', dossier_date: new Date().toISOString().split('T')[0], status: 'allocatable' }); form.setValue('status' , plotStatus == "allocated" ? "active" : "allocatable"); setShowAdd(true); }}
               requiredPermission="investments.plot-dossier.create">
               <Plus size={16} className="mr-1" />
               {t('dossier.add', 'investments') || 'Add Dossier'}
@@ -260,7 +265,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
         />
       )}
 
-      {loadingMap['getAll'] && dossiers.length === 0 && !errorMap['getAll'] && <LoadingState />}
+      {loadingMap['getAll'] && dossiers.length === 0 && !errorMap['getAll'] && <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />}
 
       <Dialog isOpen={showAdd || !!editDossier} onClose={closeFormDialog} title={isEditing ? (t('dossier.edit', 'investments') || 'Edit Dossier') : (t('dossier.add', 'investments') || 'Add Dossier')}>
         <FormProvider {...form}>
@@ -277,6 +282,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
             />
             <FormInput
               name="status"
+              disabled={plotStatus == "allocated"}
               label={t('dossier.status', 'investments') || 'Status'}
               type="select"
               options={isEditing ? [
@@ -317,15 +323,15 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       />
 
       <ConfirmDialog
-        isOpen={confirmAllocateNewDossier}
+        isOpen={!!confirmAllocateNewDossier}
         type="alert"
         title={t('dossier.allocate_new_title', 'investments') || 'Allocate New Dossier'}
         message={t('dossier.allocate_new_message', 'investments') || 'Are you sure you want to unallocate the previous allocated dossier?'}
         confirmLabel={t('dossier.allocate', 'investments') || 'Allocate'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        onConfirm={handleDelete}
-        onCancel={() => setConfirmAllocatedNewDossier(false)}
-        confirmLoading={loadingMap['remove']}
+        onConfirm={() => {if(confirmAllocateNewDossier) addDossier(confirmAllocateNewDossier)}}
+        onCancel={() => setConfirmAllocatedNewDossier(null)}
+        confirmLoading={loadingMap['create']}
       />
     </div>
   );

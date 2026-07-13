@@ -1,9 +1,9 @@
-import type { DomainResponse } from "../common/responce/DomainResponse";
+import type { DpomainResponsePaginated } from "../../../modules/hr/domain/entities/common/DomainResponsePaginated";
 
 export interface ManageEntityUsecase<T,TCreate , TUpdate, ID = number> {
-  getAll(): Promise<DomainResponse<T[]>>;
-  getById(id: ID): Promise<DomainResponse<T> | null>;
-  create(data: TCreate): Promise<DomainResponse<T>>;          // uses full T, as per repo interface
-  update(id: ID, data: TUpdate): Promise<DomainResponse<T>>;
+  getAll(params?: Record<string, string | boolean | number>): Promise<DpomainResponsePaginated<T[]>>;
+  getById(id: ID): Promise<DpomainResponsePaginated<T> | null>;
+  create(data: TCreate): Promise<DpomainResponsePaginated<T>>;
+  update(id: ID, data: TUpdate): Promise<DpomainResponsePaginated<T>>;
   delete(id: ID): Promise<void>;
 }

@@ -12,7 +12,8 @@ import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/Re
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { toast } from 'sonner';
-import { Pencil, Trash2, Star, Check, X } from 'lucide-react';
+import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
+import { Pencil, Trash2, Star, Check, X, History } from 'lucide-react';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 
 export function IndustrialDecisionTypesPage() {
@@ -24,6 +25,7 @@ export function IndustrialDecisionTypesPage() {
   const [editItem, setEditItem] = useState<IndustrialDecisionType | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<IndustrialDecisionType | null>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<IndustrialDecisionType | null>(null);
+  const [auditItem, setAuditItem] = useState<IndustrialDecisionType | null>(null);
 
   const filtered = items.filter((c: any) => c.name?.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -60,6 +62,14 @@ export function IndustrialDecisionTypesPage() {
       render: (row: IndustrialDecisionType) => getLocalizedName(row.name) 
     },
     {
+      key: 'is_active',
+      label: t('industrial_decision_types.is_active', 'investments') || 'Active',
+      width: 100,
+      render: (row: IndustrialDecisionType) => row.is_active
+        ? <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full"><Check size={12} className="inline" /> {t('common.yes', 'shared') || 'Yes'}</span>
+        : <span className="text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full"><X size={12} className="inline" /> {t('common.no', 'shared') || 'No'}</span>
+    },
+    {
       key: 'is_default',
       label: t('industrial_decision_types.is_default', 'investments') || 'Default',
       width: 120,
@@ -87,10 +97,21 @@ export function IndustrialDecisionTypesPage() {
             title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.industrial-decision-types.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
+          <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)}
+            title={t('industrial_decision_types.edit_log', 'investments') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
+            <History size={16} />
+          </Button>
         </div>
       )
     },
   ];
+
+  const handleTranslateValues = (field: string, value: string) => {
+    if (field === 'is_active' || field === 'is_default') {
+      return value === 'true' ? (t('common.yes', 'shared') || 'Yes') : value === 'false' ? (t('common.no', 'shared') || 'No') : value;
+    }
+    return value;
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -108,6 +129,7 @@ export function IndustrialDecisionTypesPage() {
         <GenericCreateForm
           fields={[
             { name: 'name', label: t('industrial_decision_types.name', 'investments'), required: true },
+            { name: 'is_active', type: 'checkbox', label: t('industrial_decision_types.is_active', 'investments') },
             { name: 'is_default', type: 'checkbox', label: t('industrial_decision_types.is_default', 'investments') }
           ]}
           schema={getCreateIndustrialDecisionTypeFormSchema(t)}
@@ -128,10 +150,11 @@ export function IndustrialDecisionTypesPage() {
         <GenericCreateForm
           fields={[
             { name: 'name', label: t('industrial_decision_types.name', 'investments'), required: true },
+            { name: 'is_active', type: 'checkbox', label: t('industrial_decision_types.is_active', 'investments') },
             { name: 'is_default', type: 'checkbox', label: t('industrial_decision_types.is_default', 'investments') }
           ]}
           schema={getCreateIndustrialDecisionTypeFormSchema(t)}
-          defaultValues={editItem ? { name: editItem.name, is_default: Boolean(editItem.is_default) } : undefined}
+          defaultValues={editItem ? { name: editItem.name, is_active: Boolean(editItem.is_active), is_default: Boolean(editItem.is_default) } : undefined}
           onSubmit={async (data) => {
             try {
               await update(editItem!.id, data);
@@ -150,6 +173,28 @@ export function IndustrialDecisionTypesPage() {
         <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
           emptyMessage={t('industrial_decision_types.no_records', 'investments')} />
       )}
+
+      <AuditLog
+        isOpen={!!auditItem}
+        onClose={() => setAuditItem(null)}
+        model="industrial_decision_type"
+        modelId={auditItem?.id}
+        module="investments"
+        labels={{
+          title: t('industrial_decision_types.edit_log', 'investments') || 'Edit Log',
+          event: t('industrial_decision_types.event', 'investments') || 'Event',
+          created_at: t('industrial_decision_types.created_at', 'investments') || 'Created At',
+          changed_by: t('industrial_decision_types.changed_by', 'investments') || 'Changed By',
+          changes: t('industrial_decision_types.changes', 'investments') || 'Changes',
+          field: t('industrial_decision_types.field', 'investments') || 'Field',
+          old_value: t('industrial_decision_types.old_value', 'investments') || 'Old Value',
+          new_value: t('industrial_decision_types.new_value', 'investments') || 'New Value',
+          no_records: t('industrial_decision_types.no_edit_log', 'investments') || 'No edit logs found',
+          subject_id: t('industrial_decision_types.subject_id', 'investments') || 'Decision Type ID',
+        }}
+        translateField={(key) => t(`industrial_decision_types.${key}`, 'investments') || key}
+        translateValues={handleTranslateValues}
+      />
 
       <ConfirmDialog
         isOpen={!!confirmDelete}

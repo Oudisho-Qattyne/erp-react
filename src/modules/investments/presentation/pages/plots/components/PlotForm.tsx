@@ -145,10 +145,10 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
       <div className="p-6 border-b border-border bg-primary/5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold">{t('plots.status', 'investments') || 'Status'}</h2>
-          {!isCreate && plot?.status_histories && plot.status_histories.length > 0 && (
-            <Button variant="outline" size="sm" onClick={() => setIsHistoryModalOpen(true)} className="flex items-center gap-2">
+          {!isCreate && plot?.id && (
+            <Button variant="outline" size="sm" onClick={() => setIsHistoryModalOpen(true)} className="flex items-center gap-2" requiredPermission="investments.plot-dossier-status-histories.list">
               <History size={16} />
-              {t('plots.view_history', 'investments') || 'سجل الحالات'}
+              {t('plots.view_history', 'investments') || 'Status History'}
             </Button>
           )}
         </div>
@@ -260,11 +260,11 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
         />
       )}
 
-      {plot && (
+      {plot && plot.id && (
         <PlotStatusHistoryModal
           isOpen={isHistoryModalOpen}
           onClose={() => setIsHistoryModalOpen(false)}
-          histories={plot.status_histories}
+          plotId={plot.id}
         />
       )}
 

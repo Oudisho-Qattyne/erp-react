@@ -11,7 +11,8 @@ import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialo
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { toast } from 'sonner';
 import { YesNo } from '../../../../../core/presentation/layouts/ui/card/YesNo';
-import { Eye, Trash2, Filter, Search } from 'lucide-react';
+import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
+import { Eye, Trash2, Filter, Search, History } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function InvestorsPage() {
@@ -22,6 +23,7 @@ export function InvestorsPage() {
   const [localSearch, setLocalSearch] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<Investor | null>(null);
+  const [auditItem, setAuditItem] = useState<Investor | null>(null);
 
   // Table State
   const [sortColumn, setSortColumn] = useState<string | undefined>(undefined);
@@ -170,12 +172,28 @@ export function InvestorsPage() {
             title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.investors.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
+          <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)}
+            title={t('investors.edit_log', 'investments') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
+            <History size={16} />
+          </Button>
         </div>
       )
     },
   ];
 
   const entity = t('investors.invistor') || "مستثمر"
+
+  const handleTranslateValues = (field: string, value: string) => {
+    if (field === 'is_active' || field === 'is_possible_investor_in_future') {
+      return value === 'true' ? (t('common.yes', 'shared') || 'Yes') : value === 'false' ? (t('common.no', 'shared') || 'No') : value;
+    }
+    if (field === 'gender') {
+      const genderKey = `investors.gender_${value}`;
+      const translated = t(genderKey, 'investments');
+      if (translated && translated !== genderKey) return translated;
+    }
+    return value;
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -236,6 +254,28 @@ export function InvestorsPage() {
         />
       )}
 
+      <AuditLog
+        isOpen={!!auditItem}
+        onClose={() => setAuditItem(null)}
+        model="investor"
+        modelId={auditItem?.id}
+        module="investments"
+        labels={{
+          title: t('investors.edit_log', 'investments') || 'Edit Log',
+          event: t('investors.event', 'investments') || 'Event',
+          created_at: t('investors.created_at', 'investments') || 'Created At',
+          changed_by: t('investors.changed_by', 'investments') || 'Changed By',
+          changes: t('investors.changes', 'investments') || 'Changes',
+          field: t('investors.field', 'investments') || 'Field',
+          old_value: t('investors.old_value', 'investments') || 'Old Value',
+          new_value: t('investors.new_value', 'investments') || 'New Value',
+          no_records: t('investors.no_edit_log', 'investments') || 'No edit logs found',
+          subject_id: t('investors.subject_id', 'investments') || 'Investor ID',
+        }}
+        translateField={(key) => t(`investors.${key}`, 'investments') || key}
+        translateValues={handleTranslateValues}
+      />
+
       <ConfirmDialog
         isOpen={!!confirmDelete}
         title={t('common.delete', 'shared') || 'Delete'}
@@ -243,6 +283,8 @@ export function InvestorsPage() {
         onConfirm={handleDeleteConfirm}
         onCancel={() => setConfirmDelete(null)}
         confirmLoading={loadingMap['remove']}
+        confirmLabel={t('common.delete', 'shared') || 'Delete'}
+        cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
       />
     </div>
   );

@@ -10,6 +10,15 @@ interface PlotAuditLogModalProps {
 export function PlotAuditLogModal({ isOpen, onClose, plotId }: PlotAuditLogModalProps) {
   const { t } = useLanguage();
 
+  const handleTranslateValues = (field: string, value: string) => {
+    if (field === 'status') {
+      const statusKey = `plot_status.${value}`;
+      const translated = t(statusKey, 'investments');
+      if (translated && translated !== statusKey) return translated;
+    }
+    return value;
+  };
+
   return (
     <AuditLog
       isOpen={isOpen}
@@ -29,6 +38,7 @@ export function PlotAuditLogModal({ isOpen, onClose, plotId }: PlotAuditLogModal
         subject_id: t('plots.plot_id', 'investments') || 'Plot ID',
       }}
       translateField={(key) => t(`plots.${key}`, 'investments') || key}
+      translateValues={handleTranslateValues}
     />
   );
 }
