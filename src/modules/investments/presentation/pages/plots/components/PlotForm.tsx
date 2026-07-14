@@ -58,7 +58,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
       type: 'select-or-create', 
       label: t('plots.plot_area_id', 'investments') || 'Plot Area',
       required: true,
-      options: plotAreas.map(pa => ({ value: pa.id, label: pa.name })),
+      options: plotAreas.map(pa => ({ value: pa.id, label: pa.name, is_default: pa.is_default })),
       createTitle: t('plot_areas.add', 'investments') || 'Add Plot Area',
       labelPath: 'name',
       renderCreateForm: (onSuccessForm, onCancelForm) => (
@@ -79,7 +79,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
       type: 'select-or-create', 
       label: t('plots.plot_classification_id', 'investments') || 'Classification',
       required: true,
-      options: classifications.map(pc => ({ value: pc.id, label: pc.name })),
+      options: classifications.map(pc => ({ value: pc.id, label: pc.name, is_default: pc.is_default })),
       createTitle: t('plot_classifications.add', 'investments') || 'Add Classification',
       labelPath: 'name',
       renderCreateForm: (onSuccessForm, onCancelForm) => (

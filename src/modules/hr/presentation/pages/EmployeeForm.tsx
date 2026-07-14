@@ -280,7 +280,7 @@ export function EmployeeForm({
   };
   const computeChronicDiseases = async () => {
     const response = await loadChronicDiseases();
-    return { options: response.data.map((c: any) => ({ value: c.id, label: c.name })) };
+    return { options: response.data.map((c: any) => ({ value: c.id, label: c.name, is_default: c.is_default })) };
   };
 
   const computeEmployeeStatuses = async () => {

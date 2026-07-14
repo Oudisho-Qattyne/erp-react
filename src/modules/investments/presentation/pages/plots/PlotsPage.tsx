@@ -102,8 +102,8 @@ export function PlotsPage() {
       await remove(confirmDelete.id);
       toast.success((t('plots.deleted', 'investments') || 'Plot deleted').replace('{name}', entityName));
       setPage(prev => prev);
-    } catch {
-      toast.error((t('plots.delete_error', 'investments') || 'Failed to delete plot').replace('{name}', entityName));
+    } catch (err: any) {
+      toast.error(err?.message || (t('plots.delete_error', 'investments') || 'Failed to delete plot').replace('{name}', entityName));
     }
     setConfirmDelete(null);
   };

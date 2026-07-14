@@ -30,7 +30,7 @@ export function CreateUserForm({ onSuccess, onCancel }: CreateUserFormProps) {
       label: t("users.role", "users") || "Role",
       type: "select",
       required: true,
-      options: roles.map((r) => ({ value: r.name, label: r.display_name })),
+      options: roles.map((r) => ({ value: r.name, label: r.display_name  })),
     },
     { name: "password", label: t("users.password", "users") || "Password", type: "password", required: true },
     { name: "confirmPassword", label: t("users.confirm_password", "users") || "Confirm Password", type: "password", required: true },

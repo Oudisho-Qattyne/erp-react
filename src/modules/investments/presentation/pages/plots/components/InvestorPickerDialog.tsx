@@ -166,9 +166,9 @@ export function InvestorPickerDialog({
             toast.success(t('investors.created', 'investments') || 'Investor created successfully')
             getAll(`/investments/investors?page=1&per_page=25`)
             return res
-          } catch {
-            toast.error(t('investors.create_error', 'investments') || 'Failed to create investor')
-            throw {}
+          } catch (err: any) {
+            toast.error(err?.message || t('investors.create_error', 'investments') || 'Failed to create investor')
+            throw err
           }
         },
         dialogTitle: t('investors.add', 'investments') || 'Add Investor',

@@ -64,9 +64,9 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
       getLicenses(listUrl);
       setIsCreateOpen(false);
       return res;
-    } catch {
-      toast.error(t('facility_industrial_licenses.create_error', 'investments') || 'Failed to create license');
-      throw {};
+    } catch (err: any) {
+      toast.error(err?.message || t('facility_industrial_licenses.create_error', 'investments') || 'Failed to create license');
+      throw err;
     }
   };
 
@@ -78,9 +78,9 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
       getLicenses(listUrl);
       setEditingLicense(null);
       return res;
-    } catch {
-      toast.error(t('facility_industrial_licenses.update_error', 'investments') || 'Failed to update license');
-      throw {};
+    } catch (err: any) {
+      toast.error(err?.message || t('facility_industrial_licenses.update_error', 'investments') || 'Failed to update license');
+      throw err;
     }
   };
 
@@ -90,8 +90,8 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
       await deleteLicense(deletingLicense.id);
       toast.success(t('facility_industrial_licenses.deleted', 'investments') || 'License deleted successfully');
       getLicenses(listUrl);
-    } catch {
-      toast.error(t('facility_industrial_licenses.delete_error', 'investments') || 'Failed to delete license');
+    } catch (err: any) {
+      toast.error(err?.message || t('facility_industrial_licenses.delete_error', 'investments') || 'Failed to delete license');
     }
     setDeletingLicense(null);
   };
@@ -102,7 +102,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
       type: 'select-or-create',
       label: t('facility_industrial_licenses.industry_category', 'investments') || 'Industry Category',
       required: true,
-      options: categories.map(c => ({ value: c.id, label: getLocalizedName(c.name) })),
+      options: categories.map(c => ({ value: c.id, label: getLocalizedName(c.name), is_default: c.is_default })),
       createTitle: t('industry_categories.create', 'investments') || 'Create Industry Category',
       labelPath: 'name',
       createButtonPermission: 'investments.industry-categories.create',
@@ -126,7 +126,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
       type: 'select-or-create',
       label: t('facility_industrial_licenses.industry_type', 'investments') || 'Industry Type',
       required: true,
-      options: industryTypes.map(t => ({ value: t.id, label: getLocalizedName(t.name) })),
+      options: industryTypes.map(t => ({ value: t.id, label: getLocalizedName(t.name), is_default: t.is_default })),
       createTitle: t('industry_types.create', 'investments') || 'Create Industry Type',
       labelPath: 'name',
       createButtonPermission: 'investments.industry-types.create',
@@ -152,7 +152,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
       type: 'select-or-create',
       label: t('facility_industrial_licenses.decision_type', 'investments') || 'Decision Type',
       required: true,
-      options: decisionTypes.map(d => ({ value: d.id, label: getLocalizedName(d.name) })),
+      options: decisionTypes.map(d => ({ value: d.id, label: getLocalizedName(d.name), is_default: d.is_default })),
       createTitle: t('industrial_decision_types.create', 'investments') || 'Create Decision Type',
       labelPath: 'name',
       createButtonPermission: 'investments.industrial-decision-types.create',
@@ -176,7 +176,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
       type: 'select-or-create',
       label: t('facility_industrial_licenses.license_source', 'investments') || 'License Source',
       required: true,
-      options: licenseSources.map(s => ({ value: s.id, label: getLocalizedName(s.name) })),
+      options: licenseSources.map(s => ({ value: s.id, label: getLocalizedName(s.name), is_default: s.is_default })),
       createTitle: t('industrial_license_sources.create', 'investments') || 'Create License Source',
       labelPath: 'name',
       createButtonPermission: 'investments.industrial-license-sources.create',

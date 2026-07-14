@@ -11,6 +11,7 @@ import { DossierStatusHistoryModal } from './components/DossierStatusHistoryModa
 import { PartnersSection } from './components/PartnersSection';
 import { FacilitiesSection } from './components/FacilitiesSection';
 import { ContractsSection } from './components/ContractsSection';
+
 import { ArrowRight, History, FileText } from 'lucide-react';
 import { SectionCard } from '../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { InfoRow } from '../../../../../core/presentation/layouts/ui/card/InfoRow';

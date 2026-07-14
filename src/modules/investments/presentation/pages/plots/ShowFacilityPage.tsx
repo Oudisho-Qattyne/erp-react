@@ -9,6 +9,7 @@ import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/Er
 import { SectionCard } from '../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { InfoRow } from '../../../../../core/presentation/layouts/ui/card/InfoRow';
 import { FacilityIndustrialLicensesSection } from './components/FacilityIndustrialLicensesSection';
+import { BuildingLicenseSection } from './components/BuildingLicenseSection';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { ArrowRight, Factory, History } from 'lucide-react';
 
@@ -97,6 +98,10 @@ export function ShowFacilityPage() {
       {
         facilityId &&
         <FacilityIndustrialLicensesSection facilityId={facilityId} />
+      }
+      {
+        facilityId &&
+        <BuildingLicenseSection facilityId={facilityId} />
       }
 
       <AuditLog

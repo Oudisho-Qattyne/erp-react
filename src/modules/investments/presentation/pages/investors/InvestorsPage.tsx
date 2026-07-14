@@ -91,8 +91,8 @@ export function InvestorsPage() {
     try {
       await remove(confirmDelete.id);
       toast.success(t('investors.deleted', 'investments') || 'Investor deleted');
-    } catch {
-      toast.error(t('investors.delete_error', 'investments') || 'Failed to delete investor');
+    } catch (err: any) {
+      toast.error(err?.message || t('investors.delete_error', 'investments') || 'Failed to delete investor');
     }
     setConfirmDelete(null);
   };
