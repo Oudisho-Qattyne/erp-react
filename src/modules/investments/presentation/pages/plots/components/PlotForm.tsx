@@ -45,8 +45,8 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
   const status = defaultValues?.status || 'unsold';
 
   useEffect(() => {
-    getPlotAreas();
-    getClassifications();
+    getPlotAreas('/investments/plot-areas?is_active=true');
+    getClassifications('/investments/plot-classifications?is_active=true');
   }, []);
 
   const formFields: FieldConfig[] = [
@@ -65,10 +65,9 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
         <GenericCreateForm
           fields={[
             { name: 'name', label: t('plot_areas.name', 'investments'), required: true },
-            { name: 'is_active', type: 'checkbox', label: t('plot_areas.is_active', 'investments') }
           ]}
           schema={getCreatePlotAreaFormSchema(t)}
-          onSubmit={async (data) => createPlotArea(data)}
+          onSubmit={async (data) => createPlotArea({ ...data, is_active: true })}
           onSuccess={onSuccessForm}
           onCancel={onCancelForm}
         />
@@ -86,10 +85,9 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
         <GenericCreateForm
           fields={[
             { name: 'name', label: t('plot_classifications.name', 'investments'), required: true },
-            { name: 'is_active', type: 'checkbox', label: t('plot_classifications.is_active', 'investments') }
           ]}
           schema={getCreatePlotClassificationFormSchema(t)}
-          onSubmit={async (data) => createClassification(data)}
+          onSubmit={async (data) => createClassification({ ...data, is_active: true })}
           onSuccess={onSuccessForm}
           onCancel={onCancelForm}
         />

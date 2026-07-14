@@ -1,5 +1,5 @@
 // src/core/presentation/layouts/ui/inputs/DatePicker.tsx
-import { useState, useRef, useEffect, type ChangeEvent } from 'react';
+import { useState, useRef, useEffect, type ChangeEvent, type KeyboardEvent } from 'react';
 import { CalendarIcon } from 'lucide-react';
 import { CustomCalendar } from '../calendar/Calendar';
 import { useLanguage } from '../../../context/i18n/I18nProvider';
@@ -25,8 +25,11 @@ export function DatePicker({
   const { direction, language } = useLanguage();
   const [inputValue, setInputValue] = useState(() => {
     if (value) {
-      const [year, month, day] = value.split('-');
-      return `${day}-${month}-${year}`; // convert to DD-MM-YYYY for display
+      const parts = value.split('-');
+      if (parts.length === 3 && parts[0].length === 4) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      }
+      return value;
     }
     return '';
   });
@@ -34,16 +37,13 @@ export function DatePicker({
   const [error, setError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const cursorPositionRef = useRef<number | null>(null);
 
-  // Convert internal YYYY-MM-DD to display DD-MM-YYYY
   const toDisplayFormat = (isoDate: string): string => {
     if (!isoDate || isoDate.length !== 10) return '';
     const [year, month, day] = isoDate.split('-');
     return `${day}-${month}-${year}`;
   };
 
-  // Convert display DD-MM-YYYY to internal YYYY-MM-DD
   const toInternalFormat = (displayDate: string): string | null => {
     const parts = displayDate.split('-');
     if (parts.length !== 3) return null;
@@ -58,61 +58,54 @@ export function DatePicker({
     return `${year}-${month}-${day}`;
   };
 
-  // Sync internal state when value prop changes
+  const formatDateString = (digits: string): string => {
+    const clean = digits.replace(/\D/g, '').slice(0, 8);
+    const parts: string[] = [];
+    if (clean.length >= 1) parts.push(clean.slice(0, 2));
+    if (clean.length >= 3) parts.push(clean.slice(2, 4));
+    if (clean.length >= 5) parts.push(clean.slice(4, 8));
+    return parts.join('-');
+  };
+
   useEffect(() => {
-    if (value && value !== toInternalFormat(inputValue)) {
-      setInputValue(toDisplayFormat(value));
-      setError(false);
+    if (value) {
+      const parts = value.split('-');
+      if (parts.length === 3 && parts[0].length === 4) {
+        const display = toDisplayFormat(value);
+        if (display !== inputValue) {
+          setInputValue(display);
+          setError(false);
+        }
+      }
     } else if (!value && inputValue) {
       setInputValue('');
       setError(false);
     }
   }, [value]);
 
-  // Restore cursor position after formatting
-  useEffect(() => {
-    if (cursorPositionRef.current !== null && inputRef.current) {
-      inputRef.current.setSelectionRange(cursorPositionRef.current, cursorPositionRef.current);
-      cursorPositionRef.current = null;
-    }
-  }, [inputValue]);
-
-  // Format input as DD-MM-YYYY while typing
-  const formatInput = (raw: string): { formatted: string; cursorOffset: number } => {
-    const digits = raw.replace(/\D/g, '').slice(0, 8);
-    let formatted = '';
-    let cursorOffset = 0;
-
-    if (digits.length >= 1) {
-      formatted += digits.slice(0, 2);
-      if (digits.length >= 3) {
-        formatted += '-' + digits.slice(2, 4);
-        if (digits.length >= 5) {
-          formatted += '-' + digits.slice(4, 8);
-        }
-      }
-    }
-
-    const oldLength = raw.length;
-    const newLength = formatted.length;
-    if (newLength > oldLength && (formatted[oldLength] === '-' || formatted[oldLength - 1] === '-')) {
-      cursorOffset = 1;
-    }
-    return { formatted, cursorOffset };
+  const digitPosInFormatted = (formatted: string, cursorPos: number): number => {
+    return formatted.slice(0, cursorPos).replace(/\D/g, '').length;
   };
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value;
-    const cursorPos = e.target.selectionStart || 0;
+  const formattedPosFromDigitPos = (formatted: string, digitPos: number): number => {
+    let count = 0;
+    for (let i = 0; i < formatted.length; i++) {
+      if (formatted[i] !== '-') {
+        if (count >= digitPos) return i;
+        count++;
+      }
+    }
+    return formatted.length;
+  };
 
-    const { formatted, cursorOffset } = formatInput(raw);
-    setInputValue(formatted);
+  const setCursor = (pos: number) => {
+    requestAnimationFrame(() => {
+      inputRef.current?.setSelectionRange(pos, pos);
+    });
+  };
 
-    let newCursorPos = cursorPos + cursorOffset;
-    if (newCursorPos > formatted.length) newCursorPos = formatted.length;
-    cursorPositionRef.current = newCursorPos;
-
-    if (formatted.length === 10) {
+  const emitIfComplete = (digits: string, formatted: string) => {
+    if (digits.length === 8) {
       const internal = toInternalFormat(formatted);
       if (internal) {
         onChange(internal);
@@ -121,29 +114,122 @@ export function DatePicker({
         setError(true);
       }
     } else {
-      if (formatted === '') {
+      if (digits.length === 0) {
         onChange('');
       }
       setError(false);
     }
   };
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (disabled) return;
+
+    const oldFormatted = inputValue;
+    const oldDigits = oldFormatted.replace(/\D/g, '');
+    const cursorPos = e.currentTarget.selectionStart || 0;
+    const selEnd = e.currentTarget.selectionEnd || cursorPos;
+    const hasSelection = selEnd > cursorPos;
+
+    if (e.key >= '0' && e.key <= '9') {
+      e.preventDefault();
+
+      const digitPos = digitPosInFormatted(oldFormatted, cursorPos);
+
+      let newDigits: string;
+      if (hasSelection) {
+        const beforeDigits = oldFormatted.slice(0, cursorPos).replace(/\D/g, '');
+        const afterDigits = oldFormatted.slice(selEnd).replace(/\D/g, '');
+        newDigits = (beforeDigits + e.key + afterDigits).slice(0, 8);
+      } else if (oldDigits.length >= 8) {
+        newDigits = oldDigits.slice(0, digitPos) + e.key + oldDigits.slice(digitPos + 1);
+      } else {
+        const insertAt = Math.min(digitPos, oldDigits.length);
+        newDigits = (oldDigits.slice(0, insertAt) + e.key + oldDigits.slice(insertAt)).slice(0, 8);
+      }
+
+      const formatted = formatDateString(newDigits);
+      setInputValue(formatted);
+
+      const newDigitPos = Math.min(
+        hasSelection
+          ? digitPosInFormatted(oldFormatted, cursorPos) + 1
+          : oldDigits.length >= 8
+            ? digitPos + 1
+            : Math.min(digitPos + 1, 8),
+        8
+      );
+
+      setCursor(formattedPosFromDigitPos(formatted, newDigitPos));
+      emitIfComplete(newDigits, formatted);
+      return;
+    }
+
+    if (e.key === 'Backspace') {
+      e.preventDefault();
+
+      if (hasSelection) {
+        const beforeDigits = oldFormatted.slice(0, cursorPos).replace(/\D/g, '');
+        const afterDigits = oldFormatted.slice(selEnd).replace(/\D/g, '');
+        const newDigits = beforeDigits + afterDigits;
+        const formatted = formatDateString(newDigits);
+        setInputValue(formatted);
+        setCursor(formattedPosFromDigitPos(formatted, beforeDigits.length));
+        if (newDigits.length === 0) onChange('');
+        setError(false);
+      } else if (cursorPos > 0) {
+        const digitPos = digitPosInFormatted(oldFormatted, cursorPos);
+        if (digitPos > 0) {
+          const newDigits = oldDigits.slice(0, digitPos - 1) + oldDigits.slice(digitPos);
+          const formatted = formatDateString(newDigits);
+          setInputValue(formatted);
+          setCursor(formattedPosFromDigitPos(formatted, digitPos - 1));
+          if (newDigits.length === 0) onChange('');
+          setError(false);
+        }
+      }
+      return;
+    }
+
+    if (e.key === 'Delete') {
+      e.preventDefault();
+
+      if (hasSelection) {
+        const beforeDigits = oldFormatted.slice(0, cursorPos).replace(/\D/g, '');
+        const afterDigits = oldFormatted.slice(selEnd).replace(/\D/g, '');
+        const newDigits = beforeDigits + afterDigits;
+        const formatted = formatDateString(newDigits);
+        setInputValue(formatted);
+        setCursor(formattedPosFromDigitPos(formatted, beforeDigits.length));
+        if (newDigits.length === 0) onChange('');
+        setError(false);
+      } else if (cursorPos < oldFormatted.length) {
+        const digitPos = digitPosInFormatted(oldFormatted, cursorPos);
+        if (digitPos < oldDigits.length) {
+          const newDigits = oldDigits.slice(0, digitPos) + oldDigits.slice(digitPos + 1);
+          const formatted = formatDateString(newDigits);
+          setInputValue(formatted);
+          setCursor(formattedPosFromDigitPos(formatted, digitPos));
+          if (newDigits.length === 0) onChange('');
+          setError(false);
+        }
+      }
+      return;
+    }
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 8);
+    const formatted = formatDateString(digits);
+    setInputValue(formatted);
+    setError(false);
+    emitIfComplete(digits, formatted);
+  };
+
   const handleCalendarSelect = (date: string) => {
-    // date is YYYY-MM-DD from calendar
     setInputValue(toDisplayFormat(date));
     onChange(date);
     setShowCalendar(false);
     setError(false);
-  };
-
-  const handleBlur = () => {
-    if (inputValue.length === 10) {
-      const internal = toInternalFormat(inputValue);
-      if (!internal) {
-        setError(true);
-      }
-    }
-    setTimeout(() => setShowCalendar(false), 200);
   };
 
   const handleFocus = () => {
@@ -169,9 +255,9 @@ export function DatePicker({
           ref={inputRef}
           type="text"
           value={inputValue}
+          onKeyDown={handleKeyDown}
           onChange={handleInputChange}
           onFocus={handleFocus}
-          onBlur={handleBlur}
           placeholder={placeholder || (language === 'ar' ? 'DD-MM-YYYY' : 'DD-MM-YYYY')}
           disabled={disabled}
           required={required}
@@ -183,7 +269,10 @@ export function DatePicker({
         />
       </div>
       {showCalendar && !disabled && (
-        <div className="absolute z-50 mt-1 left-1/2 -translate-x-1/2 min-w-[320px]">
+        <div
+          className="absolute z-50 mt-1 left-1/2 -translate-x-1/2 min-w-[320px]"
+          onMouseDown={(e) => e.preventDefault()}
+        >
           <CustomCalendar
             value={value}
             onChange={handleCalendarSelect}

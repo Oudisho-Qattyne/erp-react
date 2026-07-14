@@ -1,5 +1,6 @@
 import type { Dossier } from "./dossier";
 import type { PaymentMethod } from "../valueObjects/investments/PaymentMethod";
+import type { Installment } from "./installment";
 
 export interface Contract {
   id: number;
@@ -12,5 +13,6 @@ export interface Contract {
   final_price_per_square_meter: number;
   total_price: number;
   payment_method: PaymentMethod;
+  installments?:Installment[]
   created_at?: string;
 }

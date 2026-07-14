@@ -229,6 +229,25 @@
       "payment_method_required": "طريقة الدفع مطلوبة"
     }
   },
+  "installments": {
+    "title": "الأقساط",
+    "installment_value": "قيمة القسط",
+    "due_date": "تاريخ الاستحقاق",
+    "paid": "مدفوع",
+    "paid_yes": "مدفوع",
+    "paid_no": "غير مدفوع",
+    "pay_next": "دفع القسط التالي",
+    "pay_dialog_title": "دفع القسط التالي غير المدفوع",
+    "payment_date": "تاريخ الدفع",
+    "confirm_pay": "دفع",
+    "pay_success": "تم دفع القسط بنجاح",
+    "pay_error": "فشل في دفع القسط",
+    "edit_payment_date": "تعديل تاريخ الدفع",
+    "edit_payment_date_dialog_title": "تحديث تاريخ الدفع",
+    "update_date_success": "تم تحديث تاريخ الدفع بنجاح",
+    "update_date_error": "فشل في تحديث تاريخ الدفع",
+    "no_installments": "لا توجد أقساط"
+  },
   "facilities": {
     "title": "المنشآت",
     "add": "إضافة منشأة",
