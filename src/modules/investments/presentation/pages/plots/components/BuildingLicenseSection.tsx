@@ -53,9 +53,9 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
   }, [facilityId]);
 
   useEffect(() => {
-    getLicensingStatuses();
-    getDurationLicenses();
-    getIndustryLicenses();
+    getLicensingStatuses('/investments/license-statuses?is_active=true');
+    getDurationLicenses('/investments/by-duration-licenses?is_active=true');
+    getIndustryLicenses('/investments/by-industry-licenses?is_active=true');
   }, []);
 
   const handleCreate = async (data: any) => {
@@ -116,10 +116,9 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
           schema={getCreateLicensingStatusFormSchema(t)}
           fields={[
             { name: 'name', type: 'text', label: t('common.name', 'shared') || 'Name', required: true },
-            { name: 'is_active', type: 'checkbox', label: t('licensing_statuses.is_active', 'investments') || 'Is Active' },
             { name: 'is_default', type: 'checkbox', label: t('licensing_statuses.is_default', 'investments') || 'Set as Default' },
           ]}
-          onSubmit={createLicensingStatus}
+          onSubmit={(data) => createLicensingStatus({ ...data, is_active: true })}
           onSuccess={onSuccessForm}
           onCancel={onCancelForm}
           submitLabel={t('common.create', 'shared') || 'Create'}
@@ -143,10 +142,9 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
           schema={getCreateByDurationLicenseFormSchema(t)}
           fields={[
             { name: 'name', type: 'text', label: t('common.name', 'shared') || 'Name', required: true },
-            { name: 'is_active', type: 'checkbox', label: t('by_duration_licenses.is_active', 'investments') || 'Is Active' },
             { name: 'is_default', type: 'checkbox', label: t('by_duration_licenses.is_default', 'investments') || 'Set as Default' },
           ]}
-          onSubmit={createDurationLicense}
+          onSubmit={(data) => createDurationLicense({ ...data, is_active: true })}
           onSuccess={onSuccessForm}
           onCancel={onCancelForm}
           submitLabel={t('common.create', 'shared') || 'Create'}
@@ -167,10 +165,9 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
           schema={getCreateByIndustryLicenseFormSchema(t)}
           fields={[
             { name: 'name', type: 'text', label: t('common.name', 'shared') || 'Name', required: true },
-            { name: 'is_active', type: 'checkbox', label: t('by_industry_licenses.is_active', 'investments') || 'Is Active' },
             { name: 'is_default', type: 'checkbox', label: t('by_industry_licenses.is_default', 'investments') || 'Set as Default' },
           ]}
-          onSubmit={createIndustryLicense}
+          onSubmit={(data) => createIndustryLicense({ ...data, is_active: true })}
           onSuccess={onSuccessForm}
           onCancel={onCancelForm}
           submitLabel={t('common.create', 'shared') || 'Create'}

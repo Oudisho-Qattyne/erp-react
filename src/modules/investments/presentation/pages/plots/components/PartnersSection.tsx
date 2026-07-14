@@ -85,10 +85,10 @@ export function PartnersSection({ plotId, dossierId }: PartnersSectionProps) {
         <div className="flex items-center justify-between mb-4">
           <div />
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={() => setIsInvestorPickerOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="investments.plot-dossier.add-partner">
+            <Button variant="outline" size="sm" onClick={() => setIsInvestorPickerOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="investments.plot-dossier.update-partners">
               {t('dossier.add_investors', 'investments') || 'Add Investors'}
             </Button>
-            <Button variant="outline" size="sm" onClick={handleRemoveSelected} disabled={selectedPartnerIds.length === 0} leftIcon={<Trash2 size={16} />} requiredPermission="investments.plot-dossier.remove-partner">
+            <Button variant="outline" size="sm" onClick={handleRemoveSelected} disabled={selectedPartnerIds.length === 0} leftIcon={<Trash2 size={16} />} requiredPermission="investments.plot-dossier.update-partners">
               {t('dossier.remove_selected', 'investments') || 'Remove Selected'}
             </Button>
           </div>

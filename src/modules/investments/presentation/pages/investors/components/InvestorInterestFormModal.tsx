@@ -26,8 +26,8 @@ export function InvestorInterestFormModal({ isOpen, onClose, investorId, onSucce
 
   React.useEffect(() => {
     if (isOpen) {
-      getAreas();
-      getClassifications();
+      getAreas('/investments/plot-areas?is_active=true');
+      getClassifications('/investments/plot-classifications?is_active=true');
     }
   }, [isOpen, getAreas, getClassifications]);
 
@@ -48,10 +48,9 @@ export function InvestorInterestFormModal({ isOpen, onClose, investorId, onSucce
         <GenericCreateForm
           fields={[
             { name: 'name', label: t('plot_areas.name', 'investments') || 'Name', required: true },
-            { name: 'is_active', type: 'checkbox', label: t('plot_areas.is_active', 'investments') || 'Active' }
           ]}
           schema={getCreatePlotAreaFormSchema(t)}
-          onSubmit={createArea}
+          onSubmit={(data) => createArea({ ...data, is_active: true })}
           onSuccess={onSuccess}
           onCancel={onCancel}
         />
@@ -69,10 +68,9 @@ export function InvestorInterestFormModal({ isOpen, onClose, investorId, onSucce
         <GenericCreateForm
           fields={[
             { name: 'name', label: t('plot_classifications.name', 'investments') || 'Name', required: true },
-            { name: 'is_active', type: 'checkbox', label: t('plot_classifications.is_active', 'investments') || 'Active' }
           ]}
           schema={getCreatePlotClassificationFormSchema(t)}
-          onSubmit={createClassification}
+          onSubmit={(data) => createClassification({ ...data, is_active: true })}
           onSuccess={onSuccess}
           onCancel={onCancel}
         />

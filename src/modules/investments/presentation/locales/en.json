@@ -229,6 +229,25 @@
       "payment_method_required": "Payment method is required"
     }
   },
+  "installments": {
+    "title": "Installments",
+    "installment_value": "Installment Value",
+    "due_date": "Due Date",
+    "paid": "Paid",
+    "paid_yes": "Paid",
+    "paid_no": "Unpaid",
+    "pay_next": "Pay Next Unpaid",
+    "pay_dialog_title": "Pay Next Unpaid Installment",
+    "payment_date": "Payment Date",
+    "confirm_pay": "Pay",
+    "pay_success": "Installment paid successfully",
+    "pay_error": "Failed to pay installment",
+    "edit_payment_date": "Edit Payment Date",
+    "edit_payment_date_dialog_title": "Update Payment Date",
+    "update_date_success": "Payment date updated successfully",
+    "update_date_error": "Failed to update payment date",
+    "no_installments": "No installments found"
+  },
   "facilities": {
     "title": "Facilities",
     "add": "Add Facility",

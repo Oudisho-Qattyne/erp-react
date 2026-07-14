@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
@@ -9,6 +9,8 @@ import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/Er
 import { SectionCard } from '../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { InfoRow } from '../../../../../core/presentation/layouts/ui/card/InfoRow';
 import { ArrowLeft, FileSignature } from 'lucide-react';
+import { InstallmentsSection } from './InstallmentsSection';
+import { useInstallments } from '../../hooks/useInstallments';
 
 export function ShowContractPage() {
   const { t } = useLanguage();
@@ -20,22 +22,50 @@ export function ShowContractPage() {
     '/investments/contracts'
   );
 
+  const {
+    setContract: setInstContract,
+    installments,
+    payNextUnpaidInstallment,
+    updatePaymentDate,
+    loading,
+  } = useInstallments();
+
   const [contract, setContract] = useState<Contract | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const loadContract = useCallback(async (contractId: number) => {
+    const res = await getById(contractId);
+    if (res?.data) {
+      setContract(res.data);
+      setInstContract(res.data);
+    }
+  }, [getById, setInstContract]);
 
   useEffect(() => {
     if (!id) return;
     getById(Number(id))
       .then((res) => {
-        if (res?.data) setContract(res.data);
-        else setError(t('contract.not_found', 'investments') || 'Contract not found');
+        if (res?.data) {
+          setContract(res.data);
+          setInstContract(res.data);
+        } else setError(t('contract.not_found', 'investments') || 'Contract not found');
       })
       .catch(() => setError(t('contract.load_error', 'investments') || 'Failed to load contract'))
-      .finally(() => setLoading(false));
+      .finally(() => setInitialLoading(false));
   }, [id]);
 
-  if (loading) return <div className="p-6"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>;
+  const handlePayNextUnpaid = useCallback(async (contractId: number, paymentDate: string) => {
+    await payNextUnpaidInstallment(contractId, paymentDate);
+    await loadContract(contractId);
+  }, [payNextUnpaidInstallment, loadContract]);
+
+  const handleUpdatePaymentDate = useCallback(async (installmentId: number, contractId: number, paymentDate: string) => {
+    await updatePaymentDate(installmentId, contractId, paymentDate);
+    await loadContract(contractId);
+  }, [updatePaymentDate, loadContract]);
+
+  if (initialLoading) return <div className="p-6"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>;
   if (error) return <div className="p-6"><ErrorState message={error} onRetry={() => navigate(-1)} /></div>;
   if (!contract) return null;
 
@@ -117,6 +147,15 @@ export function ShowContractPage() {
           </div>
         </SectionCard>
       )}
+
+      <InstallmentsSection
+        contractId={contract.id}
+        installments={installments}
+        payLoading={loading['payNextUnpaidInstallment']}
+        updateLoading={loading['updatePaymentDate']}
+        onPayNextUnpaid={handlePayNextUnpaid}
+        onUpdatePaymentDate={handleUpdatePaymentDate}
+      />
     </div>
   );
 }

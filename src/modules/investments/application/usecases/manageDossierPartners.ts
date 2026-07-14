@@ -7,7 +7,17 @@ export const createManageDossierPartnersUseCase = (repository: IDossierPartnersR
     addPartners: (plotId: number, dossierId: number, investorIds: number[]) =>
       repository.addDossierPartners(plotId, dossierId, investorIds),
 
-    deletePartners: (plotId: number, dossierId: number, investorIds: number[]) =>
-      repository.deleteDossierPartners(plotId, dossierId, investorIds),
+    deletePartners: async (plotId: number, dossierId: number, investorIds: number[]) =>{
+      try {
+        const res =  await repository.getDossierPartners(plotId, dossierId)
+        if(res.data.partners){
+          let newPartners = res.data.partners.map(p => p.id).filter(p => !investorIds.includes(p))
+          return repository.addDossierPartners(plotId, dossierId, newPartners)
+        }
+        else throw new Error("Something went wrong.")
+      } catch (error) {
+        throw error
+      }
+    }
   }
 }
