@@ -30,6 +30,7 @@ lint_check:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "stage"
   allow_failure: true # Optional: won't block the build if linting fails
 
 # =========================================================================
@@ -53,6 +54,8 @@ build_project:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "stage"
+    
 
 # =========================================================================
 # STAGE 3: DEPLOYMENT VIA RSYNC
@@ -85,3 +88,5 @@ deploy_production:
     url: https://stage-erp.marka-tech.com 
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "stage"
+    
