@@ -38,6 +38,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
 
   const [confirmAllocateNewDossier, setConfirmAllocatedNewDossier] = useState<DossierFormData | null>(null)
   const [confirmAllocate, setConfirmAllocate] = useState<Dossier | null>(null)
+  const [confirmEditAllocate, setConfirmEditAllocate] = useState<DossierFormData | null>(null)
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
 
@@ -94,6 +95,10 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
 
   const handleEdit = async (data: DossierFormData) => {
     if (!editDossier) return;
+    if (data.status === 'active' && editDossier.status !== 'active') {
+      setConfirmEditAllocate(data);
+      return;
+    }
     try {
       await update(editDossier.id, data as any);
       toast.success(t('dossier.updated', 'investments') || 'Dossier updated successfully');
@@ -102,6 +107,20 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       getAll(fetchUrl());
     } catch (err: any) {
       toast.error(err?.message || t('dossier.update_error', 'investments') || 'Failed to update dossier');
+    }
+  };
+
+  const handleEditAllocateConfirm = async () => {
+    if (!editDossier || !confirmEditAllocate) return;
+    try {
+      await update(editDossier.id, confirmEditAllocate as any);
+      toast.success(t('dossier.allocated', 'investments') || 'Dossier allocated successfully');
+      setEditDossier(null);
+      setConfirmEditAllocate(null);
+      form.reset();
+      getAll(fetchUrl());
+    } catch (err: any) {
+      toast.error(err?.message || t('dossier.allocate_error', 'investments') || 'Failed to allocate dossier');
     }
   };
 
@@ -273,6 +292,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
           <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
             <FormInput
               name="dossier_number"
+              type="numeric"
               label={t('dossier.number', 'investments') || 'Dossier Number'}
               placeholder={t('dossier.number_placeholder', 'investments') || 'Enter dossier number'}
             />
@@ -283,7 +303,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
             />
             <FormInput
               name="status"
-              disabled={plotStatus == "allocated"}
+              disabled={plotStatus == "allocated" && form.getValues().status=='active' }
               label={t('dossier.status', 'investments') || 'Status'}
               type="select"
               options={isEditing ? [
@@ -327,7 +347,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
         isOpen={!!confirmAllocateNewDossier}
         type="alert"
         title={t('dossier.allocate_new_title', 'investments') || 'Allocate New Dossier'}
-        message={t('dossier.allocate_new_message', 'investments') || 'Are you sure you want to unallocate the previous allocated dossier?'}
+        message={(t('dossier.allocate_new_message', 'investments') || 'Are you sure you want to unallocate the previous allocated dossier?') + ' ' + (t('dossier.allocate_unallocate_warning', 'investments') || '(if there is another allocated dossier it will be unallocated)')}
         confirmLabel={t('dossier.allocate', 'investments') || 'Allocate'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
         onConfirm={() => {if(confirmAllocateNewDossier) addDossier(confirmAllocateNewDossier)}}
@@ -337,12 +357,25 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
 
       <ConfirmDialog
         isOpen={!!confirmAllocate}
+        type="alert"
         title={t('dossier.allocate_title', 'investments') || 'Allocate Dossier'}
-        message={t('dossier.allocate_message', 'investments') || 'Are you sure you want to allocate this dossier?'}
+        message={(t('dossier.allocate_message', 'investments') || 'Are you sure you want to allocate this dossier?') + ' ' + (t('dossier.allocate_unallocate_warning', 'investments') || '(if there is another allocated dossier it will be unallocated)')}
         confirmLabel={t('dossier.allocate', 'investments') || 'Allocate'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
         onConfirm={async () => { if (confirmAllocate) { await handleAllocate(confirmAllocate); setConfirmAllocate(null); } }}
         onCancel={() => setConfirmAllocate(null)}
+        confirmLoading={loadingMap['update']}
+      />
+
+      <ConfirmDialog
+        isOpen={!!confirmEditAllocate}
+        type="alert"
+        title={t('dossier.allocate_title', 'investments') || 'Allocate Dossier'}
+        message={(t('dossier.allocate_message', 'investments') || 'Are you sure you want to allocate this dossier?') + ' ' + (t('dossier.allocate_unallocate_warning', 'investments') || '(if there is another allocated dossier it will be unallocated)')}
+        confirmLabel={t('dossier.allocate', 'investments') || 'Allocate'}
+        cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
+        onConfirm={handleEditAllocateConfirm}
+        onCancel={() => setConfirmEditAllocate(null)}
         confirmLoading={loadingMap['update']}
       />
     </div>

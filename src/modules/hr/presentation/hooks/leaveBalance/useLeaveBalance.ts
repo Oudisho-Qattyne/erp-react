@@ -92,7 +92,7 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err.message || "Failed to fetch my leave balances"
+      const msg = err?.message || "Failed to fetch my leave balances"
       setFnError("findAllMyLeaveBalances", msg)
       toast.error(t("leave_balance.load_error", "hr").replace("{message}", msg))
     } finally {
@@ -113,7 +113,7 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err.message || "Failed to fetch employee leave balances"
+      const msg = err?.message || "Failed to fetch employee leave balances"
       setFnError("findAllEmployeeLeaveBalances", msg)
       toast.error(t("leave_balance.employee_load_error", "hr").replace("{message}", msg))
     } finally {
@@ -128,7 +128,7 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
       await useCase.adjustLeaveBalance(adjust)
       toast.success(t("leave_balance.adjusted", "hr"))
     } catch (err: any) {
-      const msg = err.message || "Failed to adjust leave balance"
+      const msg = err?.message || "Failed to adjust leave balance"
       setFnError("adjustLeaveBalance", msg)
       toast.error(t("leave_balance.adjust_error", "hr").replace("{message}", msg))
       throw err

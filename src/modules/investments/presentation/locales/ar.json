@@ -21,7 +21,7 @@
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم المنطقة",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -47,7 +47,7 @@
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم التصنيف",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -55,8 +55,8 @@
   "plots": {
     "title": "المقاسم",
     "add": "إضافة مقسم",
-    "code": "رمز المقسم",
-    "identifier": "المعرف",
+    "code": "رقم المقسم",
+    "identifier": "ID",
     "area": "المساحة (م²)",
     "plot_area_id": "المنطقة",
     "plot_classification_id": "التصنيف",
@@ -64,7 +64,6 @@
     "current_condition": "الوضع الحالي للمقسم",
     "notes": "ملاحظات",
     "status": "حالة المقسم",
-    "created_at": "تاريخ الإنشاء (اختياري)",
     "status_date": "تاريخ الحالة (اختياري)",
     "created": "تم إنشاء {name} بنجاح",
     "create_error": "فشل في إنشاء {name}",
@@ -100,7 +99,7 @@
     "longitude": "خط الطول",
     "user_id": "المستخدم",
     "folder_id": "المجلد",
-    "id": "المعرف",
+    "id": "ID",
     "status_unsold": "غير مباعة",
     "status_announced": "معلن عنها",
     "status_subscribed": "مكتتب بها",
@@ -108,7 +107,7 @@
     "status_separated": "مغصول",
     "validation": {
       "code_required": "الرمز مطلوب",
-      "identifier_required": "المعرف مطلوب",
+      "identifier_required": "ID مطلوب",
       "area_required": "المساحة مطلوبة",
       "area_invalid": "يجب أن تكون المساحة رقماً موجباً صحيحاً",
       "plot_area_id_invalid": "يجب أن تكون المنطقة رقماً",
@@ -151,6 +150,7 @@
     "allocate_message": "هل أنت متأكد من تخصيص هذه الإضبارة؟",
     "allocate_new_title": "تخصيص إضبارة جديدة",
     "allocate_new_message": "هل أنت متأكد أنك تريد إلغاء تخصيص الإضبارة المخصصة سابقاً؟",
+    "allocate_unallocate_warning": "(إذا كانت هناك إضبارة مخصصة أخرى سيتم إلغاء تخصيصها)",
     "cancel": "إلغاء",
     "cancelled": "تم إلغاء الإضبارة بنجاح",
     "cancel_error": "فشل في إلغاء الإضبارة",
@@ -219,7 +219,7 @@
     "subject_id": "معرف العقد",
     "delete_title": "حذف العقد",
     "delete_message": "هل أنت متأكد من حذف هذا العقد؟",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "dossier_id_required": "الإضبارة مطلوبة",
       "contract_number_required": "رقم العقد مطلوب",
@@ -293,7 +293,7 @@
     "subject_id": "رقم المنشأة",
     "plot_id": "المقسم",
     "plot_dossier_id": "الإضبارة",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب",
       "address_required": "العنوان مطلوب",
@@ -320,7 +320,15 @@
     "add_future_possible": "إضافة مستثمر مستقبلي محتمل",
     "edit": "تعديل مستثمر",
     "info": "معلومات المستثمر",
+    "personal_info": "المعلومات الشخصية",
+    "contact_info": "معلومات الاتصال",
+    "social_media": "وسائل التواصل الاجتماعي",
     "full_name": "الاسم الكامل",
+    "first_name": "اسم المستثمر",
+    "father_name": "اسم الأب",
+    "grandfather_name": "اسم الجد",
+    "last_name": "الكنية",
+    "mother_name": "اسم الأم",
     "national_id": "الرقم الوطني",
     "passport_number": "رقم الجواز",
     "nationality": "الجنسية",
@@ -377,9 +385,12 @@
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم المستثمر",
     "user_id": "المستخدم",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
-      "full_name_required": "الاسم الكامل مطلوب",
+      "first_name_required": "الاسم الأول مطلوب",
+      "father_name_required": "اسم الأب مطلوب",
+      "last_name_required": "اسم العائلة مطلوب",
+      "mother_name_required": "اسم الأم مطلوب",
       "nationality_required": "الجنسية مطلوبة",
       "gender_required": "الجنس مطلوب",
       "whatsapp_max": "يجب ألا يتجاوز رقم الواتساب 20 حرفاً",
@@ -514,7 +525,7 @@
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم نوع القرار",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -541,7 +552,7 @@
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم مصدر الترخيص",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -565,7 +576,7 @@
     "industrial_decision_date": "تاريخ القرار",
     "industrial_decision_type_id": "نوع القرار",
     "industrial_license_source_id": "مصدر الترخيص",
-    "id": "المعرف",
+    "id": "ID",
     "created": "تم إنشاء الترخيص بنجاح",
     "create_error": "فشل في إنشاء الترخيص",
     "updated": "تم تحديث الترخيص بنجاح",
@@ -616,7 +627,7 @@
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم تصنيف الصناعة",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -643,7 +654,7 @@
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم نوع الصناعة",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -670,7 +681,7 @@
     "new_value": "القيمة الجديدة",
     "no_edit_log": "لا توجد سجلات تعديل",
     "subject_id": "معرف الترخيص حسب المدة",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -697,7 +708,7 @@
     "new_value": "القيمة الجديدة",
     "no_edit_log": "لا توجد سجلات تعديل",
     "subject_id": "معرف الترخيص حسب الصناعة",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -723,7 +734,7 @@
     "new_value": "القيمة الجديدة",
     "no_edit_log": "لا توجد سجلات تعديل",
     "subject_id": "معرف حالة الترخيص",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }

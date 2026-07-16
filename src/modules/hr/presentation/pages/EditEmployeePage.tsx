@@ -33,7 +33,7 @@ export function EditEmployeePage() {
           const emp = result.data
           // Map API data to Form Values
           const mappedValues: Partial<EmployeeFormValues> = {
-            internal_id: emp.internal_id,
+            personal_id_number: emp.personal_id_number,
             national_id: emp.national_id,
             first_name: emp.first_name,
             father_name: emp.father_name,
@@ -46,14 +46,13 @@ export function EditEmployeePage() {
             assigned_job: emp.assigned_job,
             marital_status: emp.marital_status,
             number_of_children: emp.number_of_children,
-            spouse_name: emp.spouse_name,
+            wives: emp.wives,
             spouse_workplace: emp.spouse_workplace,
             blood_type: emp.blood_type,
             phone_number: emp.phone_number,
             sham_cash_account: emp.sham_cash_account,
-            residence_country_id: emp.residence_region?.city?.country?.id,
+            country_id: emp.residence_region?.city?.country?.id,
             residence_city_id: emp.residence_region?.city?.id,
-            residence_region_id: emp.residence_region?.id ?? emp.residence_region_id ?? 0,
             residential_area_details: emp.residential_area_details,
             civil_registry_record: emp.civil_registry_record,
             health_status: emp.health_status,
@@ -65,11 +64,8 @@ export function EditEmployeePage() {
               job_title: emp.employment_details.job_title,
               org_unit_id: emp.employment_details.org_unit_id,
               appointment_date: emp.employment_details.appointment_date,
-              contract_type: emp.employment_details.contract_type,
-              contract_nature: emp.employment_details.contract_nature,
               job_category: emp.employment_details.job_category,
 
-              workplace_city_id: emp.employment_details.workplace_city_id,
             } : undefined,
 
             educations: emp.educations?.map((edu: any) => ({

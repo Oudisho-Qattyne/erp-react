@@ -127,7 +127,7 @@ export function PlotAreasPage() {
       <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={t('plot_areas.add', 'investments')}>
         <GenericCreateForm
           fields={[
-            { name: 'name', label: t('plot_areas.name', 'investments'), required: true },
+            { name: 'name', type: 'alpha', label: t('plot_areas.name', 'investments'), required: true },
             { name: 'is_active', type: 'checkbox', label: t('plot_areas.is_active', 'investments') },
             { name: 'is_default', type: 'checkbox', label: t('plot_areas.is_default', 'investments') }
           ]}
@@ -148,7 +148,7 @@ export function PlotAreasPage() {
       <Dialog isOpen={!!editItem} onClose={() => setEditItem(null)} title={t('common.edit', 'shared') + ' ' + entityName}>
         <GenericCreateForm
           fields={[
-            { name: 'name', label: t('plot_areas.name', 'investments'), required: true },
+            { name: 'name', type: 'alpha', label: t('plot_areas.name', 'investments'), required: true },
             { name: 'is_active', type: 'checkbox', label: t('plot_areas.is_active', 'investments') },
             { name: 'is_default', type: 'checkbox', label: t('plot_areas.is_default', 'investments') }
           ]}

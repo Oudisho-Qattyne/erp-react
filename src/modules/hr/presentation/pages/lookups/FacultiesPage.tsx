@@ -37,8 +37,8 @@ export function FacultiesPage() {
       await remove(confirmDelete.id);
       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
       setConfirmDelete(null);
-    } catch {
-      toast.error(t('lookups.delete_error', 'hr').replace('{name}', entity));
+    } catch (err) {
+      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
     }
   };
 
@@ -49,8 +49,8 @@ export function FacultiesPage() {
       toast.success(t('lookups.set_default_success', 'hr').replace('{name}', entity));
       selectedUniversity && getAllByUniversity(selectedUniversity);
       setConfirmSetDefault(null);
-    } catch {
-      toast.error(t('lookups.set_default_error', 'hr').replace('{name}', entity));
+    } catch (err) {
+      toast.error(err?.message || t('lookups.set_default_error', 'hr').replace('{name}', entity));
     }
   };
 
@@ -111,9 +111,9 @@ export function FacultiesPage() {
           <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)}
             title={t('employee_form.add_faculty', 'hr') || 'Add Faculty'}>
             <GenericCreateForm
-              fields={[{ name: 'name', label: t('employees.faculty', 'hr') || 'Faculty name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
+              fields={[{ name: 'name', type: 'alpha', label: t('employees.faculty', 'hr') || 'Faculty name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
               schema={FacultyFormSchema.omit({ university_id: true })}
-              onSubmit={async (data) => { try { return await create({ ...data, name: data.name, university_id: selectedUniversity }); } catch { toast.error(t('lookups.create_error', 'hr').replace('{name}', entity)); throw {}; } }}
+              onSubmit={async (data) => { try { return await create({ ...data, name: data.name, university_id: selectedUniversity }); } catch (err) { toast.error(err?.message || t('lookups.create_error', 'hr').replace('{name}', entity)); throw {}; } }}
               onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAllByUniversity(selectedUniversity); setIsCreateOpen(false); }}
               onCancel={() => setIsCreateOpen(false)}
               submitLabel={t('employee_form.add_faculty', 'hr') || 'Add Faculty'}
@@ -123,10 +123,10 @@ export function FacultiesPage() {
           <Dialog isOpen={!!editItem} onClose={() => setEditItem(null)}
             title={t('common.edit', 'shared') + ' ' + entity}>
             <GenericCreateForm
-              fields={[{ name: 'name', label: t('employees.faculty', 'hr') || 'Faculty name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
+              fields={[{ name: 'name', type: 'alpha', label: t('employees.faculty', 'hr') || 'Faculty name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
               schema={FacultyFormSchema.omit({ university_id: true })}
               defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), is_default: Boolean(editItem.is_default) } : undefined}
-              onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: data.name }); } catch { toast.error(t('lookups.update_error', 'hr').replace('{name}', entity)); throw {}; } }}
+              onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: data.name }); } catch (err) { toast.error(err?.message || t('lookups.update_error', 'hr').replace('{name}', entity)); throw {}; } }}
               onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); selectedUniversity && getAllByUniversity(selectedUniversity); setEditItem(null); }}
               onCancel={() => setEditItem(null)}
               submitLabel={t('common.save', 'shared') || 'Save'}

@@ -22,9 +22,9 @@ export function CreateUserForm({ onSuccess, onCancel }: CreateUserFormProps) {
   }, [])
 
   const fields: FieldConfig[] = [
-    { name: "name", label: t("users.name", "users") || "Name", type: "text", required: true },
+    { name: "name", label: t("users.name", "users") || "Name", type: "alpha", required: true },
     { name: "email", label: t("users.email", "users") || "Email", type: "text", required: true },
-    { name: "mobile", label: t("users.mobile", "users") || "Mobile", type: "text", required: true },
+    { name: "mobile", label: t("users.mobile", "users") || "Mobile", type: "numeric", required: true },
     {
       name: "role",
       label: t("users.role", "users") || "Role",

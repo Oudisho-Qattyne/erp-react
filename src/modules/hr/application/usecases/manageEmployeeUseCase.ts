@@ -27,9 +27,9 @@ export const createManageEmployeeUseCase = (
     ...baseUsecase,
 
     // Example: add a custom method that is not in the generic interface
-    async getByInternalId(internalId: string): Promise<EmployeeData | null> {
+    async getByInternalId(personal_id_number: string): Promise<EmployeeData | null> {
       const { data } = await baseUsecase.getAll();
-      return data.find(emp => emp.internal_id === internalId) || null;
+      return data.find(emp => emp.personal_id_number === personal_id_number) || null;
     },
   };
 };

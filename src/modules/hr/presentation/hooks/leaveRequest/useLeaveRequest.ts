@@ -98,7 +98,7 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err.message || t("leave_request.my_requests_load_error", "hr")
+      const msg = err?.message || t("leave_request.my_requests_load_error", "hr")
       setFnError("findAllMyLeaveRequests", msg)
       toast.error(`${t("leave_request.my_requests_load_error", "hr")}: ${msg}`)
     } finally {
@@ -119,7 +119,7 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err.message || t("leave_request.employee_requests_load_error", "hr")
+      const msg = err?.message || t("leave_request.employee_requests_load_error", "hr")
       setFnError("findAllEmployeeLeaveRequests", msg)
       toast.error(`${t("leave_request.employee_requests_load_error", "hr")}: ${msg}`)
     } finally {
@@ -134,7 +134,7 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
       const res = await useCase.findLeaveRequestById(id)
       setCurrentLeaveRequest(res.data)
     } catch (err: any) {
-      const msg = err.message || t("leave_request.request_load_error", "hr")
+      const msg = err?.message || t("leave_request.request_load_error", "hr")
       setFnError("findLeaveRequestById", msg)
       toast.error(`${t("leave_request.request_load_error", "hr")}: ${msg}`)
     } finally {
@@ -149,7 +149,7 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
       await useCase.createLeaveRequset(data)
       toast.success(t("leave_request.create_success", "hr"))
     } catch (err: any) {
-      const msg = err.message || t("leave_request.create_error", "hr")
+      const msg = err?.message || t("leave_request.create_error", "hr")
       setFnError("createLeaveRequest", msg)
       toast.error(`${t("leave_request.create_error", "hr")}: ${msg}`)
       throw err
@@ -165,7 +165,7 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
       await useCase.updateLeaveRequest(id, data)
       toast.success(t("leave_request.update_success", "hr"))
     } catch (err: any) {
-      const msg = err.message || t("leave_request.update_error", "hr")
+      const msg = err?.message || t("leave_request.update_error", "hr")
       setFnError("updateLeaveRequest", msg)
       toast.error(`${t("leave_request.update_error", "hr")}: ${msg}`)
       throw err
@@ -181,7 +181,7 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
       await useCase.processleaveRequest(id, operation, reviewNotes)
       toast.success(t("leave_request.process_success", "hr"))
     } catch (err: any) {
-      const msg = err.message || t("leave_request.process_error", "hr")
+      const msg = err?.message || t("leave_request.process_error", "hr")
       setFnError("processLeaveRequest", msg)
       toast.error(`${t("leave_request.process_error", "hr")}: ${msg}`)
       throw err

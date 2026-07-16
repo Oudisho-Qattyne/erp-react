@@ -78,7 +78,7 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
   };
 
   const fields: FieldConfig[] = [
-    { name: 'contract_number', type: 'text', label: t('contract.contract_number', 'investments') || 'Contract Number', required: true },
+    { name: 'contract_number', type: 'numeric', label: t('contract.contract_number', 'investments') || 'Contract Number', required: true },
     { name: 'contract_date', type: 'date', label: t('contract.contract_date', 'investments') || 'Contract Date', required: true },
     { name: 'unit_price_per_square_meter', type: 'number', label: t('contract.unit_price_per_square_meter', 'investments') || 'Unit Price / m²', required: true },
     { name: 'weighting_factor', type: 'number', label: t('contract.weighting_factor', 'investments') || 'Weighting Factor', required: true },

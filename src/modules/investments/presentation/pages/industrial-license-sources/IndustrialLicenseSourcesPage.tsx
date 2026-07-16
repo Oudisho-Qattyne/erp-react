@@ -128,7 +128,7 @@ export function IndustrialLicenseSourcesPage() {
       <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={t('industrial_license_sources.add', 'investments')}>
         <GenericCreateForm
           fields={[
-            { name: 'name', label: t('industrial_license_sources.name', 'investments'), required: true },
+            { name: 'name', type: 'alpha', label: t('industrial_license_sources.name', 'investments'), required: true },
             { name: 'is_active', type: 'checkbox', label: t('industrial_license_sources.is_active', 'investments') },
             { name: 'is_default', type: 'checkbox', label: t('industrial_license_sources.is_default', 'investments') }
           ]}
@@ -149,7 +149,7 @@ export function IndustrialLicenseSourcesPage() {
       <Dialog isOpen={!!editItem} onClose={() => setEditItem(null)} title={t('common.edit', 'shared') + ' ' + entityName}>
         <GenericCreateForm
           fields={[
-            { name: 'name', label: t('industrial_license_sources.name', 'investments'), required: true },
+            { name: 'name', type: 'alpha', label: t('industrial_license_sources.name', 'investments'), required: true },
             { name: 'is_active', type: 'checkbox', label: t('industrial_license_sources.is_active', 'investments') },
             { name: 'is_default', type: 'checkbox', label: t('industrial_license_sources.is_default', 'investments') }
           ]}

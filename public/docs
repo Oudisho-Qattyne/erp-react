@@ -189,7 +189,7 @@ paths:
         -
           in: query
           name: search
-          description: 'Search by name, internal_id, or national_id'
+          description: 'Search by name, personal_id_number, or national_id'
           schema:
             type: string
         -
@@ -246,7 +246,7 @@ paths:
             schema:
               type: object
               required:
-                - internal_id
+                - personal_id_number
                 - national_id
                 - first_name
                 - last_name
@@ -254,7 +254,7 @@ paths:
                 - residence_region_id
                 - employment_details
               properties:
-                internal_id:
+                personal_id_number:
                   type: string
                   maxLength: 50
                   example: EMP001
@@ -295,7 +295,7 @@ paths:
                   enum: [single, married, divorced, widowed]
                   nullable: true
                   example: married
-                spouse_name:
+                wives:
                   type: string
                   nullable: true
                   example: 'Nour Hassan'
@@ -342,8 +342,8 @@ paths:
                   example: null
                 employment_details:
                   type: object
-                  required: [org_unit_id, status, workplace_city_id]
-                  properties: { job_title: { type: string, nullable: true, example: 'Software Engineer' }, org_unit_id: { type: integer, example: 1 }, status: { type: string, enum: [active, inactive, suspended], example: active }, appointment_date: { type: string, format: date, nullable: true, example: '2022-03-15' }, contract_type: { type: string, nullable: true, example: Full-time }, contract_nature: { type: string, nullable: true, example: Permanent }, job_category: { type: string, nullable: true, example: Engineering }, workplace_city_id: { type: integer, example: 14 } }
+                  required: [org_unit_id, status, workplace_residence_city_id]
+                  properties: { job_title: { type: string, nullable: true, example: 'Software Engineer' }, org_unit_id: { type: integer, example: 1 }, status: { type: string, enum: [active, inactive, suspended], example: active }, appointment_date: { type: string, format: date, nullable: true, example: '2022-03-15' }, contract_type: { type: string, nullable: true, example: Full-time }, contract_nature: { type: string, nullable: true, example: Permanent }, job_category: { type: string, nullable: true, example: Engineering }, workplace_residence_city_id: { type: integer, example: 14 } }
                 educations:
                   type: array
                   nullable: true
@@ -436,7 +436,7 @@ paths:
                   type: integer
                 employment_details:
                   type: object
-                  properties: { job_title: { type: string, nullable: true }, org_unit_id: { type: integer }, status: { type: string, enum: [active, inactive, suspended] }, workplace_city_id: { type: integer } }
+                  properties: { job_title: { type: string, nullable: true }, org_unit_id: { type: integer }, status: { type: string, enum: [active, inactive, suspended] }, workplace_residence_city_id: { type: integer } }
                 educations:
                   type: array
                   nullable: true
@@ -1215,13 +1215,13 @@ paths:
               type: object
               required:
                 - name
-                - city_id
+                - residence_city_id
               properties:
                 name:
                   type: object
                   required: [en, ar]
                   properties: { en: { type: string, example: 'region name in english' }, ar: { type: string, example: 'اسم المنطقة في العربية' } }
-                city_id:
+                residence_city_id:
                   type: integer
                   example: 1
       responses:
@@ -1293,7 +1293,7 @@ paths:
                 name:
                   type: object
                   properties: { en: { type: string, example: 'region name in english' }, ar: { type: string, example: 'اسم المنطقة في العربية' } }
-                city_id:
+                residence_city_id:
                   type: integer
       responses:
         200:
@@ -1867,7 +1867,7 @@ components:
           type: string
           nullable: true
           example: Engineering
-        workplace_city_id:
+        workplace_residence_city_id:
           type: integer
           example: 14
           description: 'FK to cities'
@@ -1934,7 +1934,7 @@ components:
         id:
           type: integer
           example: 1
-        internal_id:
+        personal_id_number:
           type: string
           example: EMP001
           description: 'Self Number / internal identifier'
@@ -1979,7 +1979,7 @@ components:
             - widowed
           nullable: true
           example: married
-        spouse_name:
+        wives:
           type: string
           nullable: true
           example: 'Nour Hassan'
@@ -2051,7 +2051,7 @@ components:
         id:
           type: integer
           example: 1
-        internal_id:
+        personal_id_number:
           type: string
           example: EMP001
         national_id:
@@ -2166,7 +2166,7 @@ components:
         name:
           type: string
           example: Baramkeh
-        city_id:
+        residence_city_id:
           type: integer
           example: 1
         created_at:

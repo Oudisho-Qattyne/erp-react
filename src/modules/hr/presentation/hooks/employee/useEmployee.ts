@@ -108,7 +108,7 @@ export const useEmployee = (): UseEmployeeReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err.message || "Failed to fetch employees"
+      const msg = err?.message || "Failed to fetch employees"
       setFnError("findAllEmployees", msg)
       toast.error(`${t("employees.load_error", "hr") || "Failed to load employees"}: ${msg}`)
     } finally {
@@ -129,7 +129,7 @@ export const useEmployee = (): UseEmployeeReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err.message || t('employees.employee_status_logs_load_error', 'hr') || "Failed to fetch employee status logs"
+      const msg = err?.message || t('employees.employee_status_logs_load_error', 'hr') || "Failed to fetch employee status logs"
       setFnError("findEmployeeStatusLogs", msg)
       toast.error(`${t('employees.employee_status_logs_load_error', 'hr') || 'Failed to load employee status logs'}: ${msg}`)
     } finally {
@@ -150,7 +150,7 @@ export const useEmployee = (): UseEmployeeReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err.message || t('employees.job_status_logs_load_error', 'hr') || "Failed to fetch job status logs"
+      const msg = err?.message || t('employees.job_status_logs_load_error', 'hr') || "Failed to fetch job status logs"
       setFnError("findJobStatusLogs", msg)
       toast.error(`${t('employees.job_status_logs_load_error', 'hr') || 'Failed to load job status logs'}: ${msg}`)
     } finally {

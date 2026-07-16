@@ -128,7 +128,7 @@ export function IndustryTypesPage() {
       <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={t('industry_types.add', 'investments')}>
         <GenericCreateForm
           fields={[
-            { name: 'name', label: t('industry_types.name', 'investments'), required: true },
+            { name: 'name', type: 'alpha', label: t('industry_types.name', 'investments'), required: true },
             { name: 'is_active', type: 'checkbox', label: t('industry_types.is_active', 'investments') },
             { name: 'is_default', type: 'checkbox', label: t('industry_types.is_default', 'investments') }
           ]}
@@ -149,7 +149,7 @@ export function IndustryTypesPage() {
       <Dialog isOpen={!!editItem} onClose={() => setEditItem(null)} title={t('common.edit', 'shared') + ' ' + entityName}>
         <GenericCreateForm
           fields={[
-            { name: 'name', label: t('industry_types.name', 'investments'), required: true },
+            { name: 'name', type: 'alpha', label: t('industry_types.name', 'investments'), required: true },
             { name: 'is_active', type: 'checkbox', label: t('industry_types.is_active', 'investments') },
             { name: 'is_default', type: 'checkbox', label: t('industry_types.is_default', 'investments') }
           ]}

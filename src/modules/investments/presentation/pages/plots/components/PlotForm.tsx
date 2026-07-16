@@ -50,9 +50,9 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
   }, []);
 
   const formFields: FieldConfig[] = [
-    { name: 'code', label: t('plots.code', 'investments') || 'Code', required: true },
-    { name: 'identifier', label: t('plots.identifier', 'investments') || 'Identifier', required: true },
-    { name: 'area', type: 'text', label: t('plots.area', 'investments') || 'Area', required: true },
+    { name: 'code', label: t('plots.code', 'investments') || 'Code', required: true , type:'numeric'},
+    { name: 'identifier', label: t('plots.identifier', 'investments') || 'Identifier', required: true , type:'numeric' },
+    { name: 'area', type: 'numeric', label: t('plots.area', 'investments') || 'Area', required: true },
     { 
       name: 'plot_area_id', 
       type: 'select-or-create', 
@@ -64,7 +64,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
       renderCreateForm: (onSuccessForm, onCancelForm) => (
         <GenericCreateForm
           fields={[
-            { name: 'name', label: t('plot_areas.name', 'investments'), required: true },
+            { name: 'name', type: 'alpha', label: t('plot_areas.name', 'investments'), required: true },
           ]}
           schema={getCreatePlotAreaFormSchema(t)}
           onSubmit={async (data) => createPlotArea({ ...data, is_active: true })}
@@ -84,7 +84,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
       renderCreateForm: (onSuccessForm, onCancelForm) => (
         <GenericCreateForm
           fields={[
-            { name: 'name', label: t('plot_classifications.name', 'investments'), required: true },
+            { name: 'name', type: 'alpha', label: t('plot_classifications.name', 'investments'), required: true },
           ]}
           schema={getCreatePlotClassificationFormSchema(t)}
           onSubmit={async (data) => createClassification({ ...data, is_active: true })}
@@ -124,7 +124,6 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
     { name: 'longitude', hidden: true },
     { name: 'current_condition', label: t('plots.current_condition', 'investments') || 'Current Condition' },
     { name: 'notes', type: 'textarea', label: t('plots.notes', 'investments') || 'Notes' },
-    { name: 'created_at', type: 'date', label: t('plots.created_at', 'investments') || 'Created At Date', hidden: !isCreate },
   ];
 
   // const handleSaveStatus = () => {

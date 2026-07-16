@@ -80,11 +80,13 @@ export function RoleForm({
           <div className="grid grid-cols-2 gap-4">
             <FormInput
               name="name"
+              type="alpha"
               label={t('role_form.name', 'users') || 'Name'}
               required
             />
             <FormInput
               name="display_name"
+              type="alpha"
               label={t('role_form.display_name', 'users') || 'Display Name'}
               required
             />

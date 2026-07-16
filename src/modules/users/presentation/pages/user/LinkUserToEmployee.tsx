@@ -65,8 +65,8 @@ export function LinkUserToEmployee() {
                   <div className="flex items-center gap-3 p-3 bg-background/50 rounded-xl border border-border/50">
                     <Briefcase size={16} className="text-primary shrink-0" />
                     <div>
-                      <p className="text-xs text-text-muted">{t("employees.internal_id", "hr") || "Internal ID"}</p>
-                      <p className="text-sm font-medium">{selectedEmployee.internal_id}</p>
+                      <p className="text-xs text-text-muted">{t("employees.personal_id_number", "hr") || "Internal ID"}</p>
+                      <p className="text-sm font-medium">{selectedEmployee.personal_id_number}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 p-3 bg-background/50 rounded-xl border border-border/50">

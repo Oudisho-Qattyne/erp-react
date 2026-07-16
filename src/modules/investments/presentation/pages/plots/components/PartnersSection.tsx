@@ -43,7 +43,7 @@ export function PartnersSection({ plotId, dossierId }: PartnersSectionProps) {
 
   const partnerColumns = [
     { key: "id", label: "#", width: 60 },
-    { key: "full_name", label: t("investors.full_name", "investments") || "Full Name", width: 200 },
+    { key: "full_name", label: t("investors.full_name", "investments") || "Full Name", width: 200, render: (row: Investor) => [row.first_name, row.father_name, row.last_name].filter(Boolean).join(' ') },
     { key: "national_id", label: t("investors.national_id", "investments") || "National ID", width: 150 },
     { key: "phone", label: t("investors.phone", "investments") || "Phone", width: 140 },
     { key: "nationality", label: t("investors.nationality", "investments") || "Nationality", width: 130 },

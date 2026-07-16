@@ -146,7 +146,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             const res = await useCase.getItemById(id);
             return (res)
         } catch (err: any) {
-            const errMsg = err.message || `Failed to get item`;
+            const errMsg = err?.message || `Failed to get item`;
             switch (err.status) {
                 case 403:
                     setFunctionError("getItemById", "Forbiden");
@@ -191,7 +191,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                     setFunctionError("loadFolderByPath", "Forbiden");
                     break;
                 default:
-                    setFunctionError("loadFolderByPath", err.message || `Failed to load folder ${path}`);
+                    setFunctionError("loadFolderByPath", err?.message || `Failed to load folder ${path}`);
                     break;
             }
         } finally {
@@ -223,7 +223,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             await loadFolderByPath(parent, api);
             toast.success(t('toasts.folder_created', 'storage').replace('{name}', name));
         } catch (err: any) {
-            const errMsg = err.message || `Failed to create folder`;
+            const errMsg = err?.message || `Failed to create folder`;
             switch (err.status) {
                 case 403:
                     setFunctionError("createFolder", "Forbiden");
@@ -254,7 +254,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
 
             toast.success(t('toasts.folder_deleted', 'storage'));
         } catch (err: any) {
-            const errMsg = err.message || `Failed to delete folder`;
+            const errMsg = err?.message || `Failed to delete folder`;
             switch (err.status) {
                 case 403:
                     setFunctionError("deleteFolder", "Forbiden");
@@ -284,7 +284,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
 
             toast.success(t('toasts.folder_renamed', 'storage').replace('{name}', name));
         } catch (err: any) {
-            const errMsg = err.message || `Failed to rename`;
+            const errMsg = err?.message || `Failed to rename`;
             switch (err.status) {
                 case 403:
                     setFunctionError("renameFolder", "Forbiden");
@@ -328,7 +328,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             toast.success(t('toasts.file_uploaded', 'storage').replace('{name}', name));
 
         } catch (err: any) {
-            const errMsg = err.message || `Failed to upload file`;
+            const errMsg = err?.message || `Failed to upload file`;
             switch (err.status) {
                 case 403:
                     setFunctionError("uploadFile", "Forbiden");
@@ -357,7 +357,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
 
             toast.success(t('toasts.file_deleted', 'storage'));
         } catch (err: any) {
-            const errMsg = err.message || `Failed to delete file`;
+            const errMsg = err?.message || `Failed to delete file`;
             switch (err.status) {
                 case 403:
                     setFunctionError("deleteFile", "Forbiden");
@@ -392,7 +392,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             }
             toast.success(t('toasts.file_downloaded', 'storage'));
         } catch (err: any) {
-            const errMsg = err.message || `Failed to download file`;
+            const errMsg = err?.message || `Failed to download file`;
             switch (err.status) {
                 case 403:
                     setFunctionError("downloadFile", "Forbiden");
@@ -444,7 +444,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             toast.success(t('toasts.item_moved', 'storage'));
             await loadFolderByPath(newParentPath, api)
         } catch (err: any) {
-            const errMsg = err.message || `Failed to move item  `;
+            const errMsg = err?.message || `Failed to move item  `;
             switch (err.status) {
                 case 403:
                     setFunctionError("moveStorageItem", "Forbiden");
@@ -492,7 +492,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                     setFunctionError("loadRoot", "Forbiden");
                     break;
                 default:
-                    setFunctionError("loadRoot", err.message || "Failed to load root items");
+                    setFunctionError("loadRoot", err?.message || "Failed to load root items");
                     break;
             }
 

@@ -8,6 +8,7 @@ import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Butt
 import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { DossierStatusHistoryModal } from './components/DossierStatusHistoryModal';
+import { PlotDetailsSection } from './components/PlotDetailsSection';
 import { PartnersSection } from './components/PartnersSection';
 import { FacilitiesSection } from './components/FacilitiesSection';
 import { ContractsSection } from './components/ContractsSection';
@@ -124,6 +125,9 @@ export function ShowDossierPage() {
         </div>
       </SectionCard>
 
+      {plotId &&
+        <PlotDetailsSection plotId={plotId} />
+      }
       {dossierId && plotId &&
         <PartnersSection plotId={plotId} dossierId={dossierId} />
       }

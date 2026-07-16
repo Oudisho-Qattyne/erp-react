@@ -5,13 +5,24 @@ import { FormInput, type FormInputProps, } from '../inputs/FormInput';
 import { Button } from '../buttons/Button';
 import { z, type ZodSchema, type ZodObject } from 'zod';
 import { useDynamicForm } from '../../../hooks/useDynamicForm221';
+import { useLanguage } from '../../../context/i18n/I18nProvider';
 import type { InputType } from '../inputs/Input';
 import type { UseFormReturn } from 'react-hook-form';
 
 export type FieldConfig<T extends FieldValues = any> = Omit<FormInputProps<T>, 'name'> & {
   name: Path<T>;
   render?: (methods: UseFormReturn<T>) => React.ReactNode;
+  group?: string;
+  groupColumns?: number;
 };
+
+export interface GroupConfig {
+  group: string;
+  title?: string;
+  columns?: number;
+  rows?: string[][];
+  children?: GroupConfig[];
+}
 
 function isZodObject(schema: ZodSchema<any>): schema is ZodObject<any> {
   return 'shape' in schema;
@@ -36,7 +47,8 @@ function flattenSchema(
 
 interface GenericCreateFormProps {
   schema: ZodSchema<any>;
-  fields?: FieldConfig[]; // 👈 explicit field configurations
+  fields?: FieldConfig[]; // explicit field configurations
+  groups?: GroupConfig[]; // group definitions (order, titles, columns)
   defaultValues?: Record<string, any>;
   onSubmit: (data: any) => Promise<any>;
   onSuccess: (id: number, item: any) => void;
@@ -44,15 +56,102 @@ interface GenericCreateFormProps {
   submitLabel?: string;
 }
 
+type GroupedItem = {
+  group: string;
+  title?: string;
+  columns: number;
+  rows?: string[][];
+  fields: FieldConfig[];
+  children?: GroupedItem[];
+};
+
+function buildGroupedFields(fields: FieldConfig[], groups?: GroupConfig[]) {
+  const grouped: GroupedItem[] = [];
+  const ungrouped: FieldConfig[] = [];
+
+  if (groups) {
+    const used = new Set<number>();
+
+    function processGroup(g: GroupConfig): GroupedItem | null {
+      if (g.children && g.children.length > 0) {
+        const children: GroupedItem[] = [];
+        for (const child of g.children) {
+          const item = processGroup(child);
+          if (item) children.push(item);
+        }
+        if (children.length === 0) return null;
+        return {
+          group: g.group,
+          title: g.title,
+          columns: 0,
+          fields: [],
+          children,
+        };
+      }
+
+      const groupFields: FieldConfig[] = [];
+      fields.forEach((f, idx) => {
+        if (!used.has(idx) && f.group === g.group) {
+          used.add(idx);
+          groupFields.push(f);
+        }
+      });
+      if (groupFields.length === 0) return null;
+      return {
+        group: g.group,
+        title: g.title,
+        columns: g.columns || groupFields.length,
+        rows: g.rows,
+        fields: groupFields,
+      };
+    }
+
+    for (const g of groups) {
+      const item = processGroup(g);
+      if (item) grouped.push(item);
+    }
+
+    fields.forEach((f, idx) => {
+      if (!used.has(idx)) ungrouped.push(f);
+    });
+  } else {
+    const groupOrder: string[] = [];
+    const groupMap = new Map<string, FieldConfig[]>();
+    for (const f of fields) {
+      if (f.group) {
+        if (!groupMap.has(f.group)) {
+          groupOrder.push(f.group);
+          groupMap.set(f.group, []);
+        }
+        groupMap.get(f.group)!.push(f);
+      } else {
+        ungrouped.push(f);
+      }
+    }
+    for (const g of groupOrder) {
+      grouped.push({
+        group: g,
+        columns: groupMap.get(g)!.length,
+        fields: groupMap.get(g)!,
+      });
+    }
+  }
+
+  return { grouped, ungrouped };
+}
+
 export function GenericCreateForm({
   schema,
   fields: explicitFields,
+  groups,
   defaultValues,
   onSubmit,
   onSuccess,
   onCancel,
-  submitLabel = 'حفظ',
+  submitLabel,
 }: GenericCreateFormProps) {
+  const { t } = useLanguage();
+  const resolvedSubmitLabel = submitLabel || t('common.save', 'shared') || 'حفظ';
   const { form: methods , errors , getValues} = useDynamicForm({ schema, defaultValues });
   const { handleSubmit, formState } = methods;
   const { isValid, isSubmitting } = formState;
@@ -93,11 +192,63 @@ export function GenericCreateForm({
 
   // If explicit fields are provided, use them
   if (explicitFields && explicitFields.length > 0) {
+    const { grouped, ungrouped } = buildGroupedFields(explicitFields, groups);
+
+    const renderGroupItem = (g: GroupedItem): React.ReactNode => {
+      if (g.children) {
+        return (
+          <div key={g.group} className="rounded-xl border border-border p-4">
+            {g.title && <h3 className="text-lg font-bold text-text mb-4">{g.title}</h3>}
+            <div className="space-y-3">
+              {g.children.map((child) => renderGroupItem(child))}
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div key={g.group} className="rounded-xl border border-border p-4">
+          {g.title && <h3 className="text-lg font-bold text-text mb-4">{g.title}</h3>}
+          {g.rows && g.rows.length > 0 ? (
+            <div className="space-y-3">
+              {g.rows.map((rowFieldNames, ri) => (
+                <div
+                  key={ri}
+                  style={{ gridTemplateColumns: `repeat(${rowFieldNames.length}, 1fr)` }}
+                  className="grid gap-3"
+                >
+                  {rowFieldNames.map((name) => {
+                    const field = g.fields.find((f) => f.name === name);
+                    if (!field) return null;
+                    return field.render
+                      ? <React.Fragment key={name}>{field.render(methods as any)}</React.Fragment>
+                      : <FormInput key={name} {...field} label={field.label} />;
+                  })}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div
+              style={{ gridTemplateColumns: `repeat(${g.columns}, 1fr)` }}
+              className="grid gap-3"
+            >
+              {g.fields.map((field) => (
+                field.render
+                  ? <React.Fragment key={field.name as string}>{field.render(methods as any)}</React.Fragment>
+                  : <FormInput key={field.name as string} {...field} label={field.label} />
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    };
+
     return (
       <FormProvider {...methods}>
         <div ref={formRef} className="space-y-4">
           <div className="space-y-3">
-            {explicitFields.map((field) => (
+            {grouped.map((g) => renderGroupItem(g))}
+            {ungrouped.map((field) => (
               field.render
                 ? <React.Fragment key={field.name as string}>{field.render(methods as any)}</React.Fragment>
                 : <FormInput key={field.name as string} {...field} label={field.label} />
@@ -105,7 +256,7 @@ export function GenericCreateForm({
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={onCancel}>
-              إلغاء
+              {t('common.cancel', 'shared') || 'إلغاء'}
             </Button>
             <Button
               type="button"
@@ -113,7 +264,7 @@ export function GenericCreateForm({
               disabled={!isValid || isSubmitting}
               onClick={methods.handleSubmit(handleFormSubmit)}
             >
-              {isSubmitting ? 'جاري...' : submitLabel}
+              {isSubmitting ? (t('common.loading', 'shared') || 'جاري...') : resolvedSubmitLabel}
             </Button>
           </div>
         </div>
@@ -171,7 +322,7 @@ export function GenericCreateForm({
         </div>
         <div className="flex justify-end gap-3 pt-2">
           <Button type="button" variant="outline" onClick={onCancel}>
-            إلغاء
+            {t('common.cancel', 'shared') || 'إلغاء'}
           </Button>
           <Button
             type="button"
@@ -179,7 +330,7 @@ export function GenericCreateForm({
             disabled={!isValid || isSubmitting}
             onClick={methods.handleSubmit(handleFormSubmit)}
           >
-            {isSubmitting ? 'جاري...' : submitLabel}
+            {isSubmitting ? (t('common.loading', 'shared') || 'جاري...') : resolvedSubmitLabel}
           </Button>
         </div>
       </div>

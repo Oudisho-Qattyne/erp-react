@@ -1,6 +1,6 @@
 export interface EmployeeListItem {
     id: number;
-    internal_id: string;
+    personal_id_number: string;
     national_id: string;
     full_name: string;
     gender: string;

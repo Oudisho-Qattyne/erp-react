@@ -99,7 +99,7 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
   };
 
   const fields: FieldConfig[] = [
-    { name: 'building_license_number', type: 'text', label: t('building_license.building_license_number', 'investments') || 'License Number', required: true },
+    { name: 'building_license_number', type: 'numeric', label: t('building_license.building_license_number', 'investments') || 'License Number', required: true },
     { name: 'building_license_date', type: 'date', label: t('building_license.building_license_date', 'investments') || 'License Date', required: true },
     { name: 'licensed_area', type: 'number', label: t('building_license.licensed_area', 'investments') || 'Licensed Area', required: true },
     {
@@ -115,7 +115,7 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
         <GenericCreateForm
           schema={getCreateLicensingStatusFormSchema(t)}
           fields={[
-            { name: 'name', type: 'text', label: t('common.name', 'shared') || 'Name', required: true },
+            { name: 'name', type: 'alpha', label: t('common.name', 'shared') || 'Name', required: true },
             { name: 'is_default', type: 'checkbox', label: t('licensing_statuses.is_default', 'investments') || 'Set as Default' },
           ]}
           onSubmit={(data) => createLicensingStatus({ ...data, is_active: true })}
@@ -126,7 +126,7 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
       ),
     },
     { name: 'date_of_displaying_license_info', type: 'date', label: t('building_license.date_of_displaying_license_info', 'investments') || 'Display Date', required: true },
-    { name: 'administrative_license_decision_number', type: 'text', label: t('building_license.administrative_license_decision_number', 'investments') || 'Admin Decision #', required: true },
+    { name: 'administrative_license_decision_number', type: 'numeric', label: t('building_license.administrative_license_decision_number', 'investments') || 'Admin Decision #', required: true },
     { name: 'administrative_license_decision_date', type: 'date', label: t('building_license.administrative_license_decision_date', 'investments') || 'Admin Decision Date', required: true },
     {
       name: 'by_duration_license_id',
@@ -141,7 +141,7 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
         <GenericCreateForm
           schema={getCreateByDurationLicenseFormSchema(t)}
           fields={[
-            { name: 'name', type: 'text', label: t('common.name', 'shared') || 'Name', required: true },
+            { name: 'name', type: 'alpha', label: t('common.name', 'shared') || 'Name', required: true },
             { name: 'is_default', type: 'checkbox', label: t('by_duration_licenses.is_default', 'investments') || 'Set as Default' },
           ]}
           onSubmit={(data) => createDurationLicense({ ...data, is_active: true })}
@@ -164,7 +164,7 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
         <GenericCreateForm
           schema={getCreateByIndustryLicenseFormSchema(t)}
           fields={[
-            { name: 'name', type: 'text', label: t('common.name', 'shared') || 'Name', required: true },
+            { name: 'name', type: 'alpha', label: t('common.name', 'shared') || 'Name', required: true },
             { name: 'is_default', type: 'checkbox', label: t('by_industry_licenses.is_default', 'investments') || 'Set as Default' },
           ]}
           onSubmit={(data) => createIndustryLicense({ ...data, is_active: true })}

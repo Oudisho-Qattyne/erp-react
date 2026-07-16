@@ -48,9 +48,9 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
       const res = await useCase.getPartners(plotId, dossierId)
       setPartners(res.data?.partners || [])
     } catch (err: any) {
-      const msg = err.message || "Failed to fetch partners"
+      const msg = err?.message || "Failed to fetch partners"
       setFnError("getPartners", msg)
-      toast.error(t("dossier.load_error", "investments") || msg)
+      toast.error(msg || t("dossier.load_error", "investments"))
     } finally {
       setFnLoading("getPartners", false)
     }
@@ -64,9 +64,9 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
       setPartners(res.data?.partners || [])
       toast.success(t("investors.add_investors_success", "investments") || "Partners added successfully")
     } catch (err: any) {
-      const msg = err.message || "Failed to add partners"
+      const msg = err?.message || "Failed to add partners"
       setFnError("addPartners", msg)
-      toast.error(t("investors.add_investors_error", "investments") || msg)
+      toast.error(msg || t("investors.add_investors_error", "investments"))
       throw err
     } finally {
       setFnLoading("addPartners", false)
@@ -81,9 +81,9 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
       setPartners(res.data?.partners || [])
       toast.success(t("investors.remove_investors_success", "investments") || "Partners removed successfully")
     } catch (err: any) {
-      const msg = err.message || "Failed to remove partners"
+      const msg = err?.message || "Failed to remove partners"
       setFnError("deletePartners", msg)
-      toast.error(t("investors.remove_investors_error", "investments") || msg)
+      toast.error(msg || t("investors.remove_investors_error", "investments"))
       throw err
     } finally {
       setFnLoading("deletePartners", false)

@@ -78,11 +78,11 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
   };
 
   const fields: FieldConfig[] = [
-    { name: 'name', type: 'text', label: t('facilities.name', 'investments') || 'Name', required: true },
+    { name: 'name', type: 'alpha', label: t('facilities.name', 'investments') || 'Name', required: true },
     { name: 'address', type: 'text', label: t('facilities.address', 'investments') || 'Address', required: true },
-    { name: 'city', type: 'text', label: t('facilities.city', 'investments') || 'City', required: true },
-    { name: 'first_phone_number', type: 'text', label: t('facilities.first_phone_number', 'investments') || 'Phone', required: true },
-    { name: 'second_phone_number', type: 'text', label: t('facilities.second_phone_number', 'investments') || 'Phone 2' },
+    { name: 'city', type: 'alpha', label: t('facilities.city', 'investments') || 'City', required: true },
+    { name: 'first_phone_number', type: 'numeric', label: t('facilities.first_phone_number', 'investments') || 'Phone', required: true },
+    { name: 'second_phone_number', type: 'numeric', label: t('facilities.second_phone_number', 'investments') || 'Phone 2' },
     { name: 'email', type: 'email', label: t('facilities.email', 'investments') || 'Email' },
     { name: 'capital_in_syp', type: 'number', label: t('facilities.capital_in_syp', 'investments') || 'Capital (SYP)', required: true },
     { name: 'capital_in_usd', type: 'number', label: t('facilities.capital_in_usd', 'investments') || 'Capital (USD)', required: true },

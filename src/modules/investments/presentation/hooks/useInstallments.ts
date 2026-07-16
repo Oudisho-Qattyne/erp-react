@@ -52,7 +52,7 @@ export const useInstallments = (): UseInstallmentsReturn => {
     } catch (err: any) {
       const msg = err?.message || "Failed to pay installment"
       setFnError("payNextUnpaidInstallment", msg)
-      toast.error(t("installments.pay_error", "investments") || msg)
+      toast.error(msg || t("installments.pay_error", "investments"))
       throw err
     } finally {
       setFnLoading("payNextUnpaidInstallment", false)
@@ -69,7 +69,7 @@ export const useInstallments = (): UseInstallmentsReturn => {
     } catch (err: any) {
       const msg = err?.message || "Failed to update payment date"
       setFnError("updatePaymentDate", msg)
-      toast.error(t("installments.update_date_error", "investments") || msg)
+      toast.error(msg || t("installments.update_date_error", "investments"))
       throw err
     } finally {
       setFnLoading("updatePaymentDate", false)

@@ -47,7 +47,7 @@ export function InvestorInterestFormModal({ isOpen, onClose, investorId, onSucce
       renderCreateForm: (onSuccess, onCancel) => (
         <GenericCreateForm
           fields={[
-            { name: 'name', label: t('plot_areas.name', 'investments') || 'Name', required: true },
+            { name: 'name', type: 'alpha', label: t('plot_areas.name', 'investments') || 'Name', required: true },
           ]}
           schema={getCreatePlotAreaFormSchema(t)}
           onSubmit={(data) => createArea({ ...data, is_active: true })}
@@ -67,7 +67,7 @@ export function InvestorInterestFormModal({ isOpen, onClose, investorId, onSucce
       renderCreateForm: (onSuccess, onCancel) => (
         <GenericCreateForm
           fields={[
-            { name: 'name', label: t('plot_classifications.name', 'investments') || 'Name', required: true },
+            { name: 'name', type: 'alpha', label: t('plot_classifications.name', 'investments') || 'Name', required: true },
           ]}
           schema={getCreatePlotClassificationFormSchema(t)}
           onSubmit={(data) => createClassification({ ...data, is_active: true })}

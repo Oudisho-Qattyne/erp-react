@@ -6,7 +6,7 @@ export const getCreateFacilityFormSchema = (t: (key: string, module?: string) =>
   city: z.string().min(1, t('facilities.validation.city_required', 'investments') || 'City is required'),
   first_phone_number: z.string().min(1, t('facilities.validation.first_phone_number_required', 'investments') || 'Phone is required'),
   second_phone_number: z.string().optional().nullable(),
-  email: z.string(t('facilities.validation.email_invalid', 'investments') || 'Invalid email').optional().nullable().or(z.literal('')),
+  email: z.string().email(t('facilities.validation.email_invalid', 'investments') || 'Invalid email address').optional().nullable().or(z.literal('')),
   capital_in_usd: z.number().positive(t('facilities.validation.capital_in_usd_positive', 'investments') || 'Must be positive'),
   capital_in_syp: z.number().positive(t('facilities.validation.capital_in_syp_positive', 'investments') || 'Must be positive'),
   value_of_machines_in_usd: z.number().positive(t('facilities.validation.value_of_machines_in_usd_positive', 'investments') || 'Must be positive'),

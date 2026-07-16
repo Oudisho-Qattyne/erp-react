@@ -20,7 +20,6 @@ export interface Plot {
   current_condition?: string;
   notes?: string;
   status_date?: string;
-  created_at?: string;
   updated_at?: string;
   folder_id?: string;
   user: User

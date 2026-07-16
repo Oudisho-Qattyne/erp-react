@@ -35,7 +35,7 @@ export function EmployeePickerDialog({
   }
 
   const columns: ColumnDef<EmployeeListItem>[] = [
-    { key: "internal_id", label: t("employees.internal_id", "hr"), width: 100, sortable: true },
+    { key: "personal_id_number", label: t("employees.personal_id_number", "hr"), width: 100, sortable: true },
     { key: "full_name", label: t("employees.full_name", "hr"), width: 200, sortable: true },
     { key: "national_id", label: t("employees.national_id", "hr"), width: 150, sortable: true },
     { key: "gender", label: t("employees.gender", "hr"), width: 80 },

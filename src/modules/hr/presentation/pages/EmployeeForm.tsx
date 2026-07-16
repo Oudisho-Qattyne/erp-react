@@ -35,7 +35,7 @@ import { cleanPayload } from '../../../../core/utils/cleanPayload';
 
 
 export const EMPLOYEE_EMPTY_DEFAULTS = {
-  internal_id: null,
+  personal_id_number: null,
   national_id: null,
   first_name: null,
   father_name: null,
@@ -48,14 +48,14 @@ export const EMPLOYEE_EMPTY_DEFAULTS = {
   assigned_job: null,
   marital_status: 'single',
   number_of_children: null,
-  spouse_name: null,
+  wives: null,
   spouse_workplace: null,
   blood_type: null,
   phone_number: null,
   sham_cash_account: null,
-  residence_country_id: null,
+  country_id: null,
   residence_city_id: null,
-  residence_region_id: null,
+  residence_region: null,
   residential_area_details: null,
   civil_registry_record: null,
   health_status: null,
@@ -66,11 +66,7 @@ export const EMPLOYEE_EMPTY_DEFAULTS = {
     job_title: null,
     org_unit_id: null,
     appointment_date: null,
-    contract_type: null,
-    contract_nature: null,
     job_category: null,
-
-    workplace_city_id: null,
   },
   job_status_id: null,
   job_status_note: null,
@@ -119,7 +115,7 @@ function CreateEntityForm<T>({
 function UniversityCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number, item: any) => void; onCancel: () => void }) {
   const { t } = useLanguage();
   const { create: createUniversity } = useEntityCrud<University>('/shared-kernal/universities', '/shared-kernal/universities');
-  return <CreateEntityForm defaultValues={{ name: "" }} schema={UniversityFormSchema} fields={[{ name: 'name', label: t('employees.university', 'hr') || 'اسم الجامعة', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
+  return <CreateEntityForm defaultValues={{ name: "" }} schema={UniversityFormSchema} fields={[{ name: 'name', type: 'alpha', label: t('employees.university', 'hr') || 'اسم الجامعة', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
     onSubmit={async (data) => {
 
       return await createUniversity(data)
@@ -133,7 +129,7 @@ function FacultyCreateForm({ onSuccess, onCancel, universityId }: { onSuccess: (
   const schemaWithoutUni = FacultyFormSchema.omit({ university_id: true });
   return (
     <GenericCreateForm
-      fields={[{ name: 'name', label: t('employees.faculty', 'hr') || 'اسم الكلية', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
+      fields={[{ name: 'name', type: 'alpha', label: t('employees.faculty', 'hr') || 'اسم الكلية', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
       schema={schemaWithoutUni}
       onSubmit={async (data: any) => {
 
@@ -157,7 +153,7 @@ function SpecializationCreateForm({ onSuccess, onCancel, facultyId }: { onSucces
   const SpecializationSchema = SpecializationFormSchema.omit({ Faculty_id: true })
   return (
     <GenericCreateForm
-      fields={[{ name: 'name', label: t('employees.specialization', 'hr') || 'اسم الاختصاص', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
+      fields={[{ name: 'name', type: 'alpha', label: t('employees.specialization', 'hr') || 'اسم الاختصاص', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
       schema={SpecializationSchema}
       defaultValues={{ faculty_id: facultyId }}
       onSubmit={async (data: any) => {
@@ -179,7 +175,7 @@ function JobStatusCreateForm({ onSuccess, onCancel, facultyId }: { onSuccess: (i
   const { t } = useLanguage();
 
   const { entities: items, getAll, create: createJobStatus, update, remove } = useEntityCrud<JobStatus>('/hr/job-statuses', '/hr/job-statuses');
-  return <CreateEntityForm defaultValues={{ name: "" }} schema={UniversityFormSchema} fields={[{ name: 'name', label: t('employee_form.job_status', 'hr') || 'الحالة الوظيفية', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
+  return <CreateEntityForm defaultValues={{ name: "" }} schema={UniversityFormSchema} fields={[{ name: 'name', type: 'alpha', label: t('employee_form.job_status', 'hr') || 'الحالة الوظيفية', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
     onSubmit={async (data) => {
       return await createJobStatus(data)
 
@@ -196,7 +192,7 @@ function JobStatusCreateForm({ onSuccess, onCancel, facultyId }: { onSuccess: (i
 
 
 // -----------------------------------------------------------------------------
-// Main EmployeeForm Component (pure form, no internal dialog)
+// Main EmployeeForm Component (pure form, no personal dialog)
 // -----------------------------------------------------------------------------
 export interface EmployeeFormProps {
   defaultValues?: Partial<EmployeeFormValues>;
@@ -291,7 +287,7 @@ export function EmployeeForm({
   // Create form for country (add after other create forms)
   function CountryCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number | string, item: any) => void; onCancel: () => void }) {
     const { create: createCountry } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
-    return <CreateEntityForm fields={[{ name: 'name', label: t('employees.country', 'hr') || 'اسم الدولة', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]} defaultValues={{ name: '' }} schema={CountryFormSchema}
+    return <CreateEntityForm fields={[{ name: 'name', type: 'alpha', label: t('employees.country', 'hr') || 'اسم الدولة', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]} defaultValues={{ name: '' }} schema={CountryFormSchema}
       onSubmit={async (data) => {
         const payload = {
           ...data,
@@ -307,7 +303,7 @@ export function EmployeeForm({
   function ChronicDiseaseCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number | string, item: any) => void; onCancel: () => void }) {
     const { create: createChronicDisease } = useEntityCrud<ChronicDiseases>('/hr/chronic-diseases', '/hr/chronic-diseases');
     return <CreateEntityForm
-      fields={[{ name: 'name', label: t('employees.chronic_diseases', 'hr') || 'الأمراض المزمنة' }]}
+      fields={[{ name: 'name', type: 'alpha', label: t('employees.chronic_diseases', 'hr') || 'الأمراض المزمنة' }]}
       defaultValues={{ name: '' }}
       schema={EntityFormSchema}
       onSubmit={async (data) => {
@@ -323,7 +319,7 @@ export function EmployeeForm({
   }
   function EmployeeStatusCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number | string, item: any) => void; onCancel: () => void }) {
     const { create: createEmployeeStatus } = useEntityCrud<EmployeeStatus>('/hr/employee-statuses', '/hr/employee-statuses');
-    return <CreateEntityForm fields={[{ name: 'name', label: t('employees.employee_status', 'hr') || 'حالة الموظف' }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]} defaultValues={{ name: '' }} schema={EmployeeStatusFormSchema} onSubmit={async (data) => {
+    return <CreateEntityForm fields={[{ name: 'name', type: 'alpha', label: t('employees.employee_status', 'hr') || 'حالة الموظف' }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]} defaultValues={{ name: '' }} schema={EmployeeStatusFormSchema} onSubmit={async (data) => {
       const payload = {
         ...data,
         name: data.name,
@@ -342,7 +338,7 @@ export function EmployeeForm({
 
     return (
       <GenericCreateForm
-        fields={[{ name: 'name', label: t('employees.city', 'hr') || 'اسم المدينة', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
+        fields={[{ name: 'name', type: 'alpha', label: t('employees.city', 'hr') || 'اسم المدينة', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
         schema={schemaWithoutCountry}
         defaultValues={{ name: '' }}
         onSubmit={async (data) => {
@@ -365,19 +361,19 @@ export function EmployeeForm({
   // Modify RegionCreateForm to accept cityId
   function RegionCreateForm({ onSuccess, onCancel, cityId }: { onSuccess: (id: number, item: any) => void; onCancel: () => void; cityId?: number }) {
     const { create: createRegion } = useRegions();
-    const schemaWithoutCity = RegionFormSchema.omit({ city_id: true });
+    const schemaWithoutCity = RegionFormSchema.omit({ residence_city_id: true });
     return (
       <GenericCreateForm
-        fields={[{ name: 'name', label: t('employees.region', 'hr') || 'اسم المنطقة السكنية', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
+        fields={[{ name: 'name', type: 'alpha', label: t('employees.region', 'hr') || 'اسم المنطقة السكنية', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'قيمة افتراضية', required: false, type: 'checkbox' }]}
         schema={schemaWithoutCity}
-        defaultValues={{ city_id: cityId }}
+        defaultValues={{ residence_city_id: cityId }}
         onSubmit={async (data) => {
           const payload = {
             ...data,
             name: {
               ar: data.name
             },
-            city_id: cityId
+            residence_city_id: cityId
           }
           return await createRegion(payload);
         }}
@@ -445,16 +441,16 @@ export function EmployeeForm({
   type FieldConfig = Omit<FormInputProps<any>, 'name'> & { name: string };
 
   const PERSONAL_FIELDS: FieldConfig[] = [
-    { name: 'internal_id', label: t('employees.internal_id', 'hr') || 'الرقم الداخلي', required: true },
-    { name: 'national_id', label: t('employees.national_id', 'hr') || 'الرقم الوطني', required: true },
-    { name: 'first_name', label: t('employees.first_name', 'hr') || 'الاسم الأول', required: true },
-    { name: 'father_name', label: t('employees.father_name', 'hr') || 'اسم الأب' },
-    { name: 'grandfather_name', label: t('employees.grandfather_name', 'hr') || 'اسم الجد' },
-    { name: 'last_name', label: t('employees.last_name', 'hr') || 'اسم العائلة', required: true },
-    { name: 'mother_name', label: t('employees.mother_name', 'hr') || 'اسم الأم' },
+    { name: 'personal_id_number', label: t('employees.personal_id_number', 'hr') || 'الرقم الذاتي' , type:'numeric'},
+    { name: 'national_id', label: t('employees.national_id', 'hr') || 'الرقم الوطني', required: true , type:'numeric' },
+    { name: 'first_name', type: 'alpha', label: t('employees.first_name', 'hr') || 'الاسم الأول', required: true },
+    { name: 'father_name', type: 'alpha', label: t('employees.father_name', 'hr') || 'اسم الأب' },
+    { name: 'grandfather_name', type: 'alpha', label: t('employees.grandfather_name', 'hr') || 'اسم الجد' },
+    { name: 'last_name', type: 'alpha', label: t('employees.last_name', 'hr') || 'اسم العائلة', required: true },
+    { name: 'mother_name', type: 'alpha', label: t('employees.mother_name', 'hr') || 'اسم الأم' },
     { name: 'gender', label: t('employees.gender', 'hr') || 'الجنس', type: 'select', options: [{ value: 'male', label: t('employees.gender_male', 'hr') || 'ذكر' }, { value: 'female', label: t('employees.gender_female', 'hr') || 'أنثى' }], required: true },
     { name: 'date_birth', type: 'date', label: t('employees.date_birth', 'hr') || 'تاريخ الميلاد' },
-    { name: 'place_birth', label: t('employees.place_birth', 'hr') || 'مكان الميلاد' },
+    { name: 'place_birth', type: 'alpha', label: t('employees.place_birth', 'hr') || 'مكان الميلاد' },
     {
       name: 'marital_status',
       label: t('employees.marital_status', 'hr') || 'الحالة الاجتماعية',
@@ -470,22 +466,45 @@ export function EmployeeForm({
 
 
     {
-      name: 'spouse_name', label: t('employees.spouse_name', 'hr') || 'اسم الزوج/الزوجة',
-      dependsOn: ['marital_status']
-      ,
+      name: 'wives', label: t('employees.wives', 'hr') || 'Wives',
+      dependsOn: ['marital_status' , 'gender'],
+      type:'data-matrix',
+      matrixFields: [
+        {
+          label: t('employees.wives_plural', 'hr') || "Wives Names",
+          name: "name",
+          type: "text"
+        },
+      ],
       compute: (values) => {
-        if (values.marital_status != 'married')
-          return { disabled: true }
-
+        if (values.marital_status == 'single')
+          return { disabled: true , value:null }
+        if(values.gender == "female")
+            return{disabled: false , numberOfRows:1 , value:[] , matrixFields:[
+          {
+          label: t('employees.wives_single', 'hr') || 'Husband Name',
+          name: "name",
+          type: "text"
+        },]}
+        if(values.gender == "male")
+          return{disabled: false , numberOfRows:4 , value:[] , matrixFields:[
+        {
+          label: t('employees.wives_plural', 'hr') || "Wives' Names",
+          name: "name",
+          type: "text"
+        },]}
         return { disabled: false }
-      }
+      },
+      rowSchema: z.object({
+        name: z.string().min(1, t('employee_form.validation.name_invalid', 'hr') || 'اسم الابن مطلوب').nullable(),
+      })
     },
     {
-      name: 'spouse_workplace', label: t('employees.spouse_workplace', 'hr') || 'جهة عمل الزوج/الزوجة',
+      name: 'spouse_workplace', type: 'alpha', label: t('employees.spouse_workplace', 'hr') || 'جهة عمل الزوج/الزوجة',
       dependsOn: ['marital_status']
       , compute: (values) => {
-        if (values.marital_status != 'married')
-          return { disabled: true }
+        if (values.marital_status == 'single')
+          return { disabled: true ,  value:null }
 
         return { disabled: false }
       }
@@ -494,8 +513,8 @@ export function EmployeeForm({
       name: 'number_of_children', label: t('employees.number_of_children', 'hr') || 'عدد الأولاد',
       dependsOn: ['marital_status'],
       compute: (values) => {
-        if (values.marital_status != 'married')
-          return { disabled: true }
+        if (values.marital_status == 'single')
+          return { disabled: true , value:null }
 
         return { disabled: false }
       },
@@ -505,7 +524,7 @@ export function EmployeeForm({
       name: 'children', label: t('employees.children', 'hr') || 'الأولاد',
       dependsOn: ['marital_status', 'number_of_children'],
       compute: (values) => {
-        if (values.marital_status != 'married' || values.number_of_children <= 0)
+        if (values.marital_status == 'single' || values.number_of_children <= 0)
           return { disabled: true , numberOfRows:0 , value:[]}
 
         return { disabled: false, numberOfRows: values.number_of_children }
@@ -530,10 +549,10 @@ export function EmployeeForm({
       })
     },
     { name: 'blood_type', type: 'select', options: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((v) => ({ value: v, label: v })), label: t('employees.blood_type', 'hr') || 'فصيلة الدم' },
-    { name: 'phone_number', label: t('employees.phone_number', 'hr') || 'رقم الهاتف' },
+    { name: 'phone_number', type: 'numeric', label: t('employees.phone_number', 'hr') || 'رقم الهاتف' },
     { name: 'sham_cash_account', label: t('employees.sham_cash_account', 'hr') || 'حساب الشام كاش' },
     {
-      name: 'residence_country_id',
+      name: 'country_id',
       type: 'select-or-create',
       searchable: true,
       label: t('employees.country', 'hr') || 'الدولة',
@@ -551,9 +570,9 @@ export function EmployeeForm({
       searchable: true,
       label: t('employees.city', 'hr') || 'المدينة',
       required: true,
-      dependsOn: ['residence_country_id'],
+      dependsOn: ['country_id'],
       compute: async (values) => {
-        const countryId = values.residence_country_id;
+        const countryId = values.country_id;
         if (!countryId) return { options: [], disabled: true };
         const response = await loadCitiesByCountry(countryId);
         return { options: response.data.map((c: any) => ({ value: c.id, label: c.name, is_default: c.is_default })) };
@@ -562,32 +581,19 @@ export function EmployeeForm({
       labelPath: 'data.name',
 
       renderCreateForm: (onSuccess, onCancel, deps) => (
-        <CityCreateForm countryId={deps?.residence_country_id as number} onSuccess={onSuccess} onCancel={onCancel} />
+        <CityCreateForm countryId={deps?.country_id as number} onSuccess={onSuccess} onCancel={onCancel} />
       ),
     },
     {
-      name: 'residence_region_id',
-      type: 'select-or-create',
+      name: 'residence_region',
+      type: 'alpha',
       searchable: true,
       label: t('employees.region', 'hr') || 'منطقة السكن',
       required: true,
-      dependsOn: ['residence_city_id'],
-      compute: async (values) => {
-        const cityId = values.residence_city_id;
-        if (!cityId) return { options: [], disabled: true };
-        const response = await loadRegionsByCity(cityId);
-        return { options: response.data.map((r: any) => ({ value: r.id, label: r.name, is_default: r.is_default })) };
-      },
-      createTitle: t('employee_form.add_region', 'hr') || 'إضافة منطقة جديدة',
-      labelPath: 'data.name',
-
-      renderCreateForm: (onSuccess, onCancel, deps) => (
-        <RegionCreateForm cityId={deps?.residence_city_id as number} onSuccess={onSuccess} onCancel={onCancel} />
-      ),
     },
     { name: 'residential_area_details', label: t('employees.residential_area_details', 'hr') || 'تفاصيل المنطقة السكنية' },
-    { name: 'civil_registry_record', label: t('employees.civil_registry_record', 'hr') || 'رقم القيد المدني' },
-    { name: 'health_status', label: t('employees.health_status', 'hr') || 'الحالة الصحية' },
+    { name: 'civil_registry_record', type: 'numeric', label: t('employees.civil_registry_record', 'hr') || 'رقم القيد المدني' },
+    { name: 'health_status', type: 'alpha', label: t('employees.health_status', 'hr') || 'الحالة الصحية' },
     { name: 'injury_details', label: t('employees.injury_details', 'hr') || 'تفاصيل الإصابات' },
     { name: 'injury_date', type: 'date', label: t('employees.injury_date', 'hr') || 'تاريخ الإصابة' },
     {
@@ -626,31 +632,10 @@ export function EmployeeForm({
   ];
 
   const EMPLOYMENT_FIELDS: FieldConfig[] = [
-    { name: 'employment_details.job_title', label: t('employees.job_title', 'hr') || 'المسمى الوظيفي' },
-    { name: 'assigned_job', label: t('employees.assigned_job', 'hr') || 'العمل المكلف به', required: true },
+    { name: 'employment_details.job_title', type: 'alpha', label: t('employees.job_title', 'hr') || 'المسمى الوظيفي' },
+    { name: 'assigned_job', type: 'alpha', label: t('employees.assigned_job', 'hr') || 'العمل المكلف به', required: true },
     { name: 'employment_details.appointment_date', type: 'date', label: t('employees.appointment_date', 'hr') || 'تاريخ التعيين' },
-    {
-      name: 'employment_details.contract_type',
-      label: t('employees.contract_type', 'hr') || 'نوع العقد',
-      type: 'select',
-      options: [
-        { value: 'full-time', label: t('show_employee.contract_full_time', 'hr') || 'دوام كامل' },
-        { value: 'part-time', label: t('show_employee.contract_part_time', 'hr') || 'دوام جزئي' },
-        { value: 'temporary', label: t('show_employee.contract_temporary', 'hr') || 'مؤقت' },
-        { value: 'contract', label: t('show_employee.contract_contract', 'hr') || 'عقد' },
-      ],
-    },
-    {
-      name: 'employment_details.contract_nature',
-      label: t('employees.contract_nature', 'hr') || 'طبيعة العقد',
-      type: 'select',
-      options: [
-        { value: 'permanent', label: t('show_employee.nature_permanent', 'hr') || 'دائم' },
-        { value: 'temporary', label: t('show_employee.nature_temporary', 'hr') || 'مؤقت' },
-        { value: 'internship', label: t('show_employee.nature_internship', 'hr') || 'تدريب' },
-      ],
-    },
-    { name: 'employment_details.job_category', label: t('employees.job_category', 'hr') || 'التصنيف الوظيفي' },
+    { name: 'employment_details.job_category', type: 'alpha', label: t('employees.job_category', 'hr') || 'التصنيف الوظيفي' },
     {
       name: 'job_status_id', label: t('employees.job_status', 'hr') || 'الحالة الوظيفية',
       required: true,
@@ -676,24 +661,7 @@ export function EmployeeForm({
         }
       }
     },
-    {
-      name: 'employment_details.workplace_city_id',
-      type: 'select-or-create',
-      searchable: true,
-      label: t('employees.workplace_city', 'hr') || 'مدينة العمل',
-      required: true,
-      createTitle: t('employee_form.add_city', 'hr') || 'إضافة مدينة جديدة',
-      dependsOn: ['residence_country_id'],
-      compute: async (values) => {
-        const countryId = values.residence_country_id;
-        if (!countryId) return { options: [], disabled: true };
-        const response = await loadCitiesByCountry(countryId);
-        return { options: response.data.map((c: any) => ({ value: c.id, label: c.name, is_default: c.is_default })) }
-      },
-      labelPath: 'data.name',
-
-      renderCreateForm: (onSuccess, onCancel) => <CityCreateForm onSuccess={onSuccess} onCancel={onCancel} />,
-    },
+   
   ];
   const gridColsClass = {
     1: 'grid-cols-1',
@@ -780,7 +748,7 @@ export function EmployeeForm({
                     ]}
                     label={t('employee_form.category', 'hr') || 'التصنيف'}
                   />
-                  <FormInput name={`educations.${idx}.degree_name`} label={t('employees.degree_name', 'hr') || "اسم الشهادة"} />
+                  <FormInput name={`educations.${idx}.degree_name`} type="alpha" label={t('employees.degree_name', 'hr') || "اسم الشهادة"} />
                   <FormInput
                     name={`educations.${idx}.university_id`}
                     type="select-or-create"
@@ -834,9 +802,9 @@ export function EmployeeForm({
                       />
                     )}
                   />
-                  <FormInput name={`educations.${idx}.graduation_year`} label={t('employees.graduation_year', 'hr') || "سنة التخرج"} />
-                  <FormInput name={`educations.${idx}.academic_stage`} label={t('employees.academic_stage', 'hr') || "المرحلة الأكاديمية"} />
-                  <FormInput name={`educations.${idx}.study_status`} label={t('employees.study_status', 'hr') || "حالة الدراسة"} />
+                  <FormInput name={`educations.${idx}.graduation_year`} type="numeric" label={t('employees.graduation_year', 'hr') || "سنة التخرج"} />
+                  <FormInput name={`educations.${idx}.academic_stage`} type="alpha" label={t('employees.academic_stage', 'hr') || "المرحلة الأكاديمية"} />
+                  <FormInput name={`educations.${idx}.study_status`} type="alpha" label={t('employees.study_status', 'hr') || "حالة الدراسة"} />
                 </div>
               </div>
             ))}

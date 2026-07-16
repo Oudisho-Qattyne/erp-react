@@ -19,7 +19,7 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
   });
 
   return z.object({
-    internal_id: z.string().min(1, t('employee_form.validation.internal_id_required', 'hr') || 'Internal ID is required'),
+    personal_id_number: z.string().min(1, t('employee_form.validation.personal_id_number_required', 'hr') || 'Internal ID is required'),
     national_id: z.string().min(1, t('employee_form.validation.national_id_required', 'hr') || 'National ID is required'),
     first_name: z.string().min(1, t('employee_form.validation.first_name_required', 'hr') || 'First name is required'),
     father_name: z.string().min(1, t('employee_form.validation.father_name_required', 'hr') || 'Father name is required'),
@@ -33,14 +33,14 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
     assigned_job: z.string().min(1, t('employee_form.validation.assigned_job_required', 'hr') || 'Assigned job is required'),
     marital_status: z.enum(['single', 'married', 'divorced', 'widowed'], t('employee_form.validation.marital_status_invalid', 'hr') || 'Marital status is invalid'),
     number_of_children: z.number().min(0, t('employee_form.validation.number_of_children_invalid', 'hr') || 'Number of children must be zero or positive'),
-    spouse_name: z.string().optional().default(''),
+    wives: z.string().optional().default(''),
     spouse_workplace: z.string().optional().default(''),
     blood_type: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], t('employee_form.validation.blood_type_invalid', 'hr') || 'Blood type is invalid'),
     phone_number: z.string().regex(/^\+?[0-9]{7,15}$/, t('employee_form.validation.phone_number_invalid', 'hr') || 'Phone number must be 7-15 digits, may start with +'),
     sham_cash_account: z.string().optional().default(''),
-    residence_country_id: z.number().optional().default(0),
+    country_id: z.number().optional().default(0),
     residence_city_id: z.number().optional().default(0),
-    residence_region_id: z.number().min(0).default(0),
+    residence_region: z.string().or(z.literal('')).nullable().optional(),
     residential_area_details: z.string().optional(),
     civil_registry_record: z.string().optional(),
     health_status: z.string().optional(),
@@ -53,10 +53,7 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
       org_unit_id: z.number().min(0).default(0),
       status: z.enum(['active', 'inactive', 'terminated', 'on_leave'], t('employee_form.validation.status_invalid', 'hr') || 'Employment status is invalid'),
       appointment_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, t('employee_form.validation.appointment_date_invalid', 'hr') || 'Appointment date must be YYYY-MM-DD'),
-      contract_type: z.enum(['full-time', 'part-time', 'temporary', 'contract'], t('employee_form.validation.contract_type_invalid', 'hr') || 'Contract type is invalid'),
-      contract_nature: z.enum(['permanent', 'temporary', 'internship'], t('employee_form.validation.contract_nature_invalid', 'hr') || 'Contract nature is invalid'),
       job_category: z.string().min(1, t('employee_form.validation.job_category_required', 'hr') || 'Job category is required'),
-      workplace_city_id: z.number().min(0).default(0),
     }),
 
     educations: z.array(EducationEntrySchema).default([]),

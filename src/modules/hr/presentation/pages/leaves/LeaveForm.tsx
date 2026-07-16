@@ -97,7 +97,7 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
   }, [entitlementType])
 
   const GENERAL_FIELDS: FieldConfig[] = [
-    { name: "name", label: t("leave.name", "hr"), required: true },
+    { name: "name", type: "alpha", label: t("leave.name", "hr"), required: true },
     { name: "description", label: t("leave.description", "hr"), required: true },
     {
       name: "unit",
