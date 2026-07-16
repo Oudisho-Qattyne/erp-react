@@ -20,6 +20,7 @@ import { IndustryTypesPage } from './presentation/pages/industry-types/IndustryT
 import { LicensingStatusesPage } from './presentation/pages/licensing-statuses/LicensingStatusesPage';
 import { ByDurationLicensesPage } from './presentation/pages/by-duration-licenses/ByDurationLicensesPage';
 import { ByIndustryLicensesPage } from './presentation/pages/by-industry-licenses/ByIndustryLicensesPage';
+import { ServiceConditionsPage } from './presentation/pages/service-conditions/ServiceConditionsPage';
 import { MapPin, Users, Clock, Building2 } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { ShowFacilityPage } from './presentation/pages/plots/ShowFacilityPage';
@@ -111,6 +112,18 @@ const investmentsModule: Module = {
       moduleName: 'investments',
       requiredPermission: 'investments.plot-classifications.list',
       icon: <List size={18} />,
+      group: 'investments',
+    },
+    {
+      path: '/investments/service-conditions',
+      element: <ServiceConditionsPage />,
+      layout: 'dashboard',
+      label: 'service_conditions.title',
+      nav: true,
+      order: 15,
+      moduleName: 'investments',
+      requiredPermission: 'investments.service-conditions.list',
+      icon: <FileCheck size={18} />,
       group: 'investments',
     },
     {

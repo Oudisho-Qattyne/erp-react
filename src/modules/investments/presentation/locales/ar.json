@@ -52,6 +52,32 @@
       "name_required": "الاسم مطلوب"
     }
   },
+  "service_conditions": {
+    "title": "شروط الخدمة",
+    "add": "إضافة شرط خدمة",
+    "name": "اسم الشرط",
+    "is_active": "فعال",
+    "is_default": "تعيين كافتراضي",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا يوجد شروط خدمة",
+    "edit_log": "سجل التعديل",
+    "no_edit_log": "لا يوجد سجل تعديلات",
+    "event": "الحدث",
+    "created_at": "تاريخ الإنشاء",
+    "changed_by": "تم التغيير بواسطة",
+    "changes": "التغييرات",
+    "field": "الحقل",
+    "old_value": "القيمة القديمة",
+    "new_value": "القيمة الجديدة",
+    "subject_id": "رقم شرط الخدمة",
+    "id": "ID",
+    "validation": {
+      "name_required": "اسم الشرط مطلوب"
+    }
+  },
   "plots": {
     "title": "المقاسم",
     "add": "إضافة مقسم",
@@ -435,6 +461,13 @@
         "update": "تعديل تصنيف",
         "delete": "حذف تصنيف"
       },
+      "service-conditions": {
+        "list": "قائمة شروط الخدمة",
+        "view": "عرض شرط خدمة",
+        "create": "إنشاء شرط خدمة",
+        "update": "تعديل شرط خدمة",
+        "delete": "حذف شرط خدمة"
+      },
       "plot-dossier": {
         "list": "قائمة الإضبارات",
         "view": "عرض الإضبارة",
@@ -796,6 +829,9 @@
     },
     "plot_classifications": {
       "title": "التصنيفات"
+    },
+    "service_conditions": {
+      "title": "شروط الخدمة"
     },
     "plots": {
       "title": "المقاسم"

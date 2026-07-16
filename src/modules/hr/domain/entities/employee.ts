@@ -42,6 +42,10 @@ export interface EmployeeChildren {
   birthdate: string
 }
 
+export interface EmployeeSpouse {
+  name: string;
+}
+
 export interface OrganizationalUnit {
   id: number;
   name: string;
@@ -77,7 +81,7 @@ export interface EmployeeData {
   assigned_job: string;
   marital_status: MaritalStatus;          // 'married', 'single', etc.   
   number_of_children: number;
-  wives: string[];
+  wives: EmployeeSpouse[];
   spouse_workplace: string;
   blood_type: BloodType;                // 'O+', etc.
   phone_number: string;

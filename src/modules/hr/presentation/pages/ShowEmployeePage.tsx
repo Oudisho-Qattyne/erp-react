@@ -204,7 +204,7 @@ export function ShowEmployeePage() {
               <InfoRow label={t('employees.marital_status', 'hr') || 'الحالة الاجتماعية'} value={getMaritalStatus(employee.marital_status, t)} />
               {employee.marital_status === 'married' && (
                 <>
-                  <InfoRow label={t('employees.wives', 'hr') || 'اسم الزوج/الزوجة'} value={employee.wives} />
+                  <InfoRow label={t('employees.wives', 'hr') || 'اسم الزوج/الزوجة'} value={employee.wives?.map((w: any) => w.name).join(', ') || '-'} />
                   <InfoRow label={t('employees.spouse_workplace', 'hr') || 'جهة عمل الزوج/الزوجة'} value={employee.spouse_workplace} />
                   <InfoRow label={t('employees.number_of_children', 'hr') || 'عدد الأولاد'} value={employee.number_of_children} />
                 </>

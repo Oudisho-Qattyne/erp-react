@@ -17,6 +17,10 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
     birthdate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, t('employee_form.validation.birthdate_invalid', 'hr') || 'تاريخ الولادة بصيغة YYYY-MM-DD'),
   })
 
+  const EmployeeSpouse = z.object({
+    name: z.string().default('').nullable().optional(),
+  })
+
   return z.object({
     // Personal
     personal_id_number: z.string().nullable().optional(),
@@ -33,7 +37,7 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
     assigned_job: z.string(t('employee_form.validation.assigned_job_required', 'hr') || 'العمل المكلف به مطلوب').min(1, t('employee_form.validation.assigned_job_required', 'hr') || 'العمل المكلف به مطلوب'),
     marital_status: z.enum(['single', 'married', 'divorced', 'widowed'], t('employee_form.validation.marital_status_invalid', 'hr') || 'الحالة الاجتماعية غير صالحة').nullable(),
     number_of_children: z.number().min(0, t('employee_form.validation.number_of_children_invalid', 'hr') || 'عدد الأولاد يجب أن يكون صفراً أو موجباً').nullable().optional(),
-    wives: z.array(z.string()).nullable().optional().default([]),
+    wives: z.array(EmployeeSpouse).default([]),
     spouse_workplace: z.string().or(z.literal('')).nullable().optional(),
     blood_type: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], t('employee_form.validation.blood_type_invalid', 'hr') || 'فصيلة الدم غير صالحة').nullable(),
     phone_number: z.string().regex(/^\+?[0-9]{7,15}$/, t('employee_form.validation.phone_number_invalid', 'hr') || 'رقم الهاتف غير صالح (يجب أن يحتوي على 7-15 رقم، ويمكن أن يبدأ بـ +)').nullable(),

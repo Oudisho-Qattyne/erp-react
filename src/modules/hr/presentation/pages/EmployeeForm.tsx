@@ -48,7 +48,7 @@ export const EMPLOYEE_EMPTY_DEFAULTS = {
   assigned_job: null,
   marital_status: 'single',
   number_of_children: null,
-  wives: null,
+  wives: [],
   spouse_workplace: null,
   blood_type: null,
   phone_number: null,
@@ -473,30 +473,30 @@ export function EmployeeForm({
         {
           label: t('employees.wives_plural', 'hr') || "Wives Names",
           name: "name",
-          type: "text"
+          type: "alpha"
         },
       ],
       compute: (values) => {
         if (values.marital_status == 'single')
-          return { disabled: true , value:null }
+          return { disabled: true, value: [] }
         if(values.gender == "female")
-            return{disabled: false , numberOfRows:1 , value:[] , matrixFields:[
+            return{disabled: false , numberOfRows:1 , matrixFields:[
           {
           label: t('employees.wives_single', 'hr') || 'Husband Name',
           name: "name",
-          type: "text"
+          type: "alpha"
         },]}
         if(values.gender == "male")
-          return{disabled: false , numberOfRows:4 , value:[] , matrixFields:[
+          return{disabled: false , numberOfRows:4 , matrixFields:[
         {
           label: t('employees.wives_plural', 'hr') || "Wives' Names",
           name: "name",
-          type: "text"
+          type: "alpha"
         },]}
         return { disabled: false }
       },
       rowSchema: z.object({
-        name: z.string().min(1, t('employee_form.validation.name_invalid', 'hr') || 'اسم الابن مطلوب').nullable(),
+        name: z.string().nullable().optional(),
       })
     },
     {
@@ -676,6 +676,7 @@ export function EmployeeForm({
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(async (data) => {
         try {
+          data = {...data , wives:data.wives.filter(w => w.name !== "")}
           await onSubmit(cleanPayload(data))
           methods.reset(data)
         } catch (err: any) {

@@ -46,7 +46,9 @@ export function EditEmployeePage() {
             assigned_job: emp.assigned_job,
             marital_status: emp.marital_status,
             number_of_children: emp.number_of_children,
-            wives: emp.wives,
+            wives: emp.wives?.map((wife: any) => ({
+              name: wife.name,
+            })) || [],
             spouse_workplace: emp.spouse_workplace,
             blood_type: emp.blood_type,
             phone_number: emp.phone_number,
@@ -87,6 +89,7 @@ export function EditEmployeePage() {
               birthdate: child.birthdate,
             })) || [],
           };
+          
           setDefaultValues(mappedValues);
         } else {
           setError(t('edit_employee.not_found', 'hr') || 'لم يتم العثور على الموظف');
@@ -102,6 +105,7 @@ export function EditEmployeePage() {
       fetchEmployee();
     }
   }, [id, apiClient]);
+  console.log(defaultValues);
 
   const handleSubmit = async (data: EmployeeFormValues) => {
     try {

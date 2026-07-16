@@ -336,6 +336,7 @@
       "contract_nature_invalid": "Invalid contract nature",
       "job_category_required": "Job category is required",
       "name_invalid": "Invalid name",
+      "spouse_name_required": "Spouse name is required",
       "birthdate_invalid": "Invalid birth date",
       "country_required": "Country is required",
       "city_required": "City is required",

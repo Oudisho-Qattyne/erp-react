@@ -52,6 +52,32 @@
       "name_required": "Name is required"
     }
   },
+  "service_conditions": {
+    "title": "Service Conditions",
+    "add": "Add Service Condition",
+    "name": "Condition Name",
+    "is_active": "Is Active",
+    "is_default": "Set as Default",
+    "created": "{name} created successfully",
+    "create_error": "Failed to create {name}",
+    "deleted": "{name} deleted successfully",
+    "delete_error": "Failed to delete {name}",
+    "no_records": "No Service Conditions found",
+    "edit_log": "Edit Log",
+    "no_edit_log": "No edit logs found",
+    "event": "Event",
+    "created_at": "Created At",
+    "changed_by": "Changed By",
+    "changes": "Changes",
+    "field": "Field",
+    "old_value": "Old Value",
+    "new_value": "New Value",
+    "subject_id": "Service Condition ID",
+    "id": "ID",
+    "validation": {
+      "name_required": "Condition name is required"
+    }
+  },
   "plots": {
     "title": "Plots",
     "add": "Add Plot",
@@ -435,6 +461,13 @@
         "update": "Edit Plot Classification",
         "delete": "Delete Plot Classification"
       },
+      "service-conditions": {
+        "list": "List Service Conditions",
+        "view": "View Service Condition",
+        "create": "Create Service Condition",
+        "update": "Edit Service Condition",
+        "delete": "Delete Service Condition"
+      },
       "plot-dossier": {
         "list": "List Dossiers",
         "view": "View Dossier",
@@ -796,6 +829,9 @@
     },
     "plot_classifications": {
       "title": "Plot Classifications"
+    },
+    "service_conditions": {
+      "title": "Service Conditions"
     },
     "plots": {
       "title": "Plots"

@@ -3,7 +3,7 @@
 import type { BloodType } from '../../../../core/domain/valueObjects/BloodType';
 import type { Gender } from '../../../../core/domain/valueObjects/Gender';
 import type { MaritalStatus } from '../../../../core/domain/valueObjects/MaritalStatus';
-import type { EducationEntry, EmployeeChildren, EmploymentDetails } from '../../domain/entities/employee';
+import type { EducationEntry, EmployeeChildren, EmployeeSpouse, EmploymentDetails } from '../../domain/entities/employee';
   
   // -----------------------------------------------------------------------------
   // Education DTOs
@@ -52,7 +52,7 @@ import type { EducationEntry, EmployeeChildren, EmploymentDetails } from '../../
     assigned_job:string;
     marital_status: MaritalStatus;
     number_of_children: number;
-    wives: string;
+    wives: EmployeeSpouse[];
     spouse_workplace: string;
     blood_type: BloodType;
     phone_number: string;

@@ -334,6 +334,7 @@
       "contract_nature_invalid": "طبيعة العقد غير صالحة",
       "job_category_required": "التصنيف الوظيفي مطلوب",
       "name_invalid": "الاسم غير صالح",
+      "spouse_name_required": "اسم الزوج/الزوجة مطلوب",
       "birthdate_invalid": "تاريخ الولادة غير صالح",
       "country_required": "الدولة مطلوبة",
       "city_required": "المدينة مطلوبة",
