@@ -1,4 +1,5 @@
 import type { DossierStatus } from "../valueObjects/plots/dossierStatus";
+import type { Plot } from "./plot";
 
 export interface Dossier {
     id:number;
@@ -8,5 +9,7 @@ export interface Dossier {
     subscription_date?: null,
     notes?: string;
     status: DossierStatus;
+    plot_id?: number;
+    plot?: Plot;
     partners?:any[]
 }

@@ -1,6 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, createContext, useContext, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
+
+interface DialogCloseHandle {
+  setDisableClose: (v: boolean) => void;
+}
+
+const DialogCloseContext = createContext<DialogCloseHandle>({
+  setDisableClose: () => {},
+});
+
+export function useDialogClose() {
+  return useContext(DialogCloseContext);
+}
 
 interface DialogProps {
   isOpen: boolean;
@@ -24,6 +36,7 @@ const sizeClasses = {
 export function Dialog({ isOpen, onClose, title, children, actions, size = 'md', headerClassName }: DialogProps) {
   const [shouldRender, setShouldRender] = useState(isOpen);
   const [isClosing, setIsClosing] = useState(false);
+  const [disableClose, setDisableClose] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -40,14 +53,18 @@ export function Dialog({ isOpen, onClose, title, children, actions, size = 'md',
     }
   }, [isOpen, shouldRender]);
 
+  const handleClose = useCallback(() => {
+    if (!disableClose) onClose();
+  }, [disableClose, onClose]);
+
   // Close on Escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) onClose();
+      if (e.key === 'Escape' && isOpen && !disableClose) onClose();
     };
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, disableClose]);
 
   if (!shouldRender) return null;
 
@@ -56,7 +73,7 @@ export function Dialog({ isOpen, onClose, title, children, actions, size = 'md',
       {/* Backdrop */}
       <div
         className={`absolute inset-0 bg-black/50 backdrop-blur-sm ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}
-        onClick={onClose}
+        onClick={handleClose}
       />
       {/* Modal panel */}
       <div
@@ -68,12 +85,16 @@ export function Dialog({ isOpen, onClose, title, children, actions, size = 'md',
         {/* Header */}
         <div className={`flex justify-between items-center p-4 border-b border-border ${headerClassName || 'bg-primary text-white'}`}>
           <h2 className="text-lg font-bold text-white">{title}</h2>
-          <button type="button" onClick={onClose} className="p-1.5 rounded-md hover:bg-danger/10 hover:text-danger transition-all duration-200 group">
+          <button type="button" onClick={handleClose} className="p-1.5 rounded-md hover:bg-danger/10 hover:text-danger transition-all duration-200 group">
             <X size={18} className="group-hover:text-danger transition-colors text-white cursor-pointer" />
           </button>
         </div>
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4">{children}</div>
+        <div className="flex-1 overflow-y-auto p-4">
+          <DialogCloseContext.Provider value={{ setDisableClose }}>
+            {children}
+          </DialogCloseContext.Provider>
+        </div>
         {/* Footer actions (optional) */}
         {actions && <div className="p-4 border-t border-border flex justify-end gap-2">{actions}</div>}
     </div>

@@ -6,6 +6,7 @@ import { Button } from '../buttons/Button';
 import { z, type ZodSchema, type ZodObject } from 'zod';
 import { useDynamicForm } from '../../../hooks/useDynamicForm221';
 import { useLanguage } from '../../../context/i18n/I18nProvider';
+import { useDialogClose } from '../dialog/Dialog';
 import type { InputType } from '../inputs/Input';
 import type { UseFormReturn } from 'react-hook-form';
 
@@ -155,7 +156,12 @@ export function GenericCreateForm({
   const { form: methods , errors , getValues} = useDynamicForm({ schema, defaultValues });
   const { handleSubmit, formState } = methods;
   const { isValid, isSubmitting } = formState;
+  const { setDisableClose } = useDialogClose();
   const formRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setDisableClose(isSubmitting);
+  }, [isSubmitting, setDisableClose]);
 
   const handleFormSubmit = async (data: any) => {
     try {
@@ -255,7 +261,7 @@ export function GenericCreateForm({
             ))}
           </div>
           <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="outline" onClick={onCancel}>
+            <Button type="button" variant="outline" disabled={isSubmitting} onClick={onCancel}>
               {t('common.cancel', 'shared') || 'إلغاء'}
             </Button>
             <Button
@@ -321,7 +327,7 @@ export function GenericCreateForm({
           })}
         </div>
         <div className="flex justify-end gap-3 pt-2">
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" disabled={isSubmitting} onClick={onCancel}>
             {t('common.cancel', 'shared') || 'إلغاء'}
           </Button>
           <Button

@@ -6,6 +6,8 @@ export interface Contract {
   id: number;
   dossier_id?: number | null;
   dossier?: Dossier | null;
+  plot_id?: number;
+  plot?: { id: number; code?: string; identifier?: string };
   contract_number: string;
   contract_date: string;
   unit_price_per_square_meter: number;

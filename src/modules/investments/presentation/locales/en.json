@@ -80,6 +80,7 @@
   },
   "plots": {
     "title": "Plots",
+    "section_title": "Plot",
     "add": "Add Plot",
     "code": "Plot Code",
     "identifier": "Identifier",
@@ -121,6 +122,10 @@
     "added_by": "Added By",
     "changed_by": "Changed By",
     "folder": "Plot Folder",
+    "group_basic_info": "Basic Information",
+    "group_classification": "Classification",
+    "group_location": "Location",
+    "group_additional": "Additional Information",
     "latitude": "Latitude",
     "longitude": "Longitude",
     "user_id": "User",
@@ -151,6 +156,7 @@
   },
   "dossier": {
     "title": "Dossiers",
+    "section_title": "Dossier",
     "add": "Add Dossier",
     "edit": "Edit Dossier",
     "number": "Dossier Number",
@@ -212,6 +218,7 @@
   },
   "contract": {
     "title": "Contracts",
+    "section_title": "Contract",
     "add": "Add Contract",
     "edit": "Edit Contract",
     "contract_number": "Contract Number",
@@ -317,6 +324,11 @@
     "old_value": "Old Value",
     "new_value": "New Value",
     "subject_id": "Facility ID",
+    "group_basic_info": "Basic Information",
+    "group_contact": "Contact Information",
+    "group_financial": "Financial Information",
+    "group_production": "Production Capacity",
+    "group_utilities": "Utilities",
     "plot_id": "Plot",
     "plot_dossier_id": "Dossier",
     "id": "ID",
@@ -628,6 +640,8 @@
     "field": "Field",
     "old_value": "Old Value",
     "new_value": "New Value",
+    "group_industry": "Industry Selection",
+    "group_decision": "Decision Details",
     "subject_id": "License ID",
     "validation": {
       "industry_category_required": "Industry category is required",
@@ -749,6 +763,7 @@
   "licensing_statuses": {
     "title": "Licensing Statuses",
     "add": "Add Licensing Status",
+    "create": "Create Licensing Status",
     "name": "Status Name",
     "is_active": "Is Active",
     "is_default": "Set as Default",
@@ -788,6 +803,10 @@
     "by_duration_license_id": "Duration License",
     "by_industry_license_id": "Industry License",
     "temp_administrative_license_expiration_date": "Temp Expiration Date",
+    "group_license_info": "License Information",
+    "group_status": "Licensing Status",
+    "group_admin_decision": "Admin Decision",
+    "group_license_types": "License Types",
     "created": "Building license created successfully",
     "create_error": "Failed to create building license",
     "updated": "Building license updated successfully",
@@ -862,6 +881,12 @@
     },
     "by_industry_licenses": {
       "title": "By Industry Licenses"
+    },
+    "dossiers": {
+      "title": "Dossiers"
+    },
+    "facilities": {
+      "title": "Facilities"
     },
     "contract": {
       "title": "Contracts"

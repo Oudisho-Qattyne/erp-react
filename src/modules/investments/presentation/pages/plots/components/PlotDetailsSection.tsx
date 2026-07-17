@@ -30,7 +30,7 @@ export function PlotDetailsSection({ plotId }: Props) {
   if (!plotId) return null;
 
   return (
-    <SectionCard title={t('plots.title', 'investments') || 'Plot Details'} icon={<MapPin size={20} />}>
+    <SectionCard title={t('plots.section_title', 'investments') || 'Plot'} icon={<MapPin size={20} />}>
       {loadingMap['getById'] && !plot ? (
         <div className="py-8"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>
       ) : error || !plot ? null : (

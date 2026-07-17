@@ -102,6 +102,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
       type: 'select-or-create',
       label: t('facility_industrial_licenses.industry_category', 'investments') || 'Industry Category',
       required: true,
+      group: 'industry',
       options: categories.map(c => ({ value: c.id, label: getLocalizedName(c.name), is_default: c.is_default })),
       createTitle: t('industry_categories.create', 'investments') || 'Create Industry Category',
       labelPath: 'name',
@@ -125,6 +126,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
       type: 'select-or-create',
       label: t('facility_industrial_licenses.industry_type', 'investments') || 'Industry Type',
       required: true,
+      group: 'industry',
       options: industryTypes.map(t => ({ value: t.id, label: getLocalizedName(t.name), is_default: t.is_default })),
       createTitle: t('industry_types.create', 'investments') || 'Create Industry Type',
       labelPath: 'name',
@@ -143,13 +145,14 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
         />
       ),
     },
-    { name: 'industrial_decision_number', type: 'numeric', label: t('facility_industrial_licenses.decision_number', 'investments') || 'Decision Number', required: true },
-    { name: 'industrial_decision_date', type: 'date', label: t('facility_industrial_licenses.decision_date', 'investments') || 'Decision Date', required: true },
+    { name: 'industrial_decision_number', type: 'numeric', label: t('facility_industrial_licenses.decision_number', 'investments') || 'Decision Number', required: true, group: 'decision' },
+    { name: 'industrial_decision_date', type: 'date', label: t('facility_industrial_licenses.decision_date', 'investments') || 'Decision Date', required: true, group: 'decision' },
     {
       name: 'industrial_decision_type_id',
       type: 'select-or-create',
       label: t('facility_industrial_licenses.decision_type', 'investments') || 'Decision Type',
       required: true,
+      group: 'decision',
       options: decisionTypes.map(d => ({ value: d.id, label: getLocalizedName(d.name), is_default: d.is_default })),
       createTitle: t('industrial_decision_types.create', 'investments') || 'Create Decision Type',
       labelPath: 'name',
@@ -173,6 +176,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
       type: 'select-or-create',
       label: t('facility_industrial_licenses.license_source', 'investments') || 'License Source',
       required: true,
+      group: 'decision',
       options: licenseSources.map(s => ({ value: s.id, label: getLocalizedName(s.name), is_default: s.is_default })),
       createTitle: t('industrial_license_sources.create', 'investments') || 'Create License Source',
       labelPath: 'name',
@@ -190,6 +194,24 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
           submitLabel={t('common.create', 'shared') || 'Create'}
         />
       ),
+    },
+  ];
+
+  const formGroups = [
+    {
+      group: 'industry',
+      title: t('facility_industrial_licenses.group_industry', 'investments') || 'Industry Selection',
+      columns: 2,
+      rows: [['industry_category_id', 'industry_type_id']],
+    },
+    {
+      group: 'decision',
+      title: t('facility_industrial_licenses.group_decision', 'investments') || 'Decision Details',
+      columns: 2,
+      rows: [
+        ['industrial_decision_number', 'industrial_decision_date'],
+        ['industrial_decision_type_id', 'industrial_license_source_id'],
+      ],
     },
   ];
 
@@ -229,11 +251,11 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
           <Button variant="ghost" size="sm" onClick={() => setViewingLicense(row)} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.facility-industrial-licenses.view">
             <Eye size={16} />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() =>{ setEditingLicense(row)}} title={t('common.edit', 'shared') || 'Edit'} requiredPermission="investments.facility-industrial-licenses.update">
+          <Button variant="ghost" size="sm" onClick={() => { setEditingLicense(row) }} title={t('common.edit', 'shared') || 'Edit'} requiredPermission="investments.facility-industrial-licenses.update">
             <Pencil size={16} />
           </Button>
           {
-            licenses.length != 1 &&
+            licenses.length > 1 &&
             <Button variant="ghost" size="sm" onClick={() => setDeletingLicense(row)} title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.facility-industrial-licenses.delete">
               <Trash2 size={16} className="text-danger" />
             </Button>
@@ -278,10 +300,11 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
         )}
       </SectionCard>
 
-      <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={t('facility_industrial_licenses.add', 'investments') || 'Add License'}>
+      <Dialog size='3xl' isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={t('facility_industrial_licenses.add', 'investments') || 'Add License'}>
         <GenericCreateForm
           schema={getCreateFacilityIndustrialLicenseFormSchema(t)}
           fields={fields}
+          groups={formGroups}
           onSubmit={handleCreate}
           onSuccess={() => setIsCreateOpen(false)}
           onCancel={() => setIsCreateOpen(false)}
@@ -289,11 +312,12 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
         />
       </Dialog>
 
-      <Dialog isOpen={!!editingLicense} onClose={() => setEditingLicense(null)} title={t('facility_industrial_licenses.edit', 'investments') || 'Edit License'}>
+      <Dialog size='3xl' isOpen={!!editingLicense} onClose={() => setEditingLicense(null)} title={t('facility_industrial_licenses.edit', 'investments') || 'Edit License'}>
         {editingLicense && (
           <GenericCreateForm
             schema={getCreateFacilityIndustrialLicenseFormSchema(t)}
             fields={fields}
+            groups={formGroups}
             defaultValues={{
               industry_category_id: editingLicense?.industry_category?.id,
               industry_type_id: editingLicense?.industry_type?.id,

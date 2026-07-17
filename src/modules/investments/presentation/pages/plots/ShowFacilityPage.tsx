@@ -8,6 +8,8 @@ import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { SectionCard } from '../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { InfoRow } from '../../../../../core/presentation/layouts/ui/card/InfoRow';
+import { DossierDetailsSection } from './components/DossierDetailsSection';
+import { PlotDetailsSection } from './components/PlotDetailsSection';
 import { FacilityIndustrialLicensesSection } from './components/FacilityIndustrialLicensesSection';
 import { BuildingLicenseSection } from './components/BuildingLicenseSection';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
@@ -95,6 +97,12 @@ export function ShowFacilityPage() {
           <InfoRow label={t('facilities.yearly_estimated_water_consumption', 'investments') || 'Water Consumption'} value={facility.yearly_estimated_water_consumption ?? '—'} />
         </div>
       </SectionCard>
+      {plotId && dossierId &&
+        <DossierDetailsSection dossierId={dossierId} plotId={plotId} />
+      }
+      {plotId &&
+        <PlotDetailsSection plotId={plotId} />
+      }
       {
         facilityId &&
         <FacilityIndustrialLicensesSection facilityId={facilityId} />

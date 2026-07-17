@@ -82,10 +82,12 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
     { name: 'contract_date', type: 'date', label: t('contract.contract_date', 'investments') || 'Contract Date', required: true },
     { name: 'unit_price_per_square_meter', type: 'number', label: t('contract.unit_price_per_square_meter', 'investments') || 'Unit Price / m²', required: true },
     { name: 'weighting_factor', type: 'number', label: t('contract.weighting_factor', 'investments') || 'Weighting Factor', required: true },
-    { name: 'payment_method', type: 'select', label: t('contract.payment_method', 'investments') || 'Payment Method', required: true, options: [
-      { value: 'cash', label: t('contract.payment_method_cash', 'investments') || 'Cash' },
-      { value: 'installment', label: t('contract.payment_method_installment', 'investments') || 'Installment' },
-    ]},
+    {
+      name: 'payment_method', type: 'select', label: t('contract.payment_method', 'investments') || 'Payment Method', required: true, options: [
+        { value: 'cash', label: t('contract.payment_method_cash', 'investments') || 'Cash' },
+        { value: 'installment', label: t('contract.payment_method_installment', 'investments') || 'Installment' },
+      ]
+    },
   ];
 
   const columns = [
@@ -95,7 +97,8 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
     { key: "weighting_factor", label: t("contract.weighting_factor", "investments") || "Weighting", width: 100 },
     { key: "final_price_per_square_meter", label: t("contract.final_price_per_square_meter", "investments") || "Final Price", width: 120 },
     { key: "total_price", label: t("contract.total_price", "investments") || "Total", width: 130 },
-    { key: "payment_method", label: t("contract.payment_method", "investments") || "Payment", width: 110,
+    {
+      key: "payment_method", label: t("contract.payment_method", "investments") || "Payment", width: 110,
       render: (row: Contract) => t(`contract.payment_method_${row.payment_method}`, 'investments') || row.payment_method
     },
     {
@@ -104,7 +107,7 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
       width: 130,
       render: (row: Contract) => (
         <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
-          <Button variant="ghost" size="sm" onClick={() => navigate(`/investments/contracts/${row.id}`)} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.contracts.view">
+          <Button variant="ghost" size="sm" onClick={() => navigate(`/investments/plots/${plotId}/dossiers/${dossierId}/contract/${row.id}`)} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.contracts.view">
             <Eye size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setEditingContract(row)} title={t('common.edit', 'shared') || 'Edit'} requiredPermission="investments.contracts.update">
@@ -136,9 +139,13 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
       >
         <div className="flex items-center justify-between mb-4">
           <div />
-          <Button variant="outline" size="sm" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="investments.contracts.create">
-            {t('contract.add', 'investments') || 'Add Contract'}
-          </Button>
+          {
+            contracts.length == 0 &&
+
+            <Button variant="outline" size="sm" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="investments.contracts.create">
+              {t('contract.add', 'investments') || 'Add Contract'}
+            </Button>
+          }
         </div>
         {errorMap["getAll"] ? (
           <ErrorState message={errorMap["getAll"]} onRetry={() => getContracts(listUrl)} />

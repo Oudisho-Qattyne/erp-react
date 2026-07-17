@@ -8,14 +8,13 @@ import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Butt
 import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { DossierStatusHistoryModal } from './components/DossierStatusHistoryModal';
+import { DossierDetailsSection } from './components/DossierDetailsSection';
 import { PlotDetailsSection } from './components/PlotDetailsSection';
 import { PartnersSection } from './components/PartnersSection';
 import { FacilitiesSection } from './components/FacilitiesSection';
 import { ContractsSection } from './components/ContractsSection';
 
-import { ArrowRight, History, FileText } from 'lucide-react';
-import { SectionCard } from '../../../../../core/presentation/layouts/ui/card/SectionCard';
-import { InfoRow } from '../../../../../core/presentation/layouts/ui/card/InfoRow';
+import { ArrowRight, History } from 'lucide-react';
 
 export function ShowDossierPage() {
   const { t } = useLanguage();
@@ -79,51 +78,9 @@ export function ShowDossierPage() {
         </Button>
       </div>
 
-      <SectionCard
-      // title={t('dossier.view_details', 'investments') || 'Dossier Details'}
-      // icon={<FileText size={20} />}
-      >
-        <div className='relative w-full flex justify-between items-center mb-6 pb-4'>
-          <h2 className="text-lg font-bold text-text flex items-center gap-2 border-b border-border/50">
-            <span className="text-primary"><FileText size={20} /></span>
-            {t('dossier.view_details', 'investments') || 'Dossier Details'}
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <InfoRow
-            label={t('dossier.number', 'investments') || 'Dossier Number'}
-            value={dossier.dossier_number}
-          />
-          <InfoRow
-            label={t('dossier.date', 'investments') || 'Dossier Date'}
-            value={dossier.dossier_date}
-          />
-          <InfoRow
-            label={t('dossier.allocated_date', 'investments') || 'Allocated Date'}
-            value={dossier.allocated_date || '—'}
-          />
-          <InfoRow
-            label={t('dossier.status', 'investments') || 'Status'}
-            value={
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full"
-                style={{
-                  color: dossier.status === 'active' ? '#16a34a' : dossier.status === 'cancelled' ? '#dc2626' : dossier.status === 'allocatable' ? '#2563eb' : '#ca8a04',
-                  background: dossier.status === 'active' ? '#dcfce7' : dossier.status === 'cancelled' ? '#fef2f2' : dossier.status === 'allocatable' ? '#dbeafe' : '#fefce8',
-                }}>
-                {t(`dossier.status_${dossier.status}`, 'investments') || dossier.status}
-              </span>
-            }
-          />
-          {dossier.notes && (
-            <div className="lg:col-span-3">
-              <InfoRow
-                label={t('plots.notes', 'investments') || 'Notes'}
-                value={dossier.notes}
-              />
-            </div>
-          )}
-        </div>
-      </SectionCard>
+      {plotId && dossierId &&
+        <DossierDetailsSection dossierId={dossierId} plotId={plotId} />
+      }
 
       {plotId &&
         <PlotDetailsSection plotId={plotId} />

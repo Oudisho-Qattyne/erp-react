@@ -80,6 +80,7 @@
   },
   "plots": {
     "title": "المقاسم",
+    "section_title": "مقسم",
     "add": "إضافة مقسم",
     "code": "رقم المقسم",
     "identifier": "ID",
@@ -121,6 +122,10 @@
     "added_by": "أضيف بواسطة",
     "changed_by": "تم التغيير بواسطة",
     "folder": "مجلد المقسم",
+    "group_basic_info": "المعلومات الأساسية",
+    "group_classification": "التصنيف",
+    "group_location": "الموقع",
+    "group_additional": "معلومات إضافية",
     "latitude": "خط العرض",
     "longitude": "خط الطول",
     "user_id": "المستخدم",
@@ -151,6 +156,7 @@
   },
   "dossier": {
     "title": "الإضبارات",
+    "section_title": "إضبارة",
     "add": "إضافة إضبارة",
     "edit": "تعديل الإضبارة",
     "number": "رقم الإضبارة",
@@ -212,6 +218,7 @@
   },
   "contract": {
     "title": "العقود",
+    "section_title": "عقد",
     "add": "إضافة عقد",
     "edit": "تعديل العقد",
     "contract_number": "رقم العقد",
@@ -317,6 +324,11 @@
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم المنشأة",
+    "group_basic_info": "المعلومات الأساسية",
+    "group_contact": "معلومات الاتصال",
+    "group_financial": "المعلومات المالية",
+    "group_production": "الطاقة الإنتاجية",
+    "group_utilities": "المرافق",
     "plot_id": "المقسم",
     "plot_dossier_id": "الإضبارة",
     "id": "ID",
@@ -628,6 +640,8 @@
     "field": "الحقل",
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
+    "group_industry": "اختيار الصناعة",
+    "group_decision": "تفاصيل القرار",
     "subject_id": "رقم الترخيص",
     "validation": {
       "industry_category_required": "تصنيف الصناعة مطلوب",
@@ -749,6 +763,7 @@
   "licensing_statuses": {
     "title": "حالات الترخيص",
     "add": "إضافة حالة ترخيص",
+    "create": "إنشاء حالة ترخيص",
     "name": "اسم الحالة",
     "is_active": "فعال",
     "is_default": "تعيين كافتراضي",
@@ -788,6 +803,10 @@
     "by_duration_license_id": "الترخيص حسب المدة",
     "by_industry_license_id": "الترخيص حسب الصناعة",
     "temp_administrative_license_expiration_date": "تاريخ انتهاء الرخصة المؤقتة",
+    "group_license_info": "معلومات الرخصة",
+    "group_status": "حالة الترخيص",
+    "group_admin_decision": "القرار الإداري",
+    "group_license_types": "أنواع التراخيص",
     "created": "تم إنشاء رخصة البناء بنجاح",
     "create_error": "فشل في إنشاء رخصة البناء",
     "updated": "تم تحديث رخصة البناء بنجاح",
@@ -862,6 +881,12 @@
     },
     "by_industry_licenses": {
       "title": "تراخيص حسب الصناعة"
+    },
+    "dossiers": {
+      "title": "الإضبارات"
+    },
+    "facilities": {
+      "title": "المنشآت"
     },
     "contract": {
       "title": "العقود"

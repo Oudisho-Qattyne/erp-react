@@ -12,7 +12,10 @@ import { CreateInvestorPage } from './presentation/pages/investors/CreateInvesto
 import { CreateFuturePossibleInvestorPage } from './presentation/pages/investors/CreateFuturepossibleInvestorPage';
 import { EditInvestorPage } from './presentation/pages/investors/EditInvestorPage';
 import { ShowDossierPage } from './presentation/pages/plots/ShowDossierPage';
+import { DossiersPage } from './presentation/pages/dossiers/DossiersPage';
+import { FacilitiesPage } from './presentation/pages/facilities/FacilitiesPage';
 import { ShowContractPage } from './presentation/pages/contracts/ShowContractPage';
+import { ContractsPage } from './presentation/pages/contracts/ContractsPage';
 import { IndustrialDecisionTypesPage } from './presentation/pages/industrial-decision-types/IndustrialDecisionTypesPage';
 import { IndustrialLicenseSourcesPage } from './presentation/pages/industrial-license-sources/IndustrialLicenseSourcesPage';
 import { IndustryCategoriesPage } from './presentation/pages/industry-categories/IndustryCategoriesPage';
@@ -21,7 +24,7 @@ import { LicensingStatusesPage } from './presentation/pages/licensing-statuses/L
 import { ByDurationLicensesPage } from './presentation/pages/by-duration-licenses/ByDurationLicensesPage';
 import { ByIndustryLicensesPage } from './presentation/pages/by-industry-licenses/ByIndustryLicensesPage';
 import { ServiceConditionsPage } from './presentation/pages/service-conditions/ServiceConditionsPage';
-import { MapPin, Users, Clock, Building2 } from 'lucide-react';
+import { MapPin, Users, Clock, Building2, FileText, Factory, FileSignature } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { ShowFacilityPage } from './presentation/pages/plots/ShowFacilityPage';
 
@@ -50,6 +53,18 @@ const investmentsModule: Module = {
       moduleName: 'investments',
       group: 'investments',
     },
+    // {
+    //   path: '/investments/dossiers',
+    //   element: <DossiersPage />,
+    //   layout: 'dashboard',
+    //   label: 'dossiers.title',
+    //   nav: true,
+    //   order: 7,
+    //   requiredPermission: 'investments.plot-dossier.list',
+    //   moduleName: 'investments',
+    //   icon: <FileText size={18} />,
+    //   group: 'investments',
+    // },
     {
       path: '/investments/plots/:plotId/dossiers/:dossierId',
       element: <ShowDossierPage />,
@@ -61,13 +76,37 @@ const investmentsModule: Module = {
       group: 'investments',
     },
     {
-      path: '/investments/contracts/:id',
+      path: '/investments/plots/:plotId/dossiers/:dossierId/contract/:id',
       element: <ShowContractPage />,
       layout: 'dashboard',
       label: 'contract.title',
       nav: false,
       requiredPermission: 'investments.contracts.view',
       moduleName: 'investments',
+      group: 'investments',
+    },
+    {
+      path: '/investments/facilities',
+      element: <FacilitiesPage />,
+      layout: 'dashboard',
+      label: 'facilities.title',
+      nav: true,
+      order: 8,
+      requiredPermission: 'investments.facilities.list',
+      moduleName: 'investments',
+      icon: <Factory size={18} />,
+      group: 'investments',
+    },
+    {
+      path: '/investments/contracts',
+      element: <ContractsPage />,
+      layout: 'dashboard',
+      label: 'contract.title',
+      nav: true,
+      order: 9,
+      requiredPermission: 'investments.contracts.list',
+      moduleName: 'investments',
+      icon: <FileSignature size={18} />,
       group: 'investments',
     },
     {

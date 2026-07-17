@@ -9,9 +9,15 @@ export interface MatrixFieldConfig {
   label: string;
   type?: InputType;
   required?: boolean;
+  disabled?: boolean;
   options?: { value: number | string; label: string }[];
   placeholder?: string;
   defaultValue?: any;
+  searchable?: boolean;
+  createTitle?: string;
+  renderCreateForm?: (onSuccess: (value: number | string, item?: unknown) => void, onCancel: () => void, dependentData?: Record<string, unknown>) => React.ReactNode;
+  labelPath?: string;
+  createButtonPermission?: string;
 }
 
 interface DataMatrixInputProps {
@@ -25,6 +31,7 @@ interface DataMatrixInputProps {
   baseClasses?: string;
   errors?: Record<number, Record<string, string>>;
   rowSchema?: { safeParse: (data: any) => { success: boolean; error?: { flatten: () => { fieldErrors: Record<string, string[]> } } } };
+  dependentData?: Record<string, unknown>;
 }
 
 const getDefaultRow = (fields: MatrixFieldConfig[]) => {
@@ -52,6 +59,7 @@ export function DataMatrixInput({
   baseClasses = '',
   errors: externalErrors = {},
   rowSchema,
+  dependentData,
 }: DataMatrixInputProps) {
   const defaultRow = useMemo(() => getDefaultRow(matrixFields), [matrixFields]);
   const rows = numberOfRows !== undefined
@@ -141,8 +149,14 @@ export function DataMatrixInput({
                         onChange={(val) => handleCellChange(rowIndex, field.name, val)}
                         options={field.options}
                         placeholder={field.placeholder}
-                        disabled={disabled}
+                        disabled={field.disabled ?? disabled}
                         required={field.required}
+                        searchable={field.searchable}
+                        createTitle={field.createTitle}
+                        renderCreateForm={field.renderCreateForm}
+                        dependentData={dependentData}
+                        labelPath={field.labelPath}
+                        createButtonPermission={field.createButtonPermission}
                         baseClasses={`${inputBaseClasses} border-0 focus:ring-0 rounded-none ${cellError ? 'border-danger ring-danger/10' : ''}`}
                       />
                       {cellError && <div className={errorClasses}>{cellError}</div>}

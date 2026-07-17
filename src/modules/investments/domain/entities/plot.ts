@@ -2,6 +2,7 @@ import type { User } from "../../../users/domain/entities/user/user";
 import type { PlotStatus } from "../valueObjects/plots/plotStatus";
 import type { PlotArea } from "./plotArea";
 import type { PlotClassification } from "./plotClassification";
+import type { PlotServiceCondition } from "./plotServiceCondition";
 
 export interface Plot {
   id: number;
@@ -17,8 +18,8 @@ export interface Plot {
   plot_classification?: PlotClassification;
   plot_area_name: string;
   plot_classification_name: string;
-  current_condition?: string;
-  notes?: string;
+  service_conditions:PlotServiceCondition[]
+  // notes?: string;
   status_date?: string;
   updated_at?: string;
   folder_id?: string;

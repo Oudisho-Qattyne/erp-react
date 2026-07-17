@@ -173,6 +173,7 @@ const InputTypes: React.FC<InputProps> = ({
           baseClasses={localClass}
           errors={matrixErrors}
           rowSchema={rowSchema}
+          dependentData={dependentData}
         />
       );
 
