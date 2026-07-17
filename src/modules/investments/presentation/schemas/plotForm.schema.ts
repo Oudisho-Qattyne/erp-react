@@ -16,8 +16,8 @@ export const getCreatePlotFormSchema = (t: (key: string, module?: string) => str
   plot_classification_id: z.number(t('plots.validation.plot_classification_id_invalid', 'investments') || 'يجب أن يكون التصنيف رقماً'),
   latitude: z.string().min(1, t('plots.validation.latitude_required', 'investments') || 'خط العرض مطلوب'),
   longitude: z.string().min(1, t('plots.validation.longitude_required', 'investments') || 'خط الطول مطلوب'),
-  service_conditions: z.array(z.coerce.number()).nullable().optional(),
-  service_conditions_notes : z.array(z.object({note : z.string() , service_condition : z.string()})),
+  // service_conditions: z.array(z.coerce.number()).nullable().optional(),
+  service_conditions : z.array(z.object({note : z.string() , id : z.number()})),
   // notes: z.string().or(z.literal('')).optional().nullable(),
   status_date: z.string().or(z.literal('')).optional().nullable(),
 });

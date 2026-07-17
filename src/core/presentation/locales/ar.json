@@ -50,7 +50,8 @@
     "delete_error": "فشل حذف {name}",
     "set_default_success": "تم تعيين {name} كافتراضي بنجاح",
     "set_default_error": "فشل تعيين {name} كافتراضي",
-    "retry": "إعادة المحاولة"
+    "retry": "إعادة المحاولة",
+    "add_row": "إضافة صف"
   },
   "pagination": {
     "showing": "عرض",

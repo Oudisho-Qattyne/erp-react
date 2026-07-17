@@ -188,14 +188,15 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
       type: "data-matrix",
       rowSchema: z.object({
         note: z.string(),
-        service_condition: z.number(),
+        id: z.number().nullable(),
       }),
       matrixFields: [
         {
           label: t('service_conditions.name', 'investments'),
-          name: "service_condition",
+          name: "id",
           type: "select-or-create",
           searchable: true,
+          excludeSelected: true,
           options: serviceConditions.map(a => ({ value: a.id, label: a.name, is_default: a.is_default })),
           createTitle: t('common.new', 'shared') || 'New',
           labelPath: 'data.name',
@@ -244,7 +245,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
       group: 'additional',
       title: t('plots.group_additional', 'investments') || 'Additional Information',
       columns: 2,
-      rows: [['service_conditions', 'service_conditions_notes']],
+      rows: [['service_conditions']],
     },
   ];
 
@@ -338,7 +339,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
             </div>
             <div className="space-y-1">
               <span className="text-sm text-text-muted">{t('plots.current_condition', 'investments') || 'Current Condition'}</span>
-              <p className="font-medium text-text">{plot?.service_conditions.map(sc => `${sc.name} `) || '—'}</p>
+              <p className="font-medium text-text">{plot?.service_conditions?.map(sc => `${sc.name} `) || '—'}</p>
               {/* keep in mind */}
             </div>
             <div className="space-y-1">

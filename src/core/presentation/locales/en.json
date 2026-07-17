@@ -50,7 +50,8 @@
     "delete_error": "Failed to delete {name}",
     "set_default_success": "{name} set as default successfully",
     "set_default_error": "Failed to set {name} as default",
-    "retry": "Retry"
+    "retry": "Retry",
+    "add_row": "Add Row"
   },
   "pagination": {
     "showing": "Showing",

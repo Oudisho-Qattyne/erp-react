@@ -120,6 +120,38 @@ export function FormInput<T extends FieldValues>({
   const finalMatrixFields = computed.matrixFields ?? matrixFields;
   const finalNumberOfRows = computed.numberOfRows ?? numberOfRows;
 
+  // Map nested array errors from react-hook-form (set by server validationErrors)
+  // e.g. errors.service_conditions[0].id → { 0: { service_condition: "msg" } }
+  const combinedMatrixErrors = useMemo(() => {
+    if (type !== 'data-matrix') return matrixErrors;
+    const merged: Record<number, Record<string, string>> = {};
+    const rawMatrixErrors = matrixErrors;
+    if (rawMatrixErrors) {
+      Object.entries(rawMatrixErrors).forEach(([rowIdx, fields]) => {
+        merged[Number(rowIdx)] = { ...fields };
+      });
+    }
+    const arrayErrors = (errors as any)?.[name];
+    if (Array.isArray(arrayErrors)) {
+      const fieldNames = finalMatrixFields?.map(f => f.name) || [];
+      arrayErrors.forEach((rowErr: any, rowIndex: number) => {
+        if (!rowErr || typeof rowErr !== 'object') return;
+        if (!merged[rowIndex]) merged[rowIndex] = {};
+        Object.entries(rowErr).forEach(([fieldName, errVal]: [string, any]) => {
+          const msg = typeof errVal === 'object' && errVal?.message ? String(errVal.message) : String(errVal);
+          if (fieldNames.includes(fieldName)) {
+            merged[rowIndex][fieldName] = msg;
+          } else if (fieldNames.length > 0) {
+            if (!merged[rowIndex][fieldNames[0]]) {
+              merged[rowIndex][fieldNames[0]] = msg;
+            }
+          }
+        });
+      });
+    }
+    return merged;
+  }, [errors, name, type, matrixErrors, finalMatrixFields]);
+
   const hasAccess = useMemo(() => {
     if (!requiredPermission) return true;
     return auth?.hasPermission(requiredPermission) ?? false;
@@ -219,7 +251,7 @@ export function FormInput<T extends FieldValues>({
         numberOfRows={finalNumberOfRows}
         minRows={minRows}
         maxRows={maxRows}
-        matrixErrors={matrixErrors}
+        matrixErrors={combinedMatrixErrors}
         rowSchema={rowSchema}
         baseClasses={baseClasses}
         requiredPermission={requiredPermission}
