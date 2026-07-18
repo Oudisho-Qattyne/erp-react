@@ -48,14 +48,14 @@ export const EMPLOYEE_EMPTY_DEFAULTS = {
   assigned_job: null,
   marital_status: 'single',
   number_of_children: null,
-  wives: [],
+  spouses: [],
   spouse_workplace: null,
   blood_type: null,
   phone_number: null,
   sham_cash_account: null,
   country_id: null,
   residence_city_id: null,
-  residence_region: null,
+  // residence_region: null,
   residential_area_details: null,
   civil_registry_record: null,
   health_status: null,
@@ -466,13 +466,18 @@ export function EmployeeForm({
 
 
     {
-      name: 'wives', label: t('employees.wives', 'hr') || 'Wives',
+      name: 'spouses', label: t('employees.spouses', 'hr') || 'Employee spouses',
       dependsOn: ['marital_status' , 'gender'],
       type:'data-matrix',
       matrixFields: [
         {
-          label: t('employees.wives_plural', 'hr') || "Wives Names",
+          label: t('employees.spouses_plural', 'hr') || "Employee spouses names",
           name: "name",
+          type: "alpha"
+        },
+        {
+          label: t('employees.spouses_workplace', 'hr') || "Employee spouses workplace",
+          name: "workplace",
           type: "alpha"
         },
       ],
@@ -482,32 +487,34 @@ export function EmployeeForm({
         if(values.gender == "female")
             return{disabled: false , numberOfRows:1 , matrixFields:[
           {
-          label: t('employees.wives_single', 'hr') || 'Husband Name',
+          label: t('employees.spouses_single', 'hr') || 'Husband Name',
           name: "name",
           type: "alpha"
-        },]}
+        },
+        {
+          label: t('employees.employee_spouse_workplace_husband', 'hr') || "Husband's workplace",
+          name: "workplace",
+          type: "alpha"
+        },
+      ]}
         if(values.gender == "male")
           return{disabled: false , numberOfRows:4 , matrixFields:[
         {
-          label: t('employees.wives_plural', 'hr') || "Wives' Names",
+          label: t('employees.spouses_plural', 'hr') || "Employee spouses' Names",
           name: "name",
           type: "alpha"
-        },]}
+        },
+        {
+          label: t('employees.employee_spouse_workplace_wife', 'hr') || "Wife's workplace",
+          name: "workplace",
+          type: "alpha"
+        },
+      ]}
         return { disabled: false }
       },
       rowSchema: z.object({
         name: z.string().nullable().optional(),
       })
-    },
-    {
-      name: 'spouse_workplace', type: 'alpha', label: t('employees.spouse_workplace', 'hr') || 'جهة عمل الزوج/الزوجة',
-      dependsOn: ['marital_status']
-      , compute: (values) => {
-        if (values.marital_status == 'single')
-          return { disabled: true ,  value:null }
-
-        return { disabled: false }
-      }
     },
     {
       name: 'number_of_children', label: t('employees.number_of_children', 'hr') || 'عدد الأولاد',
@@ -516,7 +523,7 @@ export function EmployeeForm({
         if (values.marital_status == 'single')
           return { disabled: true , value:null }
 
-        return { disabled: false }
+        return { disabled: false , required:true}
       },
       type: 'number'
     },
@@ -552,7 +559,7 @@ export function EmployeeForm({
     { name: 'phone_number', type: 'numeric', label: t('employees.phone_number', 'hr') || 'رقم الهاتف' },
     { name: 'sham_cash_account', label: t('employees.sham_cash_account', 'hr') || 'حساب الشام كاش' },
     {
-      name: 'country_id',
+      name: 'residence_country_id',
       type: 'select-or-create',
       searchable: true,
       label: t('employees.country', 'hr') || 'الدولة',
@@ -570,9 +577,9 @@ export function EmployeeForm({
       searchable: true,
       label: t('employees.city', 'hr') || 'المدينة',
       required: true,
-      dependsOn: ['country_id'],
+      dependsOn: ['residence_country_id'],
       compute: async (values) => {
-        const countryId = values.country_id;
+        const countryId = values.residence_country_id;
         if (!countryId) return { options: [], disabled: true };
         const response = await loadCitiesByCountry(countryId);
         return { options: response.data.map((c: any) => ({ value: c.id, label: c.name, is_default: c.is_default })) };
@@ -581,16 +588,16 @@ export function EmployeeForm({
       labelPath: 'data.name',
 
       renderCreateForm: (onSuccess, onCancel, deps) => (
-        <CityCreateForm countryId={deps?.country_id as number} onSuccess={onSuccess} onCancel={onCancel} />
+        <CityCreateForm countryId={deps?.residence_country_id as number} onSuccess={onSuccess} onCancel={onCancel} />
       ),
     },
-    {
-      name: 'residence_region',
-      type: 'alpha',
-      searchable: true,
-      label: t('employees.region', 'hr') || 'منطقة السكن',
-      required: true,
-    },
+    // {
+    //   name: 'residence_region',
+    //   type: 'alpha',
+    //   searchable: true,
+    //   label: t('employees.region', 'hr') || 'منطقة السكن',
+    //   required: true,
+    // },
     { name: 'residential_area_details', label: t('employees.residential_area_details', 'hr') || 'تفاصيل المنطقة السكنية' },
     { name: 'civil_registry_record', type: 'numeric', label: t('employees.civil_registry_record', 'hr') || 'رقم القيد المدني' },
     { name: 'health_status', type: 'alpha', label: t('employees.health_status', 'hr') || 'الحالة الصحية' },
@@ -676,7 +683,7 @@ export function EmployeeForm({
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(async (data) => {
         try {
-          data = {...data , wives:data.wives.filter(w => w.name !== "")}
+          data = {...data , spouses:data.spouses.filter(w => w.name !== "")}
           await onSubmit(cleanPayload(data))
           methods.reset(data)
         } catch (err: any) {

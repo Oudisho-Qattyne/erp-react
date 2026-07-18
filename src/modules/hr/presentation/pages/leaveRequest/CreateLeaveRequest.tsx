@@ -154,7 +154,7 @@ export function CreateLeaveRequest() {
                             <InfoRow label={t("leave.allow_half_day", "hr") || "Half Day"} value={<YesNo value={currentLeave.allow_half_day || false} />} />
                             <InfoRow label={t("leave.allow_hourly", "hr") || "Hourly"} value={<YesNo value={currentLeave.allow_hourly || false} />} />
                             <InfoRow label={t("leave.allow_split", "hr")} value={<YesNo value={currentLeave.allow_split} />} />
-                            <InfoRow label={t("leave.is_active", "hr")} value={<YesNo value={currentLeave.is_active} />} />
+                            <InfoRow label={t("common.is_active", "shared")} value={<YesNo value={currentLeave.is_active} />} />
 
 
                         </div>

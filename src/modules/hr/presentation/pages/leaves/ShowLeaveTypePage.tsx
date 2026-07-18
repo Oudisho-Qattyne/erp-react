@@ -104,7 +104,7 @@ export function ShowLeaveTypePage() {
             <InfoRow label={t("leave.allow_half_day", "hr")} value={<YesNo value={leave.allow_half_day} />} />
             <InfoRow label={t("leave.allow_hourly", "hr")} value={<YesNo value={leave.allow_hourly} />} />
             <InfoRow label={t("leave.allow_split", "hr")} value={<YesNo value={leave.allow_split} />} />
-            <InfoRow label={t("leave.is_active", "hr")} value={<YesNo value={leave.is_active} />} />
+            <InfoRow label={t("common.is_active", "shared")} value={<YesNo value={leave.is_active} />} />
           </div>
         </SectionCard>
       </div>

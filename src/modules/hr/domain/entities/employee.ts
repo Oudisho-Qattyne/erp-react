@@ -43,7 +43,8 @@ export interface EmployeeChildren {
 }
 
 export interface EmployeeSpouse {
-  name: string;
+  name?: string;
+  workplace?:string;
 }
 
 export interface OrganizationalUnit {
@@ -81,12 +82,14 @@ export interface EmployeeData {
   assigned_job: string;
   marital_status: MaritalStatus;          // 'married', 'single', etc.   
   number_of_children: number;
-  wives: EmployeeSpouse[];
+  spouses: EmployeeSpouse[];
   spouse_workplace: string;
   blood_type: BloodType;                // 'O+', etc.
   phone_number: string;
   sham_cash_account: string;
-  residence_region?: Region & { city?: City & { country?: Country } };
+  residence_city_id?:number;
+  city:City;
+  country:Country;
   residential_area_details: string;
   civil_registry_record: string;
   health_status: string;

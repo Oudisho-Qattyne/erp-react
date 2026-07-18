@@ -56,9 +56,18 @@ export function PlotDetailsSection({ plotId }: Props) {
             <p className="font-medium text-text">{plot.plot_classification?.name || plot.plot_classification_name || '—'}</p>
           </div>
           <div className="space-y-1">
-            <span className="text-sm text-text-muted">{t('plots.current_condition', 'investments') || 'Current Condition'}</span>
-            <p className="font-medium text-text">{plot.current_condition || '—'}</p>
-          </div>
+              <span className="text-sm text-text-muted">{t('plots.current_condition', 'investments') || 'Current Condition'}</span>
+              <div className="font-medium text-text">
+                {plot?.service_conditions?.length
+                  ? plot.service_conditions.map((sc, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <span>{sc.name}</span>
+                        {sc.note && <span className="text-xs text-text-muted">({sc.note})</span>}
+                      </div>
+                    ))
+                  : '—'}
+              </div>
+            </div>
           <div className="space-y-1">
             <span className="text-sm text-text-muted">{t('plots.location', 'investments') || 'Location'}</span>
             <div className="flex items-center gap-2">
@@ -82,12 +91,6 @@ export function PlotDetailsSection({ plotId }: Props) {
             <span className="text-sm text-text-muted">{t('plots.added_by', 'investments') || 'Added By'}</span>
             <p className="font-medium text-text">{plot.user?.name || '—'}</p>
           </div>
-          {plot.notes && (
-            <div className="space-y-1 md:col-span-2 lg:col-span-3">
-              <span className="text-sm text-text-muted">{t('plots.notes', 'investments') || 'Notes'}</span>
-              <p className="font-medium text-text whitespace-pre-wrap">{plot.notes}</p>
-            </div>
-          )}
         </div>
       )}
     </SectionCard>

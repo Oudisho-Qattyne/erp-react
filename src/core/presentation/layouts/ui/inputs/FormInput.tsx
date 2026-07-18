@@ -11,6 +11,7 @@ import { inputBaseClasses, labelClasses, errorClasses, hintClasses } from './sty
 import { DatePicker } from './DatePicker';
 import { SelectOrCreate } from './SelectOrCreate';
 import Input, { type InputType } from './Input';
+import type { ToggleVariant, ToggleSize } from './Toggle';
 import type { MatrixFieldConfig } from './DataMatrixInput';
 import { useDependentField, type ComputedProps } from './hooks/useDependentField';
 import { AuthContext } from '../../../../infrastructure/auth/AuthProvider';
@@ -56,6 +57,10 @@ export interface FormInputProps<T extends FieldValues> {
   infoButton?: () => void;
   requiredPermission?: string | string[];
   createButtonPermission?: string | string[];
+  // toggle
+  toggleVariant?: ToggleVariant;
+  toggleSize?: ToggleSize;
+  toggleLabel?: string;
 }
 
 export function FormInput<T extends FieldValues>({
@@ -88,6 +93,9 @@ export function FormInput<T extends FieldValues>({
   infoButton,
   requiredPermission,
   createButtonPermission,
+  toggleVariant,
+  toggleSize,
+  toggleLabel,
 }: FormInputProps<T>) {
   const { t, direction } = useLanguage();
   const auth = useContext(AuthContext);
@@ -174,18 +182,19 @@ export function FormInput<T extends FieldValues>({
   const baseClasses = `${inputBaseClasses} ${error ? 'border-danger ring-danger/10 animate-shake' : ''}`;
 
   // Checkbox renders inline label
-  if (type === 'checkbox') {
+  if (type === 'checkbox' || type === 'toggle') {
     return (
       <div className={`w-full mb-4 ${className || ''}`}>
-        <label htmlFor={name} className="flex items-center gap-2 cursor-pointer">
+        <label htmlFor={name} className="flex items-center gap-3 cursor-pointer">
           <Input
             infoButton={infoButton}
-            type="checkbox"
+            type={type}
             value={finalValue}
             onChange={handleChange}
             disabled={finalDisabled}
-            required={finalRequired}
-            baseClasses=""
+            toggleVariant={toggleVariant}
+            toggleSize={toggleSize}
+            toggleLabel={toggleLabel}
           />
           {label && (
             <span className="text-sm font-semibold text-text">

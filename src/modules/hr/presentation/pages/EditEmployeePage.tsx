@@ -46,15 +46,17 @@ export function EditEmployeePage() {
             assigned_job: emp.assigned_job,
             marital_status: emp.marital_status,
             number_of_children: emp.number_of_children,
-            wives: emp.wives?.map((wife: any) => ({
-              name: wife.name,
+            spouses: emp.spouses?.map((spouse: any) => ({
+              name: spouse.name,
+              workplace:spouse.workplace
+
             })) || [],
             spouse_workplace: emp.spouse_workplace,
             blood_type: emp.blood_type,
             phone_number: emp.phone_number,
             sham_cash_account: emp.sham_cash_account,
-            country_id: emp.residence_region?.city?.country?.id,
-            residence_city_id: emp.residence_region?.city?.id,
+            residence_country_id: emp.country?.id,
+            residence_city_id: emp.city?.id,
             residential_area_details: emp.residential_area_details,
             civil_registry_record: emp.civil_registry_record,
             health_status: emp.health_status,

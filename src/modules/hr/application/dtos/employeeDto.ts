@@ -52,12 +52,12 @@ import type { EducationEntry, EmployeeChildren, EmployeeSpouse, EmploymentDetail
     assigned_job:string;
     marital_status: MaritalStatus;
     number_of_children: number;
-    wives: EmployeeSpouse[];
+    spouses: EmployeeSpouse[];
     spouse_workplace: string;
     blood_type: BloodType;
     phone_number: string;
     sham_cash_account: string;
-    residence_region: string;
+    // residence_region: string;
     residential_area_details: string;
     civil_registry_record: string;
     health_status: string;

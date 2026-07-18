@@ -112,7 +112,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
           schema={getCreateIndustryCategoryFormSchema(t)}
           fields={[
             { name: 'name', type: 'alpha', label: t('common.name', 'shared') || 'Name', required: true },
-            { name: 'is_default', type: 'checkbox', label: t('industry_categories.is_default', 'investments') || 'Set as Default' },
+            { name: 'is_default', type: 'checkbox', label: t('common.is_default', 'shared') || 'Set as Default' },
           ]}
           onSubmit={(data) => createCategory({ ...data, is_active: true })}
           onSuccess={onSuccessForm}
@@ -136,7 +136,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
           schema={getCreateIndustryTypeFormSchema(t)}
           fields={[
             { name: 'name', type: 'alpha', label: t('common.name', 'shared') || 'Name', required: true },
-            { name: 'is_default', type: 'checkbox', label: t('industry_types.is_default', 'investments') || 'Set as Default' },
+            { name: 'is_default', type: 'checkbox', label: t('common.is_default', 'shared') || 'Set as Default' },
           ]}
           onSubmit={(data) => createIndustryType({ ...data, is_active: true })}
           onSuccess={onSuccessForm}
@@ -162,7 +162,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
           schema={getCreateIndustrialDecisionTypeFormSchema(t)}
           fields={[
             { name: 'name', type: 'alpha', label: t('common.name', 'shared') || 'Name', required: true },
-            { name: 'is_default', type: 'checkbox', label: t('industrial_decision_types.is_default', 'investments') || 'Set as Default' },
+            { name: 'is_default', type: 'checkbox', label: t('common.is_default', 'shared') || 'Set as Default' },
           ]}
           onSubmit={(data) => createDecisionType({ ...data, is_active: true })}
           onSuccess={onSuccessForm}
@@ -186,7 +186,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
           schema={getCreateIndustrialLicenseSourceFormSchema(t)}
           fields={[
             { name: 'name', type: 'alpha', label: t('common.name', 'shared') || 'Name', required: true },
-            { name: 'is_default', type: 'checkbox', label: t('industrial_license_sources.is_default', 'investments') || 'Set as Default' },
+            { name: 'is_default', type: 'checkbox', label: t('common.is_default', 'shared') || 'Set as Default' },
           ]}
           onSubmit={(data) => createLicenseSource({ ...data, is_active: true })}
           onSuccess={onSuccessForm}
@@ -363,7 +363,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
                 <p className="font-medium">{getLocalizedName(viewingLicense.industrial_license_source?.name) || '—'}</p>
               </div>
               <div>
-                <span className="text-sm text-muted-foreground">{t('facility_industrial_licenses.is_active', 'investments') || 'Is Active'}</span>
+                <span className="text-sm text-muted-foreground">{t('common.is_active', 'shared') || 'Is Active'}</span>
                 <p className="font-medium">{viewingLicense.is_active ? (t('common.yes', 'shared') || 'Yes') : (t('common.no', 'shared') || 'No')}</p>
               </div>
             </div>

@@ -6845,7 +6845,7 @@ components:
           type: integer
           nullable: true
           example: 2
-        wives:
+        spouses:
           type: string
           nullable: true
           example: 'Nour Hassan'
@@ -6914,7 +6914,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EmployeeChild'
-        wives:
+        spouses:
           type: array
           items:
             $ref: '#/components/schemas/EmployeeWife'
@@ -7057,7 +7057,7 @@ components:
           nullable: true
           example: 2
           description: 'Required when `marital_status` is `married`.'
-        wives:
+        spouses:
           type: string
           nullable: true
           example: 'Nour Hassan'
@@ -7131,7 +7131,7 @@ components:
           description: 'Required when `marital_status` is `married` and `number_of_children` is greater than 0. The array length must match `number_of_children`.'
           items:
             $ref: '#/components/schemas/EmployeeChildInput'
-        wives:
+        spouses:
           type: array
           nullable: true
           items:
@@ -7197,7 +7197,7 @@ components:
         number_of_children:
           type: integer
           nullable: true
-        wives:
+        spouses:
           type: string
           nullable: true
         spouse_workplace:
@@ -7260,7 +7260,7 @@ components:
           nullable: true
           items:
             $ref: '#/components/schemas/EmployeeChildInput'
-        wives:
+        spouses:
           type: array
           nullable: true
           items:

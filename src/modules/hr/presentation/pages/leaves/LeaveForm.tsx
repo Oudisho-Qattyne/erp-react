@@ -175,7 +175,7 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
     { name: "allow_half_day", type: "checkbox", label: t("leave.allow_half_day", "hr") },
     { name: "allow_hourly", type: "checkbox", label: t("leave.allow_hourly", "hr") },
     { name: "allow_split", type: "checkbox", label: t("leave.allow_split", "hr") },
-    { name: "is_active", type: "checkbox", label: t("leave.is_active", "hr") },
+    { name: "is_active", type: "checkbox", label: t("common.is_active", "shared") },
   ]
 
   const PROPORTION_FIELDS: FieldConfig[] = [

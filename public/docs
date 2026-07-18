@@ -295,7 +295,7 @@ paths:
                   enum: [single, married, divorced, widowed]
                   nullable: true
                   example: married
-                wives:
+                spouses:
                   type: string
                   nullable: true
                   example: 'Nour Hassan'
@@ -1979,7 +1979,7 @@ components:
             - widowed
           nullable: true
           example: married
-        wives:
+        spouses:
           type: string
           nullable: true
           example: 'Nour Hassan'

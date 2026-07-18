@@ -1,16 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import type { Dossier } from '../../../domain/entities/dossier';
+import type { Plot } from '../../../domain/entities/plot';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { inputBaseClasses } from '../../../../../core/presentation/layouts/ui/inputs/styles';
 import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
+import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { toast } from 'sonner';
-import { Eye, Trash2, Search, History, FileText } from 'lucide-react';
+import { Eye, Trash2, Search, History, FileText, Filter, X, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { PlotPickerDialog } from '../plots/components/PlotPickerDialog';
 const statusStyles: Record<string, { color: string; bg: string }> = {
   active: { color: '#16a34a', bg: '#dcfce7' },
   cancelled: { color: '#dc2626', bg: '#fef2f2' },
@@ -33,18 +36,100 @@ export function DossiersPage() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
 
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterPlotId, setFilterPlotId] = useState<number | undefined>(undefined);
+  const [filterPlotName, setFilterPlotName] = useState<string>('');
+  const confirmedFilterRef = useRef<{ plotName: string }>({ plotName: '' });
+  const [plotPickerOpen, setPlotPickerOpen] = useState(false);
+  const formRef = useRef<any>(null);
+
   useEffect(() => {
     const params = new URLSearchParams();
     if (searchQuery) params.append('search', searchQuery);
     if (sortColumn) { params.append('sortColumn', sortColumn); params.append('sortOrder', sortOrder); }
+    if (filterPlotId) params.append('plot_id', String(filterPlotId));
     params.append('page', String(page));
     params.append('per_page', String(perPage));
     getAll(`/investments/dossiers?${params.toString()}`);
-  }, [searchQuery, sortColumn, sortOrder, page, perPage]);
+  }, [searchQuery, sortColumn, sortOrder, page, perPage, filterPlotId]);
 
   const handleSearch = () => {
     setSearchQuery(localSearch);
     setPage(1);
+  };
+
+  const handlePlotPicked = (plots: Plot[]) => {
+    const p = plots[0];
+    if (p) {
+      setFilterPlotName(`${p.code} - ${p.identifier}`);
+      formRef.current?.setValue('plot_id', p.id);
+    }
+    setPlotPickerOpen(false);
+  };
+
+  const filterFields: FilterField[] = [
+    {
+      name: 'plot_id',
+      render: (form) => {
+        formRef.current = form;
+        return (
+          <div>
+            <label className="block text-sm font-medium text-text mb-1">
+              {t('plots.title', 'investments') || 'Plot'}
+            </label>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background text-sm text-text-muted">
+                <MapPin size={14} />
+                {filterPlotName || (t('common.all', 'shared') || 'All')}
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setPlotPickerOpen(true)}>
+                {t('common.select', 'shared') || 'Select'}
+              </Button>
+              {filterPlotName && (
+                <Button variant="ghost" size="sm" onClick={() => { setFilterPlotName(''); form.setValue('plot_id', '') }}>
+                  <X size={14} />
+                </Button>
+              )}
+            </div>
+          </div>
+        );
+      },
+    },
+  ];
+
+  const filterInitialValues = useMemo(() => ({
+    plot_id: filterPlotId || '',
+  }), [filterPlotId]);
+
+  const handleApplyFilter = (values: Record<string, any>) => {
+    const parsed: Record<string, any> = { page: 1, per_page: perPage };
+    for (const [key, val] of Object.entries(values)) {
+      if (val === '' || val === undefined) continue;
+      if (key === 'plot_id') {
+        parsed[key] = Number(val);
+      } else {
+        parsed[key] = val;
+      }
+    }
+    if (parsed.plot_id) {
+      setFilterPlotId(parsed.plot_id);
+      confirmedFilterRef.current.plotName = filterPlotName;
+    } else {
+      setFilterPlotId(undefined);
+      setFilterPlotName('');
+      confirmedFilterRef.current.plotName = '';
+    }
+    setPage(1);
+    setSearchQuery('');
+    setLocalSearch('');
+    setIsFilterOpen(false);
+  };
+
+  const handleResetFilter = () => {
+    setFilterPlotId(undefined);
+    setFilterPlotName('');
+    confirmedFilterRef.current = { plotName: '' };
+    setIsFilterOpen(false);
   };
 
   const handleSort = (column: string) => {
@@ -157,6 +242,12 @@ export function DossiersPage() {
         <Button variant="primary" size="sm" onClick={handleSearch}>
           {t('common.search', 'shared') || 'Search'}
         </Button>
+        <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
+          {t('common.filter', 'shared') || 'Filter'}
+        </Button>
+        <Button variant="outline" size="sm" onClick={handleResetFilter}>
+          {t('common.reset', 'shared') || 'Reset'}
+        </Button>
       </div>
 
       {errorMap["getAll"] ? (
@@ -182,6 +273,25 @@ export function DossiersPage() {
           }}
         />
       )}
+
+      <FilterDialog
+        isOpen={isFilterOpen}
+        fields={filterFields}
+        initialValues={filterInitialValues}
+        onFilter={handleApplyFilter}
+        onCancel={() => {
+          setFilterPlotName(confirmedFilterRef.current.plotName);
+          setIsFilterOpen(false);
+        }}
+        onReset={handleResetFilter}
+      />
+
+      <PlotPickerDialog
+        isOpen={plotPickerOpen}
+        onClose={() => setPlotPickerOpen(false)}
+        onConfirm={handlePlotPicked}
+        multiple={false}
+      />
 
       <ConfirmDialog
         isOpen={!!confirmDelete}

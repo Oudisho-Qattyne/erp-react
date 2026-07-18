@@ -204,8 +204,19 @@ export function ShowEmployeePage() {
               <InfoRow label={t('employees.marital_status', 'hr') || 'الحالة الاجتماعية'} value={getMaritalStatus(employee.marital_status, t)} />
               {employee.marital_status === 'married' && (
                 <>
-                  <InfoRow label={t('employees.wives', 'hr') || 'اسم الزوج/الزوجة'} value={employee.wives?.map((w: any) => w.name).join(', ') || '-'} />
-                  <InfoRow label={t('employees.spouse_workplace', 'hr') || 'جهة عمل الزوج/الزوجة'} value={employee.spouse_workplace} />
+                  <InfoRow label={employee.gender === 'female' ? (t('employees.spouses_female', 'hr') || 'Husband') : (t('employees.spouses_male', 'hr') || 'Wives')} value={
+                    employee.spouses && employee.spouses.length > 0 ? (
+                      <div className="space-y-1">
+                        {employee.spouses.map((spouse: any, idx: number) => (
+                          <div key={idx} className="flex flex-wrap items-center gap-x-2">
+                            <span className="font-medium">{spouse.name}</span>
+                            {spouse.workplace && <span className="text-muted-foreground">- {spouse.workplace}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    ) : '-'
+                  } />
+                  {/* keep in mind */}
                   <InfoRow label={t('employees.number_of_children', 'hr') || 'عدد الأولاد'} value={employee.number_of_children} />
                 </>
               )}
@@ -260,8 +271,8 @@ export function ShowEmployeePage() {
                   {t('employees.residential_area_details', 'hr') || 'العنوان بالتفصيل'}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <InfoRow label={t('employees.country', 'hr') || 'الدولة'} value={employee.residence_region?.city?.country?.name || '-'} />
-                  <InfoRow label={t('employees.city', 'hr') || 'المدينة'} value={employee.residence_region?.city?.name || '-'} />
+                  <InfoRow label={t('employees.country', 'hr') || 'الدولة'} value={employee.country.name || '-'} />
+                  <InfoRow label={t('employees.city', 'hr') || 'المدينة'} value={employee.city?.name || '-'} />
                   <InfoRow label={t('employees.residential_area_details', 'hr') || 'تفاصيل السكن'} value={employee.residential_area_details} />
                 </div>
               </div>

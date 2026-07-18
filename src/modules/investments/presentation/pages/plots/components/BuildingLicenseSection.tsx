@@ -117,7 +117,7 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
           schema={getCreateLicensingStatusFormSchema(t)}
           fields={[
             { name: 'name', type: 'alpha', label: t('common.name', 'shared') || 'Name', required: true },
-            { name: 'is_default', type: 'checkbox', label: t('licensing_statuses.is_default', 'investments') || 'Set as Default' },
+            { name: 'is_default', type: 'checkbox', label: t('common.is_default', 'shared') || 'Set as Default' },
           ]}
           onSubmit={(data) => createLicensingStatus({ ...data, is_active: true })}
           onSuccess={onSuccessForm}
@@ -144,7 +144,7 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
           schema={getCreateByDurationLicenseFormSchema(t)}
           fields={[
             { name: 'name', type: 'alpha', label: t('common.name', 'shared') || 'Name', required: true },
-            { name: 'is_default', type: 'checkbox', label: t('by_duration_licenses.is_default', 'investments') || 'Set as Default' },
+            { name: 'is_default', type: 'checkbox', label: t('common.is_default', 'shared') || 'Set as Default' },
           ]}
           onSubmit={(data) => createDurationLicense({ ...data, is_active: true })}
           onSuccess={onSuccessForm}
@@ -168,7 +168,7 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
           schema={getCreateByIndustryLicenseFormSchema(t)}
           fields={[
             { name: 'name', type: 'alpha', label: t('common.name', 'shared') || 'Name', required: true },
-            { name: 'is_default', type: 'checkbox', label: t('by_industry_licenses.is_default', 'investments') || 'Set as Default' },
+            { name: 'is_default', type: 'checkbox', label: t('common.is_default', 'shared') || 'Set as Default' },
           ]}
           onSubmit={(data) => createIndustryLicense({ ...data, is_active: true })}
           onSuccess={onSuccessForm}

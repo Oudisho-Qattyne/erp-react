@@ -184,7 +184,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
     // },
     {
       name: 'service_conditions',
-      label: t('plots.notes', 'investments') || 'Notes', group: 'additional',
+      label: t('plots.current_condition', 'investments') || 'Current Condition', group: 'additional',
       type: "data-matrix",
       rowSchema: z.object({
         note: z.string(),
@@ -339,8 +339,16 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
             </div>
             <div className="space-y-1">
               <span className="text-sm text-text-muted">{t('plots.current_condition', 'investments') || 'Current Condition'}</span>
-              <p className="font-medium text-text">{plot?.service_conditions?.map(sc => `${sc.name} `) || '—'}</p>
-              {/* keep in mind */}
+              <div className="font-medium text-text">
+                {plot?.service_conditions?.length
+                  ? plot.service_conditions.map((sc, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <span>{sc.name}</span>
+                        {sc.note && <span className="text-xs text-text-muted">({sc.note})</span>}
+                      </div>
+                    ))
+                  : '—'}
+              </div>
             </div>
             <div className="space-y-1">
               <span className="text-sm text-text-muted">{t('plots.location', 'investments') || 'Location'}</span>

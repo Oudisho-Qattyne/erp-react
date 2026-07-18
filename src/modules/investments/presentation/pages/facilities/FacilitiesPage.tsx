@@ -1,16 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import type { Facility } from '../../../domain/entities/facility';
+import type { Plot } from '../../../domain/entities/plot';
+import type { Dossier } from '../../../domain/entities/dossier';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { inputBaseClasses } from '../../../../../core/presentation/layouts/ui/inputs/styles';
 import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
+import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { toast } from 'sonner';
-import { Eye, Trash2, Search, History, Factory } from 'lucide-react';
+import { Eye, Trash2, Search, History, Factory, Filter, X, MapPin, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { PlotPickerDialog } from '../plots/components/PlotPickerDialog';
+import { DossierPickerDialog } from '../plots/components/DossierPickerDialog';
 
 export function FacilitiesPage() {
   const { t } = useLanguage();
@@ -27,14 +32,44 @@ export function FacilitiesPage() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
 
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterPlotId, setFilterPlotId] = useState<number | undefined>(undefined);
+  const [filterPlotName, setFilterPlotName] = useState<string>('');
+  const [filterDossierId, setFilterDossierId] = useState<number | undefined>(undefined);
+  const [filterDossierName, setFilterDossierName] = useState<string>('');
+  const confirmedFilterRef = useRef<{ plotName: string; dossierName: string }>({ plotName: '', dossierName: '' });
+  const [plotPickerOpen, setPlotPickerOpen] = useState(false);
+  const [dossierPickerOpen, setDossierPickerOpen] = useState(false);
+  const formRef = useRef<any>(null);
+
   useEffect(() => {
     const params = new URLSearchParams();
     if (searchQuery) params.append('search', searchQuery);
     if (sortColumn) { params.append('sortColumn', sortColumn); params.append('sortOrder', sortOrder); }
+    if (filterPlotId) params.append('plot_id', String(filterPlotId));
+    if (filterDossierId) params.append('plot_dossier_id', String(filterDossierId));
     params.append('page', String(page));
     params.append('per_page', String(perPage));
     getAll(`/investments/facilities?${params.toString()}`);
-  }, [searchQuery, sortColumn, sortOrder, page, perPage]);
+  }, [searchQuery, sortColumn, sortOrder, page, perPage, filterPlotId, filterDossierId]);
+
+  const handlePlotPicked = (plots: Plot[]) => {
+    const p = plots[0];
+    if (p) {
+      setFilterPlotName(`${p.code} - ${p.identifier}`);
+      formRef.current?.setValue('plot_id', p.id);
+    }
+    setPlotPickerOpen(false);
+  };
+
+  const handleDossierPicked = (dossiers: Dossier[]) => {
+    const d = dossiers[0];
+    if (d) {
+      setFilterDossierName(d.dossier_number);
+      formRef.current?.setValue('plot_dossier_id', d.id);
+    }
+    setDossierPickerOpen(false);
+  };
 
   const handleSearch = () => {
     setSearchQuery(localSearch);
@@ -61,6 +96,109 @@ export function FacilitiesPage() {
     } catch (err: any) {
       toast.error(err?.message || t('facilities.delete_error', 'investments') || 'Failed to delete facility');
     }
+  };
+
+  const filterFields: FilterField[] = [
+    {
+      name: 'plot_id',
+      render: (form) => {
+        formRef.current = form;
+        return (
+          <div>
+            <label className="block text-sm font-medium text-text mb-1">
+              {t('plots.title', 'investments') || 'Plot'}
+            </label>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background text-sm text-text-muted">
+                <MapPin size={14} />
+                {filterPlotName || (t('common.all', 'shared') || 'All')}
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setPlotPickerOpen(true)}>
+                {t('common.select', 'shared') || 'Select'}
+              </Button>
+              {filterPlotName && (
+                <Button variant="ghost" size="sm" onClick={() => { setFilterPlotName(''); form.setValue('plot_id', '') }}>
+                  <X size={14} />
+                </Button>
+              )}
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      name: 'plot_dossier_id',
+      render: (form) => {
+        formRef.current = form;
+        return (
+          <div>
+            <label className="block text-sm font-medium text-text mb-1">
+              {t('dossier.number', 'investments') || 'Dossier'}
+            </label>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background text-sm text-text-muted">
+                <FileText size={14} />
+                {filterDossierName || (t('common.all', 'shared') || 'All')}
+              </div>
+              <Button variant="outline" size="sm" onClick={() => setDossierPickerOpen(true)}>
+                {t('common.select', 'shared') || 'Select'}
+              </Button>
+              {filterDossierName && (
+                <Button variant="ghost" size="sm" onClick={() => { setFilterDossierName(''); form.setValue('plot_dossier_id', '') }}>
+                  <X size={14} />
+                </Button>
+              )}
+            </div>
+          </div>
+        );
+      },
+    },
+  ];
+
+  const filterInitialValues = useMemo(() => ({
+    plot_id: filterPlotId || '',
+    plot_dossier_id: filterDossierId || '',
+  }), [filterPlotId, filterDossierId]);
+
+  const handleApplyFilter = (values: Record<string, any>) => {
+    const parsed: Record<string, any> = { page: 1, per_page: perPage };
+    for (const [key, val] of Object.entries(values)) {
+      if (val === '' || val === undefined) continue;
+      if (key === 'plot_id' || key === 'plot_dossier_id') {
+        parsed[key] = Number(val);
+      } else {
+        parsed[key] = val;
+      }
+    }
+    if (parsed.plot_id) {
+      setFilterPlotId(parsed.plot_id);
+      confirmedFilterRef.current.plotName = filterPlotName;
+    } else {
+      setFilterPlotId(undefined);
+      setFilterPlotName('');
+      confirmedFilterRef.current.plotName = '';
+    }
+    if (parsed.plot_dossier_id) {
+      setFilterDossierId(parsed.plot_dossier_id);
+      confirmedFilterRef.current.dossierName = filterDossierName;
+    } else {
+      setFilterDossierId(undefined);
+      setFilterDossierName('');
+      confirmedFilterRef.current.dossierName = '';
+    }
+    setPage(1);
+    setSearchQuery('');
+    setLocalSearch('');
+    setIsFilterOpen(false);
+  };
+
+  const handleResetFilter = () => {
+    setFilterPlotId(undefined);
+    setFilterPlotName('');
+    setFilterDossierId(undefined);
+    setFilterDossierName('');
+    confirmedFilterRef.current = { plotName: '', dossierName: '' };
+    setIsFilterOpen(false);
   };
 
   const handleTranslateValues = (field: string, value: string) => value;
@@ -153,6 +291,12 @@ export function FacilitiesPage() {
         <Button variant="primary" size="sm" onClick={handleSearch}>
           {t('common.search', 'shared') || 'Search'}
         </Button>
+        <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
+          {t('common.filter', 'shared') || 'Filter'}
+        </Button>
+        <Button variant="outline" size="sm" onClick={handleResetFilter}>
+          {t('common.reset', 'shared') || 'Reset'}
+        </Button>
       </div>
 
       {errorMap["getAll"] ? (
@@ -188,6 +332,33 @@ export function FacilitiesPage() {
         confirmLoading={loadingMap["remove"]}
         confirmLabel={t('common.delete', 'shared') || 'Delete'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
+      />
+
+      <FilterDialog
+        isOpen={isFilterOpen}
+        fields={filterFields}
+        initialValues={filterInitialValues}
+        onFilter={handleApplyFilter}
+        onCancel={() => {
+          setFilterPlotName(confirmedFilterRef.current.plotName);
+          setFilterDossierName(confirmedFilterRef.current.dossierName);
+          setIsFilterOpen(false);
+        }}
+        onReset={handleResetFilter}
+      />
+
+      <PlotPickerDialog
+        isOpen={plotPickerOpen}
+        onClose={() => setPlotPickerOpen(false)}
+        onConfirm={handlePlotPicked}
+        multiple={false}
+      />
+
+      <DossierPickerDialog
+        isOpen={dossierPickerOpen}
+        onClose={() => setDossierPickerOpen(false)}
+        onConfirm={handleDossierPicked}
+        multiple={false}
       />
 
       <AuditLog

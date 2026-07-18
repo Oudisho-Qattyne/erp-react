@@ -57,7 +57,7 @@ export default function LeavesTypesPage() {
     ] },
     { name: "accrual_period", label: t("leave.accrual_period", "hr"), type: "select", options: [{ value: "yearly", label: t("leave.accrual_yearly", "hr") }, { value: "monthly", label: t("leave.accrual_monthly", "hr") }, { value: "none", label: t("leave.accrual_none", "hr") }] },
     { name: "is_paid", label: t("leave.is_paid", "hr"), type: "checkbox" },
-    { name: "is_active", label: t("leave.is_active", "hr"), type: "checkbox" },
+    { name: "is_active", label: t("common.is_active", "shared"), type: "checkbox" },
     { name: "requires_approval", label: t("leave.requires_approval", "hr"), type: "checkbox" },
     { name: "allow_half_day", label: t("leave.allow_half_day", "hr"), type: "checkbox" },
     { name: "allow_hourly", label: t("leave.allow_hourly", "hr"), type: "checkbox" },
