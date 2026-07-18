@@ -215,7 +215,7 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
 
             setSelectedItems([]);
             setDeleteConfirm(null);
-        } catch (err) {
+        } catch (err : any) {
             console.error('Delete failed:', err);
         }
     };
@@ -230,7 +230,7 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
             await renameFolder(renameConfirm.parent, renameConfirm.id, name, apiRef.current);
             setSelectedItems([]);
             setRenameConfirm(null);
-        } catch (err) {
+        } catch (err : any) {
             console.error('rename failed:', err);
         }
     };

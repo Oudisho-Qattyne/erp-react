@@ -39,7 +39,8 @@ export function DossiersPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterPlotId, setFilterPlotId] = useState<number | undefined>(undefined);
   const [filterPlotName, setFilterPlotName] = useState<string>('');
-  const confirmedFilterRef = useRef<{ plotName: string }>({ plotName: '' });
+  const [filterStatus, setFilterStatus] = useState<string>('');
+  const confirmedFilterRef = useRef<{ plotName: string; status: string }>({ plotName: '', status: '' });
   const [plotPickerOpen, setPlotPickerOpen] = useState(false);
   const formRef = useRef<any>(null);
 
@@ -48,10 +49,11 @@ export function DossiersPage() {
     if (searchQuery) params.append('search', searchQuery);
     if (sortColumn) { params.append('sortColumn', sortColumn); params.append('sortOrder', sortOrder); }
     if (filterPlotId) params.append('plot_id', String(filterPlotId));
+    if (filterStatus) params.append('status', filterStatus);
     params.append('page', String(page));
     params.append('per_page', String(perPage));
     getAll(`/investments/dossiers?${params.toString()}`);
-  }, [searchQuery, sortColumn, sortOrder, page, perPage, filterPlotId]);
+  }, [searchQuery, sortColumn, sortOrder, page, perPage, filterPlotId, filterStatus]);
 
   const handleSearch = () => {
     setSearchQuery(localSearch);
@@ -95,11 +97,24 @@ export function DossiersPage() {
         );
       },
     },
+    {
+      name: 'status',
+      label: t('dossier.status', 'investments') || 'Status',
+      type: 'select',
+      options: [
+        { value: '', label: t('common.all', 'shared') || 'All' },
+        { value: 'draft', label: t('dossier.status_draft', 'investments') || 'Draft' },
+        { value: 'active', label: t('dossier.status_active', 'investments') || 'Allocated' },
+        { value: 'allocatable', label: t('dossier.status_allocatable', 'investments') || 'Allocatable' },
+        { value: 'cancelled', label: t('dossier.status_cancelled', 'investments') || 'Cancelled' },
+      ],
+    },
   ];
 
   const filterInitialValues = useMemo(() => ({
     plot_id: filterPlotId || '',
-  }), [filterPlotId]);
+    status: filterStatus || '',
+  }), [filterPlotId, filterStatus]);
 
   const handleApplyFilter = (values: Record<string, any>) => {
     const parsed: Record<string, any> = { page: 1, per_page: perPage };
@@ -119,6 +134,8 @@ export function DossiersPage() {
       setFilterPlotName('');
       confirmedFilterRef.current.plotName = '';
     }
+    setFilterStatus(parsed.status || '');
+    confirmedFilterRef.current.status = parsed.status || '';
     setPage(1);
     setSearchQuery('');
     setLocalSearch('');
@@ -128,7 +145,8 @@ export function DossiersPage() {
   const handleResetFilter = () => {
     setFilterPlotId(undefined);
     setFilterPlotName('');
-    confirmedFilterRef.current = { plotName: '' };
+    setFilterStatus('');
+    confirmedFilterRef.current = { plotName: '', status: '' };
     setIsFilterOpen(false);
   };
 
@@ -183,14 +201,23 @@ export function DossiersPage() {
       key: "plot",
       label: t("plots.section_title", "investments") || "Plot",
       width: 140,
-      render: (row: Dossier) => row.plot?.code || row.plot?.identifier || row.plot_id?.toString() || '—',
+      render: (row: Dossier) => {
+        const pid = row.plot?.id;
+        if (!pid) return '—';
+        return (
+          <button type="button" onClick={() => navigate(`/investments/plots/${pid}/edit`)} className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
+            <MapPin size={14} />
+            {row.plot?.code || row.plot?.identifier || pid}
+          </button>
+        );
+      },
     },
     {
       key: "notes",
       label: t("plots.notes", "investments") || "Notes",
       width: 200,
       render: (row: Dossier) => row.notes ? (
-        <span className="truncate block max-w-[180px]" title={row.notes}>{row.notes}</span>
+        <span className="truncate block max-w-45" title={row.notes}>{row.notes}</span>
       ) : '—',
     },
     {
@@ -200,11 +227,11 @@ export function DossiersPage() {
       render: (row: Dossier) => (
         <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
           <Button variant="ghost" size="sm" onClick={() => {
-            if (row.plot_id) {
+            if (row.plot?.id) {
               navigate(`/investments/plots/${row.plot_id}/dossiers/${row.id}`);
             }
           }} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.plot-dossier.view"
-            disabled={!row.plot_id}>
+            disabled={!row.plot?.id}>
             <Eye size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)} title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.plot-dossier.delete">
@@ -281,6 +308,7 @@ export function DossiersPage() {
         onFilter={handleApplyFilter}
         onCancel={() => {
           setFilterPlotName(confirmedFilterRef.current.plotName);
+          setFilterStatus(confirmedFilterRef.current.status);
           setIsFilterOpen(false);
         }}
         onReset={handleResetFilter}

@@ -83,7 +83,7 @@
     "plot_classification_id": "التصنيف",
     "location": "الموقع",
     "current_condition": "الوضع الحالي للمقسم من حيث الخدمات",
-    "notes": "ملاحظات (إختياري)",
+    "notes": "ملاحظات",
     "status": "حالة المقسم",
     "status_date": "تاريخ الحالة (اختياري)",
     "created": "تم إنشاء {name} بنجاح",

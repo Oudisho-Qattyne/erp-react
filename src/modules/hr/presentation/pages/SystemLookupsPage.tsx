@@ -88,7 +88,7 @@ function CountriesSection() {
           onSubmit={async (data) => {
               try {
                 return await create({ name: { ar: data.name } });
-    } catch (err) {
+    } catch (err : any) {
       toast.error(err?.message || t('lookups.create_error', 'hr').replace('{name}', entity));
               throw err;
             }
@@ -111,7 +111,7 @@ function CountriesSection() {
                 try {
                   await remove(c.id);
                   toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
-    } catch (err) {
+    } catch (err : any) {
       toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
                 }
               }}>{t('common.delete') || 'حذف'}</Button>
@@ -176,7 +176,7 @@ function CitiesSection() {
               onSubmit={async (data) => {
                 try {
                   return await create({ name: { ar: data.name }, country_id: selectedCountry });
-                } catch (err) {
+                } catch (err : any) {
                   toast.error(t('lookups.create_error', 'hr').replace('{name}', entity));
                   throw err;
                 }
@@ -199,7 +199,7 @@ function CitiesSection() {
                     try {
                       await remove(c.id);
                       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
-                    } catch (err) {
+                    } catch (err : any) {
                       toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
                     }
                   }}>{t('common.delete') || 'حذف'}</Button>
@@ -293,7 +293,7 @@ function RegionsSection() {
               onSubmit={async (data) => {
                 try {
                   return await create({ name: { ar: data.name }, residence_city_id: selectedCity });
-                } catch (err) {
+                } catch (err : any) {
                   toast.error(t('lookups.create_error', 'hr').replace('{name}', entity));
                   throw err;
                 }
@@ -316,7 +316,7 @@ function RegionsSection() {
                     try {
                       await remove(r.id);
                       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
-                    } catch (err) {
+                    } catch (err : any) {
                       toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
                     }
                   }}>{t('common.delete') || 'حذف'}</Button>
@@ -366,7 +366,7 @@ function UniversitiesSection() {
           onSubmit={async (data) => {
             try {
               return await create({ name: data.name });
-    } catch (err) {
+    } catch (err : any) {
       toast.error(err?.message || t('lookups.create_error', 'hr').replace('{name}', entity));
               throw err;
             }
@@ -389,7 +389,7 @@ function UniversitiesSection() {
                 try {
                   await remove(u.id);
                   toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
-    } catch (err) {
+    } catch (err : any) {
       toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
                 }
               }}>{t('common.delete') || 'حذف'}</Button>
@@ -455,7 +455,7 @@ function FacultiesSection() {
               onSubmit={async (data) => {
                 try {
                   return await create({ name: data.name, university_id: selectedUniversity });
-                } catch (err) {
+                } catch (err : any) {
                   toast.error(t('lookups.create_error', 'hr').replace('{name}', entity));
                   throw err;
                 }
@@ -478,7 +478,7 @@ function FacultiesSection() {
                     try {
                       await remove(f.id);
                       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
-                    } catch (err) {
+                    } catch (err : any) {
                       toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
                     }
                   }}>{t('common.delete') || 'حذف'}</Button>
@@ -572,7 +572,7 @@ function SpecializationsSection() {
               onSubmit={async (data) => {
                 try {
                   return await create({ name: data.name, faculty_id: selectedFaculty });
-                } catch (err) {
+                } catch (err : any) {
                   toast.error(t('lookups.create_error', 'hr').replace('{name}', entity));
                   throw err;
                 }
@@ -595,7 +595,7 @@ function SpecializationsSection() {
                     try {
                       await remove(s.id);
                       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
-                    } catch (err) {
+                    } catch (err : any) {
                       toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
                     }
                   }}>{t('common.delete') || 'حذف'}</Button>

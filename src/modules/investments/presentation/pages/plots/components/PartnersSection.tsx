@@ -137,7 +137,7 @@ export function PartnersSection({ plotId, dossierId }: PartnersSectionProps) {
         translateValues={handleTranslateValues}
       />
 
-      <Dialog isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} title={t('dossier.partners_history', 'investments') || 'Partners History'} size="4xl">
+      <Dialog isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} title={t('dossier.partners_history', 'investments') || 'Partners History'} size="3xl">
         <DataTable
           columns={[
             { key: "id", label: "#", width: 60 },

@@ -17,7 +17,7 @@ export const getCreatePlotFormSchema = (t: (key: string, module?: string) => str
   latitude: z.string().min(1, t('plots.validation.latitude_required', 'investments') || 'خط العرض مطلوب'),
   longitude: z.string().min(1, t('plots.validation.longitude_required', 'investments') || 'خط الطول مطلوب'),
   // service_conditions: z.array(z.coerce.number()).nullable().optional(),
-  service_conditions : z.array(z.object({note : z.string() , id : z.number()})),
+  service_conditions : z.array(z.object({note : z.string().nullable().optional() , id : z.number().nullable().optional()})).nullable().optional(),
   // notes: z.string().or(z.literal('')).optional().nullable(),
   status_date: z.string().or(z.literal('')).optional().nullable(),
 });

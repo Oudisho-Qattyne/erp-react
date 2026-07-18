@@ -6,7 +6,7 @@ import { DatePicker } from './DatePicker';
 import { TimePicker } from './TimePicker';
 import { DateTimePicker } from './DateTimePicker';
 import { DataMatrixInput, type MatrixFieldConfig } from './DataMatrixInput';
-import { Toggle, type ToggleVariant } from './Toggle';
+import { Toggle, type ToggleSize, type ToggleVariant } from './Toggle';
 import { Info } from 'lucide-react';
 import { AuthContext } from '../../../../infrastructure/auth/AuthProvider';
 export type InputType = 'text' | 'number' | 'numeric' | 'alpha' | 'email' | 'password' | 'textarea' | 'date' | 'time' | 'datetime' | 'select' | 'select-or-create' | 'multi-select-or-create' | 'data-matrix' | 'checkbox' | 'toggle';

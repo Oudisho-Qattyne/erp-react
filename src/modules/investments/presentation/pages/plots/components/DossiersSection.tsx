@@ -78,7 +78,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       if(confirmAllocateNewDossier){
         setConfirmAllocatedNewDossier(null)
       }
-      getAll(fetchUrl());
+      window.location.reload();
     } catch (err: any) {
       toast.error(err?.message || t('dossier.create_error', 'investments') || 'Failed to create dossier');
     }
@@ -104,7 +104,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       toast.success(t('dossier.updated', 'investments') || 'Dossier updated successfully');
       setEditDossier(null);
       form.reset();
-      getAll(fetchUrl());
+      window.location.reload();
     } catch (err: any) {
       toast.error(err?.message || t('dossier.update_error', 'investments') || 'Failed to update dossier');
     }
@@ -118,7 +118,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       setEditDossier(null);
       setConfirmEditAllocate(null);
       form.reset();
-      getAll(fetchUrl());
+      window.location.reload();
     } catch (err: any) {
       toast.error(err?.message || t('dossier.allocate_error', 'investments') || 'Failed to allocate dossier');
     }
@@ -165,7 +165,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       await remove((confirmDelete as any).id);
       toast.success(t('dossier.deleted', 'investments') || 'Dossier deleted successfully');
       setConfirmDelete(null);
-      getAll(fetchUrl());
+      window.location.reload();
     } catch (err: any) {
       toast.error(err?.message || t('dossier.delete_error', 'investments') || 'Failed to delete dossier');
     }
@@ -175,7 +175,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
     try {
       await update(dossier.id, { status: "active" });
       toast.success(t('dossier.allocated', 'investments') || 'Dossier allocated successfully');
-      getAll(fetchUrl());
+      window.location.reload();
     } catch (err: any) {
       toast.error(err?.message || t('dossier.allocate_error', 'investments') || 'Failed to allocate dossier');
     }
