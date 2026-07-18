@@ -1159,8 +1159,6 @@ paths:
         -
           $ref: '#/components/parameters/HrHasShamCashAccountFilter'
         -
-          $ref: '#/components/parameters/HrResidenceRegionIdFilter'
-        -
           $ref: '#/components/parameters/HrUniversityIdFilter'
         -
           $ref: '#/components/parameters/HrFacultyIdFilter'
@@ -1168,8 +1166,6 @@ paths:
           $ref: '#/components/parameters/HrSpecializationIdFilter'
         -
           $ref: '#/components/parameters/HrOrganizationalUnitFilter'
-        -
-          $ref: '#/components/parameters/HrWorkPlaceCityFilter'
         -
           $ref: '#/components/parameters/HrLinkedToUserFilter'
         -
@@ -2493,7 +2489,7 @@ paths:
           schema:
             type: string
         -
-          name: dossier_id
+          name: facility_id
           in: query
           schema:
             type: integer
@@ -3064,6 +3060,74 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
+  /investments/contracts/installments/pay:
+    post:
+      tags:
+        - 'Contract Installments'
+      summary: 'Pay the next unpaid installment'
+      description: "Pays the next unpaid installment for a contract.\n- `contract_id` is required in the request body.\n- `payment_date` is optional. If omitted or null, defaults to the current date.\n- The date must fall within the allowed range: between the previous installment's payment_date (or contract_date for installment #1) and this installment's due_date.\n"
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractPaymentInstallmentDTO'
+      responses:
+        200:
+          description: 'Installment paid successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ContractPaymentInstallmentInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/contracts/installments/{installmentId}':
+    put:
+      tags:
+        - 'Contract Installments'
+      summary: 'Update installment payment date'
+      description: "Pay or unpay a specific installment by its ID.\n- Provide `payment_date` to pay the installment (set a date).\n- Set `payment_date` to null to unpay the installment.\n- If `payment_date` is omitted, it defaults to the current date.\n- Also recalculates the contract's `paid_full_amount` field.\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: installmentId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 'The installment ID.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContractPaymentInstallmentDTO'
+      responses:
+        200:
+          description: 'Installment updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ContractPaymentInstallmentInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
   /investments/plot-areas:
     get:
       tags:
@@ -5229,6 +5293,155 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
+  /investments/service-conditions:
+    get:
+      tags:
+        - 'Service Conditions'
+      summary: 'Get all Service Conditions'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: is_active
+          in: query
+          schema:
+            type: boolean
+        -
+          name: is_default
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'List of service conditions'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/ServiceConditionInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Service Conditions'
+      summary: 'Create a Service Condition'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceConditionDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ServiceConditionInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/service-conditions/{id}':
+    get:
+      tags:
+        - 'Service Conditions'
+      summary: 'Get a Service Condition by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Service condition details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ServiceConditionInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Service Conditions'
+      summary: 'Update a Service Condition'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceConditionDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ServiceConditionInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Service Conditions'
+      summary: 'Delete a Service Condition'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
   /storage-management:
     get:
       summary: 'List root-level storage items'
@@ -6330,21 +6543,10 @@ components:
           format: date
           nullable: true
           example: 1602288000
-        contract_type:
-          type: string
-          nullable: true
-          example: Full-time
-        contract_nature:
-          type: string
-          nullable: true
-          example: Permanent
         job_category:
           type: string
           nullable: true
           example: Engineering
-        workplace_city_id:
-          type: integer
-          example: 14
     Education:
       type: object
       properties:
@@ -6411,6 +6613,27 @@ components:
           type: string
           format: date
           example: 1602288000
+    EmployeeWife:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        employee_id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Nour Hassan'
+    EmployeeWifeInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          example: 'Nour Hassan'
     ChronicDisease:
       type: object
       properties:
@@ -6566,8 +6789,9 @@ components:
         id:
           type: integer
           example: 1
-        internal_id:
+        personal_id_number:
           type: string
+          nullable: true
           example: EMP001
         national_id:
           type: string
@@ -6621,7 +6845,7 @@ components:
           type: integer
           nullable: true
           example: 2
-        spouse_name:
+        spouses:
           type: string
           nullable: true
           example: 'Nour Hassan'
@@ -6690,10 +6914,17 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EmployeeChild'
+        spouses:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmployeeWife'
         chronic_diseases:
           type: array
           items:
             $ref: '#/components/schemas/ChronicDisease'
+        residence_city_id:
+          type: integer
+          example: 1
         folder:
           type: object
           nullable: true
@@ -6736,8 +6967,9 @@ components:
         id:
           type: integer
           example: 1
-        internal_id:
+        personal_id_number:
           type: string
+          nullable: true
           example: EMP001
         national_id:
           type: string
@@ -6757,18 +6989,18 @@ components:
     EmployeeCreateRequest:
       type: object
       required:
-        - internal_id
         - national_id
         - first_name
         - last_name
         - gender
         - assigned_job
-        - residence_region_id
+        - residence_city_id
         - employment_details
       properties:
-        internal_id:
+        personal_id_number:
           type: string
           maxLength: 50
+          nullable: true
           example: EMP001
         national_id:
           type: string
@@ -6825,7 +7057,7 @@ components:
           nullable: true
           example: 2
           description: 'Required when `marital_status` is `married`.'
-        spouse_name:
+        spouses:
           type: string
           nullable: true
           example: 'Nour Hassan'
@@ -6854,9 +7086,9 @@ components:
           type: string
           nullable: true
           example: SC-001234
-        residence_region_id:
+        residence_city_id:
           type: integer
-          example: 5
+          example: 1
         residential_area_details:
           type: string
           nullable: true
@@ -6899,6 +7131,11 @@ components:
           description: 'Required when `marital_status` is `married` and `number_of_children` is greater than 0. The array length must match `number_of_children`.'
           items:
             $ref: '#/components/schemas/EmployeeChildInput'
+        spouses:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/EmployeeWifeInput'
         job_status_id:
           type: integer
           example: 1
@@ -6917,7 +7154,7 @@ components:
     EmployeeUpdateRequest:
       type: object
       properties:
-        internal_id:
+        personal_id_number:
           type: string
         national_id:
           type: string
@@ -6960,7 +7197,7 @@ components:
         number_of_children:
           type: integer
           nullable: true
-        spouse_name:
+        spouses:
           type: string
           nullable: true
         spouse_workplace:
@@ -6984,7 +7221,7 @@ components:
         sham_cash_account:
           type: string
           nullable: true
-        residence_region_id:
+        residence_city_id:
           type: integer
         residential_area_details:
           type: string
@@ -7023,6 +7260,11 @@ components:
           nullable: true
           items:
             $ref: '#/components/schemas/EmployeeChildInput'
+        spouses:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/EmployeeWifeInput'
         job_status_id:
           type: integer
           nullable: true
@@ -7731,12 +7973,11 @@ components:
     BuildingLicenseDTO:
       type: object
       required:
-        - dossier_id
+        - facility_id
         - date_of_displaying_license_info
         - building_license_number
         - building_license_date
         - licensed_area
-        - current_plot_status
         - licensing_status_id
         - administrative_license_decision_number
         - administrative_license_decision_date
@@ -7744,7 +7985,7 @@ components:
         - by_industry_license_id
         - temp_administrative_license_expiration_date
       properties:
-        dossier_id:
+        facility_id:
           type: integer
           example: 1
         date_of_displaying_license_info:
@@ -7762,9 +8003,6 @@ components:
           type: number
           format: float
           example: 100.5
-        current_plot_status:
-          type: string
-          example: allocated
         licensing_status_id:
           type: integer
           example: 1
@@ -7791,7 +8029,7 @@ components:
         id:
           type: integer
           example: 1
-        dossier_id:
+        facility_id:
           type: integer
           example: 1
         date_of_displaying_license_info:
@@ -7809,9 +8047,6 @@ components:
           type: number
           format: float
           example: 100.5
-        current_plot_status:
-          type: string
-          example: allocated
         licensing_status_id:
           type: integer
           example: 1
@@ -7840,8 +8075,8 @@ components:
           type: string
           format: date
           example: 12-07-2026
-        dossier:
-          $ref: '#/components/schemas/PlotDossierInfoResource'
+        facility:
+          $ref: '#/components/schemas/FacilityInfoResource'
         licensing_status:
           $ref: '#/components/schemas/LicenseStatusInfoResource'
         by_duration_license:
@@ -7854,7 +8089,7 @@ components:
         id:
           type: integer
           example: 1
-        dossier_id:
+        facility_id:
           type: integer
           example: 1
         building_license_number:
@@ -7868,9 +8103,6 @@ components:
           type: number
           format: float
           example: 100.5
-        current_plot_status:
-          type: string
-          example: allocated
         licensing_status_id:
           type: integer
           example: 1
@@ -8027,6 +8259,12 @@ components:
         total_price:
           type: number
           example: 187500.0
+        paid_full_amount:
+          type: boolean
+          example: false
+        first_patch:
+          type: number
+          example: 0.0
         payment_method:
           type: string
           enum:
@@ -8037,6 +8275,61 @@ components:
           type: string
           format: date
           example: 12-07-2026
+        installments:
+          type: array
+          nullable: true
+          description: 'Present only when payment_method is installment. Null otherwise.'
+          items:
+            $ref: '#/components/schemas/ContractPaymentInstallmentInfoResource'
+    ContractPaymentInstallmentDTO:
+      type: object
+      required:
+        - contract_id
+      properties:
+        contract_id:
+          type: integer
+          description: 'ID of the installment contract.'
+          example: 1
+        payment_date:
+          type: string
+          format: date
+          nullable: true
+          description: 'Date of payment. Defaults to current date if omitted or null.'
+          example: '2026-07-14'
+    ContractPaymentInstallmentInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        contract_id:
+          type: integer
+          example: 1
+        contract:
+          type: object
+          nullable: true
+          allOf:
+            -
+              $ref: '#/components/schemas/ContractInfoResource'
+        installment_number:
+          type: integer
+          example: 1
+        installment_value:
+          type: number
+          example: 8812.5
+        due_date:
+          type: string
+          format: date
+          example: 12-10-2026
+        payment_date:
+          type: string
+          format: date
+          nullable: true
+          example: 14-07-2026
+        created_at:
+          type: string
+          format: date
+          example: 14-07-2026
     PlotAreaDTO:
       type: object
       required:
@@ -8152,9 +8445,6 @@ components:
         longitude:
           type: string
           example: '36.2765'
-        current_condition:
-          type: string
-          example: 'Empty land'
         notes:
           type: string
           example: 'Test notes'
@@ -8166,6 +8456,41 @@ components:
           type: string
           format: date
           example: '2026-06-27'
+        service_conditions:
+          type: array
+          description: 'Array of service condition objects with id and optional note'
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+              note:
+                type: string
+                nullable: true
+                example: 'Some note'
+    ServiceCondition_WithPivot:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Active
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+        pivot:
+          type: object
+          properties:
+            note:
+              type: string
+              nullable: true
+              example: 'Some note'
     PlotInfoResource:
       type: object
       properties:
@@ -8202,10 +8527,6 @@ components:
         longitude:
           type: string
           example: '36.2765'
-        current_condition:
-          type: string
-          nullable: true
-          example: 'Empty land'
         notes:
           type: string
           nullable: true
@@ -8247,6 +8568,11 @@ components:
           allOf:
             -
               $ref: '#/components/schemas/PlotDossierInfoResource'
+        service_conditions:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/ServiceCondition_WithPivot'
     ChangePlotStatusDTO:
       type: object
       required:
@@ -8290,13 +8616,29 @@ components:
     InvestorDTO:
       type: object
       required:
-        - full_name
+        - first_name
+        - last_name
+        - father_name
+        - mother_name
         - nationality
         - gender
       properties:
-        full_name:
+        first_name:
           type: string
-          example: 'John Doe'
+          example: John
+        last_name:
+          type: string
+          example: Doe
+        father_name:
+          type: string
+          example: Michael
+        mother_name:
+          type: string
+          example: Sarah
+        grandfather_name:
+          type: string
+          nullable: true
+          example: Robert
         national_id:
           type: string
           example: '1234567890'
@@ -8346,9 +8688,22 @@ components:
         id:
           type: integer
           example: 1
-        full_name:
+        first_name:
           type: string
-          example: 'John Doe'
+          example: John
+        last_name:
+          type: string
+          example: Doe
+        father_name:
+          type: string
+          example: Michael
+        mother_name:
+          type: string
+          example: Sarah
+        grandfather_name:
+          type: string
+          nullable: true
+          example: Robert
         national_id:
           type: string
           nullable: true
@@ -9094,6 +9449,45 @@ components:
           type: string
           format: date
           example: 12-07-2026
+    ServiceConditionDTO:
+      type: object
+      required:
+        - name
+        - is_default
+        - is_active
+      properties:
+        name:
+          type: string
+          example: Active
+        is_default:
+          type: boolean
+          example: false
+        is_active:
+          type: boolean
+          example: true
+    ServiceConditionInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Active
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date
+          example: 16-07-2026
+        updated_at:
+          type: string
+          format: date
+          example: 16-07-2026
     StorageItemBase:
       type: object
       properties:
@@ -9593,13 +9987,6 @@ components:
       schema:
         type: boolean
         example: true
-    HrResidenceRegionIdFilter:
-      name: residence_region_id
-      in: query
-      required: false
-      schema:
-        type: integer
-        example: 5
     HrUniversityIdFilter:
       name: university_id
       in: query
@@ -9628,13 +10015,6 @@ components:
       schema:
         type: integer
         example: 3
-    HrWorkPlaceCityFilter:
-      name: work_place_city
-      in: query
-      required: false
-      schema:
-        type: integer
-        example: 14
     HrLinkedToUserFilter:
       name: linked_to_user
       in: query
@@ -9941,6 +10321,9 @@ tags:
     name: Contracts
     description: 'Manage Contract definitions'
   -
+    name: 'Contract Installments'
+    description: 'Manage Contract payment installments'
+  -
     name: 'Plot Areas'
     description: 'Manage Plot Area definitions'
   -
@@ -9985,6 +10368,9 @@ tags:
   -
     name: 'License Statuses'
     description: 'Manage License Status definitions'
+  -
+    name: 'Service Conditions'
+    description: 'Manage Service Condition definitions'
   -
     name: Storage
     description: 'Resolve storage items by ID or list root-level items'

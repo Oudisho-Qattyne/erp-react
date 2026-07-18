@@ -42,6 +42,11 @@ export interface EmployeeChildren {
   birthdate: string
 }
 
+export interface EmployeeSpouse {
+  name?: string;
+  workplace?:string;
+}
+
 export interface OrganizationalUnit {
   id: number;
   name: string;
@@ -57,18 +62,14 @@ export interface EmploymentDetails {
   organizational_unit?: OrganizationalUnit;
   status: EmploymentStatus;                    // e.g., 'active'
   appointment_date: string;          // YYYY-MM-DD
-  contract_type: ContractType;             // 'Full-time', etc.
-  contract_nature: ContractNature;           // 'Permanent', etc.
   job_category: string;
-  workplace_city_id: number;
-  workplace_city?: City;
   created_at: string;
   updated_at: string;
 }
 
 export interface EmployeeData {
   id: number;
-  internal_id: string;
+  personal_id_number: string;
   national_id: string;
   first_name: string;
   father_name: string;
@@ -81,13 +82,14 @@ export interface EmployeeData {
   assigned_job: string;
   marital_status: MaritalStatus;          // 'married', 'single', etc.   
   number_of_children: number;
-  spouse_name: string;
+  spouses: EmployeeSpouse[];
   spouse_workplace: string;
   blood_type: BloodType;                // 'O+', etc.
   phone_number: string;
   sham_cash_account: string;
-  residence_region_id: number;
-  residence_region?: Region & { city?: City & { country?: Country } };
+  residence_city_id?:number;
+  city:City;
+  country:Country;
   residential_area_details: string;
   civil_registry_record: string;
   health_status: string;

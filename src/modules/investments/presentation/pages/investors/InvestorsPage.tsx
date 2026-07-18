@@ -114,7 +114,7 @@ export function InvestorsPage() {
       label: t('investors.full_name', 'investments') || 'Full Name',
       width: 200,
       sortable: true,
-      render: (row: Investor) => <span className="font-medium">{row.full_name}</span>
+      render: (row: Investor) => <span className="font-medium">{[row.first_name, row.father_name, row.last_name].filter(Boolean).join(' ')}</span>
     },
     {
       key: 'national_id',
@@ -149,7 +149,7 @@ export function InvestorsPage() {
       label: t('investors.created_at', 'investments') || 'Created At',
       width: 130,
       sortable: true,
-      render: (row: Investor) => row.created_at ? new Date(row.created_at).toLocaleDateString() : '—'
+      render: (row: Investor) => row.created_at ? row.created_at : '—'
     },
     {
       key: 'added_by',

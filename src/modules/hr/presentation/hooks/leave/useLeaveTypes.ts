@@ -125,7 +125,7 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err.message || "Failed to fetch leave types"
+      const msg = err?.message || "Failed to fetch leave types"
       setFnError("findAll", msg)
       toast.error(t("leave_types.load_error", "hr").replace("{message}", msg))
     } finally {
@@ -141,7 +141,7 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
       const data = res.data
       setCurrentLeave(Array.isArray(data) ? data[0] : data as any)
     } catch (err: any) {
-      const msg = err.message || "Failed to fetch leave type"
+      const msg = err?.message || "Failed to fetch leave type"
       setFnError("findById", msg)
       toast.error(t("leave_types.load_single_error", "hr").replace("{message}", msg))
     } finally {
@@ -156,7 +156,7 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
       await useCase.createLeaveType(data)
       toast.success(t("leave_types.created", "hr"))
     } catch (err: any) {
-      const msg = err.message || "Failed to create leave type"
+      const msg = err?.message || "Failed to create leave type"
       setFnError("create", msg)
       toast.error(t("leave_types.create_error", "hr").replace("{message}", msg))
       throw err
@@ -172,7 +172,7 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
       await useCase.updateLeaveType(id, data)
       toast.success(t("leave_types.updated", "hr"))
     } catch (err: any) {
-      const msg = err.message || "Failed to update leave type"
+      const msg = err?.message || "Failed to update leave type"
       setFnError("update", msg)
       toast.error(t("leave_types.update_error", "hr").replace("{message}", msg))
       throw err
@@ -189,7 +189,7 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
       toast.success(t("leave_types.archived", "hr"))
       await findAll()
     } catch (err: any) {
-      const msg = err.message || "Failed to archive leave type"
+      const msg = err?.message || "Failed to archive leave type"
       setFnError("archive", msg)
       toast.error(t("leave_types.archive_error", "hr").replace("{message}", msg))
       throw err
@@ -206,7 +206,7 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
       toast.success(t("leave_types.deleted", "hr"))
       await findAll()
     } catch (err: any) {
-      const msg = err.message || "Failed to delete leave type"
+      const msg = err?.message || "Failed to delete leave type"
       setFnError("delete", msg)
       toast.error(t("leave_types.delete_error", "hr").replace("{message}", msg))
       throw err
@@ -222,7 +222,7 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
       const res = await useCase.findUserEligibleLeaveTypes()
       setUserEligibleLeaveTypes(res.data)
     } catch (err: any) {
-      const msg = err.message || "Failed to fetch eligible leave types"
+      const msg = err?.message || "Failed to fetch eligible leave types"
       setFnError("findUserEligibleLeaveTypes", msg)
       toast.error(t("leave_types.eligible_load_error", "hr").replace("{message}", msg))
     } finally {

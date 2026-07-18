@@ -46,14 +46,13 @@ export default function LoginPage() {
       loginLocal(res.data.token , res.data.user)
       navigate('/hr');
     } catch (err: any) {
-      console.error('Login failed:', err);
-      // if (err.validationErrors) {
-      //   Object.keys(err.validationErrors).forEach((key) => {
-      //     const messages = err.validationErrors[key];
-      //     const message = Array.isArray(messages) ? messages[0] : messages;
-      //     form.setError(key as keyof LoginFormData, { type: 'server', message });
-      //   });
-      // }
+      if (err.validationErrors) {
+        Object.keys(err.validationErrors).forEach((key) => {
+          const messages = err.validationErrors[key];
+          const message = Array.isArray(messages) ? messages[0] : messages;
+          form.setError(key as keyof LoginFormData, { type: 'server', message });
+        });
+      }
     }
   };
 

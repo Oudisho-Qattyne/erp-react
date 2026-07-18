@@ -4,8 +4,6 @@
     "title": "المناطق",
     "add": "إضافة منطقة",
     "name": "اسم المنطقة",
-    "is_active": "فعال",
-    "is_default": "تعيين كافتراضي",
     "created": "تم إنشاء {name} بنجاح",
     "create_error": "فشل في إنشاء {name}",
     "deleted": "تم حذف {name} بنجاح",
@@ -21,7 +19,7 @@
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم المنطقة",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -30,8 +28,6 @@
     "title": "التصنيفات",
     "add": "إضافة تصنيف",
     "name": "اسم التصنيف",
-    "is_active": "فعال",
-    "is_default": "تعيين كافتراضي",
     "created": "تم إنشاء {name} بنجاح",
     "create_error": "فشل في إنشاء {name}",
     "deleted": "تم حذف {name} بنجاح",
@@ -47,24 +43,48 @@
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم التصنيف",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
   },
+  "service_conditions": {
+    "title": "شروط الخدمة",
+    "add": "إضافة شرط خدمة",
+    "name": "اسم الشرط",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا يوجد شروط خدمة",
+    "edit_log": "سجل التعديل",
+    "no_edit_log": "لا يوجد سجل تعديلات",
+    "event": "الحدث",
+    "created_at": "تاريخ الإنشاء",
+    "changed_by": "تم التغيير بواسطة",
+    "changes": "التغييرات",
+    "field": "الحقل",
+    "old_value": "القيمة القديمة",
+    "new_value": "القيمة الجديدة",
+    "subject_id": "رقم شرط الخدمة",
+    "id": "ID",
+    "validation": {
+      "name_required": "اسم الشرط مطلوب"
+    }
+  },
   "plots": {
     "title": "المقاسم",
+    "section_title": "مقسم",
     "add": "إضافة مقسم",
-    "code": "رمز المقسم",
-    "identifier": "المعرف",
+    "code": "رقم المقسم",
+    "identifier": "ID",
     "area": "المساحة (م²)",
     "plot_area_id": "المنطقة",
     "plot_classification_id": "التصنيف",
     "location": "الموقع",
-    "current_condition": "الوضع الحالي للمقسم",
+    "current_condition": "الوضع الحالي للمقسم من حيث الخدمات",
     "notes": "ملاحظات",
     "status": "حالة المقسم",
-    "created_at": "تاريخ الإنشاء (اختياري)",
     "status_date": "تاريخ الحالة (اختياري)",
     "created": "تم إنشاء {name} بنجاح",
     "create_error": "فشل في إنشاء {name}",
@@ -96,11 +116,16 @@
     "added_by": "أضيف بواسطة",
     "changed_by": "تم التغيير بواسطة",
     "folder": "مجلد المقسم",
+    "group_basic_info": "المعلومات الأساسية",
+    "group_classification": "التصنيف",
+    "group_location": "الموقع",
+    "group_additional": "معلومات إضافية",
     "latitude": "خط العرض",
     "longitude": "خط الطول",
     "user_id": "المستخدم",
     "folder_id": "المجلد",
-    "id": "المعرف",
+    "id": "ID",
+    "picker_title": "اختيار مقسم",
     "status_unsold": "غير مباعة",
     "status_announced": "معلن عنها",
     "status_subscribed": "مكتتب بها",
@@ -108,7 +133,7 @@
     "status_separated": "مغصول",
     "validation": {
       "code_required": "الرمز مطلوب",
-      "identifier_required": "المعرف مطلوب",
+      "identifier_required": "ID مطلوب",
       "area_required": "المساحة مطلوبة",
       "area_invalid": "يجب أن تكون المساحة رقماً موجباً صحيحاً",
       "plot_area_id_invalid": "يجب أن تكون المنطقة رقماً",
@@ -126,6 +151,7 @@
   },
   "dossier": {
     "title": "الإضبارات",
+    "section_title": "إضبارة",
     "add": "إضافة إضبارة",
     "edit": "تعديل الإضبارة",
     "number": "رقم الإضبارة",
@@ -151,6 +177,7 @@
     "allocate_message": "هل أنت متأكد من تخصيص هذه الإضبارة؟",
     "allocate_new_title": "تخصيص إضبارة جديدة",
     "allocate_new_message": "هل أنت متأكد أنك تريد إلغاء تخصيص الإضبارة المخصصة سابقاً؟",
+    "allocate_unallocate_warning": "(إذا كانت هناك إضبارة مخصصة أخرى سيتم إلغاء تخصيصها)",
     "cancel": "إلغاء",
     "cancelled": "تم إلغاء الإضبارة بنجاح",
     "cancel_error": "فشل في إلغاء الإضبارة",
@@ -165,6 +192,12 @@
     "add_investors": "إضافة مستثمرين",
     "remove_selected": "إزالة المحدد",
     "no_partners": "لم يتم إضافة شركاء",
+    "partners_history": "سجل الشركاء",
+    "no_partners_history": "لا توجد سجلات",
+    "partner_action_added": "إضافة",
+    "partner_action_removed": "إزالة",
+    "causer": "بواسطة",
+    "action": "الإجراء",
     "picker_title": "اختيار مستثمرين",
     "search_placeholder": "البحث عن مستثمرين...",
     "load_error": "فشل تحميل الإضبارات",
@@ -180,12 +213,14 @@
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم الإضبارة",
     "validation": {
+      "number_required": "رقم الإضبارة مطلوب",
       "date_required": "تاريخ الإضبارة مطلوب",
       "status_required": "حالة الإضبارة مطلوبة"
     }
   },
   "contract": {
     "title": "العقود",
+    "section_title": "عقد",
     "add": "إضافة عقد",
     "edit": "تعديل العقد",
     "contract_number": "رقم العقد",
@@ -219,7 +254,7 @@
     "subject_id": "معرف العقد",
     "delete_title": "حذف العقد",
     "delete_message": "هل أنت متأكد من حذف هذا العقد؟",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "dossier_id_required": "الإضبارة مطلوبة",
       "contract_number_required": "رقم العقد مطلوب",
@@ -291,9 +326,14 @@
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم المنشأة",
+    "group_basic_info": "المعلومات الأساسية",
+    "group_contact": "معلومات الاتصال",
+    "group_financial": "المعلومات المالية",
+    "group_production": "الطاقة الإنتاجية",
+    "group_utilities": "المرافق",
     "plot_id": "المقسم",
     "plot_dossier_id": "الإضبارة",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب",
       "address_required": "العنوان مطلوب",
@@ -320,7 +360,15 @@
     "add_future_possible": "إضافة مستثمر مستقبلي محتمل",
     "edit": "تعديل مستثمر",
     "info": "معلومات المستثمر",
+    "personal_info": "المعلومات الشخصية",
+    "contact_info": "معلومات الاتصال",
+    "social_media": "وسائل التواصل الاجتماعي",
     "full_name": "الاسم الكامل",
+    "first_name": "اسم المستثمر",
+    "father_name": "اسم الأب",
+    "grandfather_name": "اسم الجد",
+    "last_name": "الكنية",
+    "mother_name": "اسم الأم",
     "national_id": "الرقم الوطني",
     "passport_number": "رقم الجواز",
     "nationality": "الجنسية",
@@ -377,9 +425,12 @@
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم المستثمر",
     "user_id": "المستخدم",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
-      "full_name_required": "الاسم الكامل مطلوب",
+      "first_name_required": "الاسم الأول مطلوب",
+      "father_name_required": "اسم الأب مطلوب",
+      "last_name_required": "اسم العائلة مطلوب",
+      "mother_name_required": "اسم الأم مطلوب",
       "nationality_required": "الجنسية مطلوبة",
       "gender_required": "الجنس مطلوب",
       "whatsapp_max": "يجب ألا يتجاوز رقم الواتساب 20 حرفاً",
@@ -423,6 +474,13 @@
         "create": "إنشاء تصنيف",
         "update": "تعديل تصنيف",
         "delete": "حذف تصنيف"
+      },
+      "service-conditions": {
+        "list": "قائمة شروط الخدمة",
+        "view": "عرض شرط خدمة",
+        "create": "إنشاء شرط خدمة",
+        "update": "تعديل شرط خدمة",
+        "delete": "حذف شرط خدمة"
       },
       "plot-dossier": {
         "list": "قائمة الإضبارات",
@@ -497,8 +555,6 @@
     "add": "إضافة نوع قرار صناعي",
     "create": "إنشاء نوع قرار صناعي",
     "name": "اسم نوع القرار",
-    "is_active": "فعال",
-    "is_default": "تعيين كافتراضي",
     "created": "تم إنشاء {name} بنجاح",
     "create_error": "فشل في إنشاء {name}",
     "deleted": "تم حذف {name} بنجاح",
@@ -514,7 +570,7 @@
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم نوع القرار",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -524,8 +580,6 @@
     "add": "إضافة مصدر ترخيص صناعي",
     "create": "إنشاء مصدر ترخيص صناعي",
     "name": "اسم المصدر",
-    "is_active": "فعال",
-    "is_default": "تعيين كافتراضي",
     "created": "تم إنشاء {name} بنجاح",
     "create_error": "فشل في إنشاء {name}",
     "deleted": "تم حذف {name} بنجاح",
@@ -541,7 +595,7 @@
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم مصدر الترخيص",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -557,7 +611,6 @@
     "industry_type": "نوع الصناعة",
     "decision_type": "نوع القرار",
     "license_source": "مصدر الترخيص",
-    "is_active": "فعال",
     "facility_id": "المنشأة",
     "industry_category_id": "تصنيف الصناعة",
     "industry_type_id": "نوع الصناعة",
@@ -565,7 +618,7 @@
     "industrial_decision_date": "تاريخ القرار",
     "industrial_decision_type_id": "نوع القرار",
     "industrial_license_source_id": "مصدر الترخيص",
-    "id": "المعرف",
+    "id": "ID",
     "created": "تم إنشاء الترخيص بنجاح",
     "create_error": "فشل في إنشاء الترخيص",
     "updated": "تم تحديث الترخيص بنجاح",
@@ -584,6 +637,8 @@
     "field": "الحقل",
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
+    "group_industry": "اختيار الصناعة",
+    "group_decision": "تفاصيل القرار",
     "subject_id": "رقم الترخيص",
     "validation": {
       "industry_category_required": "تصنيف الصناعة مطلوب",
@@ -599,8 +654,6 @@
     "add": "إضافة تصنيف صناعة",
     "create": "إنشاء تصنيف صناعة",
     "name": "اسم التصنيف",
-    "is_active": "فعال",
-    "is_default": "تعيين كافتراضي",
     "created": "تم إنشاء {name} بنجاح",
     "create_error": "فشل في إنشاء {name}",
     "deleted": "تم حذف {name} بنجاح",
@@ -616,7 +669,7 @@
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم تصنيف الصناعة",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -626,8 +679,6 @@
     "add": "إضافة نوع صناعة",
     "create": "إنشاء نوع صناعة",
     "name": "اسم النوع",
-    "is_active": "فعال",
-    "is_default": "تعيين كافتراضي",
     "created": "تم إنشاء {name} بنجاح",
     "create_error": "فشل في إنشاء {name}",
     "deleted": "تم حذف {name} بنجاح",
@@ -643,7 +694,7 @@
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم نوع الصناعة",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -653,8 +704,6 @@
     "add": "إضافة ترخيص حسب المدة",
     "create": "إنشاء ترخيص حسب المدة",
     "name": "الاسم",
-    "is_active": "فعال",
-    "is_default": "افتراضي",
     "created": "تم إنشاء {name} بنجاح",
     "create_error": "فشل في إنشاء {name}",
     "deleted": "تم حذف {name} بنجاح",
@@ -670,7 +719,7 @@
     "new_value": "القيمة الجديدة",
     "no_edit_log": "لا توجد سجلات تعديل",
     "subject_id": "معرف الترخيص حسب المدة",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -680,8 +729,6 @@
     "add": "إضافة ترخيص حسب الصناعة",
     "create": "إنشاء ترخيص حسب الصناعة",
     "name": "الاسم",
-    "is_active": "فعال",
-    "is_default": "افتراضي",
     "created": "تم إنشاء {name} بنجاح",
     "create_error": "فشل في إنشاء {name}",
     "deleted": "تم حذف {name} بنجاح",
@@ -697,7 +744,7 @@
     "new_value": "القيمة الجديدة",
     "no_edit_log": "لا توجد سجلات تعديل",
     "subject_id": "معرف الترخيص حسب الصناعة",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -705,9 +752,8 @@
   "licensing_statuses": {
     "title": "حالات الترخيص",
     "add": "إضافة حالة ترخيص",
+    "create": "إنشاء حالة ترخيص",
     "name": "اسم الحالة",
-    "is_active": "فعال",
-    "is_default": "تعيين كافتراضي",
     "created": "تم إنشاء {name} بنجاح",
     "create_error": "فشل في إنشاء {name}",
     "deleted": "تم حذف {name} بنجاح",
@@ -723,7 +769,7 @@
     "new_value": "القيمة الجديدة",
     "no_edit_log": "لا توجد سجلات تعديل",
     "subject_id": "معرف حالة الترخيص",
-    "id": "المعرف",
+    "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
     }
@@ -744,6 +790,10 @@
     "by_duration_license_id": "الترخيص حسب المدة",
     "by_industry_license_id": "الترخيص حسب الصناعة",
     "temp_administrative_license_expiration_date": "تاريخ انتهاء الرخصة المؤقتة",
+    "group_license_info": "معلومات الرخصة",
+    "group_status": "حالة الترخيص",
+    "group_admin_decision": "القرار الإداري",
+    "group_license_types": "أنواع التراخيص",
     "created": "تم إنشاء رخصة البناء بنجاح",
     "create_error": "فشل في إنشاء رخصة البناء",
     "updated": "تم تحديث رخصة البناء بنجاح",
@@ -786,6 +836,9 @@
     "plot_classifications": {
       "title": "التصنيفات"
     },
+    "service_conditions": {
+      "title": "شروط الخدمة"
+    },
     "plots": {
       "title": "المقاسم"
     },
@@ -815,6 +868,12 @@
     },
     "by_industry_licenses": {
       "title": "تراخيص حسب الصناعة"
+    },
+    "dossiers": {
+      "title": "الإضبارات"
+    },
+    "facilities": {
+      "title": "المنشآت"
     },
     "contract": {
       "title": "العقود"

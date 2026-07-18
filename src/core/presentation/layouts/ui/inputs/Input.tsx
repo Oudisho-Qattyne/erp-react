@@ -6,9 +6,10 @@ import { DatePicker } from './DatePicker';
 import { TimePicker } from './TimePicker';
 import { DateTimePicker } from './DateTimePicker';
 import { DataMatrixInput, type MatrixFieldConfig } from './DataMatrixInput';
+import { Toggle, type ToggleSize, type ToggleVariant } from './Toggle';
 import { Info } from 'lucide-react';
 import { AuthContext } from '../../../../infrastructure/auth/AuthProvider';
-export type InputType = 'text' | 'number' | 'email' | 'password' | 'textarea' | 'date' | 'time' | 'datetime' | 'select' | 'select-or-create' | 'multi-select-or-create' | 'data-matrix' | 'checkbox';
+export type InputType = 'text' | 'number' | 'numeric' | 'alpha' | 'email' | 'password' | 'textarea' | 'date' | 'time' | 'datetime' | 'select' | 'select-or-create' | 'multi-select-or-create' | 'data-matrix' | 'checkbox' | 'toggle';
 
 interface InputProps {
   type: InputType;
@@ -43,6 +44,10 @@ interface InputProps {
   infoButton?: () => void | null;
   requiredPermission?: string | string[];
   createButtonPermission?: string | string[];
+  // toggle
+  toggleVariant?: ToggleVariant;
+  toggleSize?: ToggleSize;
+  toggleLabel?: string;
 }
 
 const InputTypes: React.FC<InputProps> = ({
@@ -71,6 +76,9 @@ const InputTypes: React.FC<InputProps> = ({
   matrixErrors,
   rowSchema,
   createButtonPermission,
+  toggleVariant,
+  toggleSize,
+  toggleLabel,
 }) => {
   const finalValue = value ?? '';
   const finalPlaceholder = placeholder ?? '';
@@ -173,18 +181,31 @@ const InputTypes: React.FC<InputProps> = ({
           baseClasses={localClass}
           errors={matrixErrors}
           rowSchema={rowSchema}
+          dependentData={dependentData}
         />
       );
 
     case 'checkbox':
       return (
-        <input
-          type="checkbox"
-          checked={!!value}
-          onChange={(e) => onChange(e.target.checked)}
+        <Toggle
+          value={!!value}
+          onChange={onChange}
           disabled={finalDisabled}
-          required={finalRequired}
-          className="w-4 h-4 rounded border-border text-primary focus:ring-primary cursor-pointer"
+          variant={toggleVariant}
+          size={toggleSize}
+          label={toggleLabel}
+        />
+      );
+
+    case 'toggle':
+      return (
+        <Toggle
+          value={!!value}
+          onChange={onChange}
+          disabled={finalDisabled}
+          variant={toggleVariant}
+          size={toggleSize}
+          label={toggleLabel}
         />
       );
 
@@ -220,6 +241,53 @@ const InputTypes: React.FC<InputProps> = ({
           placeholder={finalPlaceholder}
           disabled={finalDisabled}
           required={finalRequired}
+          className={localClass}
+        />
+      );
+
+    case 'alpha':
+      return (
+        <input
+          type="text"
+          value={finalValue}
+          onChange={(e) => onChange(e.target.value.replace(/[^\p{L}\s]/gu, ''))}
+          onKeyDown={(e) => {
+            const allowed = [
+              'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+              'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+              'Home', 'End',
+            ];
+            if (allowed.includes(e.key)) return;
+            if (e.ctrlKey && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase())) return;
+            if (/^\p{L}$/u.test(e.key) || e.key === ' ') return;
+            e.preventDefault();
+          }}
+          placeholder={finalPlaceholder}
+          disabled={finalDisabled}
+          className={localClass}
+        />
+      );
+
+    case 'numeric':
+      return (
+        <input
+          type="text"
+          inputMode="numeric"
+          value={finalValue}
+          onChange={(e) => onChange(e.target.value.replace(/\D/g, ''))}
+          onKeyDown={(e) => {
+            const allowed = [
+              'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+              'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+              'Home', 'End',
+            ];
+            if (allowed.includes(e.key)) return;
+            if (e.ctrlKey && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase())) return;
+            if (/^\d$/.test(e.key)) return;
+            e.preventDefault();
+          }}
+          placeholder={finalPlaceholder}
+          disabled={finalDisabled}
           className={localClass}
         />
       );

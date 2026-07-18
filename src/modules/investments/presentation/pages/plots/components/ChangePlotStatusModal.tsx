@@ -47,7 +47,7 @@ export function ChangePlotStatusModal({ isOpen, onClose, plot, onSuccess }: Chan
       onSuccess();
       onClose();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || t('plots.status_update_error', 'investments') || 'Failed to update status');
+      toast.error(err?.message || t('plots.status_update_error', 'investments') || 'Failed to update status');
     } finally {
       setLoading(false);
     }

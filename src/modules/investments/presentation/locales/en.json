@@ -4,8 +4,6 @@
     "title": "Plot Areas",
     "add": "Add Plot Area",
     "name": "Area Name",
-    "is_active": "Is Active",
-    "is_default": "Set as Default",
     "created": "{name} created successfully",
     "create_error": "Failed to create {name}",
     "deleted": "{name} deleted successfully",
@@ -30,8 +28,6 @@
     "title": "Plot Classifications",
     "add": "Add Classification",
     "name": "Classification Name",
-    "is_active": "Is Active",
-    "is_default": "Set as Default",
     "created": "{name} created successfully",
     "create_error": "Failed to create {name}",
     "deleted": "{name} deleted successfully",
@@ -52,8 +48,33 @@
       "name_required": "Name is required"
     }
   },
+  "service_conditions": {
+    "title": "Service Conditions",
+    "add": "Add Service Condition",
+    "name": "Condition Name",
+    "created": "{name} created successfully",
+    "create_error": "Failed to create {name}",
+    "deleted": "{name} deleted successfully",
+    "delete_error": "Failed to delete {name}",
+    "no_records": "No Service Conditions found",
+    "edit_log": "Edit Log",
+    "no_edit_log": "No edit logs found",
+    "event": "Event",
+    "created_at": "Created At",
+    "changed_by": "Changed By",
+    "changes": "Changes",
+    "field": "Field",
+    "old_value": "Old Value",
+    "new_value": "New Value",
+    "subject_id": "Service Condition ID",
+    "id": "ID",
+    "validation": {
+      "name_required": "Condition name is required"
+    }
+  },
   "plots": {
     "title": "Plots",
+    "section_title": "Plot",
     "add": "Add Plot",
     "code": "Plot Code",
     "identifier": "Identifier",
@@ -64,7 +85,6 @@
     "current_condition": "Current Condition",
     "notes": "Notes",
     "status": "Status",
-    "created_at": "Created At (Optional)",
     "status_date": "Status Date (Optional)",
     "created": "{name} created successfully",
     "create_error": "Failed to create {name}",
@@ -96,11 +116,16 @@
     "added_by": "Added By",
     "changed_by": "Changed By",
     "folder": "Plot Folder",
+    "group_basic_info": "Basic Information",
+    "group_classification": "Classification",
+    "group_location": "Location",
+    "group_additional": "Additional Information",
     "latitude": "Latitude",
     "longitude": "Longitude",
     "user_id": "User",
     "folder_id": "Folder",
     "id": "ID",
+    "picker_title": "Select Plot",
     "status_unsold": "Unsold",
     "status_announced": "Announced",
     "status_subscribed": "Subscribed",
@@ -126,6 +151,7 @@
   },
   "dossier": {
     "title": "Dossiers",
+    "section_title": "Dossier",
     "add": "Add Dossier",
     "edit": "Edit Dossier",
     "number": "Dossier Number",
@@ -151,6 +177,7 @@
     "allocate_message": "Are you sure you want to allocate this dossier?",
     "allocate_new_title": "Allocate New Dossier",
     "allocate_new_message": "Are you sure you want to unallocate the previous allocated dossier?",
+    "allocate_unallocate_warning": "(if there is another allocated dossier it will be unallocated)",
     "cancel": "Cancel",
     "cancelled": "Dossier cancelled successfully",
     "cancel_error": "Failed to cancel dossier",
@@ -165,6 +192,12 @@
     "add_investors": "Add Investors",
     "remove_selected": "Remove Selected",
     "no_partners": "No partners added",
+    "partners_history": "Partners History",
+    "no_partners_history": "No history records",
+    "partner_action_added": "Added",
+    "partner_action_removed": "Removed",
+    "causer": "By",
+    "action": "Action",
     "picker_title": "Select Investors",
     "search_placeholder": "Search investors...",
     "load_error": "Failed to load dossiers",
@@ -180,12 +213,14 @@
     "new_value": "New Value",
     "subject_id": "Dossier ID",
     "validation": {
+      "number_required": "Dossier number is required",
       "date_required": "Dossier date is required",
       "status_required": "Dossier status is required"
     }
   },
   "contract": {
     "title": "Contracts",
+    "section_title": "Contract",
     "add": "Add Contract",
     "edit": "Edit Contract",
     "contract_number": "Contract Number",
@@ -291,6 +326,11 @@
     "old_value": "Old Value",
     "new_value": "New Value",
     "subject_id": "Facility ID",
+    "group_basic_info": "Basic Information",
+    "group_contact": "Contact Information",
+    "group_financial": "Financial Information",
+    "group_production": "Production Capacity",
+    "group_utilities": "Utilities",
     "plot_id": "Plot",
     "plot_dossier_id": "Dossier",
     "id": "ID",
@@ -320,7 +360,15 @@
     "add_future_possible": "Add Future Possible Investor",
     "edit": "Edit Investor",
     "info": "Investor Info",
+    "personal_info": "Personal Info",
+    "contact_info": "Contact Info",
+    "social_media": "Social Media",
     "full_name": "Full Name",
+    "first_name": "Investor Name",
+    "father_name": "Father Name",
+    "grandfather_name": "Grandfather Name",
+    "last_name": "Surname",
+    "mother_name": "Mother Name",
     "national_id": "National ID",
     "passport_number": "Passport Number",
     "nationality": "Nationality",
@@ -379,7 +427,10 @@
     "user_id": "User",
     "id": "ID",
     "validation": {
-      "full_name_required": "Full name is required",
+      "first_name_required": "First name is required",
+      "father_name_required": "Father name is required",
+      "last_name_required": "Last name is required",
+      "mother_name_required": "Mother name is required",
       "nationality_required": "Nationality is required",
       "gender_required": "Gender is required",
       "whatsapp_max": "WhatsApp number must be at most 20 characters",
@@ -423,6 +474,13 @@
         "create": "Create Plot Classification",
         "update": "Edit Plot Classification",
         "delete": "Delete Plot Classification"
+      },
+      "service-conditions": {
+        "list": "List Service Conditions",
+        "view": "View Service Condition",
+        "create": "Create Service Condition",
+        "update": "Edit Service Condition",
+        "delete": "Delete Service Condition"
       },
       "plot-dossier": {
         "list": "List Dossiers",
@@ -497,8 +555,6 @@
     "add": "Add Industrial Decision Type",
     "create": "Create Industrial Decision Type",
     "name": "Decision Type Name",
-    "is_active": "Is Active",
-    "is_default": "Set as Default",
     "created": "{name} created successfully",
     "create_error": "Failed to create {name}",
     "deleted": "{name} deleted successfully",
@@ -524,8 +580,6 @@
     "add": "Add Industrial License Source",
     "create": "Create Industrial License Source",
     "name": "Source Name",
-    "is_active": "Is Active",
-    "is_default": "Set as Default",
     "created": "{name} created successfully",
     "create_error": "Failed to create {name}",
     "deleted": "{name} deleted successfully",
@@ -557,7 +611,6 @@
     "industry_type": "Industry Type",
     "decision_type": "Decision Type",
     "license_source": "License Source",
-    "is_active": "Is Active",
     "facility_id": "Facility",
     "industry_category_id": "Industry Category",
     "industry_type_id": "Industry Type",
@@ -584,6 +637,8 @@
     "field": "Field",
     "old_value": "Old Value",
     "new_value": "New Value",
+    "group_industry": "Industry Selection",
+    "group_decision": "Decision Details",
     "subject_id": "License ID",
     "validation": {
       "industry_category_required": "Industry category is required",
@@ -599,8 +654,6 @@
     "add": "Add Industry Category",
     "create": "Create Industry Category",
     "name": "Category Name",
-    "is_active": "Is Active",
-    "is_default": "Set as Default",
     "created": "{name} created successfully",
     "create_error": "Failed to create {name}",
     "deleted": "{name} deleted successfully",
@@ -626,8 +679,6 @@
     "add": "Add Industry Type",
     "create": "Create Industry Type",
     "name": "Type Name",
-    "is_active": "Is Active",
-    "is_default": "Set as Default",
     "created": "{name} created successfully",
     "create_error": "Failed to create {name}",
     "deleted": "{name} deleted successfully",
@@ -653,8 +704,6 @@
     "add": "Add By Duration License",
     "create": "Create Duration License",
     "name": "Name",
-    "is_active": "Is Active",
-    "is_default": "Is Default",
     "created": "{name} created successfully",
     "create_error": "Failed to create {name}",
     "deleted": "{name} deleted successfully",
@@ -680,8 +729,6 @@
     "add": "Add By Industry License",
     "create": "Create Industry License",
     "name": "Name",
-    "is_active": "Is Active",
-    "is_default": "Is Default",
     "created": "{name} created successfully",
     "create_error": "Failed to create {name}",
     "deleted": "{name} deleted successfully",
@@ -705,9 +752,8 @@
   "licensing_statuses": {
     "title": "Licensing Statuses",
     "add": "Add Licensing Status",
+    "create": "Create Licensing Status",
     "name": "Status Name",
-    "is_active": "Is Active",
-    "is_default": "Set as Default",
     "created": "{name} created successfully",
     "create_error": "Failed to create {name}",
     "deleted": "{name} deleted successfully",
@@ -744,6 +790,10 @@
     "by_duration_license_id": "Duration License",
     "by_industry_license_id": "Industry License",
     "temp_administrative_license_expiration_date": "Temp Expiration Date",
+    "group_license_info": "License Information",
+    "group_status": "Licensing Status",
+    "group_admin_decision": "Admin Decision",
+    "group_license_types": "License Types",
     "created": "Building license created successfully",
     "create_error": "Failed to create building license",
     "updated": "Building license updated successfully",
@@ -786,6 +836,9 @@
     "plot_classifications": {
       "title": "Plot Classifications"
     },
+    "service_conditions": {
+      "title": "Service Conditions"
+    },
     "plots": {
       "title": "Plots"
     },
@@ -815,6 +868,12 @@
     },
     "by_industry_licenses": {
       "title": "By Industry Licenses"
+    },
+    "dossiers": {
+      "title": "Dossiers"
+    },
+    "facilities": {
+      "title": "Facilities"
     },
     "contract": {
       "title": "Contracts"

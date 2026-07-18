@@ -18,6 +18,7 @@ export const createManageDossierPartnersUseCase = (repository: IDossierPartnersR
       } catch (error) {
         throw error
       }
-    }
+    },
+    listPartnersHistory: (plotId: number, dossierId: number) => repository.getPartnersHistory(plotId, dossierId),
   }
 }

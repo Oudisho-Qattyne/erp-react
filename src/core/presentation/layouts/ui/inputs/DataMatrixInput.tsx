@@ -3,15 +3,23 @@ import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '../buttons/Button';
 import Input, { type InputType } from './Input';
 import { inputBaseClasses, errorClasses } from './styles';
+import { useLanguage } from '../../../context/i18n/I18nProvider';
 
 export interface MatrixFieldConfig {
   name: string;
   label: string;
   type?: InputType;
   required?: boolean;
+  disabled?: boolean;
+  excludeSelected?: boolean;
   options?: { value: number | string; label: string }[];
   placeholder?: string;
   defaultValue?: any;
+  searchable?: boolean;
+  createTitle?: string;
+  renderCreateForm?: (onSuccess: (value: number | string, item?: unknown) => void, onCancel: () => void, dependentData?: Record<string, unknown>) => React.ReactNode;
+  labelPath?: string;
+  createButtonPermission?: string;
 }
 
 interface DataMatrixInputProps {
@@ -25,6 +33,7 @@ interface DataMatrixInputProps {
   baseClasses?: string;
   errors?: Record<number, Record<string, string>>;
   rowSchema?: { safeParse: (data: any) => { success: boolean; error?: { flatten: () => { fieldErrors: Record<string, string[]> } } } };
+  dependentData?: Record<string, unknown>;
 }
 
 const getDefaultRow = (fields: MatrixFieldConfig[]) => {
@@ -32,8 +41,10 @@ const getDefaultRow = (fields: MatrixFieldConfig[]) => {
   for (const field of fields) {
     if (field.defaultValue !== undefined) {
       row[field.name] = field.defaultValue;
-    } else if (field.type === 'number') {
+    } else if (field.type === 'number' || field.type === 'numeric') {
       row[field.name] = 0;
+    } else if (field.type === 'select' || field.type === 'select-or-create') {
+      row[field.name] = null;
     } else {
       row[field.name] = '';
     }
@@ -52,7 +63,9 @@ export function DataMatrixInput({
   baseClasses = '',
   errors: externalErrors = {},
   rowSchema,
+  dependentData,
 }: DataMatrixInputProps) {
+  const { t } = useLanguage();
   const defaultRow = useMemo(() => getDefaultRow(matrixFields), [matrixFields]);
   const rows = numberOfRows !== undefined
     ? Array.from({ length: numberOfRows }, (_, i) => value[i] || { ...defaultRow })
@@ -133,16 +146,28 @@ export function DataMatrixInput({
               <tr key={rowIndex} className="border-b border-border last:border-b-0">
                 {matrixFields.map((field) => {
                   const cellError = allErrors[rowIndex]?.[field.name];
+                  const selectedInOtherRows = field.excludeSelected
+                    ? rows.filter((_, i) => i !== rowIndex).map(r => r[field.name]).filter(v => v != null && v !== '')
+                    : [];
+                  const cellOptions = selectedInOtherRows.length > 0
+                    ? field.options?.filter(opt => !selectedInOtherRows.includes(opt.value))
+                    : field.options;
                   return (
                     <td key={field.name} className="align-top">
                       <Input
                         type={field.type || 'text'}
                         value={row[field.name]}
                         onChange={(val) => handleCellChange(rowIndex, field.name, val)}
-                        options={field.options}
+                        options={cellOptions}
                         placeholder={field.placeholder}
-                        disabled={disabled}
+                        disabled={field.disabled ?? disabled}
                         required={field.required}
+                        searchable={field.searchable}
+                        createTitle={field.createTitle}
+                        renderCreateForm={field.renderCreateForm}
+                        dependentData={dependentData}
+                        labelPath={field.labelPath}
+                        createButtonPermission={field.createButtonPermission}
                         baseClasses={`${inputBaseClasses} border-0 focus:ring-0 rounded-none ${cellError ? 'border-danger ring-danger/10' : ''}`}
                       />
                       {cellError && <div className={errorClasses}>{cellError}</div>}
@@ -155,7 +180,7 @@ export function DataMatrixInput({
                       type="button"
                       onClick={() => removeRow(rowIndex)}
                       disabled={disabled}
-                      className="p-1 text-danger/70 hover:text-danger transition-colors disabled:opacity-30"
+                      className="p-1 text-danger/70 hover:text-danger transition-colors disabled:opacity-30 cursor-pointer"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -168,7 +193,7 @@ export function DataMatrixInput({
       </div>
       {canAdd && (
         <Button type="button" variant="outline" size="sm" onClick={addRow} disabled={disabled} leftIcon={<Plus size={14} />}>
-          Add Row
+          {t('common.add_row')}
         </Button>
       )}
     </div>

@@ -102,6 +102,8 @@
     "status_suspended": "Suspended",
     "role": "Role",
     "created_at": "Created At",
+    "group_account": "Account Information",
+    "group_security": "Security",
     "password": "Password",
     "confirm_password": "Confirm Password",
     "linked_to_employee": "Linked to Employee",

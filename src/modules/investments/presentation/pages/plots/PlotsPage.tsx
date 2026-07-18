@@ -179,13 +179,6 @@ export function PlotsPage() {
       render: (row: Plot) => row.plot_classification_name || '—'
     },
     {
-      key: 'created_at',
-      label: t('plots.created_at', 'investments') || 'Created At',
-      width: 110,
-      sortable: true,
-      render: (row: Plot) => row.created_at ? new Date(row.created_at).toLocaleDateString() : '—'
-    },
-    {
       key: 'actions',
       label: t('common.actions', 'shared') || 'Actions',
       width: 140,

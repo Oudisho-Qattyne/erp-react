@@ -11,6 +11,7 @@ import { inputBaseClasses, labelClasses, errorClasses, hintClasses } from './sty
 import { DatePicker } from './DatePicker';
 import { SelectOrCreate } from './SelectOrCreate';
 import Input, { type InputType } from './Input';
+import type { ToggleVariant, ToggleSize } from './Toggle';
 import type { MatrixFieldConfig } from './DataMatrixInput';
 import { useDependentField, type ComputedProps } from './hooks/useDependentField';
 import { AuthContext } from '../../../../infrastructure/auth/AuthProvider';
@@ -56,6 +57,10 @@ export interface FormInputProps<T extends FieldValues> {
   infoButton?: () => void;
   requiredPermission?: string | string[];
   createButtonPermission?: string | string[];
+  // toggle
+  toggleVariant?: ToggleVariant;
+  toggleSize?: ToggleSize;
+  toggleLabel?: string;
 }
 
 export function FormInput<T extends FieldValues>({
@@ -88,6 +93,9 @@ export function FormInput<T extends FieldValues>({
   infoButton,
   requiredPermission,
   createButtonPermission,
+  toggleVariant,
+  toggleSize,
+  toggleLabel,
 }: FormInputProps<T>) {
   const { t, direction } = useLanguage();
   const auth = useContext(AuthContext);
@@ -120,6 +128,38 @@ export function FormInput<T extends FieldValues>({
   const finalMatrixFields = computed.matrixFields ?? matrixFields;
   const finalNumberOfRows = computed.numberOfRows ?? numberOfRows;
 
+  // Map nested array errors from react-hook-form (set by server validationErrors)
+  // e.g. errors.service_conditions[0].id → { 0: { service_condition: "msg" } }
+  const combinedMatrixErrors = useMemo(() => {
+    if (type !== 'data-matrix') return matrixErrors;
+    const merged: Record<number, Record<string, string>> = {};
+    const rawMatrixErrors = matrixErrors;
+    if (rawMatrixErrors) {
+      Object.entries(rawMatrixErrors).forEach(([rowIdx, fields]) => {
+        merged[Number(rowIdx)] = { ...fields };
+      });
+    }
+    const arrayErrors = (errors as any)?.[name];
+    if (Array.isArray(arrayErrors)) {
+      const fieldNames = finalMatrixFields?.map(f => f.name) || [];
+      arrayErrors.forEach((rowErr: any, rowIndex: number) => {
+        if (!rowErr || typeof rowErr !== 'object') return;
+        if (!merged[rowIndex]) merged[rowIndex] = {};
+        Object.entries(rowErr).forEach(([fieldName, errVal]: [string, any]) => {
+          const msg = typeof errVal === 'object' && errVal?.message ? String(errVal.message) : String(errVal);
+          if (fieldNames.includes(fieldName)) {
+            merged[rowIndex][fieldName] = msg;
+          } else if (fieldNames.length > 0) {
+            if (!merged[rowIndex][fieldNames[0]]) {
+              merged[rowIndex][fieldNames[0]] = msg;
+            }
+          }
+        });
+      });
+    }
+    return merged;
+  }, [errors, name, type, matrixErrors, finalMatrixFields]);
+
   const hasAccess = useMemo(() => {
     if (!requiredPermission) return true;
     return auth?.hasPermission(requiredPermission) ?? false;
@@ -142,18 +182,19 @@ export function FormInput<T extends FieldValues>({
   const baseClasses = `${inputBaseClasses} ${error ? 'border-danger ring-danger/10 animate-shake' : ''}`;
 
   // Checkbox renders inline label
-  if (type === 'checkbox') {
+  if (type === 'checkbox' || type === 'toggle') {
     return (
       <div className={`w-full mb-4 ${className || ''}`}>
-        <label htmlFor={name} className="flex items-center gap-2 cursor-pointer">
+        <label htmlFor={name} className="flex items-center gap-3 cursor-pointer">
           <Input
             infoButton={infoButton}
-            type="checkbox"
+            type={type}
             value={finalValue}
             onChange={handleChange}
             disabled={finalDisabled}
-            required={finalRequired}
-            baseClasses=""
+            toggleVariant={toggleVariant}
+            toggleSize={toggleSize}
+            toggleLabel={toggleLabel}
           />
           {label && (
             <span className="text-sm font-semibold text-text">
@@ -219,7 +260,7 @@ export function FormInput<T extends FieldValues>({
         numberOfRows={finalNumberOfRows}
         minRows={minRows}
         maxRows={maxRows}
-        matrixErrors={matrixErrors}
+        matrixErrors={combinedMatrixErrors}
         rowSchema={rowSchema}
         baseClasses={baseClasses}
         requiredPermission={requiredPermission}

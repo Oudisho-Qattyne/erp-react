@@ -22,7 +22,8 @@
     "cancel": "Cancel",
     "change": "Change",
     "confirm": "Confirm",
-    "is_default":"Default value",
+    "is_default":"Default",
+    "is_active":"Active",
     "yes":"Yes",
     "no":"No",
     "set_default":"Set as default",
@@ -50,7 +51,8 @@
     "delete_error": "Failed to delete {name}",
     "set_default_success": "{name} set as default successfully",
     "set_default_error": "Failed to set {name} as default",
-    "retry": "Retry"
+    "retry": "Retry",
+    "add_row": "Add Row"
   },
   "pagination": {
     "showing": "Showing",

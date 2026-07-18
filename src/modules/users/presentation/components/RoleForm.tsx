@@ -74,17 +74,31 @@ export function RoleForm({
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={methods.handleSubmit(async (data) => {
+        try {
+          await onSubmit(data);
+        } catch (err: any) {
+          if (err.validationErrors) {
+            Object.entries(err.validationErrors).forEach(([field, msgs]) => {
+              const msg = Array.isArray(msgs) ? msgs[0] : String(msgs);
+              methods.setError(field as any, { message: msg });
+            });
+          }
+          throw err;
+        }
+      })} className="space-y-6">
         <div className="bg-card rounded-lg p-4 border border-border">
           <h3 className="text-lg font-bold mb-4">{t('role_form.name', 'users') || 'Role Information'}</h3>
           <div className="grid grid-cols-2 gap-4">
             <FormInput
               name="name"
+              type="alpha"
               label={t('role_form.name', 'users') || 'Name'}
               required
             />
             <FormInput
               name="display_name"
+              type="alpha"
               label={t('role_form.display_name', 'users') || 'Display Name'}
               required
             />

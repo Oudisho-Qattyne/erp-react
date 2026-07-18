@@ -86,7 +86,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err.message || "Failed to fetch users"
+      const msg = err?.message || "Failed to fetch users"
       setFnError("getAllUsers", msg)
       toast.error(t('load_error', 'users').replace('{message}', msg))
     } finally {
@@ -101,7 +101,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
       const res = await useCase.getCurrentUser()
       setCurrentUser(res.data)
     } catch (err: any) {
-      const msg = err.message || "Failed to fetch current user"
+      const msg = err?.message || "Failed to fetch current user"
       setFnError("getCurrentUser", msg)
       toast.error(t('load_current_error', 'users').replace('{message}', msg))
     } finally {
@@ -117,7 +117,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
       toast.success(t('created', 'users'))
       await getAllUsers()
     } catch (err: any) {
-      const msg = err.message || "Failed to create user"
+      const msg = err?.message || "Failed to create user"
       setFnError("createUser", msg)
       toast.error(t('create_error', 'users').replace('{message}', msg))
       throw err
@@ -134,7 +134,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
       toast.success(t('updated', 'users'))
       await getAllUsers()
     } catch (err: any) {
-      const msg = err.message || "Failed to update user"
+      const msg = err?.message || "Failed to update user"
       setFnError("updateUser", msg)
       toast.error(t('update_error', 'users').replace('{message}', msg))
       throw err
@@ -150,7 +150,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
       await useCase.updateSignature(file)
       toast.success(t('signature_updated', 'users'))
     } catch (err: any) {
-      const msg = err.message || "Failed to update signature"
+      const msg = err?.message || "Failed to update signature"
       setFnError("updateSignature", msg)
       toast.error(t('signature_update_error', 'users').replace('{message}', msg))
       throw err
@@ -175,7 +175,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
       URL.revokeObjectURL(url)
       toast.success(t('exported', 'users'))
     } catch (err: any) {
-      const msg = err.message || "Failed to export users"
+      const msg = err?.message || "Failed to export users"
       setFnError("exportUsersExcel", msg)
       toast.error(t('export_error', 'users').replace('{message}', msg))
       throw err
@@ -200,7 +200,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
       URL.revokeObjectURL(url)
       toast.success(t('exported', 'users'))
     } catch (err: any) {
-      const msg = err.message || "Failed to export users"
+      const msg = err?.message || "Failed to export users"
       setFnError("exportUsersPdf", msg)
       toast.error(t('export_error', 'users').replace('{message}', msg))
       throw err
@@ -216,7 +216,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
       await useCase.linkUserToEmployee(userId, employeeId)
       toast.success(t('linked', 'users'))
     } catch (err: any) {
-      const msg = err.message || "Failed to link user to employee"
+      const msg = err?.message || "Failed to link user to employee"
       setFnError("linkUserToEmployee", msg)
       toast.error(t('link_error', 'users').replace('{message}', msg))
       throw err

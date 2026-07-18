@@ -20,6 +20,9 @@ import { PlotAuditLogModal } from './PlotAuditLogModal';
 import { History, Pencil, MapPin } from 'lucide-react';
 import type { Plot } from '../../../../domain/entities/plot';
 import type { PlotStatus } from '../../../../domain/valueObjects/plots/plotStatus';
+import type { ServiceCondition } from '../../../../domain/entities/serviceCondition';
+import { getCreateServiceConditionFormSchema } from '../../../schemas/serviceConditionForm.schema';
+import z from 'zod';
 
 interface PlotFormProps {
   plot?: Plot;
@@ -35,6 +38,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
   const { t } = useLanguage();
   const { entities: plotAreas, getAll: getPlotAreas, create: createPlotArea } = useEntityCrud<PlotArea>('/investments/plot-areas', '/investments/plot-areas');
   const { entities: classifications, getAll: getClassifications, create: createClassification } = useEntityCrud<PlotClassification>('/investments/plot-classifications', '/investments/plot-classifications');
+  const { entities: serviceConditions, getAll: getServiceConditions, create: createServiceCondition, update, remove, loadingMap, errorMap } = useEntityCrud<ServiceCondition>('/investments/service-conditions', '/investments/service-conditions');
 
   const [statusDate, setStatusDate] = React.useState(defaultValues?.status_date || new Date().toISOString().split('T')[0]);
   const [clickedStatus, setClickedStatus] = React.useState<PlotStatus | null>(null);
@@ -47,24 +51,26 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
   useEffect(() => {
     getPlotAreas('/investments/plot-areas?is_active=true');
     getClassifications('/investments/plot-classifications?is_active=true');
+    getServiceConditions('/investments/service-conditions?is_active=true')
   }, []);
 
   const formFields: FieldConfig[] = [
-    { name: 'code', label: t('plots.code', 'investments') || 'Code', required: true },
-    { name: 'identifier', label: t('plots.identifier', 'investments') || 'Identifier', required: true },
-    { name: 'area', type: 'text', label: t('plots.area', 'investments') || 'Area', required: true },
-    { 
-      name: 'plot_area_id', 
-      type: 'select-or-create', 
+    { name: 'code', label: t('plots.code', 'investments') || 'Code', required: true, type: 'numeric', group: 'basic_info' },
+    { name: 'identifier', label: t('plots.identifier', 'investments') || 'Identifier', required: true, type: 'numeric', group: 'basic_info' },
+    { name: 'area', type: 'numeric', label: t('plots.area', 'investments') || 'Area', required: true, group: 'basic_info' },
+    {
+      name: 'plot_area_id',
+      type: 'select-or-create',
       label: t('plots.plot_area_id', 'investments') || 'Plot Area',
       required: true,
+      group: 'classification',
       options: plotAreas.map(pa => ({ value: pa.id, label: pa.name, is_default: pa.is_default })),
       createTitle: t('plot_areas.add', 'investments') || 'Add Plot Area',
       labelPath: 'name',
       renderCreateForm: (onSuccessForm, onCancelForm) => (
         <GenericCreateForm
           fields={[
-            { name: 'name', label: t('plot_areas.name', 'investments'), required: true },
+            { name: 'name', type: 'alpha', label: t('plot_areas.name', 'investments'), required: true },
           ]}
           schema={getCreatePlotAreaFormSchema(t)}
           onSubmit={async (data) => createPlotArea({ ...data, is_active: true })}
@@ -73,18 +79,19 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
         />
       )
     },
-    { 
-      name: 'plot_classification_id', 
-      type: 'select-or-create', 
+    {
+      name: 'plot_classification_id',
+      type: 'select-or-create',
       label: t('plots.plot_classification_id', 'investments') || 'Classification',
       required: true,
+      group: 'classification',
       options: classifications.map(pc => ({ value: pc.id, label: pc.name, is_default: pc.is_default })),
       createTitle: t('plot_classifications.add', 'investments') || 'Add Classification',
       labelPath: 'name',
       renderCreateForm: (onSuccessForm, onCancelForm) => (
         <GenericCreateForm
           fields={[
-            { name: 'name', label: t('plot_classifications.name', 'investments'), required: true },
+            { name: 'name', type: 'alpha', label: t('plot_classifications.name', 'investments'), required: true },
           ]}
           schema={getCreatePlotClassificationFormSchema(t)}
           onSubmit={async (data) => createClassification({ ...data, is_active: true })}
@@ -97,12 +104,13 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
       name: 'latitude',
       label: t('plots.location', 'investments') || 'Location',
       required: true,
+      group: 'location',
       render: (methods) => {
         const { watch, setValue, formState: { errors } } = methods;
         const lat = watch('latitude') || '';
         const lng = watch('longitude') || '';
         const error = errors.latitude || errors.longitude;
-        
+
         return (
           <div className="w-full mb-4">
             <label className="block text-sm font-semibold text-text mb-1.5">
@@ -121,10 +129,124 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
         );
       }
     },
-    { name: 'longitude', hidden: true },
-    { name: 'current_condition', label: t('plots.current_condition', 'investments') || 'Current Condition' },
-    { name: 'notes', type: 'textarea', label: t('plots.notes', 'investments') || 'Notes' },
-    { name: 'created_at', type: 'date', label: t('plots.created_at', 'investments') || 'Created At Date', hidden: !isCreate },
+    { name: 'longitude', hidden: true, group: 'location' },
+    // { name: 'current_condition', label: t('plots.current_condition', 'investments') || 'Current Condition', group: 'additional' },
+    // {
+    //   name: 'service_conditions', type: 'multi-select-or-create', label: t('plots.current_condition', 'investments') || 'Current Condition', group: 'additional',
+    //   searchable: true,
+    //   options: serviceConditions.map(a => ({ value: a.id, label: a.name, is_default: a.is_default })),
+    //   createTitle: t('common.new', 'shared') || 'New',
+    //   labelPath: 'data.name',
+    //   renderCreateForm: (onSuccess, onCancel) => (
+    //     <GenericCreateForm
+    //       fields={[
+    //         { name: 'name', type: 'alpha', label: t('service_conditions.name', 'investments'), required: true },
+    //       ]}
+    //       schema={getCreateServiceConditionFormSchema(t)}
+    //       onSubmit={(data) => createServiceCondition({ ...data, is_active: true })}
+    //       onSuccess={onSuccess}
+    //       onCancel={onCancel}
+    //     />
+    //   )
+    // },
+
+    // {
+    //   name: 'service_conditions_notes', type: 'data-matrix', label: t('plots.notes', 'investments') || 'Notes', group: 'additional',
+    //   matrixFields: [
+    //     {
+    //       label: t('service_conditions.name', 'investments'),
+    //       name: "service_condition",
+    //       type: "text",
+    //       disabled:true
+    //     },
+    //     {
+    //       label: t('plots.notes', 'investments') || 'Notes',
+    //       name: "note",
+    //       type: "text",
+    //       required: true
+    //     },
+    //   ],
+    //   rowSchema: z.object({
+    //     note: z.string(),
+    //     service_condition: z.string(),
+    //   }),
+    //   dependsOn:['service_conditions'],
+    //   compute:(values) => {
+    //     const currentNotes = values.service_conditions_notes || [];
+    //     const newValues = (values.service_conditions || []).map((sc: any) => {
+    //       const scObj = serviceConditions.find((scl: any) => scl.id === sc);
+    //       const scName = scObj?.name || '';
+    //       const existing = currentNotes.find((row: any) => row.service_condition === scName);
+    //       return { service_condition: scName, note: existing?.note || '' };
+    //     });
+    //     return { numberOfRows: values.service_conditions.length, value: newValues };
+    //   }
+    // },
+    {
+      name: 'service_conditions',
+      label: t('plots.current_condition', 'investments') || 'Current Condition', group: 'additional',
+      type: "data-matrix",
+      rowSchema: z.object({
+        note: z.string(),
+        id: z.number().nullable(),
+      }),
+      matrixFields: [
+        {
+          label: t('service_conditions.name', 'investments'),
+          name: "id",
+          type: "select-or-create",
+          searchable: true,
+          excludeSelected: true,
+          options: serviceConditions.map(a => ({ value: a.id, label: a.name, is_default: a.is_default })),
+          createTitle: t('common.new', 'shared') || 'New',
+          labelPath: 'data.name',
+          renderCreateForm: (onSuccess, onCancel) => (
+            <GenericCreateForm
+              fields={[
+                { name: 'name', type: 'alpha', label: t('service_conditions.name', 'investments'), required: true },
+              ]}
+              schema={getCreateServiceConditionFormSchema(t)}
+              onSubmit={(data) => createServiceCondition({ ...data, is_active: true })}
+              onSuccess={onSuccess}
+              onCancel={onCancel}
+            />
+          )
+        },
+        {
+          label: t('plots.notes', 'investments') || 'Notes',
+          name: "note",
+          type: "text",
+          required: true
+        },
+      ]
+    }
+  ];
+
+  const formGroups = [
+    {
+      group: 'basic_info',
+      title: t('plots.group_basic_info', 'investments') || 'Basic Information',
+      columns: 3,
+      rows: [['code', 'identifier', 'area']],
+    },
+    {
+      group: 'classification',
+      title: t('plots.group_classification', 'investments') || 'Classification',
+      columns: 2,
+      rows: [['plot_area_id', 'plot_classification_id']],
+    },
+    {
+      group: 'location',
+      title: t('plots.group_location', 'investments') || 'Location',
+      columns: 1,
+      rows: [['latitude']],
+    },
+    {
+      group: 'additional',
+      title: t('plots.group_additional', 'investments') || 'Additional Information',
+      columns: 2,
+      rows: [['service_conditions']],
+    },
   ];
 
   // const handleSaveStatus = () => {
@@ -150,8 +272,8 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
             </Button>
           )}
         </div>
-        <PlotStatusStepper 
-          currentStatus={status} 
+        <PlotStatusStepper
+          currentStatus={status}
           statusDate={statusDate}
           onStatusClick={isCreate ? undefined : (status) => setClickedStatus(status)}
           permissions={{
@@ -185,6 +307,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
         {isEditing ? (
           <GenericCreateForm
             fields={formFields}
+            groups={formGroups}
             schema={getCreatePlotFormSchema(t)}
             defaultValues={defaultValues}
             onSubmit={handleFormSubmit}
@@ -216,7 +339,16 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
             </div>
             <div className="space-y-1">
               <span className="text-sm text-text-muted">{t('plots.current_condition', 'investments') || 'Current Condition'}</span>
-              <p className="font-medium text-text">{plot?.current_condition || '—'}</p>
+              <div className="font-medium text-text">
+                {plot?.service_conditions?.length
+                  ? plot.service_conditions.map((sc, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <span>{sc.name}</span>
+                        {sc.note && <span className="text-xs text-text-muted">({sc.note})</span>}
+                      </div>
+                    ))
+                  : '—'}
+              </div>
             </div>
             <div className="space-y-1">
               <span className="text-sm text-text-muted">{t('plots.location', 'investments') || 'Location'}</span>
@@ -225,9 +357,9 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
                   {plot?.latitude && plot?.longitude ? `${plot.latitude}, ${plot.longitude}` : '—'}
                 </p>
                 {plot?.latitude && plot?.longitude && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="p-1 h-auto"
                     onClick={() => window.open(`https://www.google.com/maps?q=${plot.latitude},${plot.longitude}`, '_blank')}
                     title={t('plots.show_map', 'investments') || 'Show in Map'}
@@ -241,10 +373,10 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
               <span className="text-sm text-text-muted">{t('plots.added_by', 'investments') || 'Added By'}</span>
               <p className="font-medium text-text">{plot?.user?.name || '—'}</p>
             </div>
-            <div className="space-y-1 md:col-span-2 lg:col-span-3">
+            {/* <div className="space-y-1 md:col-span-2 lg:col-span-3">
               <span className="text-sm text-text-muted">{t('plots.notes', 'investments') || 'Notes'}</span>
               <p className="font-medium text-text whitespace-pre-wrap">{plot?.notes || '—'}</p>
-            </div>
+            </div> */}
           </div>
         )}
       </div>
@@ -253,7 +385,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
         <ChangePlotStatusModal
           isOpen={!!clickedStatus}
           onClose={() => setClickedStatus(null)}
-          plot={{...plot, status: clickedStatus}}
+          plot={{ ...plot, status: clickedStatus }}
           onSuccess={() => window.location.reload()}
         />
       )}

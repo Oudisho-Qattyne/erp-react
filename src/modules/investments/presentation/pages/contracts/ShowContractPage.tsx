@@ -11,10 +11,12 @@ import { InfoRow } from '../../../../../core/presentation/layouts/ui/card/InfoRo
 import { ArrowLeft, FileSignature } from 'lucide-react';
 import { InstallmentsSection } from './InstallmentsSection';
 import { useInstallments } from '../../hooks/useInstallments';
+import { DossierDetailsSection } from '../plots/components/DossierDetailsSection';
+import { PlotDetailsSection } from '../plots/components/PlotDetailsSection';
 
 export function ShowContractPage() {
   const { t } = useLanguage();
-  const { id } = useParams<{ id: string }>();
+  const { id, plotId, dossierId } = useParams<{ id: string; plotId: string; dossierId: string }>();
   const navigate = useNavigate();
 
   const { getById } = useEntityCrud<Contract>(
@@ -77,7 +79,7 @@ export function ShowContractPage() {
             <ArrowLeft size={16} /> {t('common.back', 'shared') || 'Back'}
           </Button>
           <h1 className="text-2xl font-bold">
-            {t('contract.title', 'investments') || 'Contract'} — {contract.contract_number}
+            {t('contract.section_title', 'investments') || 'Contract'} — {contract.contract_number}
           </h1>
         </div>
       </div>
@@ -86,7 +88,7 @@ export function ShowContractPage() {
         <div className="relative w-full flex justify-between items-center mb-6 pb-4">
           <h2 className="text-lg font-bold text-text flex items-center gap-2 border-b border-border/50">
             <span className="text-primary"><FileSignature size={20} /></span>
-            {t('contract.title', 'investments') || 'Contracts'}
+            {t('contract.section_title', 'investments') || 'Contract'}
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -121,41 +123,24 @@ export function ShowContractPage() {
         </div>
       </SectionCard>
 
-      {contract.dossier && (
-        <SectionCard>
-          <div className="relative w-full flex justify-between items-center mb-6 pb-4">
-            <h2 className="text-lg font-bold text-text flex items-center gap-2 border-b border-border/50">
-              <span className="text-primary"><FileSignature size={20} /></span>
-              {t('dossier.title', 'investments') || 'Dossier'}
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <InfoRow
-              label={t('dossier.number', 'investments') || 'Dossier Number'}
-              value={contract.dossier.dossier_number}
-            />
-            <InfoRow
-              label={t('dossier.status', 'investments') || 'Status'}
-              value={t(`dossier.status_${contract.dossier.status}`, 'investments') || contract.dossier.status}
-            />
-            {contract.dossier.notes && (
-              <InfoRow
-                label={t('plots.notes', 'investments') || 'Notes'}
-                value={contract.dossier.notes}
-              />
-            )}
-          </div>
-        </SectionCard>
+      {plotId && dossierId && (
+        <>
+          <PlotDetailsSection plotId={plotId} />
+          <DossierDetailsSection dossierId={dossierId} plotId={plotId} />
+        </>
       )}
+      {
+        contract.payment_method == "installment" &&
+        <InstallmentsSection
+          contractId={contract.id}
+          installments={installments}
+          payLoading={loading['payNextUnpaidInstallment']}
+          updateLoading={loading['updatePaymentDate']}
+          onPayNextUnpaid={handlePayNextUnpaid}
+          onUpdatePaymentDate={handleUpdatePaymentDate}
+        />
+      }
 
-      <InstallmentsSection
-        contractId={contract.id}
-        installments={installments}
-        payLoading={loading['payNextUnpaidInstallment']}
-        updateLoading={loading['updatePaymentDate']}
-        onPayNextUnpaid={handlePayNextUnpaid}
-        onUpdatePaymentDate={handleUpdatePaymentDate}
-      />
     </div>
   );
 }

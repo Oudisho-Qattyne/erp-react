@@ -79,7 +79,7 @@ export function InvestorPickerDialog({
 
   const columns: ColumnDef<Investor>[] = [
     { key: "id", label: "#", width: 60 },
-    { key: "full_name", label: t("investors.full_name", "investments") || "Full Name", width: 180 },
+    { key: "full_name", label: t("investors.full_name", "investments") || "Full Name", width: 180, render: (row: Investor) => [row.first_name, row.father_name, row.last_name].filter(Boolean).join(' ') },
     { key: "national_id", label: t("investors.national_id", "investments") || "National ID", width: 150 },
     { key: "phone", label: t("investors.phone", "investments") || "Phone", width: 140 },
     { key: "nationality", label: t("investors.nationality", "investments") || "Nationality", width: 130 },
@@ -102,28 +102,48 @@ export function InvestorPickerDialog({
   }
 
   const createFormFields = [
-    { name: 'full_name', type: 'text' as const, label: t('investors.full_name', 'investments') || 'Full Name', required: true },
-    { name: 'national_id', type: 'text' as const, label: t('investors.national_id', 'investments') || 'National ID' },
-    { name: 'passport_number', type: 'text' as const, label: t('investors.passport_number', 'investments') || 'Passport Number' },
-    { name: 'nationality', type: 'text' as const, label: t('investors.nationality', 'investments') || 'Nationality', required: true },
+    { name: 'first_name', type: 'alpha' as const, label: t('investors.first_name', 'investments') || 'First Name', required: true, group: 'personal' },
+    { name: 'father_name', type: 'alpha' as const, label: t('investors.father_name', 'investments') || 'Father Name', required: true, group: 'personal' },
+    { name: 'grandfather_name', type: 'alpha' as const, label: t('investors.grandfather_name', 'investments') || 'Grandfather Name', group: 'personal' },
+    { name: 'last_name', type: 'alpha' as const, label: t('investors.last_name', 'investments') || 'Last Name', required: true, group: 'personal' },
+    { name: 'mother_name', type: 'alpha' as const, label: t('investors.mother_name', 'investments') || 'Mother Name', required: true, group: 'personal' },
+    { name: 'national_id', type: 'numeric' as const, label: t('investors.national_id', 'investments') || 'National ID', group: 'personal' },
+    { name: 'passport_number', type: 'numeric' as const, label: t('investors.passport_number', 'investments') || 'Passport Number', group: 'personal' },
+    { name: 'nationality', type: 'alpha' as const, label: t('investors.nationality', 'investments') || 'Nationality', required: true, group: 'personal' },
     {
       name: 'gender',
       type: 'select' as const,
       label: t('investors.gender', 'investments') || 'Gender',
       required: true,
+      group: 'personal',
       options: [
         { value: 'male', label: t('investors.gender_male', 'investments') || 'Male' },
         { value: 'female', label: t('investors.gender_female', 'investments') || 'Female' }
       ]
     },
-    { name: 'phone', type: 'text' as const, label: t('investors.phone', 'investments') || 'Phone' },
-    { name: 'whatsapp_number', type: 'text' as const, label: t('investors.whatsapp_number', 'investments') || 'WhatsApp' },
-    { name: 'email', type: 'email' as const, label: t('investors.email', 'investments') || 'Email' },
+    { name: 'phone', type: 'numeric' as const, label: t('investors.phone', 'investments') || 'Phone', group: 'contact' },
+    { name: 'whatsapp_number', type: 'numeric' as const, label: t('investors.whatsapp_number', 'investments') || 'WhatsApp', group: 'contact' },
+    { name: 'email', type: 'email' as const, label: t('investors.email', 'investments') || 'Email', group: 'contact' },
     { name: 'address', type: 'textarea' as const, label: t('investors.address', 'investments') || 'Address' },
-    { name: 'facebook', type: 'text' as const, label: t('investors.facebook', 'investments') || 'Facebook' },
-    { name: 'instagram', type: 'text' as const, label: t('investors.instagram', 'investments') || 'Instagram' },
-    { name: 'x', type: 'text' as const, label: t('investors.x', 'investments') || 'X (Twitter)' },
-    { name: 'linkedin', type: 'text' as const, label: t('investors.linkedin', 'investments') || 'Linkedin' },
+    { name: 'facebook', type: 'text' as const, label: t('investors.facebook', 'investments') || 'Facebook', group: 'social' },
+    { name: 'instagram', type: 'text' as const, label: t('investors.instagram', 'investments') || 'Instagram', group: 'social' },
+    { name: 'x', type: 'text' as const, label: t('investors.x', 'investments') || 'X', group: 'social' },
+    { name: 'linkedin', type: 'text' as const, label: t('investors.linkedin', 'investments') || 'Linkedin', group: 'social' },
+  ]
+
+  const createGroups = [
+    {
+      group: 'personal',
+      title: t('investors.personal_info', 'investments') || 'Personal Info',
+      rows: [
+        ['first_name', 'father_name'],
+        ['grandfather_name', 'last_name'],
+        ['mother_name', 'national_id', 'passport_number'],
+        ['nationality', 'gender'],
+      ],
+    },
+    { group: 'contact', title: t('investors.contact_info', 'investments') || 'Contact Info', rows: [['phone', 'whatsapp_number', 'email']] },
+    { group: 'social', title: t('investors.social_media', 'investments') || 'Social Media', rows: [['facebook', 'instagram', 'x', 'linkedin']] },
   ]
 
   return (
@@ -157,9 +177,11 @@ export function InvestorPickerDialog({
       onPageChange={setPage}
       onPerPageChange={(size) => { setPerPage(size); setPage(1) }}
       emptyMessage={t("investors.no_records", "investments") || "No investors found"}
+      dialogSize="3xl"
       createConfig={{
         schema: getCreateInvestorFormSchema(t),
         fields: createFormFields,
+        groups: createGroups,
         onSubmit: async (data) => {
           try {
             const res = await create(data)

@@ -144,7 +144,7 @@ export function AdjustEmployeesLeaveBalance() {
                             <InfoRow label={t("leave.allow_half_day", "hr") || "نصف يوم"} value={<YesNo value={currentLeave.allow_half_day || false} />} />
                             <InfoRow label={t("leave.allow_hourly", "hr") || "بالساعة"} value={<YesNo value={currentLeave.allow_hourly || false} />} />
                             <InfoRow label={t("leave.allow_split", "hr") || "تجزئة"} value={<YesNo value={currentLeave.allow_split || false} />} />
-                            <InfoRow label={t("leave.is_active", "hr") || "نشط"} value={<YesNo value={currentLeave.is_active || false} />} />
+                            <InfoRow label={t("common.is_active", "shared") || "نشط"} value={<YesNo value={currentLeave.is_active || false} />} />
                         </div>
                     </div>
                 )}

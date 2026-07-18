@@ -4,9 +4,10 @@ import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProv
 import { createDossierPartnersRepository } from "../../infrastructure/repositories/DossierPartnersRepository"
 import { createManageDossierPartnersUseCase } from "../../application/usecases/manageDossierPartners"
 import type { Investor } from "../../domain/entities/investor"
+import type { Partner } from "../../domain/entities/partner"
 import { toast } from "sonner"
 
-const OP_KEYS = ["getPartners", "addPartners", "deletePartners"] as const
+const OP_KEYS = ["getPartners", "addPartners", "deletePartners", "listPartnersHistory"] as const
 
 function initRecord<T>(value: T): Record<string, T> {
   return Object.fromEntries(OP_KEYS.map((k) => [k, value]))
@@ -15,6 +16,7 @@ function initRecord<T>(value: T): Record<string, T> {
 export interface UseDossierPartnersReturn {
   partners: Investor[]
   setPartners: (partners: Investor[]) => void
+  partnersHistory: Partner[]
   loading: Record<string, boolean>
   isLoading: () => boolean
   error: Record<string, string | null>
@@ -23,6 +25,7 @@ export interface UseDossierPartnersReturn {
   getPartners: (plotId: number, dossierId: number) => Promise<void>
   addPartners: (plotId: number, dossierId: number, investorIds: number[]) => Promise<void>
   deletePartners: (plotId: number, dossierId: number, investorIds: number[]) => Promise<void>
+  listPartnersHistory: (plotId: number, dossierId: number) => Promise<void>
 }
 
 export const useDossierPartners = (): UseDossierPartnersReturn => {
@@ -30,6 +33,7 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
   const { t } = useLanguage()
 
   const [partners, setPartners] = useState<Investor[]>([])
+  const [partnersHistory, setPartnersHistory] = useState<Partner[]>([])
   const [loading, setLoading] = useState<Record<string, boolean>>(() => initRecord(false))
   const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null))
 
@@ -48,9 +52,9 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
       const res = await useCase.getPartners(plotId, dossierId)
       setPartners(res.data?.partners || [])
     } catch (err: any) {
-      const msg = err.message || "Failed to fetch partners"
+      const msg = err?.message || "Failed to fetch partners"
       setFnError("getPartners", msg)
-      toast.error(t("dossier.load_error", "investments") || msg)
+      toast.error(msg || t("dossier.load_error", "investments"))
     } finally {
       setFnLoading("getPartners", false)
     }
@@ -64,9 +68,9 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
       setPartners(res.data?.partners || [])
       toast.success(t("investors.add_investors_success", "investments") || "Partners added successfully")
     } catch (err: any) {
-      const msg = err.message || "Failed to add partners"
+      const msg = err?.message || "Failed to add partners"
       setFnError("addPartners", msg)
-      toast.error(t("investors.add_investors_error", "investments") || msg)
+      toast.error(msg || t("investors.add_investors_error", "investments"))
       throw err
     } finally {
       setFnLoading("addPartners", false)
@@ -81,12 +85,27 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
       setPartners(res.data?.partners || [])
       toast.success(t("investors.remove_investors_success", "investments") || "Partners removed successfully")
     } catch (err: any) {
-      const msg = err.message || "Failed to remove partners"
+      const msg = err?.message || "Failed to remove partners"
       setFnError("deletePartners", msg)
-      toast.error(t("investors.remove_investors_error", "investments") || msg)
+      toast.error(msg || t("investors.remove_investors_error", "investments"))
       throw err
     } finally {
       setFnLoading("deletePartners", false)
+    }
+  }, [useCase, t])
+
+  const listPartnersHistory = useCallback(async (plotId: number, dossierId: number) => {
+    setFnLoading("listPartnersHistory", true)
+    setFnError("listPartnersHistory", null)
+    try {
+      const res = await useCase.listPartnersHistory(plotId, dossierId)
+      setPartnersHistory(res.data || [])
+    } catch (err: any) {
+      const msg = err?.message || "Failed to load partners history"
+      setFnError("listPartnersHistory", msg)
+      toast.error(msg || t("dossier.load_error", "investments"))
+    } finally {
+      setFnLoading("listPartnersHistory", false)
     }
   }, [useCase, t])
 
@@ -96,6 +115,7 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
   return {
     partners,
     setPartners,
+    partnersHistory,
     loading,
     isLoading,
     error,
@@ -104,5 +124,6 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
     getPartners,
     addPartners,
     deletePartners,
+    listPartnersHistory,
   }
 }

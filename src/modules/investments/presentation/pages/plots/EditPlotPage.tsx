@@ -73,8 +73,7 @@ export function EditPlotPage() {
           plot_classification_id: plot.plot_classification_id,
           latitude: plot.latitude,
           longitude: plot.longitude,
-          current_condition: plot.current_condition,
-          notes: plot.notes,
+          service_conditions:plot.service_conditions.map(sc => ({id:sc.id , note:sc.note})),
           status: plot.status
         }}
         onSubmit={handleSubmit}

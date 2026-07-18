@@ -55,8 +55,8 @@ export function EmployeesPage() {
 
   const columns: ColumnDef<EmployeeListItem>[] = [
     {
-      key: 'internal_id',
-      label: t('employees.internal_id', 'hr') || 'الرقم الداخلي',
+      key: 'personal_id_number',
+      label: t('employees.personal_id_number', 'hr') || 'الرقم الذاتي',
       width: 120,
       sortable: true,
     },

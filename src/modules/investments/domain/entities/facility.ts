@@ -1,7 +1,12 @@
+import type { Dossier } from "./dossier";
+import type { Plot } from "./plot";
+
 export interface Facility {
   id: number;
   plot_id: number;
+  plot?:Plot;
   plot_dossier_id: number;
+  plot_dossier?:Dossier;
   name: string;
   address: string;
   city: string;

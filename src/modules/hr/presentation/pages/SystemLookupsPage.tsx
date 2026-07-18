@@ -83,13 +83,13 @@ function CountriesSection() {
       </div>
       <Dialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} title={t('employee_form.add_country', 'hr') || "إضافة دولة جديدة"}>
         <GenericCreateForm
-          fields={[{ name: 'name', label: t('employees.country', 'hr') || 'اسم الدولة', required: true }]}
+          fields={[{ name: 'name', type: 'alpha', label: t('employees.country', 'hr') || 'اسم الدولة', required: true }]}
           schema={CountryFormSchema}
           onSubmit={async (data) => {
               try {
                 return await create({ name: { ar: data.name } });
-            } catch (err) {
-              toast.error(t('lookups.create_error', 'hr').replace('{name}', entity));
+    } catch (err : any) {
+      toast.error(err?.message || t('lookups.create_error', 'hr').replace('{name}', entity));
               throw err;
             }
           }}
@@ -111,8 +111,8 @@ function CountriesSection() {
                 try {
                   await remove(c.id);
                   toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
-                } catch {
-                  toast.error(t('lookups.delete_error', 'hr').replace('{name}', entity));
+    } catch (err : any) {
+      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
                 }
               }}>{t('common.delete') || 'حذف'}</Button>
             </li>
@@ -171,12 +171,12 @@ function CitiesSection() {
           </div>
           <Dialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} title={t('employee_form.add_city', 'hr') || "إضافة مدينة"}>
             <GenericCreateForm
-              fields={[{ name: 'name', label: t('employees.city', 'hr') || 'اسم المدينة', required: true }]}
+              fields={[{ name: 'name', type: 'alpha', label: t('employees.city', 'hr') || 'اسم المدينة', required: true }]}
               schema={CityFormSchema.omit({ country_id: true })}
               onSubmit={async (data) => {
                 try {
                   return await create({ name: { ar: data.name }, country_id: selectedCountry });
-                } catch (err) {
+                } catch (err : any) {
                   toast.error(t('lookups.create_error', 'hr').replace('{name}', entity));
                   throw err;
                 }
@@ -199,8 +199,8 @@ function CitiesSection() {
                     try {
                       await remove(c.id);
                       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
-                    } catch {
-                      toast.error(t('lookups.delete_error', 'hr').replace('{name}', entity));
+                    } catch (err : any) {
+                      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
                     }
                   }}>{t('common.delete') || 'حذف'}</Button>
                 </li>
@@ -288,12 +288,12 @@ function RegionsSection() {
           </div>
           <Dialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} title={t('employee_form.add_region', 'hr') || "إضافة منطقة"}>
             <GenericCreateForm
-              fields={[{ name: 'name', label: t('employees.region', 'hr') || 'اسم المنطقة', required: true }]}
-              schema={RegionFormSchema.omit({ city_id: true })}
+              fields={[{ name: 'name', type: 'alpha', label: t('employees.region', 'hr') || 'اسم المنطقة', required: true }]}
+              schema={RegionFormSchema.omit({ residence_city_id: true })}
               onSubmit={async (data) => {
                 try {
-                  return await create({ name: { ar: data.name }, city_id: selectedCity });
-                } catch (err) {
+                  return await create({ name: { ar: data.name }, residence_city_id: selectedCity });
+                } catch (err : any) {
                   toast.error(t('lookups.create_error', 'hr').replace('{name}', entity));
                   throw err;
                 }
@@ -316,8 +316,8 @@ function RegionsSection() {
                     try {
                       await remove(r.id);
                       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
-                    } catch {
-                      toast.error(t('lookups.delete_error', 'hr').replace('{name}', entity));
+                    } catch (err : any) {
+                      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
                     }
                   }}>{t('common.delete') || 'حذف'}</Button>
                 </li>
@@ -361,13 +361,13 @@ function UniversitiesSection() {
       </div>
       <Dialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} title={t('employee_form.add_university', 'hr') || "إضافة جامعة"}>
         <GenericCreateForm
-          fields={[{ name: 'name', label: t('employees.university', 'hr') || 'اسم الجامعة', required: true }]}
+          fields={[{ name: 'name', type: 'alpha', label: t('employees.university', 'hr') || 'اسم الجامعة', required: true }]}
           schema={UniversityFormSchema}
           onSubmit={async (data) => {
             try {
               return await create({ name: data.name });
-            } catch (err) {
-              toast.error(t('lookups.create_error', 'hr').replace('{name}', entity));
+    } catch (err : any) {
+      toast.error(err?.message || t('lookups.create_error', 'hr').replace('{name}', entity));
               throw err;
             }
           }}
@@ -389,8 +389,8 @@ function UniversitiesSection() {
                 try {
                   await remove(u.id);
                   toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
-                } catch {
-                  toast.error(t('lookups.delete_error', 'hr').replace('{name}', entity));
+    } catch (err : any) {
+      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
                 }
               }}>{t('common.delete') || 'حذف'}</Button>
             </li>
@@ -450,12 +450,12 @@ function FacultiesSection() {
           </div>
           <Dialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} title={t('employee_form.add_faculty', 'hr') || "إضافة كلية"}>
             <GenericCreateForm
-              fields={[{ name: 'name', label: t('employees.faculty', 'hr') || 'اسم الكلية', required: true }]}
+              fields={[{ name: 'name', type: 'alpha', label: t('employees.faculty', 'hr') || 'اسم الكلية', required: true }]}
               schema={FacultyFormSchema.omit({ university_id: true })}
               onSubmit={async (data) => {
                 try {
                   return await create({ name: data.name, university_id: selectedUniversity });
-                } catch (err) {
+                } catch (err : any) {
                   toast.error(t('lookups.create_error', 'hr').replace('{name}', entity));
                   throw err;
                 }
@@ -478,8 +478,8 @@ function FacultiesSection() {
                     try {
                       await remove(f.id);
                       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
-                    } catch {
-                      toast.error(t('lookups.delete_error', 'hr').replace('{name}', entity));
+                    } catch (err : any) {
+                      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
                     }
                   }}>{t('common.delete') || 'حذف'}</Button>
                 </li>
@@ -567,12 +567,12 @@ function SpecializationsSection() {
           </div>
           <Dialog isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} title={t('employee_form.add_specialization', 'hr') || "إضافة تخصص"}>
             <GenericCreateForm
-              fields={[{ name: 'name', label: t('employees.specialization', 'hr') || 'اسم التخصص', required: true }]}
+              fields={[{ name: 'name', type: 'alpha', label: t('employees.specialization', 'hr') || 'اسم التخصص', required: true }]}
               schema={SpecializationFormSchema.omit({ Faculty_id: true })}
               onSubmit={async (data) => {
                 try {
                   return await create({ name: data.name, faculty_id: selectedFaculty });
-                } catch (err) {
+                } catch (err : any) {
                   toast.error(t('lookups.create_error', 'hr').replace('{name}', entity));
                   throw err;
                 }
@@ -595,8 +595,8 @@ function SpecializationsSection() {
                     try {
                       await remove(s.id);
                       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
-                    } catch {
-                      toast.error(t('lookups.delete_error', 'hr').replace('{name}', entity));
+                    } catch (err : any) {
+                      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
                     }
                   }}>{t('common.delete') || 'حذف'}</Button>
                 </li>

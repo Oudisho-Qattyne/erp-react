@@ -7,7 +7,7 @@ import Input from "../inputs/Input"
 import { LoadingState } from "../state/LoadingState"
 import { ErrorState } from "../state/ErrorState"
 import { useLanguage } from "../../../context/i18n/I18nProvider"
-import { GenericCreateForm, type FieldConfig } from "../forms/GenericCreateForm"
+import { GenericCreateForm, type FieldConfig, type GroupConfig } from "../forms/GenericCreateForm"
 import type { ZodSchema } from "zod"
 import { Filter, Search, Plus } from "lucide-react"
 import { inputBaseClasses } from "../inputs/styles"
@@ -18,6 +18,7 @@ export interface SelectFromTableProps<T extends { id: number | string }> {
   onClose: () => void
   onConfirm: (selected: T[]) => void
   title: string
+  dialogSize?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl"
   multiple?: boolean
   initialSelected?: T[]
   defaultFilter?: Record<string, any>
@@ -56,6 +57,7 @@ export interface SelectFromTableProps<T extends { id: number | string }> {
   createConfig?: {
     schema: ZodSchema<any>
     fields?: FieldConfig[]
+    groups?: GroupConfig[]
     defaultValues?: Record<string, any>
     onSubmit: (data: any) => Promise<any>
     onError?: (error: any) => void
@@ -76,6 +78,7 @@ export function SelectFromTable<T extends { id: number | string }>({
   defaultFilter,
   onApplyDefaultFilter,
   requiredPermission,
+  dialogSize = "2xl",
 
   data,
   columns,
@@ -166,7 +169,7 @@ export function SelectFromTable<T extends { id: number | string }>({
       isOpen={isOpen}
       onClose={onClose}
       title={title}
-      size="2xl"
+      size={dialogSize}
       actions={
         <div className="flex items-center justify-end gap-3 w-full">
           <Button variant="outline" onClick={onClose}>
@@ -261,6 +264,7 @@ export function SelectFromTable<T extends { id: number | string }>({
           <GenericCreateForm
             schema={createConfig.schema}
             fields={createConfig.fields}
+            groups={createConfig.groups}
             defaultValues={createConfig.defaultValues}
             onSubmit={async (data) => {
               try {

@@ -1,6 +1,10 @@
 export interface Investor {
   id: number;
-  full_name: string;
+  first_name: string;
+  last_name: string;
+  father_name: string;
+  mother_name: string;
+  grandfather_name: string;
   national_id?: string;
   passport_number?: string;
   nationality: string;

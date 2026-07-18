@@ -98,6 +98,8 @@ export function ShowEmployeePage() {
       />
     );
   }
+  console.log(employee);
+  
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10 p-4">
@@ -154,7 +156,7 @@ export function ShowEmployeePage() {
               {employee.first_name} {employee.father_name ? `${employee.father_name} ` : ''}{employee.grandfather_name ? `${employee.grandfather_name} ` : ''}{employee.last_name}
             </h1>
             <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full border border-primary/20 self-center md:self-auto">
-              {employee.internal_id}
+              {employee.personal_id_number}
             </span>
           </div>
           <p className="text-text-muted text-lg flex items-center justify-center md:justify-start gap-2">
@@ -202,8 +204,19 @@ export function ShowEmployeePage() {
               <InfoRow label={t('employees.marital_status', 'hr') || 'الحالة الاجتماعية'} value={getMaritalStatus(employee.marital_status, t)} />
               {employee.marital_status === 'married' && (
                 <>
-                  <InfoRow label={t('employees.spouse_name', 'hr') || 'اسم الزوج/الزوجة'} value={employee.spouse_name} />
-                  <InfoRow label={t('employees.spouse_workplace', 'hr') || 'جهة عمل الزوج/الزوجة'} value={employee.spouse_workplace} />
+                  <InfoRow label={employee.gender === 'female' ? (t('employees.spouses_female', 'hr') || 'Husband') : (t('employees.spouses_male', 'hr') || 'Wives')} value={
+                    employee.spouses && employee.spouses.length > 0 ? (
+                      <div className="space-y-1">
+                        {employee.spouses.map((spouse: any, idx: number) => (
+                          <div key={idx} className="flex flex-wrap items-center gap-x-2">
+                            <span className="font-medium">{spouse.name}</span>
+                            {spouse.workplace && <span className="text-muted-foreground">- {spouse.workplace}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    ) : '-'
+                  } />
+                  {/* keep in mind */}
                   <InfoRow label={t('employees.number_of_children', 'hr') || 'عدد الأولاد'} value={employee.number_of_children} />
                 </>
               )}
@@ -258,9 +271,8 @@ export function ShowEmployeePage() {
                   {t('employees.residential_area_details', 'hr') || 'العنوان بالتفصيل'}
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <InfoRow label={t('employees.country', 'hr') || 'الدولة'} value={employee.residence_region?.city?.country?.name || '-'} />
-                  <InfoRow label={t('employees.city', 'hr') || 'المدينة'} value={employee.residence_region?.city?.name || '-'} />
-                  <InfoRow label={t('employees.region', 'hr') || 'المنطقة'} value={employee.residence_region?.name || '-'} />
+                  <InfoRow label={t('employees.country', 'hr') || 'الدولة'} value={employee.country.name || '-'} />
+                  <InfoRow label={t('employees.city', 'hr') || 'المدينة'} value={employee.city?.name || '-'} />
                   <InfoRow label={t('employees.residential_area_details', 'hr') || 'تفاصيل السكن'} value={employee.residential_area_details} />
                 </div>
               </div>
@@ -286,11 +298,8 @@ export function ShowEmployeePage() {
                 <InfoRow label={t('employees.job_status_note', 'hr') || 'ملاحظات الحالة الوظيفية'} value={employee.job_status_note} />
                 <InfoRow label={t('employees.assigned_job', 'hr') || 'العمل المكلف به'} value={employee.assigned_job} />
                 <InfoRow label={t('employees.appointment_date', 'hr') || 'تاريخ التعيين'} value={employee.employment_details.appointment_date} icon={<Calendar size={14} />} />
-                <InfoRow label={t('employees.contract_type', 'hr') || 'نوع العقد'} value={getContractType(employee.employment_details.contract_type, t)} />
-                <InfoRow label={t('employees.contract_nature', 'hr') || 'طبيعة العقد'} value={getContractNature(employee.employment_details.contract_nature, t)} />
                 <InfoRow label={t('employees.job_category', 'hr') || 'التصنيف الوظيفي'} value={employee.employment_details.job_category} />
                 <InfoRow label={t('employees.org_unit_id', 'hr') || 'الوحدة التنظيمية'} value={employee.employment_details.organizational_unit?.name || employee.employment_details.org_unit_id} icon={<Building2 size={14} />} />
-                <InfoRow label={t('employees.workplace_city', 'hr') || 'مدينة العمل'} value={employee.employment_details.workplace_city?.name || employee.employment_details.workplace_city_id || '-'} icon={<MapPin size={14} />} />
               </div>
             ) : (
               <EmptyState message={t('show_employee.no_employment_data', 'hr') || 'لا توجد معلومات وظيفية مسجلة'} />

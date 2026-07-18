@@ -3,12 +3,14 @@ import { useLanguage } from '../../../../../../core/presentation/context/i18n/I1
 import { useAuth } from '../../../../../../core/infrastructure/auth/AuthProvider';
 import { useDossierPartners } from '../../../hooks/useDossierPartners';
 import type { Investor } from '../../../../domain/entities/investor';
+import type { Partner } from '../../../../domain/entities/partner';
 import { Button } from '../../../../../../core/presentation/layouts/ui/buttons/Button';
 import { DataTable } from '../../../../../../core/presentation/layouts/ui/tables/ResizableTable';
+import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { InvestorPickerDialog } from './InvestorPickerDialog';
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
-import { Users, Plus, Trash2, History } from 'lucide-react';
+import { Users, Plus, Trash2, History, Clock } from 'lucide-react';
 
 interface PartnersSectionProps {
   plotId: string;
@@ -23,10 +25,15 @@ export function PartnersSection({ plotId, dossierId }: PartnersSectionProps) {
   const [isInvestorPickerOpen, setIsInvestorPickerOpen] = useState(false);
   const [selectedPartnerIds, setSelectedPartnerIds] = useState<(string | number)[]>([]);
   const [auditItem, setAuditItem] = useState<Investor | null>(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
   useEffect(() => {
     if (dossierId) partnersHook.getPartners(Number(plotId), Number(dossierId));
   }, [dossierId]);
+
+  useEffect(() => {
+    if (isHistoryOpen) partnersHook.listPartnersHistory(Number(plotId), Number(dossierId));
+  }, [isHistoryOpen]);
 
   const handlePartnerPicked = async (investors: Investor[]) => {
     const ids = investors.map((p) => p.id)
@@ -43,7 +50,7 @@ export function PartnersSection({ plotId, dossierId }: PartnersSectionProps) {
 
   const partnerColumns = [
     { key: "id", label: "#", width: 60 },
-    { key: "full_name", label: t("investors.full_name", "investments") || "Full Name", width: 200 },
+    { key: "full_name", label: t("investors.full_name", "investments") || "Full Name", width: 200, render: (row: Investor) => [row.first_name, row.father_name, row.last_name].filter(Boolean).join(' ') },
     { key: "national_id", label: t("investors.national_id", "investments") || "National ID", width: 150 },
     { key: "phone", label: t("investors.phone", "investments") || "Phone", width: 140 },
     { key: "nationality", label: t("investors.nationality", "investments") || "Nationality", width: 130 },
@@ -85,6 +92,9 @@ export function PartnersSection({ plotId, dossierId }: PartnersSectionProps) {
         <div className="flex items-center justify-between mb-4">
           <div />
           <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setIsHistoryOpen(true)} leftIcon={<Clock size={16} />}>
+              {t('dossier.partners_history', 'investments') || 'History'}
+            </Button>
             <Button variant="outline" size="sm" onClick={() => setIsInvestorPickerOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="investments.plot-dossier.update-partners">
               {t('dossier.add_investors', 'investments') || 'Add Investors'}
             </Button>
@@ -126,6 +136,26 @@ export function PartnersSection({ plotId, dossierId }: PartnersSectionProps) {
         translateField={(key) => t(`investors.${key}`, 'investments') || key}
         translateValues={handleTranslateValues}
       />
+
+      <Dialog isOpen={isHistoryOpen} onClose={() => setIsHistoryOpen(false)} title={t('dossier.partners_history', 'investments') || 'Partners History'} size="3xl">
+        <DataTable
+          columns={[
+            { key: "id", label: "#", width: 60 },
+            { key: "investor_name", label: t('investors.full_name', 'investments') || 'Investor', width: 200, render: (row: Partner) => row.investor ? [row.investor.first_name, row.investor.father_name, row.investor.last_name].filter(Boolean).join(' ') : '-' },
+            { key: "action", label: t('dossier.action', 'investments') || 'Action', width: 120, render: (row: Partner) => {
+              const key = `dossier.partner_action_${row.action}`;
+              const translated = t(key, 'investments');
+              return translated !== key ? translated : row.action;
+            }},
+            { key: "causer_id", label: t('dossier.causer', 'investments') || 'By', width: 150 },
+            { key: "created_at", label: t('dossier.date', 'investments') || 'Date', width: 180 },
+          ]}
+          data={partnersHook.partnersHistory}
+          loading={partnersHook.loading['listPartnersHistory']}
+          rowKey="id"
+          emptyMessage={t('dossier.no_partners_history', 'investments') || 'No history records'}
+        />
+      </Dialog>
 
       <InvestorPickerDialog
         isOpen={isInvestorPickerOpen}

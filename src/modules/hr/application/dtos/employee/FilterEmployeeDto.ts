@@ -9,7 +9,7 @@ export interface FilterEmployeeDto {
     blood_type?: string;
     date_birth?: string;
     has_sham_cash_account?: boolean;
-    residence_region_id?: number;
+    // residence_region?: string;
     university_id?: number;
     faculty_id?: number;
     specialization_id?: number;

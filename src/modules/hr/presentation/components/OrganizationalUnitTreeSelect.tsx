@@ -198,7 +198,7 @@ export function OrganizationalUnitTreeSelect({
       <Dialog isOpen={isCreateDialogOpen} onClose={() => setIsCreateDialogOpen(false)} title={t('organizational_unit.dialog_title', 'hr') || 'إضافة وحدة تنظيمية جديدة'} size="md">
         <GenericCreateForm
           schema={organizationalLevelFormSchema}
-          fields={[{ name: 'name', label: t('organizational_unit.name', 'hr') || 'الاسم', required: true }]}
+          fields={[{ name: 'name', type: 'alpha', label: t('organizational_unit.name', 'hr') || 'الاسم', required: true }]}
           defaultValues={createParentId ? { parent_id: createParentId } : {}}
           onSubmit={handleCreate}
           onSuccess={() => { }}

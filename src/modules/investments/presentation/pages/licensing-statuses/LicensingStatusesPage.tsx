@@ -70,7 +70,7 @@ export function LicensingStatusesPage() {
     },
     {
       key: 'is_active',
-      label: t('licensing_statuses.is_active', 'investments') || 'Is Active?',
+      label: t('common.is_active', 'shared') || 'Is Active?',
       width: 120,
       render: (row: LicensingStatus) => row.is_active
         ? <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full"><Check size={12} /> {t('common.yes', 'shared') || 'Yes'}</span>
@@ -78,7 +78,7 @@ export function LicensingStatusesPage() {
     },
     {
       key: 'is_default',
-      label: t('licensing_statuses.is_default', 'investments') || 'Default',
+      label: t('common.is_default', 'shared') || 'Default',
       width: 120,
       render: (row: LicensingStatus) => row.is_default
         ? <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full"><Star size={12} /> {t('common.yes', 'shared') || 'Yes'}</span>
@@ -128,9 +128,9 @@ export function LicensingStatusesPage() {
       <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={t('licensing_statuses.add', 'investments')}>
         <GenericCreateForm
           fields={[
-            { name: 'name', label: t('licensing_statuses.name', 'investments'), required: true },
-            { name: 'is_active', type: 'checkbox', label: t('licensing_statuses.is_active', 'investments') },
-            { name: 'is_default', type: 'checkbox', label: t('licensing_statuses.is_default', 'investments') }
+            { name: 'name', type: 'alpha', label: t('licensing_statuses.name', 'investments'), required: true },
+            { name: 'is_active', type: 'checkbox', label: t('common.is_active', 'shared') },
+            { name: 'is_default', type: 'checkbox', label: t('common.is_default', 'shared') }
           ]}
           schema={getCreateLicensingStatusFormSchema(t)}
           onSubmit={async (data) => {
@@ -149,9 +149,9 @@ export function LicensingStatusesPage() {
       <Dialog isOpen={!!editItem} onClose={() => setEditItem(null)} title={t('common.edit', 'shared') + ' ' + entityName}>
         <GenericCreateForm
           fields={[
-            { name: 'name', label: t('licensing_statuses.name', 'investments'), required: true },
-            { name: 'is_active', type: 'checkbox', label: t('licensing_statuses.is_active', 'investments') },
-            { name: 'is_default', type: 'checkbox', label: t('licensing_statuses.is_default', 'investments') }
+            { name: 'name', type: 'alpha', label: t('licensing_statuses.name', 'investments'), required: true },
+            { name: 'is_active', type: 'checkbox', label: t('common.is_active', 'shared') },
+            { name: 'is_default', type: 'checkbox', label: t('common.is_default', 'shared') }
           ]}
           schema={getCreateLicensingStatusFormSchema(t)}
           defaultValues={editItem ? { name: editItem.name, is_active: Boolean(editItem.is_active), is_default: Boolean(editItem.is_default) } : undefined}
