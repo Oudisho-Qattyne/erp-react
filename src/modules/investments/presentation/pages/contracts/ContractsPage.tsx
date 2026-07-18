@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import type { Contract } from '../../../domain/entities/contract';
-import type { Plot } from '../../../domain/entities/plot';
 import type { Dossier } from '../../../domain/entities/dossier';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { inputBaseClasses } from '../../../../../core/presentation/layouts/ui/inputs/styles';
@@ -14,7 +13,6 @@ import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/
 import { toast } from 'sonner';
 import { Eye, Trash2, Search, History, FileSignature, Filter, X, MapPin, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { PlotPickerDialog } from '../plots/components/PlotPickerDialog';
 import { DossierPickerDialog } from '../plots/components/DossierPickerDialog';
 
 export function ContractsPage() {
@@ -33,12 +31,9 @@ export function ContractsPage() {
   const [perPage, setPerPage] = useState(25);
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterPlotId, setFilterPlotId] = useState<number | undefined>(undefined);
-  const [filterPlotName, setFilterPlotName] = useState<string>('');
   const [filterDossierId, setFilterDossierId] = useState<number | undefined>(undefined);
   const [filterDossierName, setFilterDossierName] = useState<string>('');
-  const confirmedFilterRef = useRef<{ plotName: string; dossierName: string }>({ plotName: '', dossierName: '' });
-  const [plotPickerOpen, setPlotPickerOpen] = useState(false);
+  const confirmedFilterRef = useRef<{ dossierName: string }>({ dossierName: '' });
   const [dossierPickerOpen, setDossierPickerOpen] = useState(false);
   const formRef = useRef<any>(null);
 
@@ -46,21 +41,11 @@ export function ContractsPage() {
     const params = new URLSearchParams();
     if (searchQuery) params.append('search', searchQuery);
     if (sortColumn) { params.append('sortColumn', sortColumn); params.append('sortOrder', sortOrder); }
-    if (filterPlotId) params.append('plot_id', String(filterPlotId));
     if (filterDossierId) params.append('dossier_id', String(filterDossierId));
     params.append('page', String(page));
     params.append('per_page', String(perPage));
     getAll(`/investments/contracts?${params.toString()}`);
-  }, [searchQuery, sortColumn, sortOrder, page, perPage, filterPlotId, filterDossierId]);
-
-  const handlePlotPicked = (plots: Plot[]) => {
-    const p = plots[0];
-    if (p) {
-      setFilterPlotName(`${p.code} - ${p.identifier}`);
-      formRef.current?.setValue('plot_id', p.id);
-    }
-    setPlotPickerOpen(false);
-  };
+  }, [searchQuery, sortColumn, sortOrder, page, perPage, filterDossierId]);
 
   const handleDossierPicked = (dossiers: Dossier[]) => {
     const d = dossiers[0];
@@ -100,33 +85,6 @@ export function ContractsPage() {
 
   const filterFields: FilterField[] = [
     {
-      name: 'plot_id',
-      render: (form) => {
-        formRef.current = form;
-        return (
-          <div>
-            <label className="block text-sm font-medium text-text mb-1">
-              {t('plots.title', 'investments') || 'Plot'}
-            </label>
-            <div className="flex items-center gap-2">
-              <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background text-sm text-text-muted">
-                <MapPin size={14} />
-                {filterPlotName || (t('common.all', 'shared') || 'All')}
-              </div>
-              <Button variant="outline" size="sm" onClick={() => setPlotPickerOpen(true)}>
-                {t('common.select', 'shared') || 'Select'}
-              </Button>
-              {filterPlotName && (
-                <Button variant="ghost" size="sm" onClick={() => { setFilterPlotName(''); form.setValue('plot_id', '') }}>
-                  <X size={14} />
-                </Button>
-              )}
-            </div>
-          </div>
-        );
-      },
-    },
-    {
       name: 'dossier_id',
       render: (form) => {
         formRef.current = form;
@@ -156,9 +114,8 @@ export function ContractsPage() {
   ];
 
   const filterInitialValues = useMemo(() => ({
-    plot_id: filterPlotId || '',
     dossier_id: filterDossierId || '',
-  }), [filterPlotId, filterDossierId]);
+  }), [filterDossierId]);
 
   const handleApplyFilter = (values: Record<string, any>) => {
     const parsed: Record<string, any> = { page: 1, per_page: perPage };
@@ -169,14 +126,6 @@ export function ContractsPage() {
       } else {
         parsed[key] = val;
       }
-    }
-    if (parsed.plot_id) {
-      setFilterPlotId(parsed.plot_id);
-      confirmedFilterRef.current.plotName = filterPlotName;
-    } else {
-      setFilterPlotId(undefined);
-      setFilterPlotName('');
-      confirmedFilterRef.current.plotName = '';
     }
     if (parsed.dossier_id) {
       setFilterDossierId(parsed.dossier_id);
@@ -193,11 +142,9 @@ export function ContractsPage() {
   };
 
   const handleResetFilter = () => {
-    setFilterPlotId(undefined);
-    setFilterPlotName('');
     setFilterDossierId(undefined);
     setFilterDossierName('');
-    confirmedFilterRef.current = { plotName: '', dossierName: '' };
+    confirmedFilterRef.current = { dossierName: '' };
     setIsFilterOpen(false);
   };
 
@@ -351,18 +298,10 @@ export function ContractsPage() {
         initialValues={filterInitialValues}
         onFilter={handleApplyFilter}
         onCancel={() => {
-          setFilterPlotName(confirmedFilterRef.current.plotName);
           setFilterDossierName(confirmedFilterRef.current.dossierName);
           setIsFilterOpen(false);
         }}
         onReset={handleResetFilter}
-      />
-
-      <PlotPickerDialog
-        isOpen={plotPickerOpen}
-        onClose={() => setPlotPickerOpen(false)}
-        onConfirm={handlePlotPicked}
-        multiple={false}
       />
 
       <DossierPickerDialog
