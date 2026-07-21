@@ -78,7 +78,7 @@ export function PlotStatusHistoryModal({ isOpen, onClose, plotId }: PlotStatusHi
       key: 'status_date',
       label: t('plots.status_date', 'investments') || 'Status Date',
       width: 120,
-      render: (row: PlotStatusHistory) => row.status_date ? new Date(row.status_date).toLocaleDateString() : '—'
+      render: (row: PlotStatusHistory) => row.status_date || '—'
     },
     {
       key: 'user',
@@ -98,7 +98,7 @@ export function PlotStatusHistoryModal({ isOpen, onClose, plotId }: PlotStatusHi
       key: 'created_at',
       label: t('plots.created_at', 'investments') || 'Created At',
       width: 150,
-      render: (row: PlotStatusHistory) => row.created_at ? new Date(row.created_at).toLocaleString() : '—'
+      render: (row: PlotStatusHistory) => row.created_at || '—'
     }
   ];
 

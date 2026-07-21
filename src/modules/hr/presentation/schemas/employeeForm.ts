@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 export const getCreateEmployeeSchema = (t: (key: string, module?: string) => string) => {
   const EducationEntrySchema = z.object({
-    category: z.enum(['initial', 'adjusted', 'latest', 'current'], t('employee_form.validation.category_invalid', 'hr') || 'التصنيف غير صالح'),
     degree_name: z.string().min(1, t('employee_form.validation.degree_name_required', 'hr') || 'اسم الشهادة مطلوب').or(z.literal('')).nullable().optional(),
     university_id: z.number().positive(t('employee_form.validation.university_required', 'hr') || 'رقم الجامعة يجب أن يكون موجباً').nullable().optional(),
     faculty_id: z.number().positive(t('employee_form.validation.faculty_required', 'hr') || 'رقم الكلية يجب أن يكون موجباً').nullable().optional(),
@@ -55,14 +54,14 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
     // Employment (nested)
     employment_details: z.object({
       job_title: z.string().nullable(),
-      org_unit_id: z.number(t('employee_form.validation.org_unit_required', 'hr') || 'الوحدة التنظيمية مطلوبة').min(1, t('employee_form.validation.org_unit_required', 'hr') || 'الوحدة التنظيمية مطلوبة'),
+      org_unit_id: z.number(t('employee_form.validation.org_unit_required', 'hr') || 'السوية التنظيمية مطلوبة').min(1, t('employee_form.validation.org_unit_required', 'hr') || 'السوية التنظيمية مطلوبة'),
       appointment_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, t('employee_form.validation.appointment_date_invalid', 'hr') || 'تاريخ التعيين بصيغة YYYY-MM-DD').nullable(),
       job_category: z.string().nullable(),
     }),
     job_status_id: z.number(t('employee_form.validation.job_status_id_required', 'hr') || 'الحالة الوظيفية مطلوبة').min(1, t('employee_form.validation.job_status_id_required', 'hr') || 'الحالة الوظيفية مطلوبة'),
-    job_status_note: z.string(t('employee_form.validation.job_status_note_required', 'hr') || 'ملاحظات الحالة الوظيفية مطلوبة').min(1, t('employee_form.validation.job_status_note_required', 'hr') || 'ملاحظات الحالة الوظيفية مطلوبة'),
+    job_status_note: z.string().nullable().optional(),
     employee_status_id: z.number(t('employee_form.validation.employee_status_id_required', 'hr') || 'حالة الموظف مطلوبة').min(1, t('employee_form.validation.employee_status_id_required', 'hr') || 'حالة الموظف مطلوبة'),
-    employee_status_note: z.string(t('employee_form.validation.employee_status_note_required', 'hr') || 'ملاحظات حالة الموظف مطلوبة').min(1, t('employee_form.validation.employee_status_note_required', 'hr') || 'ملاحظات حالة الموظف مطلوبة'),
+    employee_status_note: z.string().nullable().optional(),
 
     // Education (array)
     educations: z.array(EducationEntrySchema).default([]),

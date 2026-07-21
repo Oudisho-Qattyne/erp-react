@@ -23,7 +23,9 @@ import { IndustryTypesPage } from './presentation/pages/industry-types/IndustryT
 import { LicensingStatusesPage } from './presentation/pages/licensing-statuses/LicensingStatusesPage';
 import { ByDurationLicensesPage } from './presentation/pages/by-duration-licenses/ByDurationLicensesPage';
 import { ByIndustryLicensesPage } from './presentation/pages/by-industry-licenses/ByIndustryLicensesPage';
+import { RentContractIndustriesPage } from './presentation/pages/rent-contract-industries/RentContractIndustriesPage';
 import { ServiceConditionsPage } from './presentation/pages/service-conditions/ServiceConditionsPage';
+import { ServiceStatusConditionsPage } from './presentation/pages/service-status-conditions/ServiceStatusConditionsPage';
 import { MapPin, Users, Clock, Building2, FileText, Factory, FileSignature } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { ShowFacilityPage } from './presentation/pages/plots/ShowFacilityPage';
@@ -166,6 +168,18 @@ const investmentsModule: Module = {
       group: 'investments',
     },
     {
+      path: '/investments/service-status-conditions',
+      element: <ServiceStatusConditionsPage />,
+      layout: 'dashboard',
+      label: 'service_status_conditions.title',
+      nav: true,
+      order: 16,
+      moduleName: 'investments',
+      requiredPermission: 'investments.service-status-conditions.list',
+      icon: <FileCheck size={18} />,
+      group: 'investments',
+    },
+    {
       path: '/investments/investors',
       element: <InvestorsPage />,
       layout: 'dashboard',
@@ -217,7 +231,7 @@ const investmentsModule: Module = {
       moduleName: 'investments',
       icon: <SlidersHorizontal size={18} />,
       group: 'investments',
-      requiredPermission: ['investments.industry-categories.list', 'investments.industry-types.list', 'investments.licensing-statuses.list', 'investments.industrial-decision-types.list', 'investments.industrial-license-sources.list', 'investments.by-duration-licenses.list', 'investments.by-industry-licenses.list'],
+      requiredPermission: ['investments.industry-categories.list', 'investments.industry-types.list', 'investments.licensing-statuses.list', 'investments.industrial-decision-types.list', 'investments.industrial-license-sources.list', 'investments.by-duration-licenses.list', 'investments.by-industry-licenses.list', 'investments.rent-contract-industries.list'],
     },
     {
       path: '/investments/industry-categories',
@@ -281,6 +295,19 @@ const investmentsModule: Module = {
       moduleName: 'investments',
       requiredPermission: 'investments.by-industry-licenses.list',
       icon: <Building2 size={18} />,
+      group: 'investments',
+      parentNav: '/investments/industrial-management',
+    },
+    {
+      path: '/investments/rent-contract-industries',
+      element: <RentContractIndustriesPage />,
+      layout: 'dashboard',
+      label: 'rent_contract_industries.title',
+      nav: true,
+      order: 8,
+      moduleName: 'investments',
+      requiredPermission: 'investments.rent-contract-industries.list',
+      icon: <FileSignature size={18} />,
       group: 'investments',
       parentNav: '/investments/industrial-management',
     },

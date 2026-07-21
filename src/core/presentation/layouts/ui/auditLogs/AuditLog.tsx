@@ -80,7 +80,7 @@ export function AuditLog({ isOpen, onClose, model, modelId, module = 'shared', l
       key: 'created_at',
       label: t('created_at', 'Created At'),
       width: 150,
-      render: (row: AuditLogEntity) => row.created_at ? new Date(row.created_at).toLocaleString() : '—'
+      render: (row: AuditLogEntity) => row.created_at || '—'
     },
     {
       key: 'causer',

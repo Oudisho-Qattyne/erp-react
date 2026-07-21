@@ -21,7 +21,9 @@ import { History, Pencil, MapPin } from 'lucide-react';
 import type { Plot } from '../../../../domain/entities/plot';
 import type { PlotStatus } from '../../../../domain/valueObjects/plots/plotStatus';
 import type { ServiceCondition } from '../../../../domain/entities/serviceCondition';
+import type { ServiceStatusCondition } from '../../../../domain/entities/serviceStatusCondition';
 import { getCreateServiceConditionFormSchema } from '../../../schemas/serviceConditionForm.schema';
+import { getCreateServiceStatusConditionFormSchema } from '../../../schemas/serviceStatusConditionForm.schema';
 import z from 'zod';
 
 interface PlotFormProps {
@@ -39,6 +41,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
   const { entities: plotAreas, getAll: getPlotAreas, create: createPlotArea } = useEntityCrud<PlotArea>('/investments/plot-areas', '/investments/plot-areas');
   const { entities: classifications, getAll: getClassifications, create: createClassification } = useEntityCrud<PlotClassification>('/investments/plot-classifications', '/investments/plot-classifications');
   const { entities: serviceConditions, getAll: getServiceConditions, create: createServiceCondition, update, remove, loadingMap, errorMap } = useEntityCrud<ServiceCondition>('/investments/service-conditions', '/investments/service-conditions');
+  const { entities: serviceStatusConditions, getAll: getServiceStatusConditions, create: createServiceStatusCondition } = useEntityCrud<ServiceStatusCondition>('/investments/service-status-conditions', '/investments/service-status-conditions');
 
   const [statusDate, setStatusDate] = React.useState(defaultValues?.status_date || new Date().toISOString().split('T')[0]);
   const [clickedStatus, setClickedStatus] = React.useState<PlotStatus | null>(null);
@@ -52,6 +55,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
     getPlotAreas('/investments/plot-areas?is_active=true');
     getClassifications('/investments/plot-classifications?is_active=true');
     getServiceConditions('/investments/service-conditions?is_active=true')
+    getServiceStatusConditions('/investments/service-status-conditions?is_active=true')
   }, []);
 
   const formFields: FieldConfig[] = [
@@ -219,6 +223,51 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
           required: true
         },
       ]
+    },
+    {
+      name: 'service_status_conditions',
+      label: t('plots.service_status_conditions', 'investments') || 'Service Status Conditions', group: 'additional',
+      type: "data-matrix",
+      rowSchema: z.object({
+        note: z.string(),
+        service_status: z.string(),
+        id: z.number().nullable(),
+      }),
+      matrixFields: [
+        {
+          label: t('service_status_conditions.name', 'investments'),
+          name: "id",
+          type: "select-or-create",
+          searchable: true,
+          excludeSelected: true,
+          options: serviceStatusConditions.map(a => ({ value: a.id, label: a.name, is_default: a.is_default })),
+          createTitle: t('common.new', 'shared') || 'New',
+          labelPath: 'data.name',
+          renderCreateForm: (onSuccess, onCancel) => (
+            <GenericCreateForm
+              fields={[
+                { name: 'name', type: 'alpha', label: t('service_status_conditions.name', 'investments'), required: true },
+              ]}
+              schema={getCreateServiceStatusConditionFormSchema(t)}
+              onSubmit={(data) => createServiceStatusCondition({ ...data, is_active: true })}
+              onSuccess={onSuccess}
+              onCancel={onCancel}
+            />
+          )
+        },
+        {
+          label: t('service_status_conditions.service_status', 'investments') || 'Service Status',
+          name: "service_status",
+          type: "text",
+          required: true
+        },
+        {
+          label: t('plots.notes', 'investments') || 'Notes',
+          name: "note",
+          type: "text",
+          required: true
+        },
+      ]
     }
   ];
 
@@ -244,8 +293,8 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
     {
       group: 'additional',
       title: t('plots.group_additional', 'investments') || 'Additional Information',
-      columns: 2,
-      rows: [['service_conditions']],
+      columns: 1,
+      rows: [['service_conditions'], ['service_status_conditions']],
     },
   ];
 
@@ -344,12 +393,26 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
                   ? plot.service_conditions.map((sc, i) => (
                       <div key={i} className="flex items-center gap-2">
                         <span>{sc.name}</span>
-                        {sc.note && <span className="text-xs text-text-muted">({sc.note})</span>}
-                      </div>
-                    ))
-                  : '—'}
-              </div>
+                      {sc.note && <span className="text-xs text-text-muted">({sc.note})</span>}
+                    </div>
+                  ))
+                : '—'}
             </div>
+          </div>
+          <div className="space-y-1">
+            <span className="text-sm text-text-muted">{t('plots.service_status_conditions', 'investments') || 'Service Status Conditions'}</span>
+            <div className="font-medium text-text">
+              {plot?.service_status_conditions?.length
+                ? plot.service_status_conditions.map((sc, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <span>{sc.name}</span>
+                      {sc.service_status && <span className="text-xs text-primary">[{sc.service_status}]</span>}
+                      {sc.note && <span className="text-xs text-text-muted">({sc.note})</span>}
+                    </div>
+                  ))
+                : '—'}
+            </div>
+          </div>
             <div className="space-y-1">
               <span className="text-sm text-text-muted">{t('plots.location', 'investments') || 'Location'}</span>
               <div className="flex items-center gap-2">

@@ -204,7 +204,7 @@ export function AdjustEmployeesLeaveBalance() {
                             rows={3}
                             value={notes}
                             onChange={(val) => setNotes(val as string)}
-                            placeholder={t("adjust_leave_balance.notes_placeholder", "hr") || "ملاحظات (اختياري)"}
+                            placeholder={t("adjust_leave_balance.notes_placeholder", "hr") || "ملاحظات"}
                             baseClasses="w-full rounded-lg border border-border bg-background px-3 py-2 text-text"
                         />
                     </div>

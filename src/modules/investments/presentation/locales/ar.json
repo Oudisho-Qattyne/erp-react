@@ -72,6 +72,31 @@
       "name_required": "اسم الشرط مطلوب"
     }
   },
+  "service_status_conditions": {
+    "title": "الوضع الحالي للمقسم من حيث التخديم",
+    "add": "إضافة شرط حالة خدمة",
+    "name": "اسم الشرط",
+    "service_status": "حالة الخدمة",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا توجد شروط حالة خدمة",
+    "edit_log": "سجل التعديل",
+    "no_edit_log": "لا يوجد سجل تعديلات",
+    "event": "الحدث",
+    "created_at": "تاريخ الإنشاء",
+    "changed_by": "تم التغيير بواسطة",
+    "changes": "التغييرات",
+    "field": "الحقل",
+    "old_value": "القيمة القديمة",
+    "new_value": "القيمة الجديدة",
+    "subject_id": "رقم شرط حالة الخدمة",
+    "id": "ID",
+    "validation": {
+      "name_required": "اسم الشرط مطلوب"
+    }
+  },
   "plots": {
     "title": "المقاسم",
     "section_title": "مقسم",
@@ -83,9 +108,10 @@
     "plot_classification_id": "التصنيف",
     "location": "الموقع",
     "current_condition": "الوضع الحالي للمقسم من حيث الخدمات",
+    "service_status_conditions": "الوضع الحالي للمقسم من حيث التخديم",
     "notes": "ملاحظات",
     "status": "حالة المقسم",
-    "status_date": "تاريخ الحالة (اختياري)",
+    "status_date": "تاريخ الحالة",
     "created": "تم إنشاء {name} بنجاح",
     "create_error": "فشل في إنشاء {name}",
     "updated": "تم تحديث {name} بنجاح",
@@ -105,7 +131,7 @@
     "select_status": "اختر الحالة",
     "status_updated": "تم تحديث الحالة بنجاح",
     "status_update_error": "فشل في تحديث الحالة",
-    "notes_placeholder": "ملاحظات اختيارية...",
+    "notes_placeholder": "ملاحظات ...",
     "from_date": "من:",
     "to_date": "إلى:",
     "back_to_list": "العودة إلى المقاسم",
@@ -482,6 +508,13 @@
         "update": "تعديل شرط خدمة",
         "delete": "حذف شرط خدمة"
       },
+      "service-status-conditions": {
+        "list": "قائمة الوضع الحالي للمقسم من حيث التخديم",
+        "view": "عرض شرط حالة خدمة",
+        "create": "إنشاء شرط حالة خدمة",
+        "update": "تعديل شرط حالة خدمة",
+        "delete": "حذف شرط حالة خدمة"
+      },
       "plot-dossier": {
         "list": "قائمة الإضبارات",
         "view": "عرض الإضبارة",
@@ -547,6 +580,20 @@
         "create": "إنشاء حالة ترخيص",
         "update": "تعديل حالة ترخيص",
         "delete": "حذف حالة ترخيص"
+      },
+      "rent-contract-industries": {
+        "list": "قائمة صناعات عقود الإيجار",
+        "view": "عرض صناعة عقد إيجار",
+        "create": "إنشاء صناعة عقد إيجار",
+        "update": "تعديل صناعة عقد إيجار",
+        "delete": "حذف صناعة عقد إيجار"
+      },
+      "rent-contracts": {
+        "list": "قائمة عقود الإيجار",
+        "view": "عرض عقد إيجار",
+        "create": "إنشاء عقد إيجار",
+        "update": "تعديل عقد إيجار",
+        "delete": "حذف عقد إيجار"
       }
     }
   },
@@ -749,6 +796,70 @@
       "name_required": "الاسم مطلوب"
     }
   },
+  "rent_contract_industries": {
+    "title": "صناعات عقد الإيجار",
+    "add": "إضافة صناعة عقد إيجار",
+    "create": "إنشاء صناعة عقد إيجار",
+    "name": "الاسم",
+    "is_default": "افتراضي",
+    "is_active": "نشط",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا توجد صناعات عقود إيجار",
+    "edit_log": "سجل التعديل",
+    "event": "الحدث",
+    "created_at": "تاريخ الإنشاء",
+    "changed_by": "تم التغيير بواسطة",
+    "changes": "التغييرات",
+    "field": "الحقل",
+    "old_value": "القيمة القديمة",
+    "new_value": "القيمة الجديدة",
+    "no_edit_log": "لا توجد سجلات تعديل",
+    "subject_id": "معرف صناعة عقد الإيجار",
+    "id": "ID",
+    "validation": {
+      "name_required": "الاسم مطلوب"
+    }
+  },
+  "rent_contract": {
+    "title": "عقود الإيجار",
+    "add": "إضافة عقد إيجار",
+    "edit": "تعديل عقد الإيجار",
+    "renter_name": "اسم المستأجر",
+    "renter_phone": "رقم الهاتف",
+    "rent_contract_number": "رقم العقد",
+    "rent_contract_date": "تاريخ العقد",
+    "rent_area": "مساحة الإيجار (م²)",
+    "rent_contract_duration": "المدة",
+    "rent_contract_industry_id": "الصناعة",
+    "created": "تم إنشاء عقد الإيجار بنجاح",
+    "create_error": "فشل في إنشاء عقد الإيجار",
+    "updated": "تم تحديث عقد الإيجار بنجاح",
+    "update_error": "فشل في تحديث عقد الإيجار",
+    "deleted": "تم حذف عقد الإيجار بنجاح",
+    "delete_error": "فشل في حذف عقد الإيجار",
+    "no_records": "لا توجد عقود إيجار",
+    "edit_log": "سجل التعديل",
+    "event": "الحدث",
+    "created_at": "تاريخ الإنشاء",
+    "changed_by": "تم التغيير بواسطة",
+    "changes": "التغييرات",
+    "field": "الحقل",
+    "old_value": "القيمة القديمة",
+    "new_value": "القيمة الجديدة",
+    "no_edit_log": "لا توجد سجلات تعديل",
+    "subject_id": "معرف عقد الإيجار",
+    "validation": {
+      "renter_name_required": "اسم المستأجر مطلوب",
+      "renter_phone_required": "رقم الهاتف مطلوب",
+      "contract_number_required": "رقم العقد مطلوب",
+      "contract_date_required": "تاريخ العقد مطلوب",
+      "rent_area_positive": "يجب أن تكون المساحة رقماً موجباً",
+      "duration_required": "المدة مطلوبة"
+    }
+  },
   "licensing_statuses": {
     "title": "حالات الترخيص",
     "add": "إضافة حالة ترخيص",
@@ -839,6 +950,9 @@
     "service_conditions": {
       "title": "شروط الخدمة"
     },
+    "service_status_conditions": {
+      "title": "الوضع الحالي للمقسم من حيث التخديم"
+    },
     "plots": {
       "title": "المقاسم"
     },
@@ -868,6 +982,9 @@
     },
     "by_industry_licenses": {
       "title": "تراخيص حسب الصناعة"
+    },
+    "rent_contract_industries": {
+      "title": "صناعات عقد الإيجار"
     },
     "dossiers": {
       "title": "الإضبارات"

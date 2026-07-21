@@ -195,7 +195,7 @@ export function OrganizationalUnitTreeSelect({
 
       {error && <p className="text-danger text-xs">{error}</p>}
 
-      <Dialog isOpen={isCreateDialogOpen} onClose={() => setIsCreateDialogOpen(false)} title={t('organizational_unit.dialog_title', 'hr') || 'إضافة وحدة تنظيمية جديدة'} size="md">
+      <Dialog isOpen={isCreateDialogOpen} onClose={() => setIsCreateDialogOpen(false)} title={t('organizational_unit.dialog_title', 'hr') || 'إضافة سوية تنظيمية جديدة'} size="md">
         <GenericCreateForm
           schema={organizationalLevelFormSchema}
           fields={[{ name: 'name', type: 'alpha', label: t('organizational_unit.name', 'hr') || 'الاسم', required: true }]}

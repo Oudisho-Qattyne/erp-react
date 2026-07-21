@@ -13,6 +13,7 @@ import { PlotDetailsSection } from './components/PlotDetailsSection';
 import { PartnersSection } from './components/PartnersSection';
 import { FacilitiesSection } from './components/FacilitiesSection';
 import { ContractsSection } from './components/ContractsSection';
+import { RentContractSection } from './components/RentContractSection';
 
 import { ArrowRight, History } from 'lucide-react';
 
@@ -93,6 +94,9 @@ export function ShowDossierPage() {
       }
       {dossierId && plotId && canShowContracts &&
         <ContractsSection plotId={plotId} dossierId={dossierId} />
+      }
+      {dossierId && plotId &&
+        <RentContractSection plotId={plotId} dossierId={dossierId} />
       }
 
       {plotId && dossierId && (

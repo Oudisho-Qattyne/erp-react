@@ -72,6 +72,31 @@
       "name_required": "Condition name is required"
     }
   },
+  "service_status_conditions": {
+    "title": "Service Status Conditions",
+    "add": "Add Service Status Condition",
+    "name": "Condition Name",
+    "service_status": "Service Status",
+    "created": "{name} created successfully",
+    "create_error": "Failed to create {name}",
+    "deleted": "{name} deleted successfully",
+    "delete_error": "Failed to delete {name}",
+    "no_records": "No Service Status Conditions found",
+    "edit_log": "Edit Log",
+    "no_edit_log": "No edit logs found",
+    "event": "Event",
+    "created_at": "Created At",
+    "changed_by": "Changed By",
+    "changes": "Changes",
+    "field": "Field",
+    "old_value": "Old Value",
+    "new_value": "New Value",
+    "subject_id": "Service Status Condition ID",
+    "id": "ID",
+    "validation": {
+      "name_required": "Condition name is required"
+    }
+  },
   "plots": {
     "title": "Plots",
     "section_title": "Plot",
@@ -83,6 +108,7 @@
     "plot_classification_id": "Classification",
     "location": "Location",
     "current_condition": "Current Condition",
+    "service_status_conditions": "Service Status Conditions",
     "notes": "Notes",
     "status": "Status",
     "status_date": "Status Date (Optional)",
@@ -482,6 +508,13 @@
         "update": "Edit Service Condition",
         "delete": "Delete Service Condition"
       },
+      "service-status-conditions": {
+        "list": "List Service Status Conditions",
+        "view": "View Service Status Condition",
+        "create": "Create Service Status Condition",
+        "update": "Edit Service Status Condition",
+        "delete": "Delete Service Status Condition"
+      },
       "plot-dossier": {
         "list": "List Dossiers",
         "view": "View Dossier",
@@ -547,6 +580,20 @@
         "create": "Create Licensing Status",
         "update": "Edit Licensing Status",
         "delete": "Delete Licensing Status"
+      },
+      "rent-contract-industries": {
+        "list": "List Rent Contract Industries",
+        "view": "View Rent Contract Industry",
+        "create": "Create Rent Contract Industry",
+        "update": "Edit Rent Contract Industry",
+        "delete": "Delete Rent Contract Industry"
+      },
+      "rent-contracts": {
+        "list": "List Rent Contracts",
+        "view": "View Rent Contract",
+        "create": "Create Rent Contract",
+        "update": "Edit Rent Contract",
+        "delete": "Delete Rent Contract"
       }
     }
   },
@@ -749,6 +796,70 @@
       "name_required": "Name is required"
     }
   },
+  "rent_contract_industries": {
+    "title": "Rent Contract Industries",
+    "add": "Add Rent Contract Industry",
+    "create": "Create Rent Contract Industry",
+    "name": "Name",
+    "is_default": "Default",
+    "is_active": "Active",
+    "created": "{name} created successfully",
+    "create_error": "Failed to create {name}",
+    "deleted": "{name} deleted successfully",
+    "delete_error": "Failed to delete {name}",
+    "no_records": "No Rent Contract Industries found",
+    "edit_log": "Edit Log",
+    "event": "Event",
+    "created_at": "Created At",
+    "changed_by": "Changed By",
+    "changes": "Changes",
+    "field": "Field",
+    "old_value": "Old Value",
+    "new_value": "New Value",
+    "no_edit_log": "No edit logs found",
+    "subject_id": "Rent Contract Industry ID",
+    "id": "ID",
+    "validation": {
+      "name_required": "Name is required"
+    }
+  },
+  "rent_contract": {
+    "title": "Rent Contracts",
+    "add": "Add Rent Contract",
+    "edit": "Edit Rent Contract",
+    "renter_name": "Renter Name",
+    "renter_phone": "Phone",
+    "rent_contract_number": "Contract Number",
+    "rent_contract_date": "Contract Date",
+    "rent_area": "Rent Area (㎡)",
+    "rent_contract_duration": "Duration",
+    "rent_contract_industry_id": "Industry",
+    "created": "Rent contract created successfully",
+    "create_error": "Failed to create rent contract",
+    "updated": "Rent contract updated successfully",
+    "update_error": "Failed to update rent contract",
+    "deleted": "Rent contract deleted successfully",
+    "delete_error": "Failed to delete rent contract",
+    "no_records": "No rent contracts found",
+    "edit_log": "Edit Log",
+    "event": "Event",
+    "created_at": "Created At",
+    "changed_by": "Changed By",
+    "changes": "Changes",
+    "field": "Field",
+    "old_value": "Old Value",
+    "new_value": "New Value",
+    "no_edit_log": "No edit logs found",
+    "subject_id": "Rent Contract ID",
+    "validation": {
+      "renter_name_required": "Renter name is required",
+      "renter_phone_required": "Phone is required",
+      "contract_number_required": "Contract number is required",
+      "contract_date_required": "Contract date is required",
+      "rent_area_positive": "Area must be a positive number",
+      "duration_required": "Duration is required"
+    }
+  },
   "licensing_statuses": {
     "title": "Licensing Statuses",
     "add": "Add Licensing Status",
@@ -839,6 +950,9 @@
     "service_conditions": {
       "title": "Service Conditions"
     },
+    "service_status_conditions": {
+      "title": "Service Status Conditions"
+    },
     "plots": {
       "title": "Plots"
     },
@@ -868,6 +982,9 @@
     },
     "by_industry_licenses": {
       "title": "By Industry Licenses"
+    },
+    "rent_contract_industries": {
+      "title": "Rent Contract Industries"
     },
     "dossiers": {
       "title": "Dossiers"
