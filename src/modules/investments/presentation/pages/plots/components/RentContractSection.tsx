@@ -12,6 +12,7 @@ import { GenericCreateForm, type FieldConfig } from '../../../../../../core/pres
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { getCreateRentContractFormSchema } from '../../../schemas/rentContractForm.schema';
+import { getCreateRentContractIndustryFormSchema } from '../../../schemas/rentContractIndustryForm.schema';
 import { FileSignature, Plus, Pencil, Trash2, History } from 'lucide-react';
 import { toast } from 'sonner';
 import { getLocalizedName } from '../../../../../../core/presentation/utils/helpes';
@@ -28,6 +29,7 @@ export function RentContractSection({ plotId, dossierId }: RentContractSectionPr
   const { entities: contracts, getAll: getContracts, create: createContract, update: updateContract, remove: deleteContract, loadingMap, errorMap } = useEntityCrud<RentContract>(baseUrl, baseUrl);
 
   const { entities: industries, getAll: getIndustries } = useEntityCrud<RentContractIndustry>('/investments/rent-contract-industries', '/investments/rent-contract-industries');
+  const { create: createIndustry } = useEntityCrud<RentContractIndustry>('/investments/rent-contract-industries', '/investments/rent-contract-industries');
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingContract, setEditingContract] = useState<RentContract | null>(null);
@@ -84,18 +86,44 @@ export function RentContractSection({ plotId, dossierId }: RentContractSectionPr
   };
 
   const fields: FieldConfig[] = [
-    { name: 'renter_name', type: 'alpha', label: t('rent_contract.renter_name', 'investments') || 'Renter Name', required: true },
-    { name: 'renter_phone', type: 'numeric', label: t('rent_contract.renter_phone', 'investments') || 'Phone', required: true },
-    { name: 'rent_contract_number', type: 'numeric', label: t('rent_contract.rent_contract_number', 'investments') || 'Contract Number', required: true },
-    { name: 'rent_contract_date', type: 'date', label: t('rent_contract.rent_contract_date', 'investments') || 'Contract Date', required: true },
-    { name: 'rent_area', type: 'number', label: t('rent_contract.rent_area', 'investments') || 'Rent Area (㎡)', required: true },
-    { name: 'rent_contract_duration', type: 'date', label: t('rent_contract.rent_contract_duration', 'investments') || 'Duration', required: true },
+    { name: 'renter_name', type: 'alpha', label: t('rent_contract.renter_name', 'investments') || 'Renter Name', required: true, group: 'renter_info' },
+    { name: 'renter_phone', type: 'numeric', label: t('rent_contract.renter_phone', 'investments') || 'Phone', required: true, group: 'renter_info' },
+    { name: 'rent_contract_number', type: 'numeric', label: t('rent_contract.rent_contract_number', 'investments') || 'Contract Number', required: true, group: 'contract_details' },
+    { name: 'rent_contract_date', type: 'date', label: t('rent_contract.rent_contract_date', 'investments') || 'Contract Date', required: true, group: 'contract_details' },
+    { name: 'rent_area', type: 'number', label: t('rent_contract.rent_area', 'investments') || 'Rent Area (㎡)', required: true, group: 'renter_info' },
+    { name: 'rent_contract_duration', type: 'date', label: t('rent_contract.rent_contract_duration', 'investments') || 'Duration', required: true, group: 'contract_details' },
     {
       name: 'rent_contract_industry_id',
-      type: 'select',
+      type: 'select-or-create',
+      searchable: true,
       label: t('rent_contract.rent_contract_industry_id', 'investments') || 'Industry',
       options: industries.map(i => ({ value: i.id, label: getLocalizedName(i.name), is_default: i.is_default })),
+      createTitle: t('rent_contract_industries.add', 'investments') || 'Add Industry',
+      renderCreateForm: (onSuccess, onCancel) => (
+        <GenericCreateForm
+          schema={getCreateRentContractIndustryFormSchema(t)}
+          fields={[
+            { name: 'name', type: 'alpha', label: t('rent_contract_industries.name', 'investments') || 'Name', required: true },
+          ]}
+          onSubmit={async (data) => {
+            const res = await createIndustry(data);
+            await getIndustries('/investments/rent-contract-industries?is_active=true');
+            return res;
+          }}
+          onSuccess={(id, result) => {
+            onSuccess(id ?? result?.data?.id, result?.data ?? result);
+          }}
+          onCancel={onCancel}
+          submitLabel={t('rent_contract_industries.add', 'investments') || 'Add Industry'}
+        />
+      ),
+      group: 'contract_details',
     },
+  ];
+
+  const formGroups = [
+    { group: 'renter_info', title: t('rent_contract.group_renter_info', 'investments') || 'Renter Information', columns: 2 },
+    { group: 'contract_details', title: t('rent_contract.group_contract_details', 'investments') || 'Contract Details', columns: 2 },
   ];
 
   const columns = [
@@ -159,10 +187,11 @@ export function RentContractSection({ plotId, dossierId }: RentContractSectionPr
         )}
       </SectionCard>
 
-      <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={t('rent_contract.add', 'investments') || 'Add Rent Contract'}>
+      <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={t('rent_contract.add', 'investments') || 'Add Rent Contract'} size="3xl">
         <GenericCreateForm
           schema={getCreateRentContractFormSchema(t)}
           fields={fields}
+          groups={formGroups}
           onSubmit={handleCreate}
           onSuccess={() => setIsCreateOpen(false)}
           onCancel={() => setIsCreateOpen(false)}
@@ -170,11 +199,12 @@ export function RentContractSection({ plotId, dossierId }: RentContractSectionPr
         />
       </Dialog>
 
-      <Dialog isOpen={!!editingContract} onClose={() => setEditingContract(null)} title={t('rent_contract.edit', 'investments') || 'Edit Rent Contract'}>
+      <Dialog isOpen={!!editingContract} onClose={() => setEditingContract(null)} title={t('rent_contract.edit', 'investments') || 'Edit Rent Contract'} size="3xl">
         {editingContract && (
           <GenericCreateForm
             schema={getCreateRentContractFormSchema(t)}
             fields={fields}
+            groups={formGroups}
             defaultValues={{
               renter_name: editingContract.renter_name,
               renter_phone: editingContract.renter_phone,

@@ -62,6 +62,7 @@ export interface SelectFromTableProps<T extends { id: number | string }> {
     onSubmit: (data: any) => Promise<any>
     onError?: (error: any) => void
     dialogTitle?: string
+    dialogSize?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl"
     buttonLabel?: string
     submitLabel?: string
     createButtonPermission?: string | string[]
@@ -260,7 +261,7 @@ export function SelectFromTable<T extends { id: number | string }>({
       />
 
       {createConfig && (
-        <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={createConfig.dialogTitle || s("common.create", "Create")}>
+        <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={createConfig.dialogTitle || s("common.create", "Create")} size={createConfig.dialogSize}>
           <GenericCreateForm
             schema={createConfig.schema}
             fields={createConfig.fields}

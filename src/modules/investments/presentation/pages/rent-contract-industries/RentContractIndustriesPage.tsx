@@ -129,8 +129,6 @@ export function RentContractIndustriesPage() {
         <GenericCreateForm
           fields={[
             { name: 'name', type: 'alpha', label: t('rent_contract_industries.name', 'investments'), required: true },
-            { name: 'is_active', type: 'checkbox', label: t('common.is_active', 'shared') },
-            { name: 'is_default', type: 'checkbox', label: t('common.is_default', 'shared') }
           ]}
           schema={getCreateRentContractIndustryFormSchema(t)}
           onSubmit={async (data) => {

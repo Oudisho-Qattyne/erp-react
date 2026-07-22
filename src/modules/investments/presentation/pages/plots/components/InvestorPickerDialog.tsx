@@ -148,6 +148,7 @@ export function InvestorPickerDialog({
 
   return (
     <SelectFromTable
+    
       isOpen={isOpen}
       onClose={onClose}
       onConfirm={onConfirm}
@@ -179,6 +180,7 @@ export function InvestorPickerDialog({
       emptyMessage={t("investors.no_records", "investments") || "No investors found"}
       dialogSize="3xl"
       createConfig={{
+        dialogSize:"3xl",
         schema: getCreateInvestorFormSchema(t),
         fields: createFormFields,
         groups: createGroups,
