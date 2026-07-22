@@ -83,7 +83,7 @@ export function DossierStatusHistoryModal({ isOpen, onClose, plotId, dossierId }
       key: 'status_date',
       label: t('dossier.date', 'investments') || 'Dossier Date',
       width: 120,
-      render: (row: DossierStatusHistory) => row.status_date ? new Date(row.status_date).toLocaleDateString() : '—'
+      render: (row: DossierStatusHistory) => row.status_date || '—'
     },
     {
       key: 'user',
@@ -103,7 +103,7 @@ export function DossierStatusHistoryModal({ isOpen, onClose, plotId, dossierId }
       key: 'created_at',
       label: t('plots.created_at', 'investments') || 'Created At',
       width: 150,
-      render: (row: DossierStatusHistory) => row.created_at ? new Date(row.created_at).toLocaleString() : '—'
+      render: (row: DossierStatusHistory) => row.created_at || '—'
     }
   ];
 

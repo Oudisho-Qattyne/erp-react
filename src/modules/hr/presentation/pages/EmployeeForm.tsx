@@ -183,7 +183,7 @@ function JobStatusCreateForm({ onSuccess, onCancel, facultyId }: { onSuccess: (i
 }
 // function OrgUnitCreateForm({ onSuccess, onCancel }: { onSuccess: (id: number, item: any) => void; onCancel: () => void }) {
 //   const { create: createOrgUnit } = useEntityCrud<OrganizationalLevels>('', '');
-//   return <CreateEntityForm schema={organizationalLevelFormSchema} onSubmit={createOrgUnit} onSuccess={onSuccess} onCancel={onCancel} title="وحدة تنظيمية" />;
+//   return <CreateEntityForm schema={organizationalLevelFormSchema} onSubmit={createOrgUnit} onSuccess={onSuccess} onCancel={onCancel} title="سوية تنظيمية" />;
 // }
 
 // -----------------------------------------------------------------------------
@@ -421,7 +421,6 @@ export function EmployeeForm({
     setValue('educations', [
       ...educations,
       {
-        category: 'latest',
         degree_name: null,
         university_id: null,
         faculty_id: null,
@@ -626,7 +625,7 @@ export function EmployeeForm({
       compute: computeEmployeeStatuses,
     },
     {
-      name: 'employee_status_note', type: 'text', label: t('employees.employee_status_note', 'hr') || 'ملاحظة حالة الموظف', required: true, dependsOn: ['employee_status_id'], compute: async (values) => {
+      name: 'employee_status_note', type: 'text', label: t('employees.employee_status_note', 'hr') || 'ملاحظة حالة الموظف', dependsOn: ['employee_status_id'], compute: async (values) => {
         if (!values.employee_status_id) {
           return ({ disabled: true })
         }
@@ -659,7 +658,7 @@ export function EmployeeForm({
       }
     },
     {
-      name: 'job_status_note', label: t('employees.job_status_note', 'hr') || 'ملاحظات الحالة الوظيفية', dependsOn: ['job_status_id'], required: true, compute: async (values) => {
+      name: 'job_status_note', label: t('employees.job_status_note', 'hr') || 'ملاحظات الحالة الوظيفية', dependsOn: ['job_status_id'], compute: async (values) => {
         if (!values.job_status_id) {
           return ({ disabled: true })
         }
@@ -726,7 +725,7 @@ export function EmployeeForm({
                 onChange={(val) => {
                   methods.setValue('employment_details.org_unit_id', val ?? 0, { shouldValidate: true, shouldDirty: true });
                 }}
-                label={t('employees.org_unit_id', 'hr') || 'الوحدة التنظيمية'}
+                label={t('employees.org_unit_id', 'hr') || 'السوية التنظيمية'}
                 required
                 error={methods.formState.errors.employment_details?.org_unit_id?.message}
               />
@@ -744,18 +743,6 @@ export function EmployeeForm({
                   {t('employee_form.delete', 'hr') || 'حذف'}
                 </button>
                 <div className={`grid ${gridColsClass} gap-4`}>
-                  <FormInput
-                    name={`educations.${idx}.category`}
-                    type="select"
-                    required
-                    options={[
-                      { value: 'initial', label: t('show_employee.edu_category_initial', 'hr') || 'أولي' },
-                      { value: 'adjusted', label: t('show_employee.edu_category_adjusted', 'hr') || 'معدل' },
-                      { value: 'latest', label: t('show_employee.edu_category_latest', 'hr') || 'أحدث' },
-                      { value: 'current', label: t('show_employee.edu_category_current', 'hr') || 'حالي' },
-                    ]}
-                    label={t('employee_form.category', 'hr') || 'التصنيف'}
-                  />
                   <FormInput name={`educations.${idx}.degree_name`} type="alpha" label={t('employees.degree_name', 'hr') || "اسم الشهادة"} />
                   <FormInput
                     name={`educations.${idx}.university_id`}

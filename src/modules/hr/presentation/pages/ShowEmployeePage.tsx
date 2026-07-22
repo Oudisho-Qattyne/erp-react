@@ -299,7 +299,7 @@ export function ShowEmployeePage() {
                 <InfoRow label={t('employees.assigned_job', 'hr') || 'العمل المكلف به'} value={employee.assigned_job} />
                 <InfoRow label={t('employees.appointment_date', 'hr') || 'تاريخ التعيين'} value={employee.employment_details.appointment_date} icon={<Calendar size={14} />} />
                 <InfoRow label={t('employees.job_category', 'hr') || 'التصنيف الوظيفي'} value={employee.employment_details.job_category} />
-                <InfoRow label={t('employees.org_unit_id', 'hr') || 'الوحدة التنظيمية'} value={employee.employment_details.organizational_unit?.name || employee.employment_details.org_unit_id} icon={<Building2 size={14} />} />
+                <InfoRow label={t('employees.org_unit_id', 'hr') || 'السوية التنظيمية'} value={employee.employment_details.organizational_unit?.name || employee.employment_details.org_unit_id} icon={<Building2 size={14} />} />
               </div>
             ) : (
               <EmptyState message={t('show_employee.no_employment_data', 'hr') || 'لا توجد معلومات وظيفية مسجلة'} />
@@ -316,11 +316,8 @@ export function ShowEmployeePage() {
               <div className="space-y-4">
                 {employee.educations.map((edu, idx) => (
                   <div key={edu.id || idx} className="bg-background/50 border border-border/60 rounded-xl p-5 hover:border-primary/30 transition-colors">
-                    <div className="flex justify-between items-start mb-3">
+                    <div className="mb-3">
                       <h3 className="font-bold text-lg text-text">{edu.degree_name || t('show_employee.not_specified', 'hr') || 'شهادة غير محددة'}</h3>
-                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded border border-primary/20">
-                        {edu.category === 'latest' ? (t('show_employee.edu_category_latest', 'hr') || 'أحدث') : (t('show_employee.edu_category_previous', 'hr') || 'سابقة')}
-                      </span>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
                       <div className="flex flex-col gap-1">

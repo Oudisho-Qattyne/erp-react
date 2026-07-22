@@ -73,7 +73,6 @@ export function EditEmployeePage() {
             } : undefined,
 
             educations: emp.educations?.map((edu: any) => ({
-              category: edu.category || 'latest',
               degree_name: edu.degree_name,
               university_id: edu.university_id,
               faculty_id: edu.faculty_id,

@@ -3,6 +3,7 @@ import type { PlotStatus } from "../valueObjects/plots/plotStatus";
 import type { PlotArea } from "./plotArea";
 import type { PlotClassification } from "./plotClassification";
 import type { PlotServiceCondition } from "./plotServiceCondition";
+import type { PlotServiceStatusCondition } from "./plotServiceStatusCondition";
 
 export interface Plot {
   id: number;
@@ -19,6 +20,7 @@ export interface Plot {
   plot_area_name: string;
   plot_classification_name: string;
   service_conditions:PlotServiceCondition[]
+  service_status_conditions:PlotServiceStatusCondition[]
   // notes?: string;
   status_date?: string;
   updated_at?: string;

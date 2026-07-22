@@ -3,7 +3,6 @@ import type { CreateEmployeeDTO, UpdateEmployeeDTO } from '../dtos/employeeDto';
 
 export const getCreateEmployeeSchema = (t: (key: string, module?: string) => string) => {
   const EducationEntrySchema = z.object({
-    category: z.enum(['latest', 'previous'], t('employee_form.validation.category_invalid', 'hr') || 'Category must be "latest" or "previous"'),
     degree_name: z.string().min(1, t('employee_form.validation.degree_name_required', 'hr') || 'Degree name is required'),
     university_id: z.number().positive(t('employee_form.validation.university_required', 'hr') || 'University ID must be positive'),
     faculty_id: z.number().positive(t('employee_form.validation.faculty_required', 'hr') || 'Faculty ID must be positive'),
