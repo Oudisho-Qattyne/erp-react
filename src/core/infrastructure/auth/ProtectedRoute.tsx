@@ -15,12 +15,8 @@ export const ProtectedRoute = ({
   requiredPermission,
   redirectTo = '/auth',
 }: ProtectedRouteProps) => {
-  const { isAuthenticated, loading, hasRole, hasPermission } = useAuth();
+  const { isAuthenticated, hasRole, hasPermission } = useAuth();
   const location = useLocation();
-
-  if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
-  }
 
   if (!isAuthenticated) {
     return <Navigate to={redirectTo} state={{ from: location }} replace />;
