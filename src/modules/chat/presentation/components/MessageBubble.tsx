@@ -1,24 +1,35 @@
-import type { Message } from '../data/dummyChats';
-import { StatusIcon } from './StatusIcon';
+import { StatusIcon } from "./StatusIcon"
+import type { Message } from "../../domain/entities/Message"
 
-export function MessageBubble({ message }: { message: Message }) {
+export function MessageBubble({ message, currentUserId }: { message: Message; currentUserId: number }) {
+  const isSentByMe = message.sender_id === currentUserId
+
+  const time = new Date(message.created_at).toLocaleTimeString("ar-SA", {
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+
   return (
-    <div className={`flex ${message.sent ? 'justify-start' : 'justify-end'}`}>
+    <div className={`flex ${isSentByMe ? "justify-start" : "justify-end"}`}>
       <div
         className={`max-w-[75%] px-3.5 py-2 rounded-2xl text-sm leading-relaxed shadow-sm ${
-          message.sent
-            ? 'bg-primary text-white rounded-tr-sm'
-            : 'bg-card text-text rounded-tl-sm'
+          isSentByMe
+            ? "bg-primary text-white rounded-tr-sm"
+            : "bg-card text-text rounded-tl-sm"
         }`}
       >
         <div className="flex items-end gap-1.5">
-          <span>{message.text}</span>
-          <span className={`text-[10px] shrink-0 flex items-center gap-0.5 ${message.sent ? 'text-white/70' : 'text-text-muted'}`}>
-            {message.time}
-            {message.sent && <StatusIcon status={message.status} />}
+          <span>{message.body}</span>
+          <span
+            className={`text-[10px] shrink-0 flex items-center gap-0.5 ${
+              isSentByMe ? "text-white/70" : "text-text-muted"
+            }`}
+          >
+            {time}
+            {isSentByMe && <StatusIcon readAt={message.read_at} />}
           </span>
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -8,7 +8,6 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
   return (
     <ChatContext.Provider value={api}>
       {children}
-      {api?.ChatFloatingButtonComponent && <api.ChatFloatingButtonComponent />}
     </ChatContext.Provider>
   );
 };
