@@ -1,35 +1,57 @@
 import { useState, useRef, useEffect } from "react"
 import { createPortal } from "react-dom"
 import { X, MessageCircle, PenSquare, ArrowRight } from "lucide-react"
-import { useAuth } from "../../../../core/infrastructure/auth/AuthProvider"
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
-import { useChat } from "../hooks/useChat"
 import { ContactList } from "./ContactList"
 import { UserList } from "./UserList"
 import { ChatView } from "./ChatView"
-import type { ChatUser } from "../../domain/valueObjects/ChatUser"
+import type { ChatUser } from "../../domain/entities/ChatUser"
 import type { Conversation } from "../../domain/entities/Conversation"
+import type { Message } from "../../domain/entities/Message"
 import type { SendMessageDto } from "../../application/dtos/SendMessageDto"
-import { toast } from "sonner"
+import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse"
+import type { DpomainResponsePaginated } from "../../../hr/domain/entities/common/DomainResponsePaginated"
 
-function ChatDialog({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const { user } = useAuth()
+interface ChatDialogProps {
+  isOpen: boolean
+  onClose: () => void
+  currentUserId: number
+  currentUser: any
+  conversations: Conversation[]
+  messages: Message[]
+  users: ChatUser[]
+  currentConversation: Conversation | null
+  loading: Record<string, boolean>
+  error: Record<string, string | null>
+  fetchConversations: () => Promise<DpomainResponsePaginated<Conversation[]> | undefined>
+  fetchMessages: (conversationId: number) => Promise<DpomainResponsePaginated<Message[]> | undefined>
+  fetchUsers: () => Promise<DpomainResponsePaginated<ChatUser[]> | undefined>
+  selectConversation: (conversation: Conversation) => Promise<void>
+  sendMessage: (data: SendMessageDto) => Promise<DomainResponse<Message> | undefined>
+  markAsRead: (conversationId: number) => Promise<void>
+}
+
+function ChatDialog({
+  isOpen,
+  onClose,
+  currentUserId,
+  currentUser,
+  conversations,
+  messages,
+  users,
+  currentConversation,
+  loading,
+  error,
+  fetchConversations,
+  fetchUsers,
+  selectConversation,
+  sendMessage: sendMsg,
+  markAsRead
+}: ChatDialogProps) {
   const { t } = useLanguage()
-  const currentUserId = user?.id as number | undefined
-  const {
-    conversations,
-    messages,
-    users,
-    currentConversation,
-    loading,
-    error,
-    fetchConversations,
-    fetchUsers,
-    selectConversation,
-    sendMessage: sendMsg,
-  } = useChat()
 
   const [showNewChat, setShowNewChat] = useState(false)
+  const [newConversationUser, setNewConversationUser] = useState<ChatUser | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -40,25 +62,59 @@ function ChatDialog({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages, currentConversation])
+  }, [messages, newConversationUser, currentConversation])
 
-  const handleSend = (text: string) => {
-    if (!currentConversation || currentUserId === undefined) return
-    const receiverId =
-      currentConversation.user_one_id === currentUserId
-        ? currentConversation.user_two_id
-        : currentConversation.user_one_id
+  const createPlaceholderConversation = (otherUser: ChatUser): Conversation => ({
+    id: 0,
+    user_one_id: currentUserId,
+    user_two_id: otherUser.id,
+    user_one: { id: currentUserId, name: currentUser?.name || "", email: currentUser?.email || "", photo: undefined, status: "online" },
+    user_two: otherUser,
+    created_at: new Date().toISOString(),
+    unread_messages_count: 0,
+  })
 
-    const dto: SendMessageDto = {
-      conversation_id: currentConversation.id,
-      receiver_id: receiverId,
-      body: text,
+  const activeConversation = newConversationUser
+    ? createPlaceholderConversation(newConversationUser)
+    : currentConversation
+
+  const handleSend = async (text: string) => {
+    if (newConversationUser) {
+      const dto: SendMessageDto = {
+        receiver_id: newConversationUser.id,
+        body: text,
+      }
+      const msgRes = await sendMsg(dto)
+      if (msgRes) {
+        const res = await fetchConversations()
+        if (res) {
+          const newConversation = res.data.find(
+            (c: Conversation) => c.user_one_id === newConversationUser.id || c.user_two_id === newConversationUser.id,
+          )
+          if (newConversation) {
+            selectConversation(newConversation)
+          }
+        }
+      }
+      setNewConversationUser(null)
+    } else if (currentConversation) {
+      const receiverId =
+        currentConversation.user_one_id === currentUserId
+          ? currentConversation.user_two_id
+          : currentConversation.user_one_id
+
+      const dto: SendMessageDto = {
+        conversation_id: currentConversation.id,
+        receiver_id: receiverId,
+        body: text,
+      }
+      sendMsg(dto)
     }
-    sendMsg(dto)
   }
 
-  const handleSelectConversation = (conv: Conversation) => {
+  const handleSelectConversation = async(conv: Conversation) => {
     setShowNewChat(false)
+    setNewConversationUser(null)
     selectConversation(conv)
   }
 
@@ -69,28 +125,28 @@ function ChatDialog({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
     if (existing) {
       handleSelectConversation(existing)
     } else {
-      toast.info(t("new_conversation_unavailable", "chat"))
+      setShowNewChat(false)
+      setNewConversationUser(selectedUser)
     }
   }
 
   const handleOpenNewChat = () => {
     setShowNewChat(true)
-    if (users.length === 0) {
-      fetchUsers()
-    }
+    fetchUsers()
   }
 
   const handleBack = () => {
+    setNewConversationUser(null)
     setShowNewChat(false)
   }
 
   if (!isOpen) return null
 
   const otherUser =
-    currentConversation && currentUserId !== undefined
-      ? currentConversation.user_one_id === currentUserId
-        ? currentConversation.user_two
-        : currentConversation.user_one
+    activeConversation
+      ? activeConversation.user_one_id === currentUserId
+        ? activeConversation.user_two
+        : activeConversation.user_one
       : null
 
   return createPortal(
@@ -133,12 +189,12 @@ function ChatDialog({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
 
         <div className="flex flex-1 overflow-hidden">
           <div
-            className={`${currentConversation && !showNewChat ? "hidden md:flex" : "flex"} w-full md:w-80 lg:w-96 flex-col border-l border-border bg-background shrink-0 relative`}
+            className={`${activeConversation && !showNewChat ? "hidden md:flex" : "flex"} w-full md:w-80 lg:w-96 flex-col border-l border-border bg-background shrink-0 relative`}
           >
             {showNewChat ? (
               <UserList
                 users={users}
-                currentUserId={currentUserId ?? 0}
+                currentUserId={currentUserId}
                 existingConversations={conversations}
                 onSelectUser={handleSelectUser}
                 onClose={() => setShowNewChat(false)}
@@ -150,14 +206,14 @@ function ChatDialog({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
               <>
                 <ContactList
                   conversations={conversations}
-                  selectedId={currentConversation?.id ?? null}
+                  selectedId={activeConversation && !newConversationUser ? activeConversation.id : null}
                   onSelect={handleSelectConversation}
-                  currentUserId={currentUserId ?? 0}
+                  currentUserId={currentUserId}
                   loading={loading["fetchConversations"] ?? false}
                   error={error["fetchConversations"] ?? null}
                   onRetry={fetchConversations}
                 />
-                {!currentConversation && (
+                {/* {!activeConversation && ( */}
                   <button
                     type="button"
                     onClick={handleOpenNewChat}
@@ -165,21 +221,21 @@ function ChatDialog({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                   >
                     <PenSquare size={18} />
                   </button>
-                )}
+                {/* )} */}
               </>
             )}
           </div>
 
-          <div className={`${!currentConversation ? "hidden md:flex" : "flex"} flex-1`}>
+          <div className={`${!activeConversation ? "hidden md:flex" : "flex"} flex-1`}>
             <ChatView
-              conversation={currentConversation}
+              conversation={activeConversation}
               messages={messages}
               messagesEndRef={messagesEndRef}
               onSend={handleSend}
               onBack={handleBack}
               loading={loading["fetchMessages"] ?? false}
               error={error["fetchMessages"] ?? null}
-              currentUserId={currentUserId ?? 0}
+              currentUserId={currentUserId}
             />
           </div>
         </div>

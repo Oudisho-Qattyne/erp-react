@@ -1,4 +1,4 @@
-import type { ChatUser } from '../valueObjects/ChatUser';
+import type { ChatUser } from "./ChatUser";
 
 export interface Message {
   id: number;

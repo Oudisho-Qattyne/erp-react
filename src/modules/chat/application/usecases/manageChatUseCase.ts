@@ -2,7 +2,7 @@ import type { DomainResponse } from "../../../../core/domain/common/responce/Dom
 import type { DpomainResponsePaginated } from "../../../hr/domain/entities/common/DomainResponsePaginated";
 import type { Conversation } from "../../domain/entities/Conversation";
 import type { Message } from "../../domain/entities/Message";
-import type { ChatUser } from "../../domain/valueObjects/ChatUser";
+import type { ChatUser } from "../../domain/entities/ChatUser";
 import type { IChatRepository } from "../../domain/repositories/IChatRepository";
 import type { SendMessageDto } from "../dtos/SendMessageDto";
 

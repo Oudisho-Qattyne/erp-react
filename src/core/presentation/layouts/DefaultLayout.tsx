@@ -20,7 +20,8 @@ const DefaultLayout = ({ children }: { children: ReactNode }) => {
   const location = useLocation();
   const chatApi = getChatApi();
   const ChatButton = chatApi?.ChatFloatingButtonComponent;
-  const showChat = !!ChatButton && !HIDDEN_CHAT_ROUTES.includes(location.pathname);
+  const chatEnabled = import.meta.env.VITE_ENABLE_CHAT === 'true';
+  const showChat = chatEnabled && !!ChatButton && !HIDDEN_CHAT_ROUTES.includes(location.pathname);
 
   return (
     <div className="min-h-screen">

@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { Search, MessageCircle, Loader2, AlertCircle } from "lucide-react"
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
-import type { ChatUser } from "../../domain/valueObjects/ChatUser"
 import type { Conversation } from "../../domain/entities/Conversation"
+import type { ChatUser } from "../../domain/entities/ChatUser"
 
 interface UserListProps {
   users: ChatUser[]

@@ -9,7 +9,7 @@ interface MessageListProps {
 
 export function MessageList({ messages, messagesEndRef, currentUserId }: MessageListProps) {
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-primary-light">
+    <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-card">
       {messages.map((msg) => (
         <MessageBubble key={msg.id} message={msg} currentUserId={currentUserId} />
       ))}

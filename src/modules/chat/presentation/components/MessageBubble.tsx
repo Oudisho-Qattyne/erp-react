@@ -1,13 +1,11 @@
+import { formatTime } from "../utils/formatDate"
 import { StatusIcon } from "./StatusIcon"
 import type { Message } from "../../domain/entities/Message"
 
 export function MessageBubble({ message, currentUserId }: { message: Message; currentUserId: number }) {
   const isSentByMe = message.sender_id === currentUserId
 
-  const time = new Date(message.created_at).toLocaleTimeString("ar-SA", {
-    hour: "2-digit",
-    minute: "2-digit",
-  })
+  const time = formatTime(message.created_at)
 
   return (
     <div className={`flex ${isSentByMe ? "justify-start" : "justify-end"}`}>
@@ -25,7 +23,7 @@ export function MessageBubble({ message, currentUserId }: { message: Message; cu
               isSentByMe ? "text-white/70" : "text-text-muted"
             }`}
           >
-            {time}
+            {message.created_at}
             {isSentByMe && <StatusIcon readAt={message.read_at} />}
           </span>
         </div>

@@ -5,8 +5,10 @@ import { createChatRepository } from "../../infrastructure/repositories/ChatRepo
 import { createManageChatUseCase } from "../../application/usecases/manageChatUseCase"
 import type { Conversation } from "../../domain/entities/Conversation"
 import type { Message } from "../../domain/entities/Message"
-import type { ChatUser } from "../../domain/valueObjects/ChatUser"
+import type { ChatUser } from "../../domain/entities/ChatUser"
 import type { SendMessageDto } from "../../application/dtos/SendMessageDto"
+import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse"
+import type { DpomainResponsePaginated } from "../../../hr/domain/entities/common/DomainResponsePaginated"
 import { toast } from "sonner"
 
 const OP_KEYS = ["fetchConversations", "fetchMessages", "sendMessage", "markAsRead", "fetchUsers"] as const
@@ -25,10 +27,10 @@ export interface UseChatReturn {
   error: Record<string, string | null>
   hasErrors: () => boolean
   clearError: () => void
-  fetchConversations: () => Promise<void>
-  fetchMessages: (conversationId: number) => Promise<void>
-  fetchUsers: () => Promise<void>
-  sendMessage: (data: SendMessageDto) => Promise<void>
+  fetchConversations: () => Promise<DpomainResponsePaginated<Conversation[]> | undefined>
+  fetchMessages: (conversationId: number) => Promise<DpomainResponsePaginated<Message[]> | undefined>
+  fetchUsers: () => Promise<DpomainResponsePaginated<ChatUser[]> | undefined>
+  sendMessage: (data: SendMessageDto) => Promise<DomainResponse<Message> | undefined>
   markAsRead: (conversationId: number) => Promise<void>
   selectConversation: (conversation: Conversation) => Promise<void>
 }
@@ -58,6 +60,7 @@ export const useChat = (): UseChatReturn => {
     try {
       const res = await useCase.getConversations()
       setConversations(res.data)
+      return res
     } catch (err: any) {
       const msg = err?.message || t("chat.conversations_load_error", "chat")
       setFnError("fetchConversations", msg)
@@ -73,6 +76,7 @@ export const useChat = (): UseChatReturn => {
     try {
       const res = await useCase.getMessages(conversationId)
       setMessages(res.data)
+      return res
     } catch (err: any) {
       const msg = err?.message || t("chat.messages_load_error", "chat")
       setFnError("fetchMessages", msg)
@@ -84,6 +88,9 @@ export const useChat = (): UseChatReturn => {
 
   const selectConversation = useCallback(async (conversation: Conversation) => {
     setCurrentConversation(conversation)
+    if(conversation.unread_messages_count > 0){
+      await markAsRead(conversation.id)
+    }
     await fetchMessages(conversation.id)
   }, [fetchMessages])
 
@@ -93,6 +100,7 @@ export const useChat = (): UseChatReturn => {
     try {
       const res = await useCase.sendMessage(data)
       setMessages((prev) => [...prev, res.data])
+      return res
     } catch (err: any) {
       const msg = err?.message || t("chat.send_error", "chat")
       setFnError("sendMessage", msg)
@@ -109,6 +117,7 @@ export const useChat = (): UseChatReturn => {
     try {
       const res = await useCase.getUsers()
       setUsers(res.data)
+      return res
     } catch (err: any) {
       const msg = err?.message || t("chat.users_load_error", "chat")
       setFnError("fetchUsers", msg)
