@@ -8,7 +8,7 @@ import ChatDialog from "./ChatDialog"
 export function ChatFloatingButton() {
   const { user } = useAuth()
   const currentUserId = user?.id as number | undefined
-  const chat = useChat()
+  const chat = useChat(currentUserId)
   const [open, setOpen] = useState(false)
 
   const totalUnread = chat.conversations.reduce(

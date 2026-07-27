@@ -1,12 +1,15 @@
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
 import { useApiClient } from "../../../../core/presentation/context/api/ApiClinetProvider"
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import { createChatRepository } from "../../infrastructure/repositories/ChatRepository"
 import { createManageChatUseCase } from "../../application/usecases/manageChatUseCase"
+import { createEcho } from "../../../../core/infrastructure/echo/echo"
+import { createChatEchoUseCase } from "../../application/usecases/chatEchoUseCase"
 import type { Conversation } from "../../domain/entities/Conversation"
 import type { Message } from "../../domain/entities/Message"
 import type { ChatUser } from "../../domain/entities/ChatUser"
 import type { SendMessageDto } from "../../application/dtos/SendMessageDto"
+import type { MessageEventData, ConversationEventData } from "../../application/dtos/chatEventData"
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse"
 import type { DpomainResponsePaginated } from "../../../hr/domain/entities/common/DomainResponsePaginated"
 import { toast } from "sonner"
@@ -35,7 +38,7 @@ export interface UseChatReturn {
   selectConversation: (conversation: Conversation) => Promise<void>
 }
 
-export const useChat = (): UseChatReturn => {
+export const useChat = (currentUserId?: number): UseChatReturn => {
   const apiClient = useApiClient()
   const { t } = useLanguage()
 
@@ -45,6 +48,11 @@ export const useChat = (): UseChatReturn => {
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null)
   const [loading, setLoading] = useState<Record<string, boolean>>(() => initRecord(false))
   const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null))
+
+  const currentConversationRef = useRef(currentConversation)
+  currentConversationRef.current = currentConversation
+
+  const echoUseCaseRef = useRef<ReturnType<typeof createChatEchoUseCase> | null>(null)
 
   const repository = createChatRepository(apiClient)
   const useCase = createManageChatUseCase(repository)
@@ -88,7 +96,7 @@ export const useChat = (): UseChatReturn => {
 
   const selectConversation = useCallback(async (conversation: Conversation) => {
     setCurrentConversation(conversation)
-    if(conversation.unread_messages_count > 0){
+    if (conversation.unread_messages_count > 0) {
       await markAsRead(conversation.id)
     }
     await fetchMessages(conversation.id)
@@ -146,6 +154,86 @@ export const useChat = (): UseChatReturn => {
   useEffect(() => {
     fetchConversations()
   }, [])
+
+  // Set up Echo once
+  useEffect(() => {
+    if (!currentUserId) return
+
+    const echo = createEcho()
+
+    const echoUseCase = createChatEchoUseCase(echo, currentUserId, {
+      onMessageSent: (data: MessageEventData) => {
+        const activeId = currentConversationRef.current?.id
+        if (data.conversation_id === activeId) {
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === data.id)) return prev
+            return [...prev, data as unknown as Message]
+          })
+        }
+        setConversations((prev) => {
+          const existing = prev.find((c) => c.id === data.conversation_id)
+          if (!existing) return prev
+          return prev.map((c) =>
+            c.id === data.conversation_id
+              ? {
+                  ...c,
+                  last_message: data,
+                  unread_messages_count: c.id === activeId
+                    ? (c.unread_messages_count ?? 0)
+                    : (c.unread_messages_count ?? 0) + 1,
+                }
+              : c,
+          )
+        })
+      },
+
+      onMessageRead: (data: MessageEventData) => {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === data.id ? { ...m, read_at: data.read_at } : m)),
+        )
+        setConversations((prev) =>
+          prev.map((c) =>
+            c.last_message?.id === data.id
+              ? { ...c, last_message: { ...c.last_message, read_at: data.read_at } }
+              : c,
+          )
+        )
+      },
+
+      onConversationRead: (data: ConversationEventData) => {
+        setConversations((prev) =>
+          prev.map((c) => (c.id === data.id ? { ...c, unread_messages_count: 0 } : c)),
+        )
+      },
+
+      onConversationCreated: () => {
+        fetchConversations()
+      },
+    })
+
+    echoUseCaseRef.current = echoUseCase
+
+    if (currentConversation) {
+      echoUseCase.subscribeToMessages(currentConversation.id)
+    }
+
+    return () => {
+      echoUseCase.destroy()
+      echoUseCaseRef.current = null
+    }
+  }, [currentUserId])
+
+  // Sync message channel subscription when conversation changes
+  useEffect(() => {
+    const echoUseCase = echoUseCaseRef.current
+    if (!echoUseCase) return
+
+    if (currentConversation) {
+      echoUseCase.subscribeToMessages(currentConversation.id)
+    } else {
+      echoUseCase.unsubscribeFromMessages()
+    }
+  }, [currentConversation?.id])
 
   return {
     conversations,
