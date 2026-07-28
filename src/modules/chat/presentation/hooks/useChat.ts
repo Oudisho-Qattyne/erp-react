@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react"
+import { useState, useCallback, useEffect, useRef, useMemo } from "react"
 import { useApiClient } from "../../../../core/presentation/context/api/ApiClinetProvider"
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import { createChatRepository } from "../../infrastructure/repositories/ChatRepository"
@@ -25,6 +25,7 @@ export interface UseChatReturn {
   conversations: Conversation[]
   messages: Message[]
   users: ChatUser[]
+  onlineUserIds: Set<number>
   currentConversation: Conversation | null
   loading: Record<string, boolean>
   isLoading: () => boolean
@@ -56,6 +57,7 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [messages, setMessages] = useState<Message[]>([])
   const [users, setUsers] = useState<ChatUser[]>([])
+  const [onlineUserIds, setOnlineUserIds] = useState<Set<number>>(new Set())
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null)
   const [loading, setLoading] = useState<Record<string, boolean>>(() => initRecord(false))
   const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null))
@@ -248,6 +250,7 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
 
   // Set up Echo once
   useEffect(() => {
+    console.log("1st effect: setting up Echo", { currentUserId })
     if (!currentUserId) return
 
     const echo = createEcho()
@@ -255,6 +258,8 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     const echoUseCase = createChatEchoUseCase(echo, currentUserId, {
       onMessageSent: (data: MessageEventData) => {
         const activeId = currentConversationRef.current?.id
+        console.log(data);
+        
         if (data.conversation_id === activeId) {
           setMessages((prev) => {
             if (prev.some((m) => m.id === data.id)) return prev
@@ -279,6 +284,8 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
       },
 
       onMessageRead: (data: MessageEventData) => {
+        console.log(data);
+
         setMessages((prev) =>
           prev.map((m) => (m.id === data.id ? { ...m, read_at: data.read_at } : m)),
         )
@@ -292,6 +299,8 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
       },
 
       onConversationRead: (data: ConversationEventData) => {
+        console.log(data);
+
         setConversations((prev) =>
           prev.map((c) => (c.id === data.id ? { ...c, unread_messages_count: 0 } : c)),
         )
@@ -300,13 +309,25 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
       onConversationCreated: () => {
         fetchConversations()
       },
+
+      onOnlineHere: (members) => {
+        setOnlineUserIds(new Set(members.map((m) => m.id)))
+      },
+
+      onOnlineJoining: (member) => {
+        setOnlineUserIds((prev) => new Set([...prev, member.id]))
+      },
+
+      onOnlineLeaving: (member) => {
+        setOnlineUserIds((prev) => {
+          const next = new Set(prev)
+          next.delete(member.id)
+          return next
+        })
+      },
     })
 
     echoUseCaseRef.current = echoUseCase
-
-    if (currentConversation) {
-      echoUseCase.subscribeToMessages(currentConversation.id)
-    }
 
     return () => {
       echoUseCase.destroy()
@@ -317,19 +338,38 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
   // Sync message channel subscription when conversation changes
   useEffect(() => {
     const echoUseCase = echoUseCaseRef.current
+    console.log("2nd effect", { hasEcho: !!echoUseCase, currentConversation })
     if (!echoUseCase) return
 
     if (currentConversation) {
+      console.log("listing");
+      
       echoUseCase.subscribeToMessages(currentConversation.id)
     } else {
       echoUseCase.unsubscribeFromMessages()
     }
   }, [currentConversation?.id])
 
+  const conversationsWithStatus = useMemo(
+    () =>
+      conversations.map((c) => ({
+        ...c,
+        user_one: { ...c.user_one, status: onlineUserIds.has(c.user_one_id) ? 'online' : 'offline' },
+        user_two: { ...c.user_two, status: onlineUserIds.has(c.user_two_id) ? 'online' : 'offline' },
+      })),
+    [conversations, onlineUserIds],
+  )
+
+  const usersWithStatus = useMemo(
+    () => users.map((u) => ({ ...u, status: onlineUserIds.has(u.id) ? 'online' : 'offline' })),
+    [users, onlineUserIds],
+  )
+
   return {
-    conversations,
+    conversations: conversationsWithStatus,
     messages,
-    users,
+    users: usersWithStatus,
+    onlineUserIds,
     currentConversation,
     loading,
     isLoading,

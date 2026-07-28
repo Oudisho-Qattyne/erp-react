@@ -6,6 +6,9 @@ export interface ChatEchoCallbacks {
   onMessageRead: (data: MessageEventData) => void
   onConversationRead: (data: ConversationEventData) => void
   onConversationCreated: (data: ConversationEventData) => void
+  onOnlineHere: (users: { id: number; name: string }[]) => void
+  onOnlineJoining: (user: { id: number; name: string }) => void
+  onOnlineLeaving: (user: { id: number; name: string }) => void
 }
 
 export interface ChatEchoUseCase {
@@ -26,13 +29,26 @@ export const createChatEchoUseCase = (
 
   const userChannelName = `private-conversations.${currentUserId}`
   const userChannel = echo.private(`conversations.${currentUserId}`)
-  userChannel.error(() => {})
+  userChannel.error((error) => {console.log("userChannel error:", error)})
 
   userChannel.listen('.conversation.read', (data: ConversationEventData) => {
     cbRef.current.onConversationRead(data)
   })
   userChannel.listen('.conversation.created', (data: ConversationEventData) => {
     cbRef.current.onConversationCreated(data)
+  })
+
+  const onlineChannel = echo.join('online')
+  onlineChannel.here((members: any[]) => {
+    console.log(members);
+    
+    cbRef.current.onOnlineHere(members)
+  })
+  onlineChannel.joining((member: any) => {
+    cbRef.current.onOnlineJoining(member)
+  })
+  onlineChannel.leaving((member: any) => {
+    cbRef.current.onOnlineLeaving(member)
   })
 
   return {
@@ -46,7 +62,7 @@ export const createChatEchoUseCase = (
       messageChannelName = channelName
 
       const channel = echo.private(`messages.${conversationId}`)
-      channel.error(() => {})
+      channel.error((error) => {console.log("messageChannel error:", error)})
       channel.listen('.message.sent', (data: MessageEventData) => {
         cbRef.current.onMessageSent(data)
       })
@@ -65,6 +81,7 @@ export const createChatEchoUseCase = (
     destroy() {
       this.unsubscribeFromMessages()
       echo.leave(userChannelName)
+      echo.leave('online')
     },
   }
 }
