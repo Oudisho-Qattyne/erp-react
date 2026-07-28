@@ -52,7 +52,8 @@
     "set_default_success": "تم تعيين {name} كافتراضي بنجاح",
     "set_default_error": "فشل تعيين {name} كافتراضي",
     "retry": "إعادة المحاولة",
-    "add_row": "إضافة صف"
+    "add_row": "إضافة صف",
+    "browse": "تصفح"
   },
   "pagination": {
     "showing": "عرض",

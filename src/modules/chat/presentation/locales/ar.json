@@ -32,5 +32,8 @@
   "messages_load_error": "فشل تحميل الرسائل",
   "send_error": "فشل إرسال الرسالة",
   "mark_read_error": "فشل تحديث حالة القراءة",
-  "users_load_error": "فشل تحميل المستخدمين"
+  "users_load_error": "فشل تحميل المستخدمين",
+  "message_list": {
+    "start_of_chat": "— بداية المحادثة —"
+  }
 }

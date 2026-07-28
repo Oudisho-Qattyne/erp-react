@@ -23,7 +23,7 @@ export const createEcho = (): Echo<'pusher'> => {
     encrypted: true,
     disableStats: true,
     enabledTransports: ['ws', 'wss'],
-    authEndpoint: '/broadcasting/auth',
+    authEndpoint: `${import.meta.env.VITE_PUBLIC_API_URL?.replace('/api/v1', '')}/broadcasting/auth`,
     auth: {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     },

@@ -15,6 +15,7 @@ import type { DpomainResponsePaginated } from "../../../hr/domain/entities/commo
 import { toast } from "sonner"
 
 const OP_KEYS = ["fetchConversations", "fetchMessages", "sendMessage", "markAsRead", "fetchUsers"] as const
+const PER_PAGE = 20
 
 function initRecord<T>(value: T): Record<string, T> {
   return Object.fromEntries(OP_KEYS.map((k) => [k, value]))
@@ -30,12 +31,22 @@ export interface UseChatReturn {
   error: Record<string, string | null>
   hasErrors: () => boolean
   clearError: () => void
-  fetchConversations: () => Promise<DpomainResponsePaginated<Conversation[]> | undefined>
-  fetchMessages: (conversationId: number) => Promise<DpomainResponsePaginated<Message[]> | undefined>
-  fetchUsers: () => Promise<DpomainResponsePaginated<ChatUser[]> | undefined>
+  fetchConversations: () => Promise<DomainResponse<Conversation[]> | undefined>
+  fetchMessages: (conversationId: number) => Promise<DomainResponse<Message[]> | undefined>
+  fetchUsers: () => Promise<DomainResponse<ChatUser[]> | undefined>
   sendMessage: (data: SendMessageDto) => Promise<DomainResponse<Message> | undefined>
   markAsRead: (conversationId: number) => Promise<void>
   selectConversation: (conversation: Conversation) => Promise<void>
+  clearMessages: () => void
+  fetchMoreConversations: () => Promise<void>
+  fetchMoreMessages: () => Promise<void>
+  fetchMoreUsers: () => Promise<void>
+  conversationsHasMore: boolean
+  conversationsLoadingMore: boolean
+  messagesHasMore: boolean
+  messagesLoadingMore: boolean
+  usersHasMore: boolean
+  usersLoadingMore: boolean
 }
 
 export const useChat = (currentUserId?: number): UseChatReturn => {
@@ -48,6 +59,18 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null)
   const [loading, setLoading] = useState<Record<string, boolean>>(() => initRecord(false))
   const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null))
+
+  const [conversationsPage, setConversationsPage] = useState(1)
+  const [conversationsHasMore, setConversationsHasMore] = useState(true)
+  const [conversationsLoadingMore, setConversationsLoadingMore] = useState(false)
+
+  const [messagesPage, setMessagesPage] = useState(1)
+  const [messagesHasMore, setMessagesHasMore] = useState(true)
+  const [messagesLoadingMore, setMessagesLoadingMore] = useState(false)
+
+  const [usersPage, setUsersPage] = useState(1)
+  const [usersHasMore, setUsersHasMore] = useState(true)
+  const [usersLoadingMore, setUsersLoadingMore] = useState(false)
 
   const currentConversationRef = useRef(currentConversation)
   currentConversationRef.current = currentConversation
@@ -65,9 +88,12 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
   const fetchConversations = useCallback(async () => {
     setFnLoading("fetchConversations", true)
     setFnError("fetchConversations", null)
+    setConversationsPage(1)
+    setConversationsHasMore(true)
     try {
-      const res = await useCase.getConversations()
+      const res = await useCase.getConversations(1, PER_PAGE)
       setConversations(res.data)
+      if (res.pagination?.hasMore !== undefined) setConversationsHasMore(res.pagination?.hasMore)
       return res
     } catch (err: any) {
       const msg = err?.message || t("chat.conversations_load_error", "chat")
@@ -78,12 +104,32 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     }
   }, [useCase, t])
 
+  const fetchMoreConversations = useCallback(async () => {
+    if (conversationsLoadingMore || !conversationsHasMore) return
+    setConversationsLoadingMore(true)
+    try {
+      const nextPage = conversationsPage + 1
+      const res = await useCase.getConversations(nextPage, PER_PAGE)
+      setConversations((prev) => [...prev, ...res.data])
+      setConversationsPage(nextPage)
+      if (res.pagination?.hasMore !== undefined) setConversationsHasMore(res.pagination?.hasMore)
+    } catch (err: any) {
+      toast.error(err?.message || t("chat.conversations_load_error", "chat"))
+    } finally {
+      setConversationsLoadingMore(false)
+    }
+  }, [useCase, conversationsPage, conversationsHasMore, conversationsLoadingMore, t])
+
   const fetchMessages = useCallback(async (conversationId: number) => {
     setFnLoading("fetchMessages", true)
     setFnError("fetchMessages", null)
+    setMessages([])
+    setMessagesPage(1)
+    setMessagesHasMore(true)
     try {
-      const res = await useCase.getMessages(conversationId)
-      setMessages(res.data)
+      const res = await useCase.getMessages(conversationId, 1, PER_PAGE)
+      setMessages([...res.data].reverse())
+      if (res.pagination?.hasMore !== undefined) setMessagesHasMore(res.pagination?.hasMore)
       return res
     } catch (err: any) {
       const msg = err?.message || t("chat.messages_load_error", "chat")
@@ -94,9 +140,28 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     }
   }, [useCase, t])
 
+  const fetchMoreMessages = useCallback(async () => {
+    const convId = currentConversationRef.current?.id
+    if (!convId || messagesLoadingMore || !messagesHasMore) return
+    setMessagesLoadingMore(true)
+    try {
+      const nextPage = messagesPage + 1
+      const res = await useCase.getMessages(convId, nextPage, PER_PAGE)
+      const older = [...res.data].reverse()
+      setMessages((prev) => [...older, ...prev])
+      setMessagesPage(nextPage)
+      if (res.pagination?.hasMore !== undefined) setMessagesHasMore(res.pagination?.hasMore)
+    } catch (err: any) {
+      toast.error(err?.message || t("chat.messages_load_error", "chat"))
+    } finally {
+      setMessagesLoadingMore(false)
+    }
+  }, [useCase, messagesPage, messagesHasMore, messagesLoadingMore, t])
+
   const selectConversation = useCallback(async (conversation: Conversation) => {
     setCurrentConversation(conversation)
-    if (conversation.unread_messages_count > 0) {
+    setMessages([])
+    if (conversation.unread_messages_count && conversation.unread_messages_count > 0) {
       await markAsRead(conversation.id)
     }
     await fetchMessages(conversation.id)
@@ -122,9 +187,12 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
   const fetchUsers = useCallback(async () => {
     setFnLoading("fetchUsers", true)
     setFnError("fetchUsers", null)
+    setUsersPage(1)
+    setUsersHasMore(true)
     try {
-      const res = await useCase.getUsers()
+      const res = await useCase.getUsers(1, PER_PAGE)
       setUsers(res.data)
+      if (res.pagination?.hasMore !== undefined) setUsersHasMore(res.pagination?.hasMore)
       return res
     } catch (err: any) {
       const msg = err?.message || t("chat.users_load_error", "chat")
@@ -134,6 +202,29 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
       setFnLoading("fetchUsers", false)
     }
   }, [useCase, t])
+
+  const fetchMoreUsers = useCallback(async () => {
+    if (usersLoadingMore || !usersHasMore) return
+    setUsersLoadingMore(true)
+    try {
+      const nextPage = usersPage + 1
+      const res = await useCase.getUsers(nextPage, PER_PAGE)
+      setUsers((prev) => [...prev, ...res.data])
+      setUsersPage(nextPage)
+      if (res.pagination?.hasMore !== undefined) setUsersHasMore(res.pagination?.hasMore)
+    } catch (err: any) {
+      toast.error(err?.message || t("chat.users_load_error", "chat"))
+    } finally {
+      setUsersLoadingMore(false)
+    }
+  }, [useCase, usersPage, usersHasMore, usersLoadingMore, t])
+
+  const clearMessages = useCallback(() => {
+    setMessages([])
+    setCurrentConversation(null)
+    setMessagesPage(1)
+    setMessagesHasMore(true)
+  }, [])
 
   const markAsRead = useCallback(async (conversationId: number) => {
     setFnLoading("markAsRead", true)
@@ -251,5 +342,15 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     sendMessage,
     markAsRead,
     selectConversation,
+    clearMessages,
+    fetchMoreConversations,
+    fetchMoreMessages,
+    fetchMoreUsers,
+    conversationsHasMore,
+    conversationsLoadingMore,
+    messagesHasMore,
+    messagesLoadingMore,
+    usersHasMore,
+    usersLoadingMore,
   }
 }

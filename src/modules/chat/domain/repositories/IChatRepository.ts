@@ -5,9 +5,9 @@ import type { Conversation } from '../entities/Conversation';
 import type { Message } from '../entities/Message';
 
 export interface IChatRepository {
-  getConversations(): Promise<DpomainResponsePaginated<Conversation[]>>;
-  getMessages(conversationId: number): Promise<DpomainResponsePaginated<Message[]>>;
+  getConversations(page?: number, perPage?: number): Promise<DomainResponse<Conversation[]>>;
+  getMessages(conversationId: number, page?: number, perPage?: number): Promise<DomainResponse<Message[]>>;
   sendMessage(data: any): Promise<DomainResponse<Message>>;
   markAsRead(conversationId: number): Promise<void>;
-  getUsers(): Promise<DpomainResponsePaginated<ChatUser[]>>;
+  getUsers(page?: number, perPage?: number): Promise<DomainResponse<ChatUser[]>>;
 }

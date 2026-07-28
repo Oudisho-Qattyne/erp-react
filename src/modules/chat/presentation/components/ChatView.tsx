@@ -15,6 +15,9 @@ interface ChatViewProps {
   loading: boolean
   error: string | null
   currentUserId: number
+  onLoadMoreMessages: () => void
+  messagesHasMore: boolean
+  messagesLoadingMore: boolean
 }
 
 export function ChatView({
@@ -26,6 +29,9 @@ export function ChatView({
   loading,
   error,
   currentUserId,
+  onLoadMoreMessages,
+  messagesHasMore,
+  messagesLoadingMore,
 }: ChatViewProps) {
   if (!conversation) {
     return <ChatEmptyState />
@@ -48,7 +54,14 @@ export function ChatView({
             </div>
           </div>
         )}
-        <MessageList messages={messages} messagesEndRef={messagesEndRef} currentUserId={currentUserId} />
+        <MessageList
+          messages={messages}
+          messagesEndRef={messagesEndRef}
+          currentUserId={currentUserId}
+          onLoadMore={onLoadMoreMessages}
+          hasMore={messagesHasMore}
+          loadingMore={messagesLoadingMore}
+        />
       </div>
       <ChatInput onSend={onSend} />
     </div>

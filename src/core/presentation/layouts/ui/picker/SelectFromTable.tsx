@@ -202,12 +202,16 @@ export function SelectFromTable<T extends { id: number | string }>({
               {s("common.search", "Search")}
             </Button>
           }
-          <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
-            {s("common.filter", "Filter")}
-          </Button>
-          <Button variant="outline" size="sm" onClick={onResetFilter}>
-            {s("common.reset", "Reset")}
-          </Button>
+          {filterFields.length > 0 && (
+            <>
+              <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
+                {s("common.filter", "Filter")}
+              </Button>
+              <Button variant="outline" size="sm" onClick={onResetFilter}>
+                {s("common.reset", "Reset")}
+              </Button>
+            </>
+          )}
         </div>
         {createConfig && (
             <Button variant="primary" size="sm" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={14} />} requiredPermission={createConfig.createButtonPermission}>

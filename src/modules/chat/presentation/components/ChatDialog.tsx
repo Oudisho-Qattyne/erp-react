@@ -23,12 +23,22 @@ interface ChatDialogProps {
   currentConversation: Conversation | null
   loading: Record<string, boolean>
   error: Record<string, string | null>
-  fetchConversations: () => Promise<DpomainResponsePaginated<Conversation[]> | undefined>
-  fetchMessages: (conversationId: number) => Promise<DpomainResponsePaginated<Message[]> | undefined>
-  fetchUsers: () => Promise<DpomainResponsePaginated<ChatUser[]> | undefined>
+  fetchConversations: () => Promise<DomainResponse<Conversation[]> | undefined>
+  fetchMessages: (conversationId: number) => Promise<DomainResponse<Message[]> | undefined>
+  fetchUsers: () => Promise<DomainResponse<ChatUser[]> | undefined>
   selectConversation: (conversation: Conversation) => Promise<void>
   sendMessage: (data: SendMessageDto) => Promise<DomainResponse<Message> | undefined>
   markAsRead: (conversationId: number) => Promise<void>
+  clearMessages: () => void
+  fetchMoreConversations: () => Promise<void>
+  fetchMoreMessages: () => Promise<void>
+  fetchMoreUsers: () => Promise<void>
+  conversationsHasMore: boolean
+  conversationsLoadingMore: boolean
+  messagesHasMore: boolean
+  messagesLoadingMore: boolean
+  usersHasMore: boolean
+  usersLoadingMore: boolean
 }
 
 function ChatDialog({
@@ -46,7 +56,17 @@ function ChatDialog({
   fetchUsers,
   selectConversation,
   sendMessage: sendMsg,
-  markAsRead
+  markAsRead,
+  clearMessages,
+  fetchMoreConversations,
+  fetchMoreMessages,
+  fetchMoreUsers,
+  conversationsHasMore,
+  conversationsLoadingMore,
+  messagesHasMore,
+  messagesLoadingMore,
+  usersHasMore,
+  usersLoadingMore,
 }: ChatDialogProps) {
   const { t } = useLanguage()
 
@@ -62,7 +82,7 @@ function ChatDialog({
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages, newConversationUser, currentConversation])
+  }, [newConversationUser, currentConversation])
 
   const createPlaceholderConversation = (otherUser: ChatUser): Conversation => ({
     id: 0,
@@ -125,6 +145,7 @@ function ChatDialog({
     if (existing) {
       handleSelectConversation(existing)
     } else {
+      clearMessages()
       setShowNewChat(false)
       setNewConversationUser(selectedUser)
     }
@@ -201,6 +222,9 @@ function ChatDialog({
                 loading={loading["fetchUsers"] ?? false}
                 error={error["fetchUsers"] ?? null}
                 onRetry={fetchUsers}
+                onLoadMore={fetchMoreUsers}
+                hasMore={usersHasMore}
+                loadingMore={usersLoadingMore}
               />
             ) : (
               <>
@@ -212,8 +236,10 @@ function ChatDialog({
                   loading={loading["fetchConversations"] ?? false}
                   error={error["fetchConversations"] ?? null}
                   onRetry={fetchConversations}
+                  onLoadMore={fetchMoreConversations}
+                  hasMore={conversationsHasMore}
+                  loadingMore={conversationsLoadingMore}
                 />
-                {/* {!activeConversation && ( */}
                   <button
                     type="button"
                     onClick={handleOpenNewChat}
@@ -221,7 +247,6 @@ function ChatDialog({
                   >
                     <PenSquare size={18} />
                   </button>
-                {/* )} */}
               </>
             )}
           </div>
@@ -236,6 +261,9 @@ function ChatDialog({
               loading={loading["fetchMessages"] ?? false}
               error={error["fetchMessages"] ?? null}
               currentUserId={currentUserId}
+              onLoadMoreMessages={fetchMoreMessages}
+              messagesHasMore={messagesHasMore}
+              messagesLoadingMore={messagesLoadingMore}
             />
           </div>
         </div>

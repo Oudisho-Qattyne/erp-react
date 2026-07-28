@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Search, MessageCircle, Loader2, AlertCircle } from "lucide-react"
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import type { Conversation } from "../../domain/entities/Conversation"
@@ -13,11 +13,30 @@ interface UserListProps {
   loading: boolean
   error: string | null
   onRetry: () => void
+  onLoadMore: () => void
+  hasMore: boolean
+  loadingMore: boolean
 }
 
-export function UserList({ users, currentUserId, existingConversations, onSelectUser, onClose, loading, error, onRetry }: UserListProps) {
+export function UserList({ users, currentUserId, existingConversations, onSelectUser, onClose, loading, error, onRetry, onLoadMore, hasMore, loadingMore }: UserListProps) {
   const { t } = useLanguage()
   const [searchQuery, setSearchQuery] = useState("")
+  const bottomSentinelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const sentinel = bottomSentinelRef.current
+    if (!sentinel) return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && hasMore && !loadingMore) {
+          onLoadMore()
+        }
+      },
+      { rootMargin: "100px" },
+    )
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [hasMore, loadingMore, onLoadMore])
 
   if (loading) {
     return (
@@ -109,6 +128,12 @@ export function UserList({ users, currentUserId, existingConversations, onSelect
             </button>
           )
         })}
+        {loadingMore && (
+          <div className="flex justify-center py-3">
+            <Loader2 size={18} className="text-primary animate-spin" />
+          </div>
+        )}
+        <div ref={bottomSentinelRef} />
         {filtered.length === 0 && (
           <div className="flex items-center justify-center h-32 text-sm text-text-muted">
             {searchQuery ? t("user_list.no_results", "chat") : t("user_list.no_users", "chat")}
