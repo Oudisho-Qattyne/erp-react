@@ -11,6 +11,16 @@ export const createChatRepository = (apiClient: ApiClient): IChatRepository => {
   const paginate = (page?: number, perPage?: number) => ({
     params: { ...(page ? { page } : {}), ...(perPage ? { per_page: perPage } : {}) },
   })
+
+  const withFilters = (page?: number, perPage?: number, filters?: { name?: string; email?: string; status?: string }) => ({
+    params: {
+      ...(page ? { page } : {}),
+      ...(perPage ? { per_page: perPage } : {}),
+      ...(filters?.name ? { name: filters.name } : {}),
+      ...(filters?.email ? { email: filters.email } : {}),
+      ...(filters?.status ? { status: filters.status } : {}),
+    },
+  })
   return {
     getConversations: (page?, perPage?) =>
       apiClient.get<DpomainResponsePaginated<Conversation[]>>(`${baseUrl}/conversations`, paginate(page, perPage)),
@@ -27,7 +37,7 @@ export const createChatRepository = (apiClient: ApiClient): IChatRepository => {
     markAsRead: (conversationId: number) =>
       apiClient.put<void>(`${baseUrl}/conversations/${conversationId}/read`),
 
-    getUsers: (page?, perPage?) =>
-      apiClient.get<DpomainResponsePaginated<ChatUser[]>>(`${baseUrl}/users`, paginate(page, perPage)),
+    getUsers: (page?, perPage?, filters?) =>
+      apiClient.get<DpomainResponsePaginated<ChatUser[]>>(`${baseUrl}/users`, withFilters(page, perPage, filters)),
   }
 }

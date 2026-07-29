@@ -13,6 +13,7 @@ import type { MessageEventData, ConversationEventData } from "../../application/
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse"
 import type { DpomainResponsePaginated } from "../../../hr/domain/entities/common/DomainResponsePaginated"
 import { toast } from "sonner"
+import { playReceiveSound } from "../../../../core/presentation/utils/notificationSound"
 
 const OP_KEYS = ["fetchConversations", "fetchMessages", "sendMessage", "markAsRead", "fetchUsers"] as const
 const PER_PAGE = 20
@@ -34,7 +35,8 @@ export interface UseChatReturn {
   clearError: () => void
   fetchConversations: () => Promise<DomainResponse<Conversation[]> | undefined>
   fetchMessages: (conversationId: number) => Promise<DomainResponse<Message[]> | undefined>
-  fetchUsers: () => Promise<DomainResponse<ChatUser[]> | undefined>
+  fetchUsers: (filters?: { name?: string; email?: string; status?: string }) => Promise<DomainResponse<ChatUser[]> | undefined>
+  setUserFilters: (filters: { name?: string; email?: string; status?: string }) => void
   sendMessage: (data: SendMessageDto) => Promise<DomainResponse<Message> | undefined>
   markAsRead: (conversationId: number) => Promise<void>
   selectConversation: (conversation: Conversation) => Promise<void>
@@ -73,9 +75,15 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
   const [usersPage, setUsersPage] = useState(1)
   const [usersHasMore, setUsersHasMore] = useState(true)
   const [usersLoadingMore, setUsersLoadingMore] = useState(false)
+  const [userFilters, setUserFilters] = useState<{ name?: string; email?: string; status?: string }>({})
 
   const currentConversationRef = useRef(currentConversation)
   currentConversationRef.current = currentConversation
+
+  const markAsReadRef = useRef<((conversationId: number) => Promise<void>) | null>(null)
+
+  const userFiltersRef = useRef(userFilters)
+  userFiltersRef.current = userFilters
 
   const echoUseCaseRef = useRef<ReturnType<typeof createChatEchoUseCase> | null>(null)
 
@@ -163,9 +171,9 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
   const selectConversation = useCallback(async (conversation: Conversation) => {
     setCurrentConversation(conversation)
     setMessages([])
-    if (conversation.unread_messages_count && conversation.unread_messages_count > 0) {
+    // if (conversation.unread_messages_count && conversation.unread_messages_count > 0) {
       await markAsRead(conversation.id)
-    }
+    // }
     await fetchMessages(conversation.id)
   }, [fetchMessages])
 
@@ -174,7 +182,7 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     setFnError("sendMessage", null)
     try {
       const res = await useCase.sendMessage(data)
-      setMessages((prev) => [...prev, res.data])
+      // setMessages((prev) => [...prev, res.data])
       return res
     } catch (err: any) {
       const msg = err?.message || t("chat.send_error", "chat")
@@ -186,13 +194,14 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     }
   }, [useCase, t])
 
-  const fetchUsers = useCallback(async () => {
+  const fetchUsers = useCallback(async (filters?: { name?: string; email?: string; status?: string }) => {
     setFnLoading("fetchUsers", true)
     setFnError("fetchUsers", null)
     setUsersPage(1)
     setUsersHasMore(true)
     try {
-      const res = await useCase.getUsers(1, PER_PAGE)
+      const activeFilters = filters ?? userFiltersRef.current
+      const res = await useCase.getUsers(1, PER_PAGE, activeFilters)
       setUsers(res.data)
       if (res.pagination?.hasMore !== undefined) setUsersHasMore(res.pagination?.hasMore)
       return res
@@ -210,7 +219,7 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     setUsersLoadingMore(true)
     try {
       const nextPage = usersPage + 1
-      const res = await useCase.getUsers(nextPage, PER_PAGE)
+      const res = await useCase.getUsers(nextPage, PER_PAGE, userFiltersRef.current)
       setUsers((prev) => [...prev, ...res.data])
       setUsersPage(nextPage)
       if (res.pagination?.hasMore !== undefined) setUsersHasMore(res.pagination?.hasMore)
@@ -241,6 +250,8 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     }
   }, [useCase, t])
 
+  markAsReadRef.current = markAsRead
+
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])
 
@@ -250,7 +261,6 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
 
   // Set up Echo once
   useEffect(() => {
-    console.log("1st effect: setting up Echo", { currentUserId })
     if (!currentUserId) return
 
     const echo = createEcho()
@@ -258,13 +268,15 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     const echoUseCase = createChatEchoUseCase(echo, currentUserId, {
       onMessageSent: (data: MessageEventData) => {
         const activeId = currentConversationRef.current?.id
-        console.log(data);
-        
         if (data.conversation_id === activeId) {
           setMessages((prev) => {
             if (prev.some((m) => m.id === data.id)) return prev
             return [...prev, data as unknown as Message]
           })
+          markAsReadRef.current?.(data.conversation_id)
+        }
+        if (data.sender_id !== currentUserId) {
+          playReceiveSound()
         }
         setConversations((prev) => {
           const existing = prev.find((c) => c.id === data.conversation_id)
@@ -284,8 +296,6 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
       },
 
       onMessageRead: (data: MessageEventData) => {
-        console.log(data);
-
         setMessages((prev) =>
           prev.map((m) => (m.id === data.id ? { ...m, read_at: data.read_at } : m)),
         )
@@ -299,8 +309,6 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
       },
 
       onConversationRead: (data: ConversationEventData) => {
-        console.log(data);
-
         setConversations((prev) =>
           prev.map((c) => (c.id === data.id ? { ...c, unread_messages_count: 0 } : c)),
         )
@@ -338,12 +346,9 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
   // Sync message channel subscription when conversation changes
   useEffect(() => {
     const echoUseCase = echoUseCaseRef.current
-    console.log("2nd effect", { hasEcho: !!echoUseCase, currentConversation })
     if (!echoUseCase) return
 
     if (currentConversation) {
-      console.log("listing");
-      
       echoUseCase.subscribeToMessages(currentConversation.id)
     } else {
       echoUseCase.unsubscribeFromMessages()
@@ -365,12 +370,24 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     [users, onlineUserIds],
   )
 
+  const currentConversationWithStatus = useMemo(
+    () =>
+      currentConversation
+        ? {
+            ...currentConversation,
+            user_one: { ...currentConversation.user_one, status: onlineUserIds.has(currentConversation.user_one_id) ? 'online' : 'offline' },
+            user_two: { ...currentConversation.user_two, status: onlineUserIds.has(currentConversation.user_two_id) ? 'online' : 'offline' },
+          }
+        : null,
+    [currentConversation, onlineUserIds],
+  )
+
   return {
     conversations: conversationsWithStatus,
     messages,
     users: usersWithStatus,
     onlineUserIds,
-    currentConversation,
+    currentConversation: currentConversationWithStatus,
     loading,
     isLoading,
     error,
@@ -379,6 +396,7 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     fetchConversations,
     fetchMessages,
     fetchUsers,
+    setUserFilters,
     sendMessage,
     markAsRead,
     selectConversation,

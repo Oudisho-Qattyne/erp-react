@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Search, MessageCircle, Loader2, AlertCircle } from "lucide-react"
+import { Search, MessageCircle, Loader2, AlertCircle, X } from "lucide-react"
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import type { Conversation } from "../../domain/entities/Conversation"
 import type { ChatUser } from "../../domain/entities/ChatUser"
@@ -16,11 +16,13 @@ interface UserListProps {
   onLoadMore: () => void
   hasMore: boolean
   loadingMore: boolean
+  onSearch: (filters: { name?: string; email?: string; status?: string }) => void
 }
 
-export function UserList({ users, currentUserId, existingConversations, onSelectUser, onClose, loading, error, onRetry, onLoadMore, hasMore, loadingMore }: UserListProps) {
+export function UserList({ users, currentUserId, existingConversations, onSelectUser, onClose, loading, error, onRetry, onLoadMore, hasMore, loadingMore, onSearch }: UserListProps) {
   const { t } = useLanguage()
-  const [searchQuery, setSearchQuery] = useState("")
+  const [nameFilter, setNameFilter] = useState("")
+  const [emailFilter, setEmailFilter] = useState("")
   const bottomSentinelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -37,6 +39,25 @@ export function UserList({ users, currentUserId, existingConversations, onSelect
     observer.observe(sentinel)
     return () => observer.disconnect()
   }, [hasMore, loadingMore, onLoadMore])
+
+  const handleSearch = () => {
+    const filters: { name?: string; email?: string } = {}
+    if (nameFilter.trim()) filters.name = nameFilter.trim()
+    if (emailFilter.trim()) filters.email = emailFilter.trim()
+    onSearch(filters)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSearch()
+  }
+
+  const clearFilters = () => {
+    setNameFilter("")
+    setEmailFilter("")
+    onSearch({})
+  }
+
+  const hasActiveFilters = nameFilter || emailFilter
 
   if (loading) {
     return (
@@ -64,10 +85,6 @@ export function UserList({ users, currentUserId, existingConversations, onSelect
   }
 
   const otherUsers = users.filter((u) => u.id !== currentUserId)
-  const filtered = otherUsers.filter((u) =>
-    u.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
-
   const hasExistingConversation = (userId: number) =>
     existingConversations.some(
       (c) => c.user_one_id === userId || c.user_two_id === userId,
@@ -75,20 +92,48 @@ export function UserList({ users, currentUserId, existingConversations, onSelect
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="p-3 border-b border-border">
+      <div className="p-3 border-b border-border space-y-2">
         <div className="relative">
           <Search size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted" />
           <input
             type="text"
             placeholder={t("user_list.search_placeholder", "chat")}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={nameFilter}
+            onChange={(e) => setNameFilter(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="w-full pr-9 pl-3 py-2 text-sm rounded-lg border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/50"
           />
         </div>
+        <input
+          type="text"
+          placeholder={t("user_list.email_placeholder", "chat")}
+          value={emailFilter}
+          onChange={(e) => setEmailFilter(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/50"
+        />
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={handleSearch}
+            className="flex-1 px-3 py-1.5 text-sm bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors cursor-pointer"
+          >
+            {t("user_list.search_btn", "chat")}
+          </button>
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="px-3 py-1.5 text-sm bg-border text-text rounded-lg hover:bg-border/80 transition-colors cursor-pointer flex items-center gap-1"
+            >
+              <X size={14} />
+              {t("user_list.clear", "chat")}
+            </button>
+          )}
+        </div>
       </div>
       <div className="flex-1 overflow-y-auto">
-        {filtered.map((user) => {
+        {otherUsers.map((user) => {
           const existing = hasExistingConversation(user.id)
           return (
             <button
@@ -134,9 +179,9 @@ export function UserList({ users, currentUserId, existingConversations, onSelect
           </div>
         )}
         <div ref={bottomSentinelRef} />
-        {filtered.length === 0 && (
+        {otherUsers.length === 0 && (
           <div className="flex items-center justify-center h-32 text-sm text-text-muted">
-            {searchQuery ? t("user_list.no_results", "chat") : t("user_list.no_users", "chat")}
+            {hasActiveFilters ? t("user_list.no_results", "chat") : t("user_list.no_users", "chat")}
           </div>
         )}
       </div>

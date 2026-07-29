@@ -29,7 +29,7 @@ export const createChatEchoUseCase = (
 
   const userChannelName = `private-conversations.${currentUserId}`
   const userChannel = echo.private(`conversations.${currentUserId}`)
-  userChannel.error((error) => {console.log("userChannel error:", error)})
+  userChannel.error((error : any) => {console.log("userChannel error:", error)})
 
   userChannel.listen('.conversation.read', (data: ConversationEventData) => {
     cbRef.current.onConversationRead(data)
@@ -40,8 +40,6 @@ export const createChatEchoUseCase = (
 
   const onlineChannel = echo.join('online')
   onlineChannel.here((members: any[]) => {
-    console.log(members);
-    
     cbRef.current.onOnlineHere(members)
   })
   onlineChannel.joining((member: any) => {
@@ -62,7 +60,7 @@ export const createChatEchoUseCase = (
       messageChannelName = channelName
 
       const channel = echo.private(`messages.${conversationId}`)
-      channel.error((error) => {console.log("messageChannel error:", error)})
+      channel.error((error : any) => {console.log("messageChannel error:", error)})
       channel.listen('.message.sent', (data: MessageEventData) => {
         cbRef.current.onMessageSent(data)
       })

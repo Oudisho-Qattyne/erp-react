@@ -10,7 +10,10 @@
     "no_results": "لا توجد نتائج"
   },
   "user_list": {
-    "search_placeholder": "ابحث عن مستخدم...",
+    "search_placeholder": "ابحث بالاسم...",
+    "email_placeholder": "ابحث بالبريد الإلكتروني...",
+    "search_btn": "بحث",
+    "clear": "مسح",
     "loading": "جاري التحميل...",
     "retry": "إعادة المحاولة",
     "no_results": "لا توجد نتائج",
