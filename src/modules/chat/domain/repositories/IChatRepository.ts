@@ -9,5 +9,5 @@ export interface IChatRepository {
   getMessages(conversationId: number, page?: number, perPage?: number): Promise<DomainResponse<Message[]>>;
   sendMessage(data: any): Promise<DomainResponse<Message>>;
   markAsRead(conversationId: number): Promise<void>;
-  getUsers(page?: number, perPage?: number): Promise<DomainResponse<ChatUser[]>>;
+  getUsers(page?: number, perPage?: number, name?: string, email?: string): Promise<DomainResponse<ChatUser[]>>;
 }

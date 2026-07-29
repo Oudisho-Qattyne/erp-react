@@ -11,7 +11,7 @@ export interface ManageChatUseCase {
   getMessages(conversationId: number, page?: number, perPage?: number): Promise<DomainResponse<Message[]>>;
   sendMessage(data: SendMessageDto): Promise<DomainResponse<Message>>;
   markAsRead(conversationId: number): Promise<void>;
-  getUsers(page?: number, perPage?: number): Promise<DomainResponse<ChatUser[]>>;
+  getUsers(page?: number, perPage?: number, name?: string, email?: string): Promise<DomainResponse<ChatUser[]>>;
 }
 
 export const createManageChatUseCase = (
@@ -21,5 +21,5 @@ export const createManageChatUseCase = (
   getMessages: (conversationId, page, perPage) => chatRepository.getMessages(conversationId, page, perPage),
   sendMessage: (data: SendMessageDto) => chatRepository.sendMessage(data),
   markAsRead: (conversationId) => chatRepository.markAsRead(conversationId),
-  getUsers: (page, perPage) => chatRepository.getUsers(page, perPage),
+  getUsers: (page, perPage, name, email) => chatRepository.getUsers(page, perPage, name, email),
 });

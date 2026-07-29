@@ -39,7 +39,7 @@ export function MessageList({ messages, messagesEndRef, currentUserId, onLoadMor
       prevScrollHeightRef.current = 0
       prevScrollTopRef.current = 0
     } else {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+      container.scrollTop = container.scrollHeight
     }
   }, [messages.length])
 
@@ -65,7 +65,7 @@ export function MessageList({ messages, messagesEndRef, currentUserId, onLoadMor
   }, [messages[0]?.id])
 
   return (
-    <div ref={containerRef} className="flex-1 overflow-y-auto p-4 space-y-2 bg-card">
+    <div ref={containerRef} className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-2">
       {loadingMore && (
         <div className="flex justify-center py-2">
           <Loader2 size={18} className="text-primary animate-spin" />

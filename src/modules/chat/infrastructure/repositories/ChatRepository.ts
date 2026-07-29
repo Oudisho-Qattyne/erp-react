@@ -8,8 +8,8 @@ import type { IChatRepository } from "../../domain/repositories/IChatRepository"
 
 export const createChatRepository = (apiClient: ApiClient): IChatRepository => {
   const baseUrl = "/chat"
-  const paginate = (page?: number, perPage?: number) => ({
-    params: { ...(page ? { page } : {}), ...(perPage ? { per_page: perPage } : {}) },
+  const paginate = (page?: number, perPage?: number, name?: string, email?: string) => ({
+    params: { ...(page ? { page } : {}), ...(perPage ? { per_page: perPage } : {}), ...(name ? { name } : {}), ...(email ? { email } : {}) },
   })
   return {
     getConversations: (page?, perPage?) =>
@@ -27,7 +27,7 @@ export const createChatRepository = (apiClient: ApiClient): IChatRepository => {
     markAsRead: (conversationId: number) =>
       apiClient.put<void>(`${baseUrl}/conversations/${conversationId}/read`),
 
-    getUsers: (page?, perPage?) =>
-      apiClient.get<DpomainResponsePaginated<ChatUser[]>>(`${baseUrl}/users`, paginate(page, perPage)),
+    getUsers: (page?, perPage?, name?, email?) =>
+      apiClient.get<DpomainResponsePaginated<ChatUser[]>>(`${baseUrl}/users`, paginate(page, perPage, name, email)),
   }
 }

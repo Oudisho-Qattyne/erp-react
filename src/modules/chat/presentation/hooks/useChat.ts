@@ -4,7 +4,8 @@ import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProv
 import { createChatRepository } from "../../infrastructure/repositories/ChatRepository"
 import { createManageChatUseCase } from "../../application/usecases/manageChatUseCase"
 import { createEcho } from "../../../../core/infrastructure/echo/echo"
-import { createChatEchoUseCase } from "../../application/usecases/chatEchoUseCase"
+import { subscribeUserChannel, subscribeOnlineChannel, createMessageChannelUseCase } from "../../application/usecases/chatEchoUseCase"
+import type { ChatEchoCallbacks } from "../../application/usecases/chatEchoUseCase"
 import type { Conversation } from "../../domain/entities/Conversation"
 import type { Message } from "../../domain/entities/Message"
 import type { ChatUser } from "../../domain/entities/ChatUser"
@@ -13,6 +14,7 @@ import type { MessageEventData, ConversationEventData } from "../../application/
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse"
 import type { DpomainResponsePaginated } from "../../../hr/domain/entities/common/DomainResponsePaginated"
 import { toast } from "sonner"
+import { playSentSound, playReceivedSound } from "../../../../core/infrastructure/audio/chatSounds"
 
 const OP_KEYS = ["fetchConversations", "fetchMessages", "sendMessage", "markAsRead", "fetchUsers"] as const
 const PER_PAGE = 20
@@ -42,12 +44,18 @@ export interface UseChatReturn {
   fetchMoreConversations: () => Promise<void>
   fetchMoreMessages: () => Promise<void>
   fetchMoreUsers: () => Promise<void>
+  usersNameSearch: string
+  usersEmailSearch: string
+  setUsersNameSearch: (search: string) => void
+  setUsersEmailSearch: (search: string) => void
   conversationsHasMore: boolean
   conversationsLoadingMore: boolean
   messagesHasMore: boolean
   messagesLoadingMore: boolean
   usersHasMore: boolean
   usersLoadingMore: boolean
+  incomingMessage: (Pick<MessageEventData, 'conversation_id' | 'body' | 'sender_id'> & { sender_name: string }) | null
+  clearIncomingMessage: () => void
 }
 
 export const useChat = (currentUserId?: number): UseChatReturn => {
@@ -59,6 +67,8 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
   const [users, setUsers] = useState<ChatUser[]>([])
   const [onlineUserIds, setOnlineUserIds] = useState<Set<number>>(new Set())
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null)
+  const [incomingMessage, setIncomingMessage] = useState<UseChatReturn['incomingMessage']>(null)
+  const clearIncomingMessage = useCallback(() => setIncomingMessage(null), [])
   const [loading, setLoading] = useState<Record<string, boolean>>(() => initRecord(false))
   const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null))
 
@@ -73,11 +83,14 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
   const [usersPage, setUsersPage] = useState(1)
   const [usersHasMore, setUsersHasMore] = useState(true)
   const [usersLoadingMore, setUsersLoadingMore] = useState(false)
+  const [usersNameSearch, setUsersNameSearch] = useState("")
+  const [usersEmailSearch, setUsersEmailSearch] = useState("")
 
   const currentConversationRef = useRef(currentConversation)
   currentConversationRef.current = currentConversation
 
-  const echoUseCaseRef = useRef<ReturnType<typeof createChatEchoUseCase> | null>(null)
+  const cbRef = useRef<ChatEchoCallbacks>(null as any)
+  const messageChannelRef = useRef<ReturnType<typeof createMessageChannelUseCase> | null>(null)
 
   const repository = createChatRepository(apiClient)
   const useCase = createManageChatUseCase(repository)
@@ -174,7 +187,7 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     setFnError("sendMessage", null)
     try {
       const res = await useCase.sendMessage(data)
-      setMessages((prev) => [...prev, res.data])
+      if (res) playSentSound()
       return res
     } catch (err: any) {
       const msg = err?.message || t("chat.send_error", "chat")
@@ -186,13 +199,13 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     }
   }, [useCase, t])
 
-  const fetchUsers = useCallback(async () => {
+  const fetchUsers = useCallback(async (name?: string, email?: string) => {
     setFnLoading("fetchUsers", true)
     setFnError("fetchUsers", null)
     setUsersPage(1)
     setUsersHasMore(true)
     try {
-      const res = await useCase.getUsers(1, PER_PAGE)
+      const res = await useCase.getUsers(1, PER_PAGE, name || undefined, email || undefined)
       setUsers(res.data)
       if (res.pagination?.hasMore !== undefined) setUsersHasMore(res.pagination?.hasMore)
       return res
@@ -210,7 +223,7 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     setUsersLoadingMore(true)
     try {
       const nextPage = usersPage + 1
-      const res = await useCase.getUsers(nextPage, PER_PAGE)
+      const res = await useCase.getUsers(nextPage, PER_PAGE, usersNameSearch || undefined, usersEmailSearch || undefined)
       setUsers((prev) => [...prev, ...res.data])
       setUsersPage(nextPage)
       if (res.pagination?.hasMore !== undefined) setUsersHasMore(res.pagination?.hasMore)
@@ -219,7 +232,7 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     } finally {
       setUsersLoadingMore(false)
     }
-  }, [useCase, usersPage, usersHasMore, usersLoadingMore, t])
+  }, [useCase, usersPage, usersNameSearch, usersEmailSearch, usersHasMore, usersLoadingMore, t])
 
   const clearMessages = useCallback(() => {
     setMessages([])
@@ -231,6 +244,9 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
   const markAsRead = useCallback(async (conversationId: number) => {
     setFnLoading("markAsRead", true)
     setFnError("markAsRead", null)
+    setConversations((prev) =>
+      prev.map((c) => (c.id === conversationId ? { ...c, unread_messages_count: 0 } : c)),
+    )
     try {
       await useCase.markAsRead(conversationId)
     } catch (err: any) {
@@ -248,116 +264,138 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     fetchConversations()
   }, [])
 
-  // Set up Echo once
+  // Keep cbRef.current always up to date
+  cbRef.current = {
+    onMessageSent: (data: MessageEventData) => {
+      if (data.sender_id !== currentUserId) playReceivedSound()
+
+      if (data.conversation_id === currentConversationRef.current?.id) {
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === data.id)) return prev
+          return [...prev, data as unknown as Message]
+        })
+      }
+    },
+
+    onConversationMessageSent: (data: MessageEventData) => {
+      const isActive = data.conversation_id === currentConversationRef.current?.id
+      if (data.sender_id !== currentUserId && !isActive) playReceivedSound()
+      setConversations((prev) => {
+        const existing = prev.find((c) => c.id === data.conversation_id)
+        if (!existing) return prev
+        if (!isActive) {
+          const senderName = existing.user_one_id === data.sender_id
+            ? existing.user_one.name
+            : existing.user_two.name
+          setIncomingMessage({ conversation_id: data.conversation_id, body: data.body, sender_id: data.sender_id, sender_name: senderName })
+        }
+        return prev.map((c) =>
+          c.id === data.conversation_id
+            ? {
+              ...c,
+              last_message: data,
+              unread_messages_count: isActive ? (c.unread_messages_count ?? 0) : (c.unread_messages_count ?? 0) + 1,
+            }
+            : c,
+        )
+      })
+      if (data.conversation_id === currentConversationRef.current?.id) {
+        markAsRead(data.conversation_id)
+      }
+    },
+
+    onMessageRead: (data: MessageEventData) => {
+      setMessages((prev) =>
+        prev.map((m) => (m.id === data.id ? { ...m, read_at: data.read_at } : m)),
+      )
+      setConversations((prev) =>
+        prev.map((c) =>
+          c.last_message?.id === data.id
+            ? { ...c, last_message: { ...c.last_message, read_at: data.read_at } }
+            : c,
+        )
+      )
+    },
+
+    onConversationRead: (data: ConversationEventData) => {
+      setConversations((prev) =>
+        prev.map((c) => (c.id === data.id ? { ...c, unread_messages_count: 0 } : c)),
+      )
+    },
+
+    onConversationCreated: () => {
+      fetchConversations()
+    },
+
+    onOnlineHere: (members) => {
+      setOnlineUserIds(new Set(members.map((m) => m.id)))
+    },
+
+    onOnlineJoining: (member) => {
+      setOnlineUserIds((prev) => new Set([...prev, member.id]))
+    },
+
+    onOnlineLeaving: (member) => {
+      setOnlineUserIds((prev) => {
+        const next = new Set(prev)
+        next.delete(member.id)
+        return next
+      })
+    },
+  }
+
+  // Subscribe core channels (user + presence) — runs once, never cleans up
   useEffect(() => {
-    console.log("1st effect: setting up Echo", { currentUserId })
     if (!currentUserId) return
 
     const echo = createEcho()
+    subscribeUserChannel(echo, currentUserId, cbRef)
+    subscribeOnlineChannel(echo, cbRef)
+  }, [currentUserId])
 
-    const echoUseCase = createChatEchoUseCase(echo, currentUserId, {
-      onMessageSent: (data: MessageEventData) => {
-        const activeId = currentConversationRef.current?.id
-        console.log(data);
-        
-        if (data.conversation_id === activeId) {
-          setMessages((prev) => {
-            if (prev.some((m) => m.id === data.id)) return prev
-            return [...prev, data as unknown as Message]
-          })
-        }
-        setConversations((prev) => {
-          const existing = prev.find((c) => c.id === data.conversation_id)
-          if (!existing) return prev
-          return prev.map((c) =>
-            c.id === data.conversation_id
-              ? {
-                  ...c,
-                  last_message: data,
-                  unread_messages_count: c.id === activeId
-                    ? (c.unread_messages_count ?? 0)
-                    : (c.unread_messages_count ?? 0) + 1,
-                }
-              : c,
-          )
-        })
-      },
+  // Create message channel use case — cleaned up when currentUserId changes
+  useEffect(() => {
+    if (!currentUserId) return
 
-      onMessageRead: (data: MessageEventData) => {
-        console.log(data);
-
-        setMessages((prev) =>
-          prev.map((m) => (m.id === data.id ? { ...m, read_at: data.read_at } : m)),
-        )
-        setConversations((prev) =>
-          prev.map((c) =>
-            c.last_message?.id === data.id
-              ? { ...c, last_message: { ...c.last_message, read_at: data.read_at } }
-              : c,
-          )
-        )
-      },
-
-      onConversationRead: (data: ConversationEventData) => {
-        console.log(data);
-
-        setConversations((prev) =>
-          prev.map((c) => (c.id === data.id ? { ...c, unread_messages_count: 0 } : c)),
-        )
-      },
-
-      onConversationCreated: () => {
-        fetchConversations()
-      },
-
-      onOnlineHere: (members) => {
-        setOnlineUserIds(new Set(members.map((m) => m.id)))
-      },
-
-      onOnlineJoining: (member) => {
-        setOnlineUserIds((prev) => new Set([...prev, member.id]))
-      },
-
-      onOnlineLeaving: (member) => {
-        setOnlineUserIds((prev) => {
-          const next = new Set(prev)
-          next.delete(member.id)
-          return next
-        })
-      },
-    })
-
-    echoUseCaseRef.current = echoUseCase
+    const echo = createEcho()
+    const msgUseCase = createMessageChannelUseCase(echo, cbRef)
+    messageChannelRef.current = msgUseCase
 
     return () => {
-      echoUseCase.destroy()
-      echoUseCaseRef.current = null
+      msgUseCase.destroy()
+      messageChannelRef.current = null
     }
   }, [currentUserId])
 
-  // Sync message channel subscription when conversation changes
+  // Subscribe/unsubscribe message channel based on active conversation
   useEffect(() => {
-    const echoUseCase = echoUseCaseRef.current
-    console.log("2nd effect", { hasEcho: !!echoUseCase, currentConversation })
-    if (!echoUseCase) return
+    const msgUseCase = messageChannelRef.current
+    if (!msgUseCase) return
 
     if (currentConversation) {
-      console.log("listing");
-      
-      echoUseCase.subscribeToMessages(currentConversation.id)
+      msgUseCase.subscribe(currentConversation.id)
     } else {
-      echoUseCase.unsubscribeFromMessages()
+      msgUseCase.unsubscribe()
     }
   }, [currentConversation?.id])
 
+  const applyOnlineStatus = useCallback(
+    (c: Conversation) => ({
+      ...c,
+      user_one: { ...c.user_one, status: onlineUserIds.has(c.user_one_id) ? 'online' : 'offline' },
+      user_two: { ...c.user_two, status: onlineUserIds.has(c.user_two_id) ? 'online' : 'offline' },
+    }),
+    [onlineUserIds],
+  )
+
   const conversationsWithStatus = useMemo(
-    () =>
-      conversations.map((c) => ({
-        ...c,
-        user_one: { ...c.user_one, status: onlineUserIds.has(c.user_one_id) ? 'online' : 'offline' },
-        user_two: { ...c.user_two, status: onlineUserIds.has(c.user_two_id) ? 'online' : 'offline' },
-      })),
-    [conversations, onlineUserIds],
+    () => conversations.map(applyOnlineStatus),
+    [conversations, applyOnlineStatus],
+  )
+
+  const currentConversationWithStatus = useMemo(
+    () => (currentConversation ? applyOnlineStatus(currentConversation) : null),
+    [currentConversation, applyOnlineStatus],
   )
 
   const usersWithStatus = useMemo(
@@ -365,12 +403,22 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     [users, onlineUserIds],
   )
 
+  // Debounced search: re-fetch users when search changes
+  useEffect(() => {
+    const timer = setTimeout(() => fetchUsers(usersNameSearch, usersEmailSearch), 300)
+    return () => clearTimeout(timer)
+  }, [usersNameSearch, usersEmailSearch])
+
   return {
     conversations: conversationsWithStatus,
     messages,
     users: usersWithStatus,
     onlineUserIds,
-    currentConversation,
+    usersNameSearch,
+    usersEmailSearch,
+    setUsersNameSearch,
+    setUsersEmailSearch,
+    currentConversation: currentConversationWithStatus,
     loading,
     isLoading,
     error,
@@ -392,5 +440,7 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     messagesLoadingMore,
     usersHasMore,
     usersLoadingMore,
+    incomingMessage,
+    clearIncomingMessage,
   }
 }

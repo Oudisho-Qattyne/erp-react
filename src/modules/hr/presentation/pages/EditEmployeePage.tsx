@@ -106,7 +106,6 @@ export function EditEmployeePage() {
       fetchEmployee();
     }
   }, [id, apiClient]);
-  console.log(defaultValues);
 
   const handleSubmit = async (data: EmployeeFormValues) => {
     try {

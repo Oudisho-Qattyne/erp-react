@@ -1,4 +1,5 @@
 import { formatTime, formatDate } from "../utils/formatDate"
+import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import type { Conversation } from "../../domain/entities/Conversation"
 
 interface ContactItemProps {
@@ -9,15 +10,17 @@ interface ContactItemProps {
 }
 
 export function ContactItem({ conversation, isSelected, onSelect, currentUserId }: ContactItemProps) {
+  const { language } = useLanguage()
+  const locale = language === 'ar' ? 'ar-SA' : 'en-US'
   const otherUser =
     conversation.user_one_id === currentUserId
       ? conversation.user_two
       : conversation.user_one
 
   const lastMsg = conversation.last_message
-  const lastMsgTime = lastMsg ? formatTime(lastMsg.created_at) : ""
+  const lastMsgTime = lastMsg ? formatTime(lastMsg.created_at, locale) : ""
   const today = new Date()
-  const lastMsgDate = lastMsg ? formatDate(lastMsg.created_at) : ""
+  const lastMsgDate = lastMsg ? formatDate(lastMsg.created_at, locale) : ""
   const isToday = lastMsg && lastMsg.created_at.slice(0, 10) === today.toISOString().slice(0, 10)
   const displayTime = lastMsg ? (isToday ? lastMsgTime : lastMsgDate) : ""
   const unread = conversation.unread_messages_count ?? 0
@@ -60,7 +63,7 @@ export function ContactItem({ conversation, isSelected, onSelect, currentUserId 
             <span className={`text-xs ${isSelected ? "text-white/50" : "text-text-muted"}`}>No messages yet</span>
           )}
           {unread > 0 && (
-            <span className={`text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none shrink-0 mr-1 ${
+            <span className={`text-[10px] font-bold rounded-full min-w-4.5 h-4.5 flex items-center justify-center px-1 leading-none shrink-0 mr-1 ${
               isSelected ? "bg-white text-primary" : "bg-primary text-white"
             }`}>
               {unread > 99 ? "99+" : unread}

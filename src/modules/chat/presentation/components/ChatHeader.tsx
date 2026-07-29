@@ -1,4 +1,4 @@
-import { ArrowLeft, MoreVertical } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import type { Conversation } from "../../domain/entities/Conversation"
 
@@ -33,9 +33,6 @@ export function ChatHeader({ conversation, currentUserId, onBack }: ChatHeaderPr
           {otherUser.status === "online" ? t("chat_header.online", "chat") : t("chat_header.offline", "chat")}
         </div>
       </div>
-      <button type="button" className="p-1.5 hover:bg-primary-light rounded-md cursor-pointer">
-        <MoreVertical size={16} />
-      </button>
     </div>
   )
 }
