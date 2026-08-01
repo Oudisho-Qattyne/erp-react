@@ -6,6 +6,7 @@ import { createManageInstallmentsUseCase } from "../../application/usecases/mana
 import type { Contract } from "../../domain/entities/contract"
 import type { Installment } from "../../domain/entities/installment"
 import { toast } from "sonner"
+import { useIdempotency } from "../../../../core/presentation/hooks/useIdempotency"
 
 const OP_KEYS = ["payNextUnpaidInstallment", "updatePaymentDate"] as const
 
@@ -36,6 +37,7 @@ export const useInstallments = (): UseInstallmentsReturn => {
 
   const repository = createInstallmentRepository(apiClient)
   const useCase = createManageInstallmentsUseCase(repository)
+  const idem = useIdempotency()
 
   const setFnLoading = (fn: string, v: boolean) => setLoading((p) => ({ ...p, [fn]: v }))
   const setFnError = (fn: string, e: string | null) => setError((p) => ({ ...p, [fn]: e }))
@@ -45,11 +47,14 @@ export const useInstallments = (): UseInstallmentsReturn => {
   const payNextUnpaidInstallment = useCallback(async (contractId: number, paymentDate: string) => {
     setFnLoading("payNextUnpaidInstallment", true)
     setFnError("payNextUnpaidInstallment", null)
+    const key = idem.getKey('payInstallment', { contractId, paymentDate })
     try {
-      const res = await useCase.payNextUnpaidInstallment(contractId, paymentDate)
+      const res = await useCase.payNextUnpaidInstallment(contractId, paymentDate, key)
+      idem.onSettled(undefined, key)
       setContract(res.data)
       toast.success(t("installments.pay_success", "investments") || "Installment paid successfully")
     } catch (err: any) {
+      idem.onSettled(err, key)
       const msg = err?.message || "Failed to pay installment"
       setFnError("payNextUnpaidInstallment", msg)
       toast.error(msg || t("installments.pay_error", "investments"))
@@ -57,16 +62,19 @@ export const useInstallments = (): UseInstallmentsReturn => {
     } finally {
       setFnLoading("payNextUnpaidInstallment", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const updatePaymentDate = useCallback(async (installmentId: number, contractId: number, paymentDate: string) => {
     setFnLoading("updatePaymentDate", true)
     setFnError("updatePaymentDate", null)
+    const key = idem.getKey('updatePaymentDate', { installmentId, contractId, paymentDate })
     try {
-      const res = await useCase.updatePaymentDate(installmentId, contractId, paymentDate)
+      const res = await useCase.updatePaymentDate(installmentId, contractId, paymentDate, key)
+      idem.onSettled(undefined, key)
       setContract(res.data)
       toast.success(t("installments.update_date_success", "investments") || "Payment date updated successfully")
     } catch (err: any) {
+      idem.onSettled(err, key)
       const msg = err?.message || "Failed to update payment date"
       setFnError("updatePaymentDate", msg)
       toast.error(msg || t("installments.update_date_error", "investments"))
@@ -74,7 +82,7 @@ export const useInstallments = (): UseInstallmentsReturn => {
     } finally {
       setFnLoading("updatePaymentDate", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])

@@ -10,14 +10,14 @@ export const createManageLeaveTypesUseCase = (repository: ILeaveTypeRepository) 
     findLeaveTypeById: (id: number) => {
       return repository.findLeaveTypeById(id)
     },
-    createLeaveType: (data: CreateLeaveTypeDto) => {
-      return repository.createLeaveType(data)
+    createLeaveType: (data: CreateLeaveTypeDto, idempotencyKey?: string) => {
+      return repository.createLeaveType(data, idempotencyKey)
     },
-    updateLeaveType: (id: number, data: UpdateLeaveTypeDto) => {
-      return repository.updateLeaveType(id, data)
+    updateLeaveType: (id: number, data: UpdateLeaveTypeDto, idempotencyKey?: string) => {
+      return repository.updateLeaveType(id, data, idempotencyKey)
     },
-    archiveLeaveType: (id: number) => {
-      return repository.archiveLeaveType(id)
+    archiveLeaveType: (id: number, idempotencyKey?: string) => {
+      return repository.archiveLeaveType(id, idempotencyKey)
     },
     deleteLeaveType: (id: number) => {
       return repository.deleteLeaveType(id)

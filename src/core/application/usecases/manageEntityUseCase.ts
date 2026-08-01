@@ -26,20 +26,20 @@ export function createManageEntityUsecase<T,TCreate , TUpdate, ID = number>(
       }
     },
 
-    async create(data: TCreate): Promise<DpomainResponsePaginated<T>> {
+    async create(data: TCreate, idempotencyKey?: string): Promise<DpomainResponsePaginated<T>> {
       if (validator) {
         await validator(data);
       }
       try {
-        return await repository.create(data);
+        return await repository.create(data, idempotencyKey);
       } catch (error : any) {
         throw error;
       }
     },
 
-    async update(id: ID, data: TUpdate): Promise<DpomainResponsePaginated<T>> {
+    async update(id: ID, data: TUpdate, idempotencyKey?: string): Promise<DpomainResponsePaginated<T>> {
       try {
-        return await repository.update(id, data);
+        return await repository.update(id, data, idempotencyKey);
       } catch (error : any) {
         throw error;
       }

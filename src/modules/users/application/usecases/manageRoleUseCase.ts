@@ -16,12 +16,12 @@ export const createManageRoleUseCase = (
       return repository.getRoleId(id);
     },
 
-    create(data: CreateRoleData): Promise<DomainResponse<Role>> {
-      return repository.createRole(data);
+    create(data: CreateRoleData, idempotencyKey?: string): Promise<DomainResponse<Role>> {
+      return repository.createRole(data, idempotencyKey);
     },
 
-    update(id: number, data: UpdateRoleData): Promise<DomainResponse<DetailedRole>> {
-      return repository.updateRole(id, data);
+    update(id: number, data: UpdateRoleData, idempotencyKey?: string): Promise<DomainResponse<DetailedRole>> {
+      return repository.updateRole(id, data, idempotencyKey);
     },
 
     delete(id: number): Promise<DomainResponse<[]>> {

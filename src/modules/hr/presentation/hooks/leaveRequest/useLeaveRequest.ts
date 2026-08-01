@@ -8,6 +8,7 @@ import type { FilterLeaveRequestDto } from "../../../application/dtos/leaveReque
 import type { CreateLeaveRequestDto, UpdateLeaveRequestDto } from "../../../application/dtos/leaveRequest/leaveRequest"
 import type { LeaveRequestProcessOperations } from "../../../domain/valueObjects/leaveRequest/leaveRequestProcessOperations"
 import { toast } from "sonner"
+import { useIdempotency } from "../../../../../core/presentation/hooks/useIdempotency"
 
 const OP_KEYS = ["findAllMyLeaveRequests", "findAllEmployeeLeaveRequests", "findLeaveRequestById", "createLeaveRequest", "updateLeaveRequest", "processLeaveRequest"] as const
 
@@ -57,6 +58,7 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
 
   const repository = createLeaveRequesteRepository(apiClient)
   const useCase = createManageLeaveRequestUseCase(repository)
+  const idem = useIdempotency()
 
   const setFnLoading = (fn: string, v: boolean) => setLoading((p) => ({ ...p, [fn]: v }))
   const setFnError = (fn: string, e: string | null) => setError((p) => ({ ...p, [fn]: e }))
@@ -145,10 +147,13 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
   const createLeaveRequest = useCallback(async (data: CreateLeaveRequestDto) => {
     setFnLoading("createLeaveRequest", true)
     setFnError("createLeaveRequest", null)
+    const key = idem.getKey('create', data)
     try {
-      await useCase.createLeaveRequset(data)
+      await useCase.createLeaveRequset(data, key)
+      idem.onSettled(undefined, key)
       toast.success(t("leave_request.create_success", "hr"))
     } catch (err: any) {
+      idem.onSettled(err, key)
       const msg = err?.message || t("leave_request.create_error", "hr")
       setFnError("createLeaveRequest", msg)
       toast.error(`${t("leave_request.create_error", "hr")}: ${msg}`)
@@ -156,15 +161,18 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
     } finally {
       setFnLoading("createLeaveRequest", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const updateLeaveRequest = useCallback(async (id: number, data: UpdateLeaveRequestDto) => {
     setFnLoading("updateLeaveRequest", true)
     setFnError("updateLeaveRequest", null)
+    const key = idem.getKey('update', { id, data })
     try {
-      await useCase.updateLeaveRequest(id, data)
+      await useCase.updateLeaveRequest(id, data, key)
+      idem.onSettled(undefined, key)
       toast.success(t("leave_request.update_success", "hr"))
     } catch (err: any) {
+      idem.onSettled(err, key)
       const msg = err?.message || t("leave_request.update_error", "hr")
       setFnError("updateLeaveRequest", msg)
       toast.error(`${t("leave_request.update_error", "hr")}: ${msg}`)
@@ -172,15 +180,18 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
     } finally {
       setFnLoading("updateLeaveRequest", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const processLeaveRequest = useCallback(async (id: number, operation: LeaveRequestProcessOperations, reviewNotes: string) => {
     setFnLoading("processLeaveRequest", true)
     setFnError("processLeaveRequest", null)
+    const key = idem.getKey('process', { id, operation, reviewNotes })
     try {
-      await useCase.processleaveRequest(id, operation, reviewNotes)
+      await useCase.processleaveRequest(id, operation, reviewNotes, key)
+      idem.onSettled(undefined, key)
       toast.success(t("leave_request.process_success", "hr"))
     } catch (err: any) {
+      idem.onSettled(err, key)
       const msg = err?.message || t("leave_request.process_error", "hr")
       setFnError("processLeaveRequest", msg)
       toast.error(`${t("leave_request.process_error", "hr")}: ${msg}`)
@@ -188,7 +199,7 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
     } finally {
       setFnLoading("processLeaveRequest", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])

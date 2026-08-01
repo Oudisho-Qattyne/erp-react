@@ -15,6 +15,7 @@ import type { DomainResponse } from "../../../../core/domain/common/responce/Dom
 import type { DpomainResponsePaginated } from "../../../hr/domain/entities/common/DomainResponsePaginated"
 import { toast } from "sonner"
 import { playSentSound, playReceivedSound } from "../../../../core/infrastructure/audio/chatSounds"
+import { useIdempotency } from "../../../../core/presentation/hooks/useIdempotency"
 
 const OP_KEYS = ["fetchConversations", "fetchMessages", "sendMessage", "markAsRead", "fetchUsers"] as const
 const PER_PAGE = 20
@@ -94,6 +95,7 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
 
   const repository = createChatRepository(apiClient)
   const useCase = createManageChatUseCase(repository)
+  const idem = useIdempotency()
 
   const setFnLoading = (fn: string, v: boolean) => setLoading((p) => ({ ...p, [fn]: v }))
   const setFnError = (fn: string, e: string | null) => setError((p) => ({ ...p, [fn]: e }))
@@ -185,11 +187,14 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
   const sendMessage = useCallback(async (data: SendMessageDto) => {
     setFnLoading("sendMessage", true)
     setFnError("sendMessage", null)
+    const key = idem.getKey('sendMessage', data)
     try {
-      const res = await useCase.sendMessage(data)
+      const res = await useCase.sendMessage(data, key)
+      idem.onSettled(undefined, key)
       if (res) playSentSound()
       return res
     } catch (err: any) {
+      idem.onSettled(err, key)
       const msg = err?.message || t("chat.send_error", "chat")
       setFnError("sendMessage", msg)
       toast.error(msg)
@@ -197,7 +202,7 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     } finally {
       setFnLoading("sendMessage", false)
     }
-  }, [useCase, t])
+  }, [useCase, idem, t])
 
   const fetchUsers = useCallback(async (name?: string, email?: string) => {
     setFnLoading("fetchUsers", true)
@@ -247,15 +252,18 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     setConversations((prev) =>
       prev.map((c) => (c.id === conversationId ? { ...c, unread_messages_count: 0 } : c)),
     )
+    const key = idem.getKey('markAsRead', { conversationId })
     try {
-      await useCase.markAsRead(conversationId)
+      await useCase.markAsRead(conversationId, key)
+      idem.onSettled(undefined, key)
     } catch (err: any) {
+      idem.onSettled(err, key)
       const msg = err?.message || t("chat.mark_read_error", "chat")
       setFnError("markAsRead", msg)
     } finally {
       setFnLoading("markAsRead", false)
     }
-  }, [useCase, t])
+  }, [useCase, idem, t])
 
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])

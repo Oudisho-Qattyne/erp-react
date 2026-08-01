@@ -9,6 +9,7 @@ import { DossierPickerDialog } from './DossierPickerDialog';
 import { toast } from 'sonner';
 import type { Plot } from '../../../../domain/entities/plot';
 import type { Dossier } from '../../../../domain/entities/dossier';
+import { useIdempotency } from '../../../../../../core/presentation/hooks/useIdempotency';
 
 interface ChangePlotStatusModalProps {
   isOpen: boolean;
@@ -20,6 +21,7 @@ interface ChangePlotStatusModalProps {
 export function ChangePlotStatusModal({ isOpen, onClose, plot, onSuccess }: ChangePlotStatusModalProps) {
   const { t } = useLanguage();
   const apiClient = useApiClient();
+  const idem = useIdempotency();
   
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string>('');
@@ -56,7 +58,14 @@ export function ChangePlotStatusModal({ isOpen, onClose, plot, onSuccess }: Chan
       if (status === 'allocated' && selectedDossier) {
         body.allocated_dossier_id = selectedDossier.id;
       }
-      await apiClient.put(`/investments/plots/${plot.id}/status`, body);
+      const key = idem.getKey('changePlotStatus', { plotId: plot.id, body });
+      try {
+        await apiClient.put(`/investments/plots/${plot.id}/status`, body, { headers: { 'Idempotency-Key': key } });
+        idem.onSettled(undefined, key);
+      } catch (err) {
+        idem.onSettled(err, key);
+        throw err;
+      }
       
       toast.success(t('plots.status_updated', 'investments') || 'Status updated successfully');
       onSuccess();

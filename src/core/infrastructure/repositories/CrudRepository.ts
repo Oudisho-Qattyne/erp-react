@@ -10,11 +10,11 @@ export function createCrufRepository<T,TCreate , TUpdate, ID = number>(apiCliein
         findById:async (id: ID) => {
             return apiClieint.get<DpomainResponsePaginated<T>>(`${restUrl}/${id}`)
         },
-        create: async(data: TCreate) => {
-            return apiClieint.post<DpomainResponsePaginated<T>,TCreate>(`${restUrl}`, data)
+        create: async(data: TCreate, idempotencyKey?: string) => {
+            return apiClieint.post<DpomainResponsePaginated<T>,TCreate>(`${restUrl}`, data, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined)
         },
-        update: async(id: ID, data: TUpdate) => {
-            return apiClieint.put<DpomainResponsePaginated<T>,TUpdate>(`${restUrl}/${id}`, data)
+        update: async(id: ID, data: TUpdate, idempotencyKey?: string) => {
+            return apiClieint.put<DpomainResponsePaginated<T>,TUpdate>(`${restUrl}/${id}`, data, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined)
         },
         delete: async(id: ID) => {
             return apiClieint.delete(`${restUrl}/${id}`)

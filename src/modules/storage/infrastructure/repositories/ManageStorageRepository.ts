@@ -26,14 +26,14 @@ export const createManageStorageRepository = (
             return apiClient.get(`${baseUrl}/search`, { params: { path: path } });
         },
 
-        createFolder: async (parentId, name): Promise<DomainResponse<StorageFolder>> => {
+        createFolder: async (parentId, name, idempotencyKey?): Promise<DomainResponse<StorageFolder>> => {
             return apiClient.post(`${baseUrl}/folders`, {
                 "parent_id": parentId,
                 "name": name
-            })
+            }, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined)
         },
 
-        uploadFile: async (parentId, file, name, isSecure): Promise<DomainResponse<StorageFile>> => {
+        uploadFile: async (parentId, file, name, isSecure, idempotencyKey?): Promise<DomainResponse<StorageFile>> => {
             const formData = new FormData();
             formData.append('file', file);
             formData.append('name', name);               // ✅ required by backend
@@ -46,7 +46,7 @@ export const createManageStorageRepository = (
 
 
             // ✅ Do NOT set Content-Type header – let the browser handle multipart boundary
-            return apiClient.post(`${baseUrl}/files/upload`, formData);
+            return apiClient.post(`${baseUrl}/files/upload`, formData, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined);
         },
         deleteFolder: async (folderId: string): Promise<DomainResponse<void>> => {
             return apiClient.delete(`${baseUrl}/folders/${folderId}`);
@@ -59,18 +59,18 @@ export const createManageStorageRepository = (
         //   return apiClient.post(`${baseUrl}/folders`, data);
         // },
 
-        renameFolder: async (folderId: string, name: string): Promise<DomainResponse<StorageFolder>> => {
-            return apiClient.put(`${baseUrl}/folders/${folderId}`, { name });
+        renameFolder: async (folderId: string, name: string, idempotencyKey?): Promise<DomainResponse<StorageFolder>> => {
+            return apiClient.put(`${baseUrl}/folders/${folderId}`, { name }, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined);
         },
         downloadFile: async (fileId: string, signedUrl?: string): Promise<DomainResponse<Blob>> => {
             return apiClient.get(`/storage-management/files/${fileId}/download`, { responseType: 'blob' })
         },
 
-        moveFolder: async (folderId: string, newParentId: string | null): Promise<DomainResponse<StorageFolder>> => {
-            return apiClient.put(`${baseUrl}/folders/${folderId}/move`, { new_parent_id : newParentId });
+        moveFolder: async (folderId: string, newParentId: string | null, idempotencyKey?): Promise<DomainResponse<StorageFolder>> => {
+            return apiClient.put(`${baseUrl}/folders/${folderId}/move`, { new_parent_id : newParentId }, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined);
         },
-        moveFile: async (fileId: string, newParentId: string | null): Promise<DomainResponse<StorageFile>> => {
-            return apiClient.put(`${baseUrl}/files/${fileId}/move`, { new_parent_id : newParentId });
+        moveFile: async (fileId: string, newParentId: string | null, idempotencyKey?): Promise<DomainResponse<StorageFile>> => {
+            return apiClient.put(`${baseUrl}/files/${fileId}/move`, { new_parent_id : newParentId }, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined);
         },
 
         // // File operations

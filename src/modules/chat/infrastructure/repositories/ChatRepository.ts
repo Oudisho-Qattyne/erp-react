@@ -21,11 +21,13 @@ export const createChatRepository = (apiClient: ApiClient): IChatRepository => {
         paginate(page, perPage),
       ),
 
-    sendMessage: (data: any) =>
-      apiClient.post<DomainResponse<Message>>(`${baseUrl}/conversations/messages`, data),
+    sendMessage: (data: any, idempotencyKey?: string) =>
+      apiClient.post<DomainResponse<Message>>(`${baseUrl}/conversations/messages`, data,
+        idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined),
 
-    markAsRead: (conversationId: number) =>
-      apiClient.put<void>(`${baseUrl}/conversations/${conversationId}/read`),
+    markAsRead: (conversationId: number, idempotencyKey?: string) =>
+      apiClient.put<void>(`${baseUrl}/conversations/${conversationId}/read`, undefined,
+        idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined),
 
     getUsers: (page?, perPage?, name?, email?) =>
       apiClient.get<DpomainResponsePaginated<ChatUser[]>>(`${baseUrl}/users`, paginate(page, perPage, name, email)),

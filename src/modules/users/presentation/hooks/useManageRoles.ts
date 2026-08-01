@@ -4,6 +4,7 @@ import type { DomainResponse } from '../../../../core/domain/common/responce/Dom
 import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
 import { createManageRoleUseCase } from '../../application/usecases/manageRoleUseCase';
 import { createCrudRoleRepository } from '../../infrastructure/repositories';
+import { useIdempotency } from '../../../../core/presentation/hooks/useIdempotency';
 import type { Permissions } from '../../domain/entities/permissions';
 import type { CreateRoleData, UpdateRoleData } from '../../application/dtos/roleDto';
 
@@ -31,6 +32,7 @@ export function useManageRoles(): UseManageRolesReturn {
   const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null));
   const repository = useMemo(() => createCrudRoleRepository(apiClient), [apiClient]);
   const usecase = useMemo(() => createManageRoleUseCase(repository), [repository]);
+  const idem = useIdempotency();
 
   const clearError = useCallback((key?: string) => {
     if (key) {
@@ -57,8 +59,18 @@ export function useManageRoles(): UseManageRolesReturn {
     clearError,
     getAll: () => wrap('getAll', () => usecase.getAll()),
     getById: (id) => wrap('getById', () => usecase.getById(id)),
-    create: (data) => wrap('create', () => usecase.create(data)),
-    update: (id, data) => wrap('update', () => usecase.update(id, data)),
+    create: (data) => wrap('create', () => {
+      const key = idem.getKey('createRole', data);
+      return usecase.create(data, key)
+        .then((res) => { idem.onSettled(undefined, key); return res; })
+        .catch((err: any) => { idem.onSettled(err, key); throw err; });
+    }),
+    update: (id, data) => wrap('update', () => {
+      const key = idem.getKey('updateRole', { id, data });
+      return usecase.update(id, data, key)
+        .then((res) => { idem.onSettled(undefined, key); return res; })
+        .catch((err: any) => { idem.onSettled(err, key); throw err; });
+    }),
     remove: (id) => wrap('remove', () => usecase.delete(id)),
     getPermissions: () => wrap('getPermissions', () => usecase.getPermissions()),
   };

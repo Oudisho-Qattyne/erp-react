@@ -8,6 +8,7 @@ import type { CreateLeaveTypeDto, UpdateLeaveTypeDto } from "../../../applicatio
 import type { EntityWithNameOnly } from "../../../../../core/domain/entities/EntityWithNameOnly"
 import type { Leave } from "../../../domain/entities/leave/leave"
 import { toast } from "sonner"
+import { useIdempotency } from "../../../../../core/presentation/hooks/useIdempotency"
 
 const OP_KEYS = ["findAll", "findById", "create", "update", "archive", "delete", "findUserEligibleLeaveTypes"] as const
 
@@ -76,6 +77,7 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
 
   const repository = createLeaveTypeRepository(apiClient)
   const useCase = createManageLeaveTypesUseCase(repository)
+  const idem = useIdempotency()
 
   const setFnLoading = (fn: string, v: boolean) => setLoading((p) => ({ ...p, [fn]: v }))
   const setFnError = (fn: string, e: string | null) => setError((p) => ({ ...p, [fn]: e }))
@@ -152,10 +154,13 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
   const create = useCallback(async (data: CreateLeaveTypeDto) => {
     setFnLoading("create", true)
     setFnError("create", null)
+    const key = idem.getKey('create', data)
     try {
-      await useCase.createLeaveType(data)
+      await useCase.createLeaveType(data, key)
+      idem.onSettled(undefined, key)
       toast.success(t("leave_types.created", "hr"))
     } catch (err: any) {
+      idem.onSettled(err, key)
       const msg = err?.message || "Failed to create leave type"
       setFnError("create", msg)
       toast.error(t("leave_types.create_error", "hr").replace("{message}", msg))
@@ -163,15 +168,18 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
     } finally {
       setFnLoading("create", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const update = useCallback(async (id: number, data: UpdateLeaveTypeDto) => {
     setFnLoading("update", true)
     setFnError("update", null)
+    const key = idem.getKey('update', { id, data })
     try {
-      await useCase.updateLeaveType(id, data)
+      await useCase.updateLeaveType(id, data, key)
+      idem.onSettled(undefined, key)
       toast.success(t("leave_types.updated", "hr"))
     } catch (err: any) {
+      idem.onSettled(err, key)
       const msg = err?.message || "Failed to update leave type"
       setFnError("update", msg)
       toast.error(t("leave_types.update_error", "hr").replace("{message}", msg))
@@ -179,16 +187,19 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
     } finally {
       setFnLoading("update", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const archive = useCallback(async (id: number) => {
     setFnLoading("archive", true)
     setFnError("archive", null)
+    const key = idem.getKey('archive', { id })
     try {
-      await useCase.archiveLeaveType(id)
+      await useCase.archiveLeaveType(id, key)
+      idem.onSettled(undefined, key)
       toast.success(t("leave_types.archived", "hr"))
       await findAll()
     } catch (err: any) {
+      idem.onSettled(err, key)
       const msg = err?.message || "Failed to archive leave type"
       setFnError("archive", msg)
       toast.error(t("leave_types.archive_error", "hr").replace("{message}", msg))
@@ -196,7 +207,7 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
     } finally {
       setFnLoading("archive", false)
     }
-  }, [useCase, t, findAll])
+  }, [useCase, t, findAll, idem])
 
   const deleteFn = useCallback(async (id: number) => {
     setFnLoading("delete", true)

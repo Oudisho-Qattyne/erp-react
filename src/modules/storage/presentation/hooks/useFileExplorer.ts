@@ -9,6 +9,7 @@ import type { DomainResponse } from "../../../../core/domain/common/responce/Dom
 import { toast } from "sonner";
 import type { IApi } from "@svar-ui/react-filemanager";
 import { object } from "zod";
+import { useIdempotency } from "../../../../core/presentation/hooks/useIdempotency";
 
 /**
  * Removes the first segment of `path` if it equals `segmentPath`.
@@ -92,6 +93,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
 
     const repository = createManageStorageRepository(apiClient);
     const useCase = createManageStorageUseCase(repository);
+    const idem = useIdempotency();
 
     const filterStorageItems = (data: StorageItemDto[], fileTypes?: string[]): StorageItemDto[] => {
         if (fileTypes) {
@@ -203,21 +205,32 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         setFunctionLoading("createFolder", true);
         setFunctionError("createFolder", null);
         try {
+            let parentId: string | undefined | null = null;
             if (rootFolder) {
                 if (parent == "/") {
-                    const res = await useCase.createFolder(rootFolder._id, name);
+                    parentId = rootFolder._id;
                 }
                 else {
                     const storageItem = api.getFile(parent);
                     if (storageItem) {
-                        const res = await useCase.createFolder(storageItem?._id, name);
+                        parentId = storageItem?._id;
                     }
                 }
             }
             else {
                 const storageItem = api.getFile(parent);
                 if (storageItem) {
-                    const res = await useCase.createFolder(storageItem?._id, name);
+                    parentId = storageItem?._id;
+                }
+            }
+            if (parentId !== null && parentId !== undefined) {
+                const key = idem.getKey('createFolder', { parentId, name });
+                try {
+                    const res = await useCase.createFolder(parentId, name, key);
+                    idem.onSettled(undefined, key);
+                } catch (err) {
+                    idem.onSettled(err, key);
+                    throw err;
                 }
             }
             await loadFolderByPath(parent, api);
@@ -239,7 +252,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             setFunctionLoading("createFolder", false);
 
         }
-    }, [useCase, language, t, loadFolderByPath, rootFolder]);
+    }, [useCase, language, t, loadFolderByPath, rootFolder, idem]);
 
     const deleteFolder = useCallback(async (parent: string, id: string, api: any) => {
         setFunctionLoading("deleteFolder", true);
@@ -278,7 +291,14 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         try {
             const storageItem = api.getFile(id);
             if (storageItem) {
-                const res = await useCase.renameFolder(storageItem._id, name);
+                const key = idem.getKey('renameFolder', { folderId: storageItem._id, name });
+                try {
+                    const res = await useCase.renameFolder(storageItem._id, name, key);
+                    idem.onSettled(undefined, key);
+                } catch (err) {
+                    idem.onSettled(err, key);
+                    throw err;
+                }
             }
             await loadFolderByPath(parent, api);
 
@@ -299,28 +319,38 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         } finally {
             setFunctionLoading("renameFolder", false);
         }
-    }, [useCase, language, t]);
+    }, [useCase, language, t, loadFolderByPath, idem]);
 
     const uploadFile = useCallback(async (parent: string, file: File, isSecure: boolean = true, name: string, api: IApi) => {
         setFunctionLoading("uploadFile", true);
         setFunctionError("uploadFile", null);
         try {
+            let parentId: string | undefined | null = null;
             if (rootFolder) {
                 if (parent == '/') {
-                    const res = await useCase.uploadFile(rootFolder._id, file, name, isSecure);
-
+                    parentId = rootFolder._id;
                 }
                 else {
                     const storageItem = api.getFile(parent);
                     if (storageItem) {
-                        const res = await useCase.uploadFile(storageItem?._id, file, name, isSecure);
+                        parentId = storageItem?._id;
                     }
                 }
             }
             else {
                 const storageItem = api.getFile(parent);
                 if (storageItem) {
-                    const res = await useCase.uploadFile(storageItem?._id, file, name, isSecure);
+                    parentId = storageItem?._id;
+                }
+            }
+            if (parentId !== null && parentId !== undefined) {
+                const key = idem.getKey('uploadFile', { parentId, file, name, isSecure });
+                try {
+                    const res = await useCase.uploadFile(parentId, file, name, isSecure, key);
+                    idem.onSettled(undefined, key);
+                } catch (err) {
+                    idem.onSettled(err, key);
+                    throw err;
                 }
             }
 
@@ -343,7 +373,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         } finally {
             setFunctionLoading("uploadFile", false);
         }
-    }, [useCase, language, t, loadFolderByPath]);
+    }, [useCase, language, t, loadFolderByPath, rootFolder, idem]);
 
     const deleteFile = useCallback(async (parent: string, id: string, api: any) => {
         setFunctionLoading("deleteFile", true);
@@ -422,22 +452,36 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             if (rootFolder) {
 
                 if (storageItem) {
-                    if (storageItem.type == "file") {
-                        const res = await useCase.moveFile(storageItem?._id, parentItem ? parentItem?._id : rootFolder._id)
-                    }
-                    else if (storageItem.type == "folder") {
-                        const res = await useCase.moveFolder(storageItem?._id, parentItem ? parentItem?._id : rootFolder._id)
+                    const key = idem.getKey(storageItem.type == 'file' ? 'moveFile' : 'moveFolder', { itemId: storageItem._id, newParentId: parentItem ? parentItem?._id : rootFolder._id });
+                    try {
+                        if (storageItem.type == "file") {
+                            const res = await useCase.moveFile(storageItem?._id, parentItem ? parentItem?._id : rootFolder._id, key)
+                        }
+                        else if (storageItem.type == "folder") {
+                            const res = await useCase.moveFolder(storageItem?._id, parentItem ? parentItem?._id : rootFolder._id, key)
+                        }
+                        idem.onSettled(undefined, key);
+                    } catch (err) {
+                        idem.onSettled(err, key);
+                        throw err;
                     }
                 }
             }
             else {
 
                 if (storageItem) {
-                    if (storageItem.type == "file") {
-                        const res = await useCase.moveFile(storageItem?._id, parentItem ? parentItem?._id : null)
-                    }
-                    else if (storageItem.type == "folder") {
-                        const res = await useCase.moveFolder(storageItem?._id,  parentItem ? parentItem?._id : null)
+                    const key = idem.getKey(storageItem.type == 'file' ? 'moveFile' : 'moveFolder', { itemId: storageItem._id, newParentId: parentItem ? parentItem?._id : null });
+                    try {
+                        if (storageItem.type == "file") {
+                            const res = await useCase.moveFile(storageItem?._id, parentItem ? parentItem?._id : null, key)
+                        }
+                        else if (storageItem.type == "folder") {
+                            const res = await useCase.moveFolder(storageItem?._id,  parentItem ? parentItem?._id : null, key)
+                        }
+                        idem.onSettled(undefined, key);
+                    } catch (err) {
+                        idem.onSettled(err, key);
+                        throw err;
                     }
                 }
             }
@@ -461,7 +505,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         }
     }
 
-        , [rootFolder, t]
+        , [rootFolder, t, idem]
     )
 
     const loadRoot = useCallback(async (rootFolder?: StorageItemDto) => {

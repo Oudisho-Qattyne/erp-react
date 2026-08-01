@@ -6,13 +6,13 @@ export interface IUserRepository {
     getAllUsers: (filter: any) => Promise<DpomainResponsePaginated<User[]>>;
     getCurrentUsers: () => Promise<DomainResponse<User>>;
 
-    createUser: (user: any) => Promise<DomainResponse<User>>;
-    updateUser: (id: number, user: any) => Promise<DomainResponse<User>>;
+    createUser: (user: any, idempotencyKey?: string) => Promise<DomainResponse<User>>;
+    updateUser: (id: number, user: any, idempotencyKey?: string) => Promise<DomainResponse<User>>;
 
-    updateSignature: (signature: File) => Promise<DomainResponse<User>>;
+    updateSignature: (signature: File, idempotencyKey?: string) => Promise<DomainResponse<User>>;
 
-    exportUsersExcel: () => Promise<DomainResponse<Blob>>;
-    exportUsersPdf: () => Promise<DomainResponse<Blob>>;
+    exportUsersExcel: (idempotencyKey?: string) => Promise<DomainResponse<Blob>>;
+    exportUsersPdf: (idempotencyKey?: string) => Promise<DomainResponse<Blob>>;
 
-    linkUserToEmployee: (user_id : number, emplyee_id : number) => Promise<DomainResponse<User>>
+    linkUserToEmployee: (user_id : number, emplyee_id : number, idempotencyKey?: string) => Promise<DomainResponse<User>>
 }
