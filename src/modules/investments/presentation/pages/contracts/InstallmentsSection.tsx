@@ -5,7 +5,7 @@ import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Butt
 import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { Dialog } from '../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { SectionCard } from '../../../../../core/presentation/layouts/ui/card/SectionCard';
-import { Calendar, CreditCard, Pencil } from 'lucide-react';
+import { Calendar, CreditCard, Pencil, AlertCircle } from 'lucide-react';
 import Input from '../../../../../core/presentation/layouts/ui/inputs/Input';
 
 interface InstallmentsSectionProps {
@@ -30,17 +30,26 @@ export function InstallmentsSection({
   const [payDialogOpen, setPayDialogOpen] = useState(false);
   const [payDate, setPayDate] = useState(new Date().toISOString().split('T')[0]);
 
+  const [payError, setPayError] = useState('');
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editInstallment, setEditInstallment] = useState<Installment | null>(null);
   const [editDate, setEditDate] = useState('');
+  const [editError, setEditError] = useState('');
 
   const openPayDialog = () => {
     setPayDate(new Date().toISOString().split('T')[0]);
+    setPayError('');
     setPayDialogOpen(true);
   };
 
   const handlePay = async () => {
     if (!payDate) return;
+    const nextUnpaid = sorted.find((i) => !i.payment_date);
+    if (nextUnpaid && payDate < normalizeDate(nextUnpaid.due_date)) {
+      setPayError(t('installments.validation.payment_before_due', 'investments') || 'Payment date cannot be before the due date');
+      return;
+    }
+    setPayError('');
     await onPayNextUnpaid(contractId, payDate);
     setPayDialogOpen(false);
   };
@@ -59,11 +68,17 @@ export function InstallmentsSection({
   const openEditDialog = (inst: Installment) => {
     setEditInstallment(inst);
     setEditDate(normalizeDate(inst.payment_date || ''));
+    setEditError('');
     setEditDialogOpen(true);
   };
 
   const handleEdit = async () => {
     if (!editInstallment || !editDate) return;
+    if (editDate < normalizeDate(editInstallment.due_date)) {
+      setEditError(t('installments.validation.payment_before_due', 'investments') || 'Payment date cannot be before the due date');
+      return;
+    }
+    setEditError('');
     await onUpdatePaymentDate(editInstallment.id, contractId, editDate);
     setEditDialogOpen(false);
     setEditInstallment(null);
@@ -155,7 +170,8 @@ export function InstallmentsSection({
             <label className="block text-sm font-medium text-text mb-1">
               {t('installments.payment_date', 'investments') || 'Payment Date'} <span className="text-danger">*</span>
             </label>
-            <Input type="date" value={payDate} onChange={(val) => setPayDate(val as string)} required className="w-full" />
+            <Input type="date" value={payDate} onChange={(val) => { setPayDate(val as string); setPayError('') }} required className="w-full" />
+            {payError && <p className="flex items-center gap-1 text-xs text-danger mt-1"><AlertCircle size={12} />{payError}</p>}
           </div>
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => setPayDialogOpen(false)} disabled={payLoading}>
@@ -187,7 +203,8 @@ export function InstallmentsSection({
             <label className="block text-sm font-medium text-text mb-1">
               {t('installments.payment_date', 'investments') || 'Payment Date'} <span className="text-danger">*</span>
             </label>
-            <Input type="date" value={editDate} onChange={(val) => setEditDate(val as string)} required className="w-full" />
+            <Input type="date" value={editDate} onChange={(val) => { setEditDate(val as string); setEditError('') }} required className="w-full" />
+            {editError && <p className="flex items-center gap-1 text-xs text-danger mt-1"><AlertCircle size={12} />{editError}</p>}
           </div>
           <div className="flex justify-end gap-2 pt-4">
             <Button

@@ -124,7 +124,15 @@
     "reason_placeholder": "Enter the reason for your leave request",
     "review_notes": "Review Notes",
     "review_notes_placeholder": "Enter review notes...",
-    "submit": "Submit Request"
+    "submit": "Submit Request",
+    "validation": {
+      "leave_type_required": "Leave type is required",
+      "start_date_required": "Start date is required",
+      "end_date_required": "End date is required",
+      "requested_units_min": "Requested units must be at least 1",
+      "reason_required": "Reason is required",
+      "end_date_after_start": "End date must be on or after start date"
+    }
   },
   "leave_types": {
     "title": "Leave Types",
@@ -336,6 +344,10 @@
       "name_invalid": "Invalid name",
       "spouse_name_required": "Spouse name is required",
       "birthdate_invalid": "Invalid birth date",
+      "date_birth_future": "Date of birth cannot be in the future",
+      "birthdate_future": "Birth date cannot be in the future",
+      "graduation_year_future": "Graduation year cannot be in the future",
+      "injury_date_format_invalid": "Injury date must be in YYYY-MM-DD format",
       "country_required": "Country is required",
       "city_required": "City is required",
       "region_required": "Residential region is required"
