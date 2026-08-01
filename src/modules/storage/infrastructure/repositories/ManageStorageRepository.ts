@@ -66,6 +66,10 @@ export const createManageStorageRepository = (
             return apiClient.get(`/storage-management/files/${fileId}/download`, { responseType: 'blob' })
         },
 
+        getFileBlob: async (storageItemId: string | number): Promise<Blob> => {
+            return apiClient.get<Blob>(`${baseUrl}/${storageItemId}`, { responseType: 'blob' })
+        },
+
         moveFolder: async (folderId: string, newParentId: string | null, idempotencyKey?): Promise<DomainResponse<StorageFolder>> => {
             return apiClient.put(`${baseUrl}/folders/${folderId}/move`, { new_parent_id : newParentId }, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined);
         },

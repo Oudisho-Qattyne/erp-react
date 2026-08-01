@@ -45,10 +45,8 @@ function uuid(): string {
 }
 
 function isRetryable(err: unknown): boolean {
-  if (typeof err === 'object' && err !== null && (err as { status?: unknown }).status !== undefined) {
-    const status = Number((err as { status?: unknown }).status);
-    return !(Number.isInteger(status) && status >= 400 && status <= 499 && status !== 409);
-  }
+  if (err === undefined || err === null) return false;
+  if (typeof err === 'object' && (err as { status?: unknown }).status !== undefined) return false;
   return true;
 }
 

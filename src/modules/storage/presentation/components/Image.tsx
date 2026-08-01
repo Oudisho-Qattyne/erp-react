@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useApiClient } from "../../../../core/presentation/context/api/ApiClinetProvider"
+import { useStorageFile } from "../hooks/useStorageFile"
 import { Spinner } from "../../../../core/presentation/layouts/ui/state/Spinner"
 
 export interface ImageProps {
@@ -7,7 +7,7 @@ export interface ImageProps {
     className?: string
 }
 export const Image = ({ id, className }: ImageProps) => {
-    const apiClient = useApiClient();
+    const { getFileBlob } = useStorageFile();
     const [imageUrl, setImageUrl] = useState<string | null>(null)
     const [loadingImage, setLoadingImage] = useState<boolean>(true)
     const [imageError, setImageError] = useState<string | null>(null)
@@ -23,7 +23,7 @@ export const Image = ({ id, className }: ImageProps) => {
         setImageError(null)
         setImageUrl(null)
 
-        apiClient.get<Blob>(`/storage-management/${id}`, { responseType: 'blob' })
+        getFileBlob(id)
             .then(blob => {
                 if (!cancelled) {
                     setImageUrl(URL.createObjectURL(blob))

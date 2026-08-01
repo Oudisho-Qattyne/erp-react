@@ -115,6 +115,10 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
 
     downloadFile: async (fileId: string, signedUrl?: string): Promise<any> => {
       return await repository.downloadFile(fileId, signedUrl)
+    },
+
+    getFileBlob: async (storageItemId: string | number): Promise<Blob> => {
+      return await repository.getFileBlob(storageItemId)
     }
     // getFileDownloadUrl: async (fileId: string): Promise<string> => {
     //   return repository.getFileDownloadUrl(fileId);

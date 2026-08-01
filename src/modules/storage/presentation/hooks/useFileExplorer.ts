@@ -75,6 +75,7 @@ export interface UseFileExplorerReturn {
     uploadFile: (parentId: string, file: File, isSecure: boolean, name: string, api: any) => Promise<void>;
     deleteFile: (parentId: string, id: string, api: any) => Promise<void>;
     downloadFile: (id: string, signedUrl: string, api: any) => Promise<void>;
+    getFileBlob: (storageItemId: string | number) => Promise<Blob>;
     moveStorageItem: (itemPath: string, newParentPath: string , api: IApi) => Promise<void>
     clearError: () => void;
 }
@@ -439,6 +440,10 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         }
     }, [useCase, language, t]);
 
+    const getFileBlob = useCallback(async (storageItemId: string | number): Promise<Blob> => {
+        return await useCase.getFileBlob(storageItemId);
+    }, [useCase]);
+
     const moveStorageItem = useCallback(async (itemPath: string, newParentPath: string, api: IApi) => {
         setFunctionLoading("moveStorageItem", true);
         setFunctionError("moveStorageItem", null);
@@ -593,6 +598,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         uploadFile,
         deleteFile,
         downloadFile,
+        getFileBlob,
         moveStorageItem,
         clearError,
     })

@@ -37,4 +37,7 @@ export interface IManageStorageRepository {
   
   // // Download a file (returns blob with content disposition)
   downloadFile(fileId: string, signedUrl?: string): Promise<DomainResponse<Blob>>;
+
+  // Get a raw file blob by storage item id (for previews/images)
+  getFileBlob(storageItemId: string | number): Promise<Blob>;
 }
