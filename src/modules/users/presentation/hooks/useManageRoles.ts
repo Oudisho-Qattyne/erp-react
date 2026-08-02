@@ -59,18 +59,8 @@ export function useManageRoles(): UseManageRolesReturn {
     clearError,
     getAll: () => wrap('getAll', () => usecase.getAll()),
     getById: (id) => wrap('getById', () => usecase.getById(id)),
-    create: (data) => wrap('create', () => {
-      const key = idem.getKey('createRole', data);
-      return usecase.create(data, key)
-        .then((res) => { idem.onSettled(undefined, key); return res; })
-        .catch((err: any) => { idem.onSettled(err, key); throw err; });
-    }),
-    update: (id, data) => wrap('update', () => {
-      const key = idem.getKey('updateRole', { id, data });
-      return usecase.update(id, data, key)
-        .then((res) => { idem.onSettled(undefined, key); return res; })
-        .catch((err: any) => { idem.onSettled(err, key); throw err; });
-    }),
+    create: (data) => wrap('create', () => idem.run('createRole', data, (key) => usecase.create(data, key))),
+    update: (id, data) => wrap('update', () => idem.run('updateRole', { id, data }, (key) => usecase.update(id, data, key))),
     remove: (id) => wrap('remove', () => usecase.delete(id)),
     getPermissions: () => wrap('getPermissions', () => usecase.getPermissions()),
   };

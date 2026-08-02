@@ -187,14 +187,11 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
   const sendMessage = useCallback(async (data: SendMessageDto) => {
     setFnLoading("sendMessage", true)
     setFnError("sendMessage", null)
-    const key = idem.getKey('sendMessage', data)
     try {
-      const res = await useCase.sendMessage(data, key)
-      idem.onSettled(undefined, key)
+      const res = await idem.run('sendMessage', data, (key) => useCase.sendMessage(data, key))
       if (res) playSentSound()
       return res
     } catch (err: any) {
-      idem.onSettled(err, key)
       const msg = err?.message || t("chat.send_error", "chat")
       setFnError("sendMessage", msg)
       toast.error(msg)
@@ -252,12 +249,9 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     setConversations((prev) =>
       prev.map((c) => (c.id === conversationId ? { ...c, unread_messages_count: 0 } : c)),
     )
-    const key = idem.getKey('markAsRead', { conversationId })
     try {
-      await useCase.markAsRead(conversationId, key)
-      idem.onSettled(undefined, key)
+      await idem.run('markAsRead', { conversationId }, (key) => useCase.markAsRead(conversationId, key))
     } catch (err: any) {
-      idem.onSettled(err, key)
       const msg = err?.message || t("chat.mark_read_error", "chat")
       setFnError("markAsRead", msg)
     } finally {

@@ -147,13 +147,10 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
   const createLeaveRequest = useCallback(async (data: CreateLeaveRequestDto) => {
     setFnLoading("createLeaveRequest", true)
     setFnError("createLeaveRequest", null)
-    const key = idem.getKey('create', data)
     try {
-      await useCase.createLeaveRequset(data, key)
-      idem.onSettled(undefined, key)
+      await idem.run('create', data, (key) => useCase.createLeaveRequset(data, key))
       toast.success(t("leave_request.create_success", "hr"))
     } catch (err: any) {
-      idem.onSettled(err, key)
       const msg = err?.message || t("leave_request.create_error", "hr")
       setFnError("createLeaveRequest", msg)
       toast.error(`${t("leave_request.create_error", "hr")}: ${msg}`)
@@ -166,13 +163,10 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
   const updateLeaveRequest = useCallback(async (id: number, data: UpdateLeaveRequestDto) => {
     setFnLoading("updateLeaveRequest", true)
     setFnError("updateLeaveRequest", null)
-    const key = idem.getKey('update', { id, data })
     try {
-      await useCase.updateLeaveRequest(id, data, key)
-      idem.onSettled(undefined, key)
+      await idem.run('update', { id, data }, (key) => useCase.updateLeaveRequest(id, data, key))
       toast.success(t("leave_request.update_success", "hr"))
     } catch (err: any) {
-      idem.onSettled(err, key)
       const msg = err?.message || t("leave_request.update_error", "hr")
       setFnError("updateLeaveRequest", msg)
       toast.error(`${t("leave_request.update_error", "hr")}: ${msg}`)
@@ -185,13 +179,10 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
   const processLeaveRequest = useCallback(async (id: number, operation: LeaveRequestProcessOperations, reviewNotes: string) => {
     setFnLoading("processLeaveRequest", true)
     setFnError("processLeaveRequest", null)
-    const key = idem.getKey('process', { id, operation, reviewNotes })
     try {
-      await useCase.processleaveRequest(id, operation, reviewNotes, key)
-      idem.onSettled(undefined, key)
+      await idem.run('process', { id, operation, reviewNotes }, (key) => useCase.processleaveRequest(id, operation, reviewNotes, key))
       toast.success(t("leave_request.process_success", "hr"))
     } catch (err: any) {
-      idem.onSettled(err, key)
       const msg = err?.message || t("leave_request.process_error", "hr")
       setFnError("processLeaveRequest", msg)
       toast.error(`${t("leave_request.process_error", "hr")}: ${msg}`)

@@ -154,13 +154,10 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
   const create = useCallback(async (data: CreateLeaveTypeDto) => {
     setFnLoading("create", true)
     setFnError("create", null)
-    const key = idem.getKey('create', data)
     try {
-      await useCase.createLeaveType(data, key)
-      idem.onSettled(undefined, key)
+      await idem.run('create', data, (key) => useCase.createLeaveType(data, key))
       toast.success(t("leave_types.created", "hr"))
     } catch (err: any) {
-      idem.onSettled(err, key)
       const msg = err?.message || "Failed to create leave type"
       setFnError("create", msg)
       toast.error(t("leave_types.create_error", "hr").replace("{message}", msg))
@@ -173,13 +170,10 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
   const update = useCallback(async (id: number, data: UpdateLeaveTypeDto) => {
     setFnLoading("update", true)
     setFnError("update", null)
-    const key = idem.getKey('update', { id, data })
     try {
-      await useCase.updateLeaveType(id, data, key)
-      idem.onSettled(undefined, key)
+      await idem.run('update', { id, data }, (key) => useCase.updateLeaveType(id, data, key))
       toast.success(t("leave_types.updated", "hr"))
     } catch (err: any) {
-      idem.onSettled(err, key)
       const msg = err?.message || "Failed to update leave type"
       setFnError("update", msg)
       toast.error(t("leave_types.update_error", "hr").replace("{message}", msg))
@@ -192,14 +186,11 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
   const archive = useCallback(async (id: number) => {
     setFnLoading("archive", true)
     setFnError("archive", null)
-    const key = idem.getKey('archive', { id })
     try {
-      await useCase.archiveLeaveType(id, key)
-      idem.onSettled(undefined, key)
+      await idem.run('archive', { id }, (key) => useCase.archiveLeaveType(id, key))
       toast.success(t("leave_types.archived", "hr"))
       await findAll()
     } catch (err: any) {
-      idem.onSettled(err, key)
       const msg = err?.message || "Failed to archive leave type"
       setFnError("archive", msg)
       toast.error(t("leave_types.archive_error", "hr").replace("{message}", msg))

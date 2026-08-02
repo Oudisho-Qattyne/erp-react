@@ -65,14 +65,11 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
   const addPartners = useCallback(async (plotId: number, dossierId: number, investorIds: number[]) => {
     setFnLoading("addPartners", true)
     setFnError("addPartners", null)
-    const key = idem.getKey('addPartners', { plotId, dossierId, investorIds })
     try {
-      const res = await useCase.addPartners(plotId, dossierId, investorIds, key)
-      idem.onSettled(undefined, key)
+      const res = await idem.run('addPartners', { plotId, dossierId, investorIds }, (key) => useCase.addPartners(plotId, dossierId, investorIds, key))
       setPartners(res.data?.partners || [])
       toast.success(t("investors.add_investors_success", "investments") || "Partners added successfully")
     } catch (err: any) {
-      idem.onSettled(err, key)
       const msg = err?.message || "Failed to add partners"
       setFnError("addPartners", msg)
       toast.error(msg || t("investors.add_investors_error", "investments"))
@@ -85,14 +82,11 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
   const deletePartners = useCallback(async (plotId: number, dossierId: number, investorIds: number[]) => {
     setFnLoading("deletePartners", true)
     setFnError("deletePartners", null)
-    const key = idem.getKey('removePartners', { plotId, dossierId, investorIds })
     try {
-      const res = await useCase.deletePartners(plotId, dossierId, investorIds, key)
-      idem.onSettled(undefined, key)
+      const res = await idem.run('removePartners', { plotId, dossierId, investorIds }, (key) => useCase.deletePartners(plotId, dossierId, investorIds, key))
       setPartners(res.data?.partners || [])
       toast.success(t("investors.remove_investors_success", "investments") || "Partners removed successfully")
     } catch (err: any) {
-      idem.onSettled(err, key)
       const msg = err?.message || "Failed to remove partners"
       setFnError("deletePartners", msg)
       toast.error(msg || t("investors.remove_investors_error", "investments"))

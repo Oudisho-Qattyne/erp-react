@@ -144,31 +144,17 @@ export function useManageEmployee(params: UseManageEmployeeParams = {}): UseMana
   }, [usecase]);
 
   const create = useCallback(async (data: CreateEmployeeDTO) => {
-    const key = idem.getKey('createEmployee', data);
-    try {
-      const newEmployee = await usecase.create(data, key);
-      idem.onSettled(undefined, key);
-      // Optionally refresh list to include new employee
-      await fetchEmployees();
-      return newEmployee;
-    } catch (err) {
-      idem.onSettled(err, key);
-      throw err;
-    }
+    const newEmployee = await idem.run('createEmployee', data, (key) => usecase.create(data, key));
+    // Optionally refresh list to include new employee
+    await fetchEmployees();
+    return newEmployee;
   }, [usecase, fetchEmployees, idem]);
 
   const update = useCallback(async (id: number, data: UpdateEmployeeDTO) => {
-    const key = idem.getKey('updateEmployee', { id, data });
-    try {
-      const updated = await usecase.update(id, data, key);
-      idem.onSettled(undefined, key);
-      // Update list optimistically or refetch
-      setEmployees(prev => prev.map(emp => emp.id === id ? { ...emp, ...updated } : emp));
-      return updated;
-    } catch (err) {
-      idem.onSettled(err, key);
-      throw err;
-    }
+    const updated = await idem.run('updateEmployee', { id, data }, (key) => usecase.update(id, data, key));
+    // Update list optimistically or refetch
+    setEmployees(prev => prev.map(emp => emp.id === id ? { ...emp, ...updated } : emp));
+    return updated;
   }, [usecase, idem]);
 
   const remove = useCallback(async (id: number) => {

@@ -44,15 +44,44 @@ function uuid(): string {
   });
 }
 
-function isRetryable(err: unknown): boolean {
+const IDEMPOTENCY_KEYS = [
+  'idempotency_missing_key',
+  'idempotency_wrog_data',
+  'idempotency_request_process',
+] as const;
+
+type IdempotencyCode = (typeof IDEMPOTENCY_KEYS)[number] | null;
+
+function getIdempotencyCode(err: unknown): IdempotencyCode {
+  if (typeof err !== 'object' || err === null) return null;
+  const data = (err as { data?: unknown }).data;
+  if (data === null || typeof data !== 'object') return null;
+  const record = data as Record<string, unknown>;
+  for (const code of IDEMPOTENCY_KEYS) {
+    if (code in record) return code;
+  }
+  return null;
+}
+
+function shouldRegenerateAndRetry(err: unknown): boolean {
+  if (typeof err !== 'object' || err === null) return false;
+  const status = (err as { status?: unknown }).status;
+  if (status !== 409) return false;
+  const code = getIdempotencyCode(err);
+  return code === 'idempotency_missing_key' || code === 'idempotency_wrog_data';
+}
+
+function shouldKeepKey(err: unknown): boolean {
   if (err === undefined || err === null) return false;
-  if (typeof err === 'object' && (err as { status?: unknown }).status !== undefined) return false;
-  return true;
+  const status = typeof err === 'object' ? (err as { status?: unknown }).status : undefined;
+  if (status === undefined || status === null) return true;
+  return status === 409 && getIdempotencyCode(err) === 'idempotency_request_process';
 }
 
 export interface UseIdempotencyReturn {
   getKey: (action: string, data?: unknown) => string;
   onSettled: (err?: unknown, key?: string) => void;
+  run: <T>(action: string, data: unknown, fn: (key: string) => Promise<T>) => Promise<T>;
   reset: () => void;
 }
 
@@ -69,7 +98,7 @@ export function useIdempotency(): UseIdempotencyReturn {
   }, []);
 
   const onSettled = useCallback((err?: unknown, key?: string) => {
-    if (isRetryable(err) || !key) return;
+    if (!key || shouldKeepKey(err)) return;
     for (const [h, k] of keysRef.current) {
       if (k === key) {
         keysRef.current.delete(h);
@@ -78,9 +107,38 @@ export function useIdempotency(): UseIdempotencyReturn {
     }
   }, []);
 
+  const run = useCallback(async <T>(
+    action: string,
+    data: unknown,
+    fn: (key: string) => Promise<T>
+  ): Promise<T> => {
+    const MAX_RETRIES = 3;
+    let key = getKey(action, data);
+    let err: unknown;
+    for (let attempt = 0; ; attempt++) {
+      try {
+        const result = await fn(key);
+        onSettled(undefined, key);
+        return result;
+      } catch (e) {
+        err = e;
+        if (!shouldRegenerateAndRetry(err) || attempt >= MAX_RETRIES) break;
+        for (const [h, k] of keysRef.current) {
+          if (k === key) {
+            keysRef.current.delete(h);
+            break;
+          }
+        }
+        key = getKey(action, data);
+      }
+    }
+    onSettled(err, key);
+    throw err;
+  }, [getKey, onSettled]);
+
   const reset = useCallback(() => {
     keysRef.current.clear();
   }, []);
 
-  return { getKey, onSettled, reset };
+  return { getKey, onSettled, run, reset };
 }

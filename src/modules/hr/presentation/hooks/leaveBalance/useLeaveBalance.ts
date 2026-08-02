@@ -126,13 +126,10 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
   const adjustLeaveBalance = useCallback(async (adjust: AdjustLeaveBalanceDto) => {
     setFnLoading("adjustLeaveBalance", true)
     setFnError("adjustLeaveBalance", null)
-    const key = idem.getKey('adjust', adjust)
     try {
-      await useCase.adjustLeaveBalance(adjust, key)
-      idem.onSettled(undefined, key)
+      await idem.run('adjust', adjust, (key) => useCase.adjustLeaveBalance(adjust, key))
       toast.success(t("leave_balance.adjusted", "hr"))
     } catch (err: any) {
-      idem.onSettled(err, key)
       const msg = err?.message || "Failed to adjust leave balance"
       setFnError("adjustLeaveBalance", msg)
       toast.error(t("leave_balance.adjust_error", "hr").replace("{message}", msg))

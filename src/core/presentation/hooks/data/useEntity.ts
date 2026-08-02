@@ -160,14 +160,11 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
   const create = useCallback(async (data: CreateEntityDTO<T>) => {
     setFnLoading('create', true);
     setFnError('create', null);
-    const key = idem.getKey('create', data);
     try {
-      const newEntity = await usecase.create(data, key);
-      idem.onSettled(undefined, key);
+      const newEntity = await idem.run('create', data, (key) => usecase.create(data, key));
       setEntities(prev => [...prev, newEntity.data]);
       return newEntity;
     } catch (err: any) {
-      idem.onSettled(err, key);
       const msg = err.message || 'Failed to create entities';
       setFnError('create', msg);
       throw err;
@@ -179,14 +176,11 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
   const update = useCallback(async (id: number, data: UpdateEntityDTO<T>) => {
     setFnLoading('update', true);
     setFnError('update', null);
-    const key = idem.getKey('update', { id, data });
     try {
-      const updated = await usecase.update(id, data, key);
-      idem.onSettled(undefined, key);
+      const updated = await idem.run('update', { id, data }, (key) => usecase.update(id, data, key));
       setEntities(prev => prev.map(u => u.id === id ? updated.data : u));
       return updated;
     } catch (err: any) {
-      idem.onSettled(err, key);
       const msg = err.message || `Failed to update entities ${id}`;
       setFnError('update', msg);
       throw err;

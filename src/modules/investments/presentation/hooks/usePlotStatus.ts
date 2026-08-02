@@ -15,14 +15,7 @@ export const usePlotStatus = (): UsePlotStatusReturn => {
   const idem = useIdempotency()
 
   const changeStatus = async (plotId: number, body: PlotStatusBody): Promise<void> => {
-    const key = idem.getKey('changePlotStatus', { plotId, body })
-    try {
-      await useCase.changeStatus(plotId, body, key)
-      idem.onSettled(undefined, key)
-    } catch (err) {
-      idem.onSettled(err, key)
-      throw err
-    }
+    await idem.run('changePlotStatus', { plotId, body }, (key) => useCase.changeStatus(plotId, body, key))
   }
 
   return { changeStatus }
