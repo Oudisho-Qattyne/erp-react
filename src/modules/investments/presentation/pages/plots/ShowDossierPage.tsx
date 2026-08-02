@@ -33,12 +33,13 @@ export function ShowDossierPage() {
   );
 
   const [dossier, setDossier] = useState<Dossier | null>(null);
-  const [plotStatus, setPlotStatus] = useState<string | null>(null);
+  const [plot, setPlot] = useState<Plot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [historyOpen, setHistoryOpen] = useState(false);
 
+  const plotStatus = plot?.status ?? null;
   const canShowContracts = plotStatus === 'allocated' && dossier?.status === 'active';
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export function ShowDossierPage() {
       .then(([dossierRes, plotRes]) => {
         if (dossierRes?.data) setDossier(dossierRes.data);
         else setError(t('dossier.not_found', 'investments') || 'Dossier not found');
-        if (plotRes?.data) setPlotStatus(plotRes.data.status);
+        if (plotRes?.data) setPlot(plotRes.data);
       })
       .catch(() => setError(t('dossier.load_error', 'investments') || 'Failed to load dossier'))
       .finally(() => setLoading(false));
@@ -58,9 +59,8 @@ export function ShowDossierPage() {
 
   const handleBack = () => navigate(`/investments/plots/${plotId}/edit`);
 
-  if (loading) return <div className="p-6"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>;
   if (error) return <div className="p-6"><ErrorState message={error} onRetry={() => handleBack()} /></div>;
-  if (!dossier) return null;
+  if (!loading && !dossier) return null;
 
   return (
     <div className="p-6 w-full mx-auto space-y-6">
@@ -80,11 +80,17 @@ export function ShowDossierPage() {
       </div>
 
       {plotId && dossierId &&
-        <DossierDetailsSection dossierId={dossierId} plotId={plotId} />
+        (loading
+          ? <div className="py-8"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>
+          : <DossierDetailsSection dossierId={dossierId} plotId={plotId} dossier={dossier} />
+        )
       }
 
       {plotId &&
-        <PlotDetailsSection plotId={plotId} />
+        (loading
+          ? <div className="py-8"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>
+          : <PlotDetailsSection plotId={plotId} plot={plot} />
+        )
       }
       {dossierId && plotId &&
         <PartnersSection plotId={plotId} dossierId={dossierId} />

@@ -9,15 +9,20 @@ import { MapPin } from 'lucide-react';
 
 interface Props {
   plotId: string;
+  plot?: Plot | null;
 }
 
-export function PlotDetailsSection({ plotId }: Props) {
+export function PlotDetailsSection({ plotId, plot: plotProp }: Props) {
   const { t } = useLanguage();
   const { getById, loadingMap } = useEntityCrud<Plot>('/investments/plots', '/investments/plots');
   const [plot, setPlot] = useState<Plot | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (plotProp) {
+      setPlot(plotProp);
+      return;
+    }
     if (!plotId) return;
     getById(Number(plotId))
       .then((res) => {
@@ -25,7 +30,7 @@ export function PlotDetailsSection({ plotId }: Props) {
         else setError(t('plots.not_found', 'investments') || 'Plot not found');
       })
       .catch((err) => setError(err?.message || t('plots.load_error', 'investments') || 'Failed to load plot'));
-  }, [plotId]);
+  }, [plotId, plotProp]);
 
   if (!plotId) return null;
 

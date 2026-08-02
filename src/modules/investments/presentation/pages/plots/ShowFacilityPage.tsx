@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import type { Facility } from '../../../domain/entities/facility';
+import type { Dossier } from '../../../domain/entities/dossier';
+import type { Plot } from '../../../domain/entities/plot';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
@@ -22,8 +24,21 @@ export function ShowFacilityPage() {
 
   const { getById } = useEntityCrud<Facility>(`/investments/facilities`, `/investments/facilities`);
 
+  const { getById: getDossierById } = useEntityCrud<Dossier>(
+    `/investments/plots/${plotId}/dossiers`,
+    `/investments/plots/${plotId}/dossiers`
+  );
+
+  const { getById: getPlotById } = useEntityCrud<Plot>(
+    `/investments/plots`,
+    `/investments/plots`
+  );
+
   const [facility, setFacility] = useState<Facility | null>(null);
+  const [dossier, setDossier] = useState<Dossier | null>(null);
+  const [plot, setPlot] = useState<Plot | null>(null);
   const [loading, setLoading] = useState(true);
+  const [relationsLoading, setRelationsLoading] = useState(!!(plotId && dossierId));
   const [error, setError] = useState<string | null>(null);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
 
@@ -38,7 +53,24 @@ export function ShowFacilityPage() {
       .finally(() => setLoading(false));
   }, [facilityId]);
 
+  useEffect(() => {
+    if (!dossierId || !plotId) return;
+    Promise.all([
+      getDossierById(Number(dossierId)),
+      getPlotById(Number(plotId)),
+    ])
+      .then(([dossierRes, plotRes]) => {
+        if (dossierRes?.data) setDossier(dossierRes.data);
+        if (plotRes?.data) setPlot(plotRes.data);
+      })
+      .catch(() => {})
+      .finally(() => setRelationsLoading(false));
+  }, [dossierId, plotId]);
+
   const handleBack = () => navigate(`/investments/plots/${plotId}/dossiers/${dossierId}`);
+
+  const plotStatus = plot?.status ?? null;
+  const canShowLicenses = plotStatus === 'allocated' && dossier?.status === 'active';
 
   if (loading) return <div className="p-6"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>;
   if (error) return <div className="p-6"><ErrorState message={error} onRetry={() => window.location.reload()} /></div>;
@@ -98,17 +130,23 @@ export function ShowFacilityPage() {
         </div>
       </SectionCard>
       {plotId && dossierId &&
-        <DossierDetailsSection dossierId={dossierId} plotId={plotId} />
+        (relationsLoading
+          ? <div className="py-8"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>
+          : <DossierDetailsSection dossierId={dossierId} plotId={plotId} dossier={dossier} />
+        )
       }
       {plotId &&
-        <PlotDetailsSection plotId={plotId} />
+        (relationsLoading
+          ? <div className="py-8"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>
+          : <PlotDetailsSection plotId={plotId} plot={plot} />
+        )
       }
       {
-        facilityId &&
+        facilityId && canShowLicenses &&
         <FacilityIndustrialLicensesSection facilityId={facilityId} />
       }
       {
-        facilityId &&
+        facilityId && canShowLicenses &&
         <BuildingLicenseSection facilityId={facilityId} />
       }
 
