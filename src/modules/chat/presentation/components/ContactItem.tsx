@@ -28,7 +28,7 @@ export function ContactItem({ conversation, isSelected, onSelect, currentUserId 
   return (
     <button
       onClick={() => onSelect(conversation)}
-      className={`w-full text-right px-3 py-3 flex items-center gap-3 hover:bg-primary-light transition-colors border-b border-border/50 cursor-pointer ${
+      className={`group w-full text-right px-3 py-3 flex items-center gap-3 hover:bg-primary-light transition-colors border-b border-border/50 cursor-pointer ${
         isSelected ? "bg-primary" : ""
       }`}
     >
@@ -46,21 +46,21 @@ export function ContactItem({ conversation, isSelected, onSelect, currentUserId 
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-baseline">
-          <span className={`font-semibold text-sm truncate ${isSelected ? "text-white" : "text-text"}`}>
+          <span className={`font-semibold text-sm truncate group-hover:text-white ${isSelected ? "text-white" : "text-text"}`}>
             {otherUser.name}
           </span>
-          <span className={`text-[11px] shrink-0 mr-1 ${isSelected ? "text-white/70" : "text-text-muted"}`}>
+          <span className={`text-[11px] shrink-0 mr-1 group-hover:text-white/70 ${isSelected ? "text-white/70" : "text-text-muted"}`}>
             {displayTime}
           </span>
         </div>
         <div className="flex justify-between items-center mt-0.5">
           {lastMsg ? (
-            <span className={`text-xs truncate ${isSelected ? "text-white/70" : "text-text-muted"}`}>
+            <span className={`text-xs truncate group-hover:text-white/70 ${isSelected ? "text-white/70" : "text-text-muted"}`}>
               {lastMsg.sender_id === currentUserId ? "You: " : ""}
               {lastMsg.body}
             </span>
           ) : (
-            <span className={`text-xs ${isSelected ? "text-white/50" : "text-text-muted"}`}>No messages yet</span>
+            <span className={`text-xs group-hover:text-white/50 ${isSelected ? "text-white/50" : "text-text-muted"}`}>No messages yet</span>
           )}
           {unread > 0 && (
             <span className={`text-[10px] font-bold rounded-full min-w-4.5 h-4.5 flex items-center justify-center px-1 leading-none shrink-0 mr-1 ${

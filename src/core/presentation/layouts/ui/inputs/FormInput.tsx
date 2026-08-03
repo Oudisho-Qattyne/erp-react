@@ -36,6 +36,9 @@ export interface FormInputProps<T extends FieldValues> {
   min?: number;
   max?: number;
   step?: number;
+  // For decimal
+  decimalPlaces?: number;
+  allowNegative?: boolean;
   // For select-or-create
   createTitle?: string;
   labelPath?: string;
@@ -79,6 +82,8 @@ export function FormInput<T extends FieldValues>({
   min,
   max,
   step,
+  decimalPlaces,
+  allowNegative,
   createTitle = 'إضافة جديد',
   labelPath,
   renderCreateForm,
@@ -256,6 +261,8 @@ export function FormInput<T extends FieldValues>({
         min={min}
         max={max}
         step={step}
+        decimalPlaces={decimalPlaces}
+        allowNegative={allowNegative}
         matrixFields={finalMatrixFields}
         numberOfRows={finalNumberOfRows}
         minRows={minRows}

@@ -1,0 +1,47 @@
+{
+  "title": "Finance",
+  "dashboard": {
+    "title": "Finance Dashboard",
+    "welcome_title": "Finance Module",
+    "welcome_subtitle": "Your financial management hub",
+    "total_balance": "Total Balance",
+    "income": "Income",
+    "expenses": "Expenses",
+    "subtotal": "Subtotal",
+    "currency": "SYP",
+    "placeholder_title": "Coming Soon",
+    "placeholder_message": "This module is ready — build finance features here such as transactions, accounts, expenses, revenue and reports.",
+    "no_data": "No data yet"
+  },
+  "navigation": {
+    "dashboard": {
+      "title": "Dashboard"
+    }
+  },
+  "fee": {
+    "name": "Name",
+    "code": "Code",
+    "fee_value": "Fee Value",
+    "fee_status": "Status",
+    "status_active": "Active",
+    "status_archived": "Archived",
+    "created": "Fee created successfully",
+    "create_error": "Failed to create fee",
+    "updated": "Fee updated successfully",
+    "update_error": "Failed to update fee",
+    "archived": "Fee archived successfully",
+    "archive_error": "Failed to archive fee",
+    "deleted": "Fee deleted successfully",
+    "delete_error": "Failed to delete fee",
+    "load_error": "Failed to load fees",
+    "validation": {
+      "name_min": "Name must be at least 3 letters",
+      "name_max": "Name must be at most 255 letters",
+      "name_invalid": "Name must contain letters only",
+      "code_invalid": "Code must contain letters and digits only, without spaces",
+      "fee_value_required": "Fee value is required",
+      "fee_value_negative": "Fee value cannot be negative",
+      "fee_value_decimals": "Fee value must have at most 2 decimal places"
+    }
+  }
+}

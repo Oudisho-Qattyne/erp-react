@@ -102,7 +102,7 @@ export function UserList({ users, currentUserId, existingConversations, onSelect
                 <button
                   key={user.id}
                   onClick={() => onSelectUser(user)}
-                  className="w-full text-right px-3 py-3 flex items-center gap-3 hover:bg-primary-light transition-colors border-b border-border/50 cursor-pointer"
+                  className="group w-full text-right px-3 py-3 flex items-center gap-3 hover:bg-primary-light transition-colors border-b border-border/50 cursor-pointer"
                 >
                   <div className="relative shrink-0">
                     <div className="w-11 h-11 rounded-full flex items-center justify-center font-bold text-sm bg-primary/10 text-primary">
@@ -117,20 +117,20 @@ export function UserList({ users, currentUserId, existingConversations, onSelect
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-sm text-text truncate">
+                    <div className="font-semibold text-sm text-text truncate group-hover:text-white">
                       {user.name}
                     </div>
-                    <div className="text-xs text-text-muted truncate">
+                    <div className="text-xs text-text-muted truncate group-hover:text-white/70">
                       {user.email}
                     </div>
                   </div>
                   <div className="shrink-0">
                     {existing ? (
-                      <span className="text-[10px] text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] text-primary bg-primary/10 px-2 py-0.5 rounded-full group-hover:text-white/90">
                         {t("user_list.existing_conversation", "chat")}
                       </span>
                     ) : (
-                      <MessageCircle size={16} className="text-text-muted" />
+                      <MessageCircle size={16} className="text-text-muted group-hover:text-white/70" />
                     )}
                   </div>
                 </button>
