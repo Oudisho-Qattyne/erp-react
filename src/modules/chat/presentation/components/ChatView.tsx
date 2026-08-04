@@ -3,6 +3,7 @@ import { ChatHeader } from "./ChatHeader"
 import { MessageList } from "./MessageList"
 import { ChatInput } from "./ChatInput"
 import { ChatEmptyState } from "./ChatEmptyState"
+import { ChatBackgroundPattern } from "./ChatBackgroundPattern"
 import type { Conversation } from "../../domain/entities/Conversation"
 import type { Message } from "../../domain/entities/Message"
 
@@ -38,9 +39,10 @@ export function ChatView({
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-card">
+    <div className="flex-1 flex flex-col bg-background">
       <ChatHeader conversation={conversation} currentUserId={currentUserId} onBack={onBack} />
       <div className="flex-1 flex flex-col relative overflow-hidden">
+        <ChatBackgroundPattern key={conversation.id} />
         {loading && (
           <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center">
             <Loader2 size={28} className="text-primary animate-spin" />

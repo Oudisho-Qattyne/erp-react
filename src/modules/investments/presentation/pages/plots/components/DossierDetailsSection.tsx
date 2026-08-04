@@ -10,6 +10,7 @@ import { FileText } from 'lucide-react';
 interface Props {
   dossierId: string;
   plotId: string;
+  dossier?: Dossier | null;
 }
 
 const statusStyles: Record<string, { color: string; bg: string }> = {
@@ -19,7 +20,7 @@ const statusStyles: Record<string, { color: string; bg: string }> = {
   draft: { color: '#ca8a04', bg: '#fefce8' },
 };
 
-export function DossierDetailsSection({ dossierId, plotId }: Props) {
+export function DossierDetailsSection({ dossierId, plotId, dossier: dossierProp }: Props) {
   const { t } = useLanguage();
   const { getById, loadingMap } = useEntityCrud<Dossier>(
     `/investments/plots/${plotId}/dossiers`,
@@ -29,6 +30,10 @@ export function DossierDetailsSection({ dossierId, plotId }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (dossierProp) {
+      setDossier(dossierProp);
+      return;
+    }
     if (!dossierId || !plotId) return;
     getById(Number(dossierId))
       .then((res) => {
@@ -36,7 +41,7 @@ export function DossierDetailsSection({ dossierId, plotId }: Props) {
         else setError(t('dossier.not_found', 'investments') || 'Dossier not found');
       })
       .catch((err) => setError(err?.message || t('dossier.load_error', 'investments') || 'Failed to load dossier'));
-  }, [dossierId, plotId]);
+  }, [dossierId, plotId, dossierProp]);
 
   if (!dossierId || !plotId) return null;
 

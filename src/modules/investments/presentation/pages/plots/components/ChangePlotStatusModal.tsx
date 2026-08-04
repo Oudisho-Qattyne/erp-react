@@ -4,11 +4,12 @@ import { Button } from '../../../../../../core/presentation/layouts/ui/buttons/B
 import { ChevronDown } from 'lucide-react';
 import Input from '../../../../../../core/presentation/layouts/ui/inputs/Input';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
-import { useApiClient } from '../../../../../../core/presentation/context/api/ApiClinetProvider';
 import { DossierPickerDialog } from './DossierPickerDialog';
 import { toast } from 'sonner';
 import type { Plot } from '../../../../domain/entities/plot';
 import type { Dossier } from '../../../../domain/entities/dossier';
+import type { PlotStatusBody } from '../../../../domain/repositories/IPlotRepository';
+import { usePlotStatus } from '../../../hooks/usePlotStatus';
 
 interface ChangePlotStatusModalProps {
   isOpen: boolean;
@@ -19,7 +20,7 @@ interface ChangePlotStatusModalProps {
 
 export function ChangePlotStatusModal({ isOpen, onClose, plot, onSuccess }: ChangePlotStatusModalProps) {
   const { t } = useLanguage();
-  const apiClient = useApiClient();
+  const { changeStatus } = usePlotStatus();
   
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string>('');
@@ -48,7 +49,7 @@ export function ChangePlotStatusModal({ isOpen, onClose, plot, onSuccess }: Chan
 
     setLoading(true);
     try {
-      const body: any = {
+      const body: PlotStatusBody = {
         status,
         status_date: statusDate,
         notes,
@@ -56,8 +57,7 @@ export function ChangePlotStatusModal({ isOpen, onClose, plot, onSuccess }: Chan
       if (status === 'allocated' && selectedDossier) {
         body.allocated_dossier_id = selectedDossier.id;
       }
-      await apiClient.put(`/investments/plots/${plot.id}/status`, body);
-      
+      await changeStatus(plot.id, body);
       toast.success(t('plots.status_updated', 'investments') || 'Status updated successfully');
       onSuccess();
       onClose();

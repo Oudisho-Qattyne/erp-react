@@ -98,7 +98,6 @@ export function ShowEmployeePage() {
       />
     );
   }
-  console.log(employee);
   
 
   return (

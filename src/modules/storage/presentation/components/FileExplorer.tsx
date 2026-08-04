@@ -14,7 +14,6 @@ import '../styles/filemanager-theme.css';
 import '../styles/storage-explorer.css';
 import type { StorageItemDto } from '../../application/dtos/storageItem';
 import { useFileExplorer } from '../hooks/useFileExplorer';
-import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
 import { AuthContext } from '../../../../core/infrastructure/auth/AuthProvider';
 import type { StorageItem } from '../../domain/entities/FileSystemEntry';
 
@@ -29,7 +28,6 @@ interface FileExplorerProps {
 
 export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTypes, multiple = true }: FileExplorerProps) {
 
-    const apiClient = useApiClient();
     const previewCache = useRef<Map<string, string>>(new Map());
     const [, forceRender] = useReducer(x => x + 1, 0);
 
@@ -46,6 +44,7 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
         uploadFile,
         deleteFile,
         downloadFile,
+        getFileBlob,
         loadFolderByPath,
         moveStorageItem,
     } = useFileExplorer(folderId, fileTypes, previewCache)
@@ -245,7 +244,7 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
         if (!mimeType?.startsWith('image')) return null;
         const cached = previewCache.current.get(file.id);
         if (cached) return cached;
-        apiClient.get<Blob>(`/storage-management/${file._id || file.id}`, { responseType: 'blob' })
+        getFileBlob(file._id || file.id)
             .then(blob => {
                 const url = URL.createObjectURL(blob);
                 previewCache.current.set(file.id, url);

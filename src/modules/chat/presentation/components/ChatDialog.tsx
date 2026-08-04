@@ -26,8 +26,7 @@ interface ChatDialogProps {
   error: Record<string, string | null>
   fetchConversations: () => Promise<DomainResponse<Conversation[]> | undefined>
   fetchMessages: (conversationId: number) => Promise<DomainResponse<Message[]> | undefined>
-  fetchUsers: (filters?: { name?: string; email?: string; status?: string }) => Promise<DomainResponse<ChatUser[]> | undefined>
-  setUserFilters: (filters: { name?: string; email?: string; status?: string }) => void
+  fetchUsers: (name?: string, email?: string) => Promise<DomainResponse<ChatUser[]> | undefined>
   selectConversation: (conversation: Conversation) => Promise<void>
   sendMessage: (data: SendMessageDto) => Promise<DomainResponse<Message> | undefined>
   markAsRead: (conversationId: number) => Promise<void>
@@ -41,6 +40,10 @@ interface ChatDialogProps {
   messagesLoadingMore: boolean
   usersHasMore: boolean
   usersLoadingMore: boolean
+  usersNameSearch: string
+  usersEmailSearch: string
+  setUsersNameSearch: (search: string) => void
+  setUsersEmailSearch: (search: string) => void
 }
 
 function ChatDialog({
@@ -70,6 +73,10 @@ function ChatDialog({
   messagesLoadingMore,
   usersHasMore,
   usersLoadingMore,
+  usersNameSearch,
+  usersEmailSearch,
+  setUsersNameSearch,
+  setUsersEmailSearch,
 }: ChatDialogProps) {
   const { t } = useLanguage()
 
@@ -84,8 +91,8 @@ function ChatDialog({
   }, [isOpen, showNewChat])
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [newConversationUser, currentConversation])
+    if (isOpen) messagesEndRef.current?.scrollIntoView({ behavior: "auto" })
+  }, [newConversationUser, currentConversation, isOpen])
 
   const createPlaceholderConversation = (otherUser: ChatUser): Conversation => ({
     id: 0,
@@ -235,7 +242,10 @@ function ChatDialog({
                 onLoadMore={fetchMoreUsers}
                 hasMore={usersHasMore}
                 loadingMore={usersLoadingMore}
-                onSearch={handleSearchUsers}
+                nameSearch={usersNameSearch}
+                emailSearch={usersEmailSearch}
+                onNameSearchChange={setUsersNameSearch}
+                onEmailSearchChange={setUsersEmailSearch}
               />
             ) : (
               <>

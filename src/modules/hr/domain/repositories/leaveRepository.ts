@@ -6,9 +6,9 @@ import type { DomainResponse } from "../../../../core/domain/common/responce/Dom
 export interface ILeaveTypeRepository {
     findAllLeaveTypes(filter?: any): Promise<DpomainResponsePaginated<EntityWithNameOnly[]>>;
     findLeaveTypeById(id: number): Promise<DpomainResponsePaginated<Leave>>;
-    createLeaveType(data: any): Promise<DpomainResponsePaginated<Leave>>;
-    updateLeaveType(id: number, data: any): Promise<DpomainResponsePaginated<Leave>>;
-    archiveLeaveType(id: number): Promise<DpomainResponsePaginated<Leave>>;
+    createLeaveType(data: any, idempotencyKey?: string): Promise<DpomainResponsePaginated<Leave>>;
+    updateLeaveType(id: number, data: any, idempotencyKey?: string): Promise<DpomainResponsePaginated<Leave>>;
+    archiveLeaveType(id: number, idempotencyKey?: string): Promise<DpomainResponsePaginated<Leave>>;
     deleteLeaveType(id: number): Promise<DpomainResponsePaginated<Leave>>;
     getUserEligibleLeaveTypes(): Promise<DomainResponse<EntityWithNameOnly[]>>;
 }

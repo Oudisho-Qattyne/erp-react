@@ -51,7 +51,7 @@ export function createFetchApiClient(
       const errorData = await response.json().catch(() => null);
       const message = errorData?.message || `HTTP error! status: ${response.status}`;
       const validationErrors = errorData?.validationErrors;
-      throw createApiError(message, validationErrors, response.status);
+      throw createApiError(message, validationErrors, response.status, errorData);
     }
 
     // No content (204) or empty body – return null

@@ -7,6 +7,7 @@ import type { LeaveBalance } from "../../../domain/entities/leaveBalance/leaveBa
 import type { FilterLeaveBalancesDto } from "../../../application/dtos/LeaveBalance/FilterLeaveBalanceDto"
 import type { AdjustLeaveBalanceDto } from "../../../application/dtos/LeaveBalance/AdjustLeaveBalanceDto"
 import { toast } from "sonner"
+import { useIdempotency } from "../../../../../core/presentation/hooks/useIdempotency"
 
 const OP_KEYS = ["findAllMyLeaveBalances", "findAllEmployeeLeaveBalances", "adjustLeaveBalance"] as const
 
@@ -51,6 +52,7 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
 
   const repository = createLeaveBalanceRepository(apiClient)
   const useCase = createManageLeaveBalanceUseCase(repository)
+  const idem = useIdempotency()
 
   const setFnLoading = (fn: string, v: boolean) => setLoading((p) => ({ ...p, [fn]: v }))
   const setFnError = (fn: string, e: string | null) => setError((p) => ({ ...p, [fn]: e }))
@@ -125,7 +127,7 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
     setFnLoading("adjustLeaveBalance", true)
     setFnError("adjustLeaveBalance", null)
     try {
-      await useCase.adjustLeaveBalance(adjust)
+      await idem.run('adjust', adjust, (key) => useCase.adjustLeaveBalance(adjust, key))
       toast.success(t("leave_balance.adjusted", "hr"))
     } catch (err: any) {
       const msg = err?.message || "Failed to adjust leave balance"
@@ -135,7 +137,7 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
     } finally {
       setFnLoading("adjustLeaveBalance", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])

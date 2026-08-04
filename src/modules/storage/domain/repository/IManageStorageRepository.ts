@@ -13,22 +13,22 @@ export interface IManageStorageRepository {
   getFolderContentsByPath(path: string): Promise<DomainResponse<StorageItem[]>>;
 
   // Create a new folder
-  createFolder(parentId: string | null, name: string): Promise<DomainResponse<StorageFolder>>;
+  createFolder(parentId: string | null, name: string, idempotencyKey?: string): Promise<DomainResponse<StorageFolder>>;
 
   // Upload a file
-  uploadFile(parentId: string | null, file: File, name: string, isSecure?: boolean): Promise<DomainResponse<StorageFile>>;
+  uploadFile(parentId: string | null, file: File, name: string, isSecure?: boolean, idempotencyKey?: string): Promise<DomainResponse<StorageFile>>;
 
   // // Rename a folder
-  renameFolder(id: string, newName: string): Promise<DomainResponse<StorageFolder>>;
+  renameFolder(id: string, newName: string, idempotencyKey?: string): Promise<DomainResponse<StorageFolder>>;
 
   // Delete a folder
   deleteFolder(id: string): Promise<DomainResponse<void>>;
 
   // // Move a folder to a new parent (null = root)
   // moveFolder(id: string, newParentId: string | null): Promise<DomainResponse<StorageFolder>>;
-  moveFolder (folderId: string, newParentId:string | null): Promise<DomainResponse<StorageFolder>>
+  moveFolder (folderId: string, newParentId:string | null, idempotencyKey?: string): Promise<DomainResponse<StorageFolder>>
   // // Move a file to a new parent
-  moveFile (fileId: string, newParentId:string | null): Promise<DomainResponse<StorageFile>> 
+  moveFile (fileId: string, newParentId:string | null, idempotencyKey?: string): Promise<DomainResponse<StorageFile>> 
   
   // moveFile(id: string, newParentId: string | null): Promise<DomainResponse<StorageFile>>;
   
@@ -37,4 +37,7 @@ export interface IManageStorageRepository {
   
   // // Download a file (returns blob with content disposition)
   downloadFile(fileId: string, signedUrl?: string): Promise<DomainResponse<Blob>>;
+
+  // Get a raw file blob by storage item id (for previews/images)
+  getFileBlob(storageItemId: string | number): Promise<Blob>;
 }

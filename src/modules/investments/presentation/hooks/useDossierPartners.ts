@@ -6,6 +6,7 @@ import { createManageDossierPartnersUseCase } from "../../application/usecases/m
 import type { Investor } from "../../domain/entities/investor"
 import type { Partner } from "../../domain/entities/partner"
 import { toast } from "sonner"
+import { useIdempotency } from "../../../../core/presentation/hooks/useIdempotency"
 
 const OP_KEYS = ["getPartners", "addPartners", "deletePartners", "listPartnersHistory"] as const
 
@@ -39,6 +40,7 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
 
   const repository = createDossierPartnersRepository(apiClient)
   const useCase = createManageDossierPartnersUseCase(repository)
+  const idem = useIdempotency()
 
   const setFnLoading = (fn: string, v: boolean) => setLoading((p) => ({ ...p, [fn]: v }))
   const setFnError = (fn: string, e: string | null) => setError((p) => ({ ...p, [fn]: e }))
@@ -64,7 +66,7 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
     setFnLoading("addPartners", true)
     setFnError("addPartners", null)
     try {
-      const res = await useCase.addPartners(plotId, dossierId, investorIds)
+      const res = await idem.run('addPartners', { plotId, dossierId, investorIds }, (key) => useCase.addPartners(plotId, dossierId, investorIds, key))
       setPartners(res.data?.partners || [])
       toast.success(t("investors.add_investors_success", "investments") || "Partners added successfully")
     } catch (err: any) {
@@ -75,13 +77,13 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
     } finally {
       setFnLoading("addPartners", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const deletePartners = useCallback(async (plotId: number, dossierId: number, investorIds: number[]) => {
     setFnLoading("deletePartners", true)
     setFnError("deletePartners", null)
     try {
-      const res = await useCase.deletePartners(plotId, dossierId, investorIds)
+      const res = await idem.run('removePartners', { plotId, dossierId, investorIds }, (key) => useCase.deletePartners(plotId, dossierId, investorIds, key))
       setPartners(res.data?.partners || [])
       toast.success(t("investors.remove_investors_success", "investments") || "Partners removed successfully")
     } catch (err: any) {
@@ -92,7 +94,7 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
     } finally {
       setFnLoading("deletePartners", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const listPartnersHistory = useCallback(async (plotId: number, dossierId: number) => {
     setFnLoading("listPartnersHistory", true)

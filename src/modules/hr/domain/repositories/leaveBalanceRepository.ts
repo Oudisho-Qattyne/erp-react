@@ -5,5 +5,5 @@ import type { LeaveBalance } from "../entities/leaveBalance/leaveBalance";
 export interface ILeaveBalanceRepository {
     findAllEmployeeLeaveBalances(employeeId:number | undefined ,  filter?: any): Promise<DpomainResponsePaginated<LeaveBalance[]>>;
     findAllMyLeaveBalances(filter?: any): Promise<DpomainResponsePaginated<LeaveBalance[]>>;
-    adjustLeaveBalance(adjust : any) : Promise<DpomainResponsePaginated<any>>
+    adjustLeaveBalance(adjust : any, idempotencyKey?: string) : Promise<DpomainResponsePaginated<any>>
 }

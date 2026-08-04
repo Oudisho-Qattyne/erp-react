@@ -5,6 +5,7 @@ import { createCrufRepository } from '../../../infrastructure/repositories/CrudR
 import { createManageEntityUsecase } from '../../../application/usecases/manageEntityUseCase';
 import type { EntityWithNameOnly } from '../../../domain/entities/EntityWithNameOnly';
 import { useApiClient } from '../../context/api/ApiClinetProvider';
+import { useIdempotency } from '../useIdempotency';
 
 const OP_KEYS = ['getAll', 'getById', 'create', 'update', 'remove'] as const;
 
@@ -76,6 +77,7 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
   const [entities, setEntities] = useState<T[]>([]);
   const [pagination, setPagination] = useState<PaginationInfo>();
   const apiClient = useApiClient();
+  const idem = useIdempotency();
 
   const loading = Object.values(loadingMap).some(Boolean);
   const error = Object.values(errorMap).find((e) => e !== null) ?? null;
@@ -159,7 +161,7 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
     setFnLoading('create', true);
     setFnError('create', null);
     try {
-      const newEntity = await usecase.create(data);
+      const newEntity = await idem.run('create', data, (key) => usecase.create(data, key));
       setEntities(prev => [...prev, newEntity.data]);
       return newEntity;
     } catch (err: any) {
@@ -169,13 +171,13 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
     } finally {
       setFnLoading('create', false);
     }
-  }, [usecase]);
+  }, [usecase, idem]);
 
   const update = useCallback(async (id: number, data: UpdateEntityDTO<T>) => {
     setFnLoading('update', true);
     setFnError('update', null);
     try {
-      const updated = await usecase.update(id, data);
+      const updated = await idem.run('update', { id, data }, (key) => usecase.update(id, data, key));
       setEntities(prev => prev.map(u => u.id === id ? updated.data : u));
       return updated;
     } catch (err: any) {
@@ -185,7 +187,7 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
     } finally {
       setFnLoading('update', false);
     }
-  }, [usecase]);
+  }, [usecase, idem]);
 
   const remove = useCallback(async (id: number) => {
     setFnLoading('remove', true);

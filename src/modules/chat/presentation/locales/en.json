@@ -10,10 +10,8 @@
     "no_results": "No results"
   },
   "user_list": {
-    "search_placeholder": "Search by name...",
-    "email_placeholder": "Search by email...",
-    "search_btn": "Search",
-    "clear": "Clear",
+    "search_name_placeholder": "Search by name...",
+    "search_email_placeholder": "Search by email...",
     "loading": "Loading...",
     "retry": "Retry",
     "no_results": "No results",

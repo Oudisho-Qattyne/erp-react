@@ -43,8 +43,8 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
     },
 
 
-    createFolder: async (parentId: string, name: string): Promise<DomainResponse<StorageItemDto>> => {
-      const res = await repository.createFolder(parentId, name)
+    createFolder: async (parentId: string, name: string, idempotencyKey?: string): Promise<DomainResponse<StorageItemDto>> => {
+      const res = await repository.createFolder(parentId, name, idempotencyKey)
       let storageItemsDto: StorageItemDto
       if (res.data) {
 
@@ -61,13 +61,13 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
     },
 
     // File operations
-    uploadFile: async (parentId: string, file: File, name: string, isSecure: boolean): Promise<DomainResponse<StorageFile>> => {
-      return (repository.uploadFile(parentId, file, name ? name : file.name, isSecure));
+    uploadFile: async (parentId: string, file: File, name: string, isSecure: boolean, idempotencyKey?: string): Promise<DomainResponse<StorageFile>> => {
+      return (repository.uploadFile(parentId, file, name ? name : file.name, isSecure, idempotencyKey));
     },
 
 
-    renameFolder: async (folderId: string, name: string): Promise<DomainResponse<StorageFolder>> => {
-      return (repository.renameFolder(folderId, name));
+    renameFolder: async (folderId: string, name: string, idempotencyKey?: string): Promise<DomainResponse<StorageFolder>> => {
+      return (repository.renameFolder(folderId, name, idempotencyKey));
     },
 
     deleteFolder: async (folderId: string): Promise<void> => {
@@ -77,13 +77,13 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
       //   }
     },
 
-    moveFolder: async (folderId: string, newParentId: string | null): Promise<DomainResponse<StorageFolder>> => {
-      return(repository.moveFolder(folderId, newParentId));
+    moveFolder: async (folderId: string, newParentId: string | null, idempotencyKey?: string): Promise<DomainResponse<StorageFolder>> => {
+      return(repository.moveFolder(folderId, newParentId, idempotencyKey));
     },
 
 
-    moveFile: async (fileId: string, newParentId: string | null): Promise<DomainResponse<StorageFile>> => {
-      return(repository.moveFile(fileId, newParentId));
+    moveFile: async (fileId: string, newParentId: string | null, idempotencyKey?: string): Promise<DomainResponse<StorageFile>> => {
+      return(repository.moveFile(fileId, newParentId, idempotencyKey));
     },
 
     deleteFile: async (fileId: string): Promise<void> => {
@@ -115,6 +115,10 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
 
     downloadFile: async (fileId: string, signedUrl?: string): Promise<any> => {
       return await repository.downloadFile(fileId, signedUrl)
+    },
+
+    getFileBlob: async (storageItemId: string | number): Promise<Blob> => {
+      return await repository.getFileBlob(storageItemId)
     }
     // getFileDownloadUrl: async (fileId: string): Promise<string> => {
     //   return repository.getFileDownloadUrl(fileId);

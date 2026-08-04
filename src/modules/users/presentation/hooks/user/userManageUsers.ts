@@ -3,6 +3,7 @@ import { useApiClient } from "../../../../../core/presentation/context/api/ApiCl
 import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nProvider"
 import { createUserRepository } from "../../../infrastructure/repositories/user/repository"
 import { createManageUserUseCase } from "../../../application/usecases/user/manageUserUsecase"
+import { useIdempotency } from "../../../../../core/presentation/hooks/useIdempotency"
 import type { User } from "../../../domain/entities/user/user"
 import type { FilterUserDto } from "../../../application/dtos/user/filterUserDto"
 import type { CreateUserDto, UpdateuserDto } from "../../../application/dtos/user/userDto"
@@ -55,6 +56,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
 
   const repository = createUserRepository(apiClient)
   const useCase = createManageUserUseCase(repository)
+  const idem = useIdempotency()
 
   const setFnLoading = (fn: string, v: boolean) => setLoading((p) => ({ ...p, [fn]: v }))
   const setFnError = (fn: string, e: string | null) => setError((p) => ({ ...p, [fn]: e }))
@@ -113,7 +115,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
     setFnLoading("createUser", true)
     setFnError("createUser", null)
     try {
-      await useCase.createUser(data)
+      await idem.run('createUser', data, (key) => useCase.createUser(data, key))
       toast.success(t('created', 'users'))
       await getAllUsers()
     } catch (err: any) {
@@ -124,13 +126,13 @@ export const useManageUsers = (): UseManageUsersReturn => {
     } finally {
       setFnLoading("createUser", false)
     }
-  }, [useCase, t, getAllUsers])
+  }, [useCase, t, getAllUsers, idem])
 
   const updateUser = useCallback(async (id: number, data: UpdateuserDto) => {
     setFnLoading("updateUser", true)
     setFnError("updateUser", null)
     try {
-      await useCase.updateUser(id, data)
+      await idem.run('updateUser', { id, data }, (key) => useCase.updateUser(id, data, key))
       toast.success(t('updated', 'users'))
       await getAllUsers()
     } catch (err: any) {
@@ -141,13 +143,13 @@ export const useManageUsers = (): UseManageUsersReturn => {
     } finally {
       setFnLoading("updateUser", false)
     }
-  }, [useCase, t, getAllUsers])
+  }, [useCase, t, getAllUsers, idem])
 
   const updateSignature = useCallback(async (file: File) => {
     setFnLoading("updateSignature", true)
     setFnError("updateSignature", null)
     try {
-      await useCase.updateSignature(file)
+      await idem.run('uploadSignature', { signature: file }, (key) => useCase.updateSignature(file, key))
       toast.success(t('signature_updated', 'users'))
     } catch (err: any) {
       const msg = err?.message || "Failed to update signature"
@@ -157,13 +159,13 @@ export const useManageUsers = (): UseManageUsersReturn => {
     } finally {
       setFnLoading("updateSignature", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const exportUsersExcel = useCallback(async () => {
     setFnLoading("exportUsersExcel", true)
     setFnError("exportUsersExcel", null)
     try {
-      const res = await useCase.exportUsersExcel()
+      const res = await idem.run('exportExcel', undefined, (key) => useCase.exportUsersExcel(key))
       const blob = res as any
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
@@ -182,13 +184,13 @@ export const useManageUsers = (): UseManageUsersReturn => {
     } finally {
       setFnLoading("exportUsersExcel", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const exportUsersPdf = useCallback(async () => {
     setFnLoading("exportUsersPdf", true)
     setFnError("exportUsersPdf", null)
     try {
-      const res = await useCase.exportUsersPdf()
+      const res = await idem.run('exportPdf', undefined, (key) => useCase.exportUsersPdf(key))
       const blob = res as any
       const url = URL.createObjectURL(blob)
       const a = document.createElement("a")
@@ -207,13 +209,13 @@ export const useManageUsers = (): UseManageUsersReturn => {
     } finally {
       setFnLoading("exportUsersPdf", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const linkUserToEmployee = useCallback(async (userId: number, employeeId: number) => {
     setFnLoading("linkUserToEmployee", true)
     setFnError("linkUserToEmployee", null)
     try {
-      await useCase.linkUserToEmployee(userId, employeeId)
+      await idem.run('linkUserToEmployee', { userId, employeeId }, (key) => useCase.linkUserToEmployee(userId, employeeId, key))
       toast.success(t('linked', 'users'))
     } catch (err: any) {
       const msg = err?.message || "Failed to link user to employee"
@@ -223,7 +225,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
     } finally {
       setFnLoading("linkUserToEmployee", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
 
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])

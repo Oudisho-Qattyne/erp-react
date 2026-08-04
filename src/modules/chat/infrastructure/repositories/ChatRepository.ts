@@ -8,18 +8,8 @@ import type { IChatRepository } from "../../domain/repositories/IChatRepository"
 
 export const createChatRepository = (apiClient: ApiClient): IChatRepository => {
   const baseUrl = "/chat"
-  const paginate = (page?: number, perPage?: number) => ({
-    params: { ...(page ? { page } : {}), ...(perPage ? { per_page: perPage } : {}) },
-  })
-
-  const withFilters = (page?: number, perPage?: number, filters?: { name?: string; email?: string; status?: string }) => ({
-    params: {
-      ...(page ? { page } : {}),
-      ...(perPage ? { per_page: perPage } : {}),
-      ...(filters?.name ? { name: filters.name } : {}),
-      ...(filters?.email ? { email: filters.email } : {}),
-      ...(filters?.status ? { status: filters.status } : {}),
-    },
+  const paginate = (page?: number, perPage?: number, name?: string, email?: string) => ({
+    params: { ...(page ? { page } : {}), ...(perPage ? { per_page: perPage } : {}), ...(name ? { name } : {}), ...(email ? { email } : {}) },
   })
   return {
     getConversations: (page?, perPage?) =>
@@ -31,13 +21,15 @@ export const createChatRepository = (apiClient: ApiClient): IChatRepository => {
         paginate(page, perPage),
       ),
 
-    sendMessage: (data: any) =>
-      apiClient.post<DomainResponse<Message>>(`${baseUrl}/conversations/messages`, data),
+    sendMessage: (data: any, idempotencyKey?: string) =>
+      apiClient.post<DomainResponse<Message>>(`${baseUrl}/conversations/messages`, data,
+        idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined),
 
-    markAsRead: (conversationId: number) =>
-      apiClient.put<void>(`${baseUrl}/conversations/${conversationId}/read`),
+    markAsRead: (conversationId: number, idempotencyKey?: string) =>
+      apiClient.put<void>(`${baseUrl}/conversations/${conversationId}/read`, undefined,
+        idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined),
 
-    getUsers: (page?, perPage?, filters?) =>
-      apiClient.get<DpomainResponsePaginated<ChatUser[]>>(`${baseUrl}/users`, withFilters(page, perPage, filters)),
+    getUsers: (page?, perPage?, name?, email?) =>
+      apiClient.get<DpomainResponsePaginated<ChatUser[]>>(`${baseUrl}/users`, paginate(page, perPage, name, email)),
   }
 }
