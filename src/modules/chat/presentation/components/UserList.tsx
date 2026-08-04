@@ -71,33 +71,6 @@ export function UserList({ users, currentUserId, existingConversations, onSelect
             className="w-full pr-9 pl-3 py-2 text-sm rounded-lg border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/50"
           />
         </div>
-        <input
-          type="text"
-          placeholder={t("user_list.email_placeholder", "chat")}
-          value={emailFilter}
-          onChange={(e) => setEmailFilter(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className="w-full px-3 py-2 text-sm rounded-lg border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/50"
-        />
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={handleSearch}
-            className="flex-1 px-3 py-1.5 text-sm bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors cursor-pointer"
-          >
-            {t("user_list.search_btn", "chat")}
-          </button>
-          {hasActiveFilters && (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="px-3 py-1.5 text-sm bg-border text-text rounded-lg hover:bg-border/80 transition-colors cursor-pointer flex items-center gap-1"
-            >
-              <X size={14} />
-              {t("user_list.clear", "chat")}
-            </button>
-          )}
-        </div>
       </div>
       <div className="flex-1 overflow-y-auto">
         {loading ? (

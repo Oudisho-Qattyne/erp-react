@@ -1,9 +1,10 @@
-import type { CreateFeeDto, UpdateFeeDto } from "../dtos/feeDtos";
+import type { CreateFeeDto, FeeFilters, UpdateFeeDto } from "../dtos/feeDtos";
+import type { Fee } from "../../domain/entities/Fee";
 import type { IFeeRepository } from "../../domain/repositories/IFeeRepository";
 
 export const createManageFeesUseCase = (repository: IFeeRepository) => {
   return {
-    findAllFees: (params?: Record<string, string | boolean | number>) => {
+    findAllFees: (params?: FeeFilters) => {
       return repository.findAllFees(params)
     },
     findFeeById: (id: number) => {
@@ -15,11 +16,11 @@ export const createManageFeesUseCase = (repository: IFeeRepository) => {
     updateFee: (id: number, data: UpdateFeeDto, idempotencyKey?: string) => {
       return repository.updateFee(id, data, idempotencyKey)
     },
-    archiveFee: (id: number, idempotencyKey?: string) => {
-      return repository.archiveFee(id, idempotencyKey)
+    archiveFee: (fee: Pick<Fee, "id" | "name">, idempotencyKey?: string) => {
+      return repository.archiveFee(fee, idempotencyKey)
     },
-    deleteFee: (id: number) => {
-      return repository.deleteFee(id)
+    activeFee: (fee: Pick<Fee, "id" | "name">, idempotencyKey?: string) => {
+      return repository.activeFee(fee, idempotencyKey)
     },
   }
 }

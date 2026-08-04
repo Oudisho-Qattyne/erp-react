@@ -1,16 +1,16 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { useApiClient } from "../../../../core/presentation/context/api/ApiClinetProvider"
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import { createFeeRepository } from "../../infrastructure/repositories/FeeRepository"
 import { createManageFeesUseCase } from "../../application/usecases/manageFeesUseCase"
-import type { CreateFeeDto, UpdateFeeDto } from "../../application/dtos/feeDtos"
+import type { CreateFeeDto, FeeFilters, UpdateFeeDto } from "../../application/dtos/feeDtos"
 import type { Fee } from "../../domain/entities/Fee"
 import { toast } from "sonner"
 import { useIdempotency } from "../../../../core/presentation/hooks/useIdempotency"
 
 const MODULE = "finance"
 
-const OP_KEYS = ["findAllFees", "findFeeById", "createFee", "updateFee", "archiveFee", "deleteFee"] as const
+const OP_KEYS = ["findAllFees", "findFeeById", "createFee", "updateFee", "archiveFee", "activeFee"] as const
 
 function initRecord<T>(value: T): Record<string, T> {
   return Object.fromEntries(OP_KEYS.map((k) => [k, value]))
@@ -26,16 +26,16 @@ export interface UseFeesReturn {
   hasErrors: () => boolean
   clearError: () => void
   pagination: { currentPage: number; lastPage: number; total: number; hasMore: boolean }
-  filter: Record<string, string | boolean | number>
-  setFilter: (patch: Record<string, string | boolean | number>) => void
+  filter: FeeFilters
+  setFilter: (patch: Partial<FeeFilters>) => void
   resetFilter: () => void
   setPage: (page: number) => void
   findAllFees: () => Promise<void>
   findFeeById: (id: number) => Promise<void>
   createFee: (data: CreateFeeDto) => Promise<void>
   updateFee: (id: number, data: UpdateFeeDto) => Promise<void>
-  archiveFee: (id: number) => Promise<void>
-  deleteFee: (id: number) => Promise<void>
+  archiveFee: (fee: Pick<Fee, "id" | "name">) => Promise<void>
+  activeFee: (fee: Pick<Fee, "id" | "name">) => Promise<void>
 }
 
 export const useFees = (): UseFeesReturn => {
@@ -46,7 +46,7 @@ export const useFees = (): UseFeesReturn => {
   const [fee, setFee] = useState<Fee | null>(null)
   const [loading, setLoading] = useState<Record<string, boolean>>(() => initRecord(false))
   const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null))
-  const [filter, setFilterState] = useState<Record<string, string | boolean | number>>({})
+  const [filter, setFilterState] = useState<FeeFilters>({})
   const [pagination, setPagination] = useState({ currentPage: 1, lastPage: 1, total: 0, hasMore: false })
 
   const repository = createFeeRepository(apiClient)
@@ -58,7 +58,12 @@ export const useFees = (): UseFeesReturn => {
 
   const clearError = useCallback(() => setError(initRecord(null)), [])
 
-  const setFilter = useCallback((patch: Record<string, string | boolean | number>) => {
+  useEffect(() => {
+    findAllFees()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter])
+
+  const setFilter = useCallback((patch: Partial<FeeFilters>) => {
     setFilterState((prev) => ({ ...prev, ...patch, page: 1 }))
   }, [])
 
@@ -138,11 +143,11 @@ export const useFees = (): UseFeesReturn => {
     }
   }, [useCase, t, idem])
 
-  const archiveFee = useCallback(async (id: number) => {
+  const archiveFee = useCallback(async (fee: Pick<Fee, "id" | "name">) => {
     setFnLoading("archiveFee", true)
     setFnError("archiveFee", null)
     try {
-      const res = await idem.run("archiveFee", { id }, (key) => useCase.archiveFee(id, key))
+      const res = await idem.run("archiveFee", fee, (key) => useCase.archiveFee(fee, key))
       setFee(res.data)
       toast.success(t("fee.archived", MODULE) || "Fee archived successfully")
     } catch (err: unknown) {
@@ -155,21 +160,22 @@ export const useFees = (): UseFeesReturn => {
     }
   }, [useCase, t, idem])
 
-  const deleteFee = useCallback(async (id: number) => {
-    setFnLoading("deleteFee", true)
-    setFnError("deleteFee", null)
+  const activeFee = useCallback(async (fee: Pick<Fee, "id" | "name">) => {
+    setFnLoading("activeFee", true)
+    setFnError("activeFee", null)
     try {
-      await useCase.deleteFee(id)
-      toast.success(t("fee.deleted", MODULE) || "Fee deleted successfully")
+      const res = await idem.run("activeFee", fee, (key) => useCase.activeFee(fee, key))
+      setFee(res.data)
+      toast.success(t("fee.activated", MODULE) || "Fee activated successfully")
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("fee.delete_error", MODULE) || "Failed to delete fee"
-      setFnError("deleteFee", msg)
+      const msg = err instanceof Error ? err.message : t("fee.activate_error", MODULE) || "Failed to activate fee"
+      setFnError("activeFee", msg)
       toast.error(msg)
       throw err
     } finally {
-      setFnLoading("deleteFee", false)
+      setFnLoading("activeFee", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])
@@ -193,6 +199,6 @@ export const useFees = (): UseFeesReturn => {
     createFee,
     updateFee,
     archiveFee,
-    deleteFee,
+    activeFee,
   }
 }

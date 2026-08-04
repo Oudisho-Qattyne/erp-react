@@ -1,22 +1,22 @@
 {
   "title": "المالية",
-  "dashboard": {
-    "title": "لوحة المالية",
-    "welcome_title": "وحدة المالية",
-    "welcome_subtitle": "مركز إدارة الشؤون المالية",
-    "total_balance": "الرصيد الإجمالي",
-    "income": "الإيرادات",
-    "expenses": "المصروفات",
-    "subtotal": "المجموع الفرعي",
-    "currency": "ل.س",
-    "placeholder_title": "قريباً",
-    "placeholder_message": "هذه الوحدة جاهزة — أضف ميزات المالية هنا مثل المعاملات والحسابات والمصروفات والإيرادات والتقارير.",
-    "no_data": "لا توجد بيانات بعد"
-  },
   "navigation": {
-    "dashboard": {
-      "title": "لوحة التحكم"
+    "title": "المالية",
+    "fees": {
+      "title": "الرسوم"
+    },
+    "transactions": {
+      "title": "المناقلات"
     }
+  },
+  "fees": {
+    "title": "الرسوم",
+    "add": "إضافة رسم",
+    "add_title": "إضافة رسم جديد",
+    "edit_title": "تعديل الرسم",
+    "edit": "تعديل",
+    "search_placeholder": "ابحث بالاسم...",
+    "no_data": "لا توجد رسوم"
   },
   "fee": {
     "name": "الاسم",
@@ -31,6 +31,10 @@
     "update_error": "فشل تحديث الرسم",
     "archived": "تم أرشفة الرسم بنجاح",
     "archive_error": "فشل أرشفة الرسم",
+    "activated": "تم تفعيل الرسم بنجاح",
+    "activate_error": "فشل تفعيل الرسم",
+    "archive": "أرشفة",
+    "activate": "تفعيل",
     "deleted": "تم حذف الرسم بنجاح",
     "delete_error": "فشل حذف الرسم",
     "load_error": "فشل تحميل الرسوم",
@@ -42,6 +46,45 @@
       "fee_value_required": "قيمة الرسم مطلوبة",
       "fee_value_negative": "لا يمكن أن تكون قيمة الرسم سالبة",
       "fee_value_decimals": "يجب ألا تتجاوز قيمة الرسم منزلتين عشريتين"
+    }
+  },
+  "transactions": {
+    "title": "المناقلات",
+    "add": "إضافة مناقلة",
+    "add_title": "إضافة مناقلة جديدة",
+    "search_placeholder": "ابحث عن السبب...",
+    "no_data": "لا توجد معاملات"
+  },
+  "transaction": {
+    "type": "النوع",
+    "value": "القيمة",
+    "date": "التاريخ",
+    "date_from": "من تاريخ",
+    "date_to": "إلى تاريخ",
+    "reason": "السبب",
+    "status": "الحالة",
+    "type_addition": "إضافة",
+    "type_deduction": "خصم",
+    "type_incoming": "وارد",
+    "type_outgoing": "صادر",
+    "status_pending": "قيد الانتظار",
+    "status_approved": "معتمدة",
+    "status_canceled": "ملغاة",
+    "approve": "اعتماد",
+    "cancel": "إلغاء",
+    "approve_confirm": "هل أنت متأكد من اعتماد هذه المناقلة؟",
+    "cancel_confirm": "هل أنت متأكد من إلغاء هذه المناقلة؟",
+    "created": "تم إنشاء المناقلة بنجاح",
+    "create_error": "فشل إنشاء المناقلة",
+    "updated": "تم تحديث المناقلة بنجاح",
+    "update_error": "فشل تحديث المناقلة",
+    "load_error": "فشل تحميل المناقلات",
+    "validation": {
+      "type_required": "نوع المناقلة مطلوب",
+      "value_required": "القيمة مطلوبة",
+      "value_negative": "لا يمكن أن تكون القيمة سالبة",
+      "value_decimals": "يجب ألا تتجاوز القيمة منزلتين عشريتين",
+      "reason_max": "يجب ألا يتجاوز السبب 500 حرفاً"
     }
   }
 }

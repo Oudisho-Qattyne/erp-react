@@ -37,8 +37,7 @@ export interface UseChatReturn {
   clearError: () => void
   fetchConversations: () => Promise<DomainResponse<Conversation[]> | undefined>
   fetchMessages: (conversationId: number) => Promise<DomainResponse<Message[]> | undefined>
-  fetchUsers: (filters?: { name?: string; email?: string; status?: string }) => Promise<DomainResponse<ChatUser[]> | undefined>
-  setUserFilters: (filters: { name?: string; email?: string; status?: string }) => void
+  fetchUsers: () => Promise<DomainResponse<ChatUser[]> | undefined>
   sendMessage: (data: SendMessageDto) => Promise<DomainResponse<Message> | undefined>
   markAsRead: (conversationId: number) => Promise<void>
   selectConversation: (conversation: Conversation) => Promise<void>
@@ -179,9 +178,9 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
   const selectConversation = useCallback(async (conversation: Conversation) => {
     setCurrentConversation(conversation)
     setMessages([])
-    // if (conversation.unread_messages_count && conversation.unread_messages_count > 0) {
+    if (conversation.unread_messages_count && conversation.unread_messages_count > 0) {
       await markAsRead(conversation.id)
-    // }
+    }
     await fetchMessages(conversation.id)
   }, [fetchMessages])
 
@@ -430,7 +429,6 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     fetchConversations,
     fetchMessages,
     fetchUsers,
-    setUserFilters,
     sendMessage,
     markAsRead,
     selectConversation,

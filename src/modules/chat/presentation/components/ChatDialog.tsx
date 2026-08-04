@@ -11,7 +11,6 @@ import type { Message } from "../../domain/entities/Message"
 import type { SendMessageDto } from "../../application/dtos/SendMessageDto"
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse"
 import type { DpomainResponsePaginated } from "../../../hr/domain/entities/common/DomainResponsePaginated"
-import { playSendSound } from "../../../../core/presentation/utils/notificationSound"
 
 interface ChatDialogProps {
   isOpen: boolean
@@ -59,7 +58,6 @@ function ChatDialog({
   error,
   fetchConversations,
   fetchUsers,
-  setUserFilters,
   selectConversation,
   sendMessage: sendMsg,
   markAsRead,
@@ -109,7 +107,6 @@ function ChatDialog({
     : currentConversation
 
   const handleSend = async (text: string) => {
-    playSendSound()
     if (newConversationUser) {
       const dto: SendMessageDto = {
         receiver_id: newConversationUser.id,
@@ -165,11 +162,6 @@ function ChatDialog({
   const handleOpenNewChat = () => {
     setShowNewChat(true)
     fetchUsers()
-  }
-
-  const handleSearchUsers = (filters: { name?: string; email?: string; status?: string }) => {
-    setUserFilters(filters)
-    fetchUsers(filters)
   }
 
   const handleBack = () => {

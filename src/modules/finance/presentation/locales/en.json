@@ -1,22 +1,22 @@
 {
   "title": "Finance",
-  "dashboard": {
-    "title": "Finance Dashboard",
-    "welcome_title": "Finance Module",
-    "welcome_subtitle": "Your financial management hub",
-    "total_balance": "Total Balance",
-    "income": "Income",
-    "expenses": "Expenses",
-    "subtotal": "Subtotal",
-    "currency": "SYP",
-    "placeholder_title": "Coming Soon",
-    "placeholder_message": "This module is ready — build finance features here such as transactions, accounts, expenses, revenue and reports.",
-    "no_data": "No data yet"
-  },
   "navigation": {
-    "dashboard": {
-      "title": "Dashboard"
+    "title": "Finance",
+    "fees": {
+      "title": "Fees"
+    },
+    "transactions": {
+      "title": "Transactions"
     }
+  },
+  "fees": {
+    "title": "Fees",
+    "add": "Add Fee",
+    "add_title": "Add New Fee",
+    "edit_title": "Edit Fee",
+    "edit": "Edit",
+    "search_placeholder": "Search by name...",
+    "no_data": "No fees found"
   },
   "fee": {
     "name": "Name",
@@ -31,6 +31,10 @@
     "update_error": "Failed to update fee",
     "archived": "Fee archived successfully",
     "archive_error": "Failed to archive fee",
+    "activated": "Fee activated successfully",
+    "activate_error": "Failed to activate fee",
+    "archive": "Archive",
+    "activate": "Activate",
     "deleted": "Fee deleted successfully",
     "delete_error": "Failed to delete fee",
     "load_error": "Failed to load fees",
@@ -42,6 +46,45 @@
       "fee_value_required": "Fee value is required",
       "fee_value_negative": "Fee value cannot be negative",
       "fee_value_decimals": "Fee value must have at most 2 decimal places"
+    }
+  },
+  "transactions": {
+    "title": "Transactions",
+    "add": "Add Transaction",
+    "add_title": "Add New Transaction",
+    "search_placeholder": "Search by reason...",
+    "no_data": "No transactions found"
+  },
+  "transaction": {
+    "type": "Type",
+    "value": "Value",
+    "date": "Date",
+    "date_from": "Date From",
+    "date_to": "Date To",
+    "reason": "Reason",
+    "status": "Status",
+    "type_addition": "Addition",
+    "type_deduction": "Deduction",
+    "type_incoming": "Incoming",
+    "type_outgoing": "Outgoing",
+    "status_pending": "Pending",
+    "status_approved": "Approved",
+    "status_canceled": "Canceled",
+    "approve": "Approve",
+    "cancel": "Cancel",
+    "approve_confirm": "Are you sure you want to approve this transaction?",
+    "cancel_confirm": "Are you sure you want to cancel this transaction?",
+    "created": "Transaction created successfully",
+    "create_error": "Failed to create transaction",
+    "updated": "Transaction updated successfully",
+    "update_error": "Failed to update transaction",
+    "load_error": "Failed to load transactions",
+    "validation": {
+      "type_required": "Transaction type is required",
+      "value_required": "Value is required",
+      "value_negative": "Value cannot be negative",
+      "value_decimals": "Value must have at most 2 decimal places",
+      "reason_max": "Reason must be at most 500 characters"
     }
   }
 }
