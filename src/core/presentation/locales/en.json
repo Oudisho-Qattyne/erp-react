@@ -53,7 +53,8 @@
     "set_default_error": "Failed to set {name} as default",
     "retry": "Retry",
     "add_row": "Add Row",
-    "browse": "Browse"
+    "browse": "Browse",
+    "server_error": "Something went wrong, please try again later"
   },
   "pagination": {
     "showing": "Showing",

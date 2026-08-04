@@ -21,6 +21,6 @@ export const createManageFeesUseCase = (repository: IFeeRepository) => {
     },
     activeFee: (fee: Pick<Fee, "id" | "name">, idempotencyKey?: string) => {
       return repository.activeFee(fee, idempotencyKey)
-    },
+    }
   }
 }

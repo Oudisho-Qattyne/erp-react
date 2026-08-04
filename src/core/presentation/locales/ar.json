@@ -53,7 +53,8 @@
     "set_default_error": "فشل تعيين {name} كافتراضي",
     "retry": "إعادة المحاولة",
     "add_row": "إضافة صف",
-    "browse": "تصفح"
+    "browse": "تصفح",
+    "server_error": "حدث خطأ ما، يرجى المحاولة مرة أخرى لاحقاً"
   },
   "pagination": {
     "showing": "عرض",

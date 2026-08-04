@@ -42,7 +42,7 @@ export function FeesPage() {
   } = useFees()
 
   const handleSearch = () => {
-    setFilter({ name: localSearch, page: 1 })
+    setFilter({ search: localSearch, page: 1 })
   }
 
   useEffect(() => {
@@ -112,8 +112,6 @@ export function FeesPage() {
   ]
 
   const filterFields: FilterField[] = [
-    { name: "name", type: "text", label: t("fee.name", MODULE) || "Name" },
-    { name: "code", type: "text", label: t("fee.code", MODULE) || "Code" },
     {
       name: "status",
       type: "select",
