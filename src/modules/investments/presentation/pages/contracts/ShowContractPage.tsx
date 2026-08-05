@@ -126,7 +126,7 @@ export function ShowContractPage() {
       {plotId && dossierId && (
         <>
           <PlotDetailsSection plotId={plotId} />
-          <DossierDetailsSection dossierId={dossierId} plotId={plotId} />
+          <DossierDetailsSection dossierId={dossierId} plotId={plotId} dossier={contract.dossier ?? null} />
         </>
       )}
       {

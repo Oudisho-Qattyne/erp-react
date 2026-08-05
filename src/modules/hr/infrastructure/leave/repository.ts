@@ -15,14 +15,14 @@ export const createLeaveTypeRepository = (apiClient: ApiClient): ILeaveTypeRepos
     findLeaveTypeById: (id: number) => {
       return apiClient.get<DpomainResponsePaginated<Leave>>(`${baseUrl}/${id}`)
     },
-    createLeaveType(data: any) {
-      return apiClient.post<DpomainResponsePaginated<Leave>>(baseUrl, data)
+    createLeaveType(data: any, idempotencyKey?: string) {
+      return apiClient.post<DpomainResponsePaginated<Leave>>(baseUrl, data, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined)
     },
-    updateLeaveType(id: number, data: any) {
-      return apiClient.put<DpomainResponsePaginated<Leave>>(`${baseUrl}/${id}`, data)
+    updateLeaveType(id: number, data: any, idempotencyKey?: string) {
+      return apiClient.put<DpomainResponsePaginated<Leave>>(`${baseUrl}/${id}`, data, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined)
     },
-    archiveLeaveType(id: number) {
-      return apiClient.patch<DpomainResponsePaginated<Leave>>(`${baseUrl}/${id}/archive`)
+    archiveLeaveType(id: number, idempotencyKey?: string) {
+      return apiClient.patch<DpomainResponsePaginated<Leave>>(`${baseUrl}/${id}/archive`, undefined, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined)
     },
     deleteLeaveType(id: number) {
       return apiClient.delete<DpomainResponsePaginated<Leave>> (`${baseUrl}/${id}`)

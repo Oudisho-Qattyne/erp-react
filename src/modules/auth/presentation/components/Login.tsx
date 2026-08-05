@@ -13,6 +13,7 @@ import { FormInput } from '../../../../core/presentation/layouts/ui/inputs/FormI
 import { FormProvider } from 'react-hook-form';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import { useAuth as useAuthProvider } from '../../../../core/infrastructure/auth/AuthProvider';
+import { applyServerValidationErrors } from '../../../../core/presentation/utils/handleApiError';
 
 // Validation schema helper
 const getLoginSchema = (t: (key: string, mod?: string) => string) => z.object({
@@ -46,13 +47,7 @@ export default function LoginPage() {
       loginLocal(res.data.token , res.data.user)
       navigate('/hr');
     } catch (err: any) {
-      if (err.validationErrors) {
-        Object.keys(err.validationErrors).forEach((key) => {
-          const messages = err.validationErrors[key];
-          const message = Array.isArray(messages) ? messages[0] : messages;
-          form.setError(key as keyof LoginFormData, { type: 'server', message });
-        });
-      }
+      applyServerValidationErrors(err, form.setError);
     }
   };
 

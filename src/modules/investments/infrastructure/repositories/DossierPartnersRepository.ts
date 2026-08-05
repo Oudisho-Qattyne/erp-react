@@ -8,7 +8,7 @@ export const createDossierPartnersRepository = (apiClient: ApiClient): IDossierP
   const baseUrl = "/investments/plots"
   return ({
     getDossierPartners: (plotId: number, dossierId: number) => apiClient.get<DomainResponse<Dossier>>(`${baseUrl}/${plotId}/dossiers/${dossierId}/partners`),
-    addDossierPartners: (plotId: number, dossierId: number, investorIds: number[]) => apiClient.put<DomainResponse<Dossier>>(`${baseUrl}/${plotId}/dossiers/${dossierId}/partners`, { investor_ids: investorIds }),
+    addDossierPartners: (plotId: number, dossierId: number, investorIds: number[], idempotencyKey?: string) => apiClient.put<DomainResponse<Dossier>>(`${baseUrl}/${plotId}/dossiers/${dossierId}/partners`, { investor_ids: investorIds }, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined),
     getPartnersHistory: (plotId: number, dossierId: number) => apiClient.get<DomainResponse<Partner[]>>(`${baseUrl}/${plotId}/dossiers/${dossierId}/partners-history`),
   })
 }

@@ -75,7 +75,7 @@ const usersModule: Module = {
       label: 'edit_role.title',
       nav: false,
       moduleName: 'users',
-      requiredPermission: 'users.roles.update',
+      requiredPermission: 'users.roles.edit',
     },
   ],
   locales: { en: enLocales, ar: arLocales },

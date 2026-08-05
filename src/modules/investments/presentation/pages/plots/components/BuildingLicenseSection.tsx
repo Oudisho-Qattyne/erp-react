@@ -21,6 +21,7 @@ import { getCreateByIndustryLicenseFormSchema } from '../../../schemas/byIndustr
 import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { FileText, Plus, Eye, Pencil, Trash2, History } from 'lucide-react';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
 import { getLocalizedName } from '../../../../../../core/presentation/utils/helpes';
 
 interface BuildingLicenseSectionProps {
@@ -66,7 +67,7 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
       setIsCreateOpen(false);
       return res;
     } catch (err: any) {
-      toast.error(err?.message || t('building_license.create_error', 'investments') || 'Failed to create building license');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -81,7 +82,7 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
       setFullLicense(null);
       return res;
     } catch (err: any) {
-      toast.error(err?.message || t('building_license.update_error', 'investments') || 'Failed to update building license');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -93,7 +94,7 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
       toast.success(t('building_license.deleted', 'investments') || 'Building license deleted successfully');
       getLicenses(listUrl);
     } catch (err: any) {
-      toast.error(err?.message || t('building_license.delete_error', 'investments') || 'Failed to delete building license');
+      handleApiError(err, { module: "investments" });
     }
     setDeletingLicense(null);
   };

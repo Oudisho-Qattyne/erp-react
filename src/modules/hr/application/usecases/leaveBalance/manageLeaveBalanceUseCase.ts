@@ -13,8 +13,8 @@ export const createManageLeaveBalanceUseCase = (repository: ILeaveBalanceReposit
         findAllEmployeeLeaveBalances(employeeId : number | undefined , filter : FilterLeaveBalancesDto) {
             return repository.findAllEmployeeLeaveBalances(employeeId , filter)
         },
-        adjustLeaveBalance(adjust : AdjustLeaveBalanceDto) {
-            return repository.adjustLeaveBalance(adjust)
+        adjustLeaveBalance(adjust : AdjustLeaveBalanceDto, idempotencyKey?: string) {
+            return repository.adjustLeaveBalance(adjust, idempotencyKey)
         },
   }
 }

@@ -1,13 +1,14 @@
 import { useState, useCallback, useEffect } from "react"
 import { useApiClient } from "../../../../../core/presentation/context/api/ApiClinetProvider"
-import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nProvider"
 import { createEmployeeRepository } from "../../../infrastructure/employee/repository"
 import { createManageEmployeeUseCase } from "../../../application/usecases/employee/manageEmployeeUseCase"
+import { handleApiError } from "../../../../../core/presentation/utils/handleApiError"
 import type { EmployeeListItem } from "../../../domain/entities/EmployeeListItem"
 import type { EmployeeStatusLog } from "../../../domain/entities/employeeStatus/employeeStatusLog"
 import type { JobStatusLog } from "../../../domain/entities/jobStatus/JobStatusLog"
 import type { FilterEmployeeDto } from "../../../application/dtos/employee/FilterEmployeeDto"
-import { toast } from "sonner"
+
+const MODULE = "hr"
 
 const OP_KEYS = ["findEmployeeStatusLogs", "findJobStatusLogs", "findAllEmployees"] as const
 
@@ -45,7 +46,6 @@ export interface UseEmployeeReturn {
 
 export const useEmployee = (): UseEmployeeReturn => {
   const apiClient = useApiClient()
-  const { t } = useLanguage()
 
   const [employees, setEmployees] = useState<EmployeeListItem[]>([])
   const [employeeStatusLogs, setEmployeeStatusLogs] = useState<EmployeeStatusLog[]>([])
@@ -108,13 +108,11 @@ export const useEmployee = (): UseEmployeeReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err?.message || "Failed to fetch employees"
-      setFnError("findAllEmployees", msg)
-      toast.error(`${t("employees.load_error", "hr") || "Failed to load employees"}: ${msg}`)
+      setFnError("findAllEmployees", handleApiError(err, { module: MODULE }))
     } finally {
       setFnLoading("findAllEmployees", false)
     }
-  }, [useCase, filter, t])
+  }, [useCase, filter])
 
   const findEmployeeStatusLogs = useCallback(async (employeeId: number) => {
     setFnLoading("findEmployeeStatusLogs", true)
@@ -129,13 +127,11 @@ export const useEmployee = (): UseEmployeeReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err?.message || t('employees.employee_status_logs_load_error', 'hr') || "Failed to fetch employee status logs"
-      setFnError("findEmployeeStatusLogs", msg)
-      toast.error(`${t('employees.employee_status_logs_load_error', 'hr') || 'Failed to load employee status logs'}: ${msg}`)
+      setFnError("findEmployeeStatusLogs", handleApiError(err, { module: MODULE }))
     } finally {
       setFnLoading("findEmployeeStatusLogs", false)
     }
-  }, [useCase, employeeStatusFilter, t])
+  }, [useCase, employeeStatusFilter])
 
   const findJobStatusLogs = useCallback(async (employeeId: number) => {
     setFnLoading("findJobStatusLogs", true)
@@ -150,13 +146,11 @@ export const useEmployee = (): UseEmployeeReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err?.message || t('employees.job_status_logs_load_error', 'hr') || "Failed to fetch job status logs"
-      setFnError("findJobStatusLogs", msg)
-      toast.error(`${t('employees.job_status_logs_load_error', 'hr') || 'Failed to load job status logs'}: ${msg}`)
+      setFnError("findJobStatusLogs", handleApiError(err, { module: MODULE }))
     } finally {
       setFnLoading("findJobStatusLogs", false)
     }
-  }, [useCase, jobStatusFilter, t])
+  }, [useCase, jobStatusFilter])
 
   useEffect(() => {
     findAllEmployees()

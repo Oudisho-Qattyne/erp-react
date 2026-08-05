@@ -1,0 +1,99 @@
+{
+  "title": "Finance",
+  "navigation": {
+    "title": "Finance",
+    "fees": {
+      "title": "Fees"
+    },
+    "transactions": {
+      "title": "Transactions"
+    }
+  },
+  "fees": {
+    "title": "Fees",
+    "add": "Add Fee",
+    "add_title": "Add New Fee",
+    "edit_title": "Edit Fee",
+    "edit": "Edit",
+    "search_placeholder": "Search by name...",
+    "no_data": "No fees found"
+  },
+  "fee": {
+    "name": "Name",
+    "code": "Code",
+    "fee_value": "Fee Value",
+    "fee_status": "Status",
+    "value": "Value",
+    "value_from": "Min Value",
+    "value_to": "Max Value",
+    "status_active": "Active",
+    "status_archived": "Archived",
+    "created": "Fee created successfully",
+    "create_error": "Failed to create fee",
+    "updated": "Fee updated successfully",
+    "update_error": "Failed to update fee",
+    "archived": "Fee archived successfully",
+    "archive_error": "Failed to archive fee",
+    "activated": "Fee activated successfully",
+    "activate_error": "Failed to activate fee",
+    "archive": "Archive",
+    "activate": "Activate",
+    "archive_confirm": "Are you sure you want to archive this fee?",
+    "activate_confirm": "Are you sure you want to activate this fee?",
+    "deleted": "Fee deleted successfully",
+    "delete_error": "Failed to delete fee",
+    "load_error": "Failed to load fees",
+    "validation": {
+      "name_min": "Name must be at least 3 letters",
+      "name_max": "Name must be at most 255 letters",
+      "name_invalid": "Name must contain letters only",
+      "code_invalid": "Code must contain letters and digits only, without spaces",
+      "fee_value_required": "Fee value is required",
+      "fee_value_negative": "Fee value cannot be negative",
+      "fee_value_decimals": "Fee value must have at most 2 decimal places"
+    }
+  },
+  "transactions": {
+    "title": "Transactions",
+    "add": "Add Transaction",
+    "add_title": "Add New Transaction",
+    "search_placeholder": "Search by reason...",
+    "no_data": "No transactions found"
+  },
+  "transaction": {
+    "type": "Type",
+    "value": "Value",
+    "date": "Date",
+    "from_date": "From Date",
+    "to_date": "To Date",
+    "value_from": "Min Value",
+    "value_to": "Max Value",
+    "reason": "Reason",
+    "status": "Status",
+    "transactionable_type": "Transactionable Type",
+    "transactionable_type_general": "General",
+    "transactionable_id": "Transactionable",
+    "type_incoming": "Incoming",
+    "type_outgoing": "Outgoing",
+    "status_pending": "Pending",
+    "status_approved": "Approved",
+    "status_canceled": "Canceled",
+    "approve": "Approve",
+    "cancel": "Cancel",
+    "approve_confirm": "Are you sure you want to approve this transaction?",
+    "cancel_confirm": "Are you sure you want to cancel this transaction?",
+    "created": "Transaction created successfully",
+    "create_error": "Failed to create transaction",
+    "updated": "Transaction updated successfully",
+    "update_error": "Failed to update transaction",
+    "load_error": "Failed to load transactions",
+    "validation": {
+      "type_required": "Transaction type is required",
+      "value_required": "Value is required",
+      "value_negative": "Value cannot be negative",
+      "value_decimals": "Value must have at most 2 decimal places",
+      "reason_max": "Reason must be at most 500 characters",
+      "transactionable_id_required": "Please select a transactionable item"
+    }
+  }
+}

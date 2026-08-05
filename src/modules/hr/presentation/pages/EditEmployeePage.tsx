@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
 import type { DomainResponse } from '../../../../core/domain/common/responce/DomainResponse';
 import type { EmployeeData } from '../../domain/entities/employee';
 import type { EmployeeFormValues } from '../schemas/employeeForm';
@@ -11,18 +10,18 @@ import { ErrorState } from '../../../../core/presentation/layouts/ui/state/Error
 import { ArrowRight } from 'lucide-react';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import { useManageEmployee } from '../hooks/useEmployees';
+import { handleApiError } from '../../../../core/presentation/utils/handleApiError';
 
 export function EditEmployeePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const apiClient = useApiClient();
   const { t } = useLanguage();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [defaultValues, setDefaultValues] = useState<Partial<EmployeeFormValues> | null>(null);
-  const { getById } = useManageEmployee();
+  const { getById, update } = useManageEmployee();
   
   useEffect(() => {
     const fetchEmployee = async () => {
@@ -96,7 +95,7 @@ export function EditEmployeePage() {
           setError(t('edit_employee.not_found', 'hr') || 'لم يتم العثور على الموظف');
         }
       } catch (err: any) {
-        setError(err.message || t('edit_employee.load_error', 'hr') || 'حدث خطأ أثناء تحميل بيانات الموظف');
+        setError(handleApiError(err, { module: "hr", silent: true }));
       } finally {
         setLoading(false);
       }
@@ -105,19 +104,18 @@ export function EditEmployeePage() {
     if (id) {
       fetchEmployee();
     }
-  }, [id, apiClient]);
-  console.log(defaultValues);
+  }, [id, getById]);
 
   const handleSubmit = async (data: EmployeeFormValues) => {
     try {
       setSaving(true);
       setError(null);
-      const res = await apiClient.put(`/hr/employees/${id}`, data);
+      const res = await update(Number(id), data as any);
       
       navigate('/hr/employees')
     } catch (err: any) {
       
-      setError(err.message || t('edit_employee.update_error', 'hr') || 'فشل في تحديث بيانات الموظف');
+      setError(handleApiError(err, { silent: true, module: "hr" }));
       throw err
     } finally {
       setSaving(false);

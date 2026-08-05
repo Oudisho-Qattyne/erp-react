@@ -1,0 +1,40 @@
+{
+  "dialog": {
+    "title_conversations": "المحادثات",
+    "title_new_chat": "محادثة جديدة"
+  },
+  "contact_list": {
+    "search_placeholder": "ابحث عن محادثة...",
+    "loading": "جاري التحميل...",
+    "retry": "إعادة المحاولة",
+    "no_results": "لا توجد نتائج"
+  },
+  "user_list": {
+    "search_name_placeholder": "ابحث بالاسم...",
+    "search_email_placeholder": "ابحث بالبريد الإلكتروني...",
+    "loading": "جاري التحميل...",
+    "retry": "إعادة المحاولة",
+    "no_results": "لا توجد نتائج",
+    "no_users": "لا يوجد مستخدمون",
+    "existing_conversation": "محادثة موجودة"
+  },
+  "chat_header": {
+    "online": "متصل الآن",
+    "offline": "غير متصل"
+  },
+  "chat_input": {
+    "placeholder": "اكتب رسالة..."
+  },
+  "empty_state": {
+    "select_conversation": "اختر محادثة من القائمة"
+  },
+  "new_conversation_unavailable": "إنشاء محادثة جديدة غير متاح حالياً",
+  "conversations_load_error": "فشل تحميل المحادثات",
+  "messages_load_error": "فشل تحميل الرسائل",
+  "send_error": "فشل إرسال الرسالة",
+  "mark_read_error": "فشل تحديث حالة القراءة",
+  "users_load_error": "فشل تحميل المستخدمين",
+  "message_list": {
+    "start_of_chat": "— بداية المحادثة —"
+  }
+}

@@ -7,6 +7,7 @@ import { useManageRoles } from '../hooks/useManageRoles';
 import { RoleForm } from '../components/RoleForm';
 import type { RoleFormValues } from '../schemas/roleForm';
 import type { Permissions } from '../../domain/entities/permissions';
+import { handleApiError } from '../../../../core/presentation/utils/handleApiError';
 
 function extractPermissionIds(permissions: Permissions): number[] {
   const ids: number[] = [];
@@ -41,7 +42,7 @@ export function EditRolePage() {
         });
       })
       .catch((err: any) => {
-        setPageError(err?.message || t('edit_role.load_error', 'users') || 'Error loading role data');
+        setPageError(handleApiError(err, { module: "users", silent: true }));
       })
       .finally(() => setPageLoading(false));
   }, [id]);

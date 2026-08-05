@@ -3,11 +3,13 @@ import { useApiClient } from "../../../../../core/presentation/context/api/ApiCl
 import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nProvider"
 import { createLeaveRequesteRepository } from "../../../infrastructure/leaveRequest/repository"
 import { createManageLeaveRequestUseCase } from "../../../application/usecases/leaveRequest/manageLeaveRequestUseCase"
+import { handleApiError } from "../../../../../core/presentation/utils/handleApiError"
 import type { LeaveRequest } from "../../../domain/entities/leaveRequest/leaveRequest"
 import type { FilterLeaveRequestDto } from "../../../application/dtos/leaveRequest/FilterLeaveRequestDto"
 import type { CreateLeaveRequestDto, UpdateLeaveRequestDto } from "../../../application/dtos/leaveRequest/leaveRequest"
 import type { LeaveRequestProcessOperations } from "../../../domain/valueObjects/leaveRequest/leaveRequestProcessOperations"
 import { toast } from "sonner"
+import { useIdempotency } from "../../../../../core/presentation/hooks/useIdempotency"
 
 const OP_KEYS = ["findAllMyLeaveRequests", "findAllEmployeeLeaveRequests", "findLeaveRequestById", "createLeaveRequest", "updateLeaveRequest", "processLeaveRequest"] as const
 
@@ -57,6 +59,7 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
 
   const repository = createLeaveRequesteRepository(apiClient)
   const useCase = createManageLeaveRequestUseCase(repository)
+  const idem = useIdempotency()
 
   const setFnLoading = (fn: string, v: boolean) => setLoading((p) => ({ ...p, [fn]: v }))
   const setFnError = (fn: string, e: string | null) => setError((p) => ({ ...p, [fn]: e }))
@@ -98,13 +101,11 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err?.message || t("leave_request.my_requests_load_error", "hr")
-      setFnError("findAllMyLeaveRequests", msg)
-      toast.error(`${t("leave_request.my_requests_load_error", "hr")}: ${msg}`)
+      setFnError("findAllMyLeaveRequests", handleApiError(err, { module: "hr" }))
     } finally {
       setFnLoading("findAllMyLeaveRequests", false)
     }
-  }, [useCase, filter, t])
+  }, [useCase, filter])
 
   const findAllEmployeeLeaveRequests = useCallback(async (employeeId?: number) => {
     setFnLoading("findAllEmployeeLeaveRequests", true)
@@ -119,13 +120,11 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err?.message || t("leave_request.employee_requests_load_error", "hr")
-      setFnError("findAllEmployeeLeaveRequests", msg)
-      toast.error(`${t("leave_request.employee_requests_load_error", "hr")}: ${msg}`)
+      setFnError("findAllEmployeeLeaveRequests", handleApiError(err, { module: "hr" }))
     } finally {
       setFnLoading("findAllEmployeeLeaveRequests", false)
     }
-  }, [useCase, filter, t])
+  }, [useCase, filter])
 
   const findLeaveRequestById = useCallback(async (id: number) => {
     setFnLoading("findLeaveRequestById", true)
@@ -134,61 +133,53 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
       const res = await useCase.findLeaveRequestById(id)
       setCurrentLeaveRequest(res.data)
     } catch (err: any) {
-      const msg = err?.message || t("leave_request.request_load_error", "hr")
-      setFnError("findLeaveRequestById", msg)
-      toast.error(`${t("leave_request.request_load_error", "hr")}: ${msg}`)
+      setFnError("findLeaveRequestById", handleApiError(err, { module: "hr" }))
     } finally {
       setFnLoading("findLeaveRequestById", false)
     }
-  }, [useCase, t])
+  }, [useCase])
 
   const createLeaveRequest = useCallback(async (data: CreateLeaveRequestDto) => {
     setFnLoading("createLeaveRequest", true)
     setFnError("createLeaveRequest", null)
     try {
-      await useCase.createLeaveRequset(data)
+      await idem.run('create', data, (key) => useCase.createLeaveRequset(data, key))
       toast.success(t("leave_request.create_success", "hr"))
     } catch (err: any) {
-      const msg = err?.message || t("leave_request.create_error", "hr")
-      setFnError("createLeaveRequest", msg)
-      toast.error(`${t("leave_request.create_error", "hr")}: ${msg}`)
+      setFnError("createLeaveRequest", handleApiError(err, { module: "hr" }))
       throw err
     } finally {
       setFnLoading("createLeaveRequest", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const updateLeaveRequest = useCallback(async (id: number, data: UpdateLeaveRequestDto) => {
     setFnLoading("updateLeaveRequest", true)
     setFnError("updateLeaveRequest", null)
     try {
-      await useCase.updateLeaveRequest(id, data)
+      await idem.run('update', { id, data }, (key) => useCase.updateLeaveRequest(id, data, key))
       toast.success(t("leave_request.update_success", "hr"))
     } catch (err: any) {
-      const msg = err?.message || t("leave_request.update_error", "hr")
-      setFnError("updateLeaveRequest", msg)
-      toast.error(`${t("leave_request.update_error", "hr")}: ${msg}`)
+      setFnError("updateLeaveRequest", handleApiError(err, { module: "hr" }))
       throw err
     } finally {
       setFnLoading("updateLeaveRequest", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const processLeaveRequest = useCallback(async (id: number, operation: LeaveRequestProcessOperations, reviewNotes: string) => {
     setFnLoading("processLeaveRequest", true)
     setFnError("processLeaveRequest", null)
     try {
-      await useCase.processleaveRequest(id, operation, reviewNotes)
+      await idem.run('process', { id, operation, reviewNotes }, (key) => useCase.processleaveRequest(id, operation, reviewNotes, key))
       toast.success(t("leave_request.process_success", "hr"))
     } catch (err: any) {
-      const msg = err?.message || t("leave_request.process_error", "hr")
-      setFnError("processLeaveRequest", msg)
-      toast.error(`${t("leave_request.process_error", "hr")}: ${msg}`)
+      setFnError("processLeaveRequest", handleApiError(err, { module: "hr" }))
       throw err
     } finally {
       setFnLoading("processLeaveRequest", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])

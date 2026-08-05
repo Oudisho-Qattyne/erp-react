@@ -10,7 +10,11 @@ import { useLeaveRequest } from "../../hooks/leaveRequest/useLeaveRequest"
 import { useLeaveTypes } from "../../hooks/leave/useLeaveTypes"
 import { useLeaveTypeLocalization } from "../../hooks/leave/useLeaveTypeLocalization"
 import type { EntityWithNameOnly } from "../../../../../core/domain/entities/EntityWithNameOnly"
-import { FileText, Info, X, Plus, ArrowLeft } from "lucide-react"
+import { FileText, Info, X, Plus, ArrowLeft, AlertCircle } from "lucide-react"
+import { getCreateLeaveRequestSchema } from "../../schemas/leaveRequestForm.schema"
+import type { z } from "zod"
+
+type FormErrors = Partial<Record<keyof z.infer<ReturnType<typeof getCreateLeaveRequestSchema>>, string>>
 
 function formatDate(input: string): string {
     if (!input) return ""
@@ -34,6 +38,7 @@ export function CreateLeaveRequest() {
     const [endDate, setEndDate] = useState("")
     const [requestedUnits, setRequestedUnits] = useState(0)
     const [reason, setReason] = useState("")
+    const [errors, setErrors] = useState<FormErrors>({})
 
     useEffect(() => {
         if (selectedLeaveType) {
@@ -68,7 +73,7 @@ export function CreateLeaveRequest() {
     }, [currentLeaveRequest])
 
     const handleLeaveTypePicked = (types: EntityWithNameOnly[]) => {
-        if (types.length > 0) setSelectedLeaveType(types[0])
+        if (types.length > 0) { setSelectedLeaveType(types[0]); setErrors((prev) => ({ ...prev, leave_type_id: undefined })) }
         setIsLeaveTypePickerOpen(false)
     }
 
@@ -79,10 +84,31 @@ export function CreateLeaveRequest() {
         typeof text === "string" ? text : language === "ar" ? text?.ar : text?.en
 
     const handleSubmit = async () => {
-        if (!selectedLeaveType || !startDate || !endDate || !reason) return
+        setErrors({})
+
+        const schema = getCreateLeaveRequestSchema(t)
+        const result = schema.safeParse({
+            leave_type_id: selectedLeaveType?.id,
+            start_date: startDate,
+            end_date: endDate,
+            requested_units: requestedUnits,
+            reason: reason || undefined,
+        })
+
+        if (!result.success) {
+            const fieldErrors: FormErrors = {}
+            for (const issue of result.error.issues) {
+                const path = issue.path[0] as keyof FormErrors
+                if (path && !fieldErrors[path]) {
+                    fieldErrors[path] = issue.message
+                }
+            }
+            setErrors(fieldErrors)
+            return
+        }
 
         const payload = {
-            leave_type_id: selectedLeaveType.id,
+            leave_type_id: selectedLeaveType!.id,
             start_date: formatDate(startDate),
             end_date: formatDate(endDate),
             requested_units: requestedUnits,
@@ -100,6 +126,7 @@ export function CreateLeaveRequest() {
         setEndDate("")
         setRequestedUnits(0)
         setReason("")
+        setErrors({})
         navigate("/hr/my-leave-requests")
     }
 
@@ -129,7 +156,7 @@ export function CreateLeaveRequest() {
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm border border-primary/20">
                             <FileText size={14} />
                             {getLeaveTypeName(selectedLeaveType)}
-                            <button onClick={() => { setSelectedLeaveType(null) }} className="hover:text-danger transition-colors">
+                            <button onClick={() => { setSelectedLeaveType(null); setErrors((prev) => ({ ...prev, leave_type_id: undefined })) }} className="hover:text-danger transition-colors">
                                 <X size={14} />
                             </button>
                         </span>
@@ -137,6 +164,9 @@ export function CreateLeaveRequest() {
                         <Button variant="outline" onClick={() => setIsLeaveTypePickerOpen(true)} leftIcon={<Plus size={16} />}>
                             {t("leave_request.select_leave_type", "hr") || "Select Leave Type"}
                         </Button>
+                    )}
+                    {errors.leave_type_id && (
+                        <p className="flex items-center gap-1 text-xs text-danger mt-1"><AlertCircle size={12} />{errors.leave_type_id}</p>
                     )}
                 </div>
 
@@ -177,9 +207,12 @@ export function CreateLeaveRequest() {
                             <Input
                                 type="datetime"
                                 value={startDate}
-                                onChange={(val) => setStartDate(val as string)}
+                                onChange={(val) => { setStartDate(val as string); setErrors((prev) => ({ ...prev, start_date: undefined })) }}
                                 baseClasses="w-full rounded-lg border border-border bg-background px-3 py-2 text-text"
                             />
+                            {errors.start_date && (
+                                <p className="flex items-center gap-1 text-xs text-danger mt-1"><AlertCircle size={12} />{errors.start_date}</p>
+                            )}
                         </div>
                         <div className="space-y-4">
                             <label className="block text-sm font-medium text-text">
@@ -188,9 +221,12 @@ export function CreateLeaveRequest() {
                             <Input
                                 type="datetime"
                                 value={endDate}
-                                onChange={(val) => setEndDate(val as string)}
+                                onChange={(val) => { setEndDate(val as string); setErrors((prev) => ({ ...prev, end_date: undefined })) }}
                                 baseClasses="w-full rounded-lg border border-border bg-background px-3 py-2 text-text"
                             />
+                            {errors.end_date && (
+                                <p className="flex items-center gap-1 text-xs text-danger mt-1"><AlertCircle size={12} />{errors.end_date}</p>
+                            )}
                         </div>
                         <div className="space-y-4">
                             <label className="block text-sm font-medium text-text">
@@ -200,10 +236,13 @@ export function CreateLeaveRequest() {
                                 type="number"
                                 min={1}
                                 value={requestedUnits}
-                                onChange={(val) => setRequestedUnits(Number(val))}
+                                onChange={(val) => { setRequestedUnits(Number(val)); setErrors((prev) => ({ ...prev, requested_units: undefined })) }}
                                 placeholder={t("leave_request.requested_units_placeholder", "hr") || "Enter number of units"}
                                 baseClasses="w-full rounded-lg border border-border bg-background px-3 py-2 text-text"
                             />
+                            {errors.requested_units && (
+                                <p className="flex items-center gap-1 text-xs text-danger mt-1"><AlertCircle size={12} />{errors.requested_units}</p>
+                            )}
                         </div>
                     </div>
 
@@ -215,10 +254,13 @@ export function CreateLeaveRequest() {
                             type="textarea"
                             rows={4}
                             value={reason}
-                            onChange={(val) => setReason(val as string)}
+                            onChange={(val) => { setReason(val as string); setErrors((prev) => ({ ...prev, reason: undefined })) }}
                             placeholder={t("leave_request.reason_placeholder", "hr") || "Enter the reason for your leave request"}
                             baseClasses="w-full rounded-lg border border-border bg-background px-3 py-2 text-text"
                         />
+                        {errors.reason && (
+                            <p className="flex items-center gap-1 text-xs text-danger mt-1"><AlertCircle size={12} />{errors.reason}</p>
+                        )}
                     </div>
                 </div>
 

@@ -33,10 +33,10 @@ export function DossierPickerDialog({
   const [filterValues, setFilterValues] = useState<Record<string, any>>({})
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !defaultFilter) {
       fetchDossiers({ page: 1, per_page: perPage })
     }
-  }, [isOpen])
+  }, [isOpen, defaultFilter])
 
   const fetchDossiers = (params: Record<string, any> = {}) => {
     const sp = new URLSearchParams()

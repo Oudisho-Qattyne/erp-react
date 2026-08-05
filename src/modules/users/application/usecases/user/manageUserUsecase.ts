@@ -18,26 +18,26 @@ export const createManageUserUseCase = (
       return repository.getCurrentUsers();
     },
 
-    createUser(data: CreateUserDto): Promise<DomainResponse<User>> {
-      return repository.createUser(data);
+    createUser(data: CreateUserDto, idempotencyKey?: string): Promise<DomainResponse<User>> {
+      return repository.createUser(data, idempotencyKey);
     },
 
-    updateUser(id: number, data: UpdateuserDto): Promise<DomainResponse<User>> {
-      return repository.updateUser(id, data);
+    updateUser(id: number, data: UpdateuserDto, idempotencyKey?: string): Promise<DomainResponse<User>> {
+      return repository.updateUser(id, data, idempotencyKey);
     },
-    updateSignature( file: File): Promise<DomainResponse<User>> {
-        return repository.updateSignature(file);
+    updateSignature( file: File, idempotencyKey?: string): Promise<DomainResponse<User>> {
+        return repository.updateSignature(file, idempotencyKey);
       },
 
-    exportUsersExcel() {
-        return repository.exportUsersExcel()
+    exportUsersExcel(idempotencyKey?: string) {
+        return repository.exportUsersExcel(idempotencyKey)
     },
-    exportUsersPdf() {
-        return repository.exportUsersPdf()
+    exportUsersPdf(idempotencyKey?: string) {
+        return repository.exportUsersPdf(idempotencyKey)
     },
 
-    linkUserToEmployee(user_id : number , employee_id : number) {
-        return repository.linkUserToEmployee(user_id , employee_id)
+    linkUserToEmployee(user_id : number , employee_id : number, idempotencyKey?: string) {
+        return repository.linkUserToEmployee(user_id , employee_id, idempotencyKey)
     }
   };
 };

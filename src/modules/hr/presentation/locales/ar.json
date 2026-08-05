@@ -124,7 +124,15 @@
     "reason_placeholder": "أدخل سبب طلب الإجازة",
     "review_notes": "ملاحظات المراجعة",
     "review_notes_placeholder": "أدخل ملاحظات المراجعة...",
-    "submit": "إرسال الطلب"
+    "submit": "إرسال الطلب",
+    "validation": {
+      "leave_type_required": "نوع الإجازة مطلوب",
+      "start_date_required": "تاريخ البداية مطلوب",
+      "end_date_required": "تاريخ النهاية مطلوب",
+      "requested_units_min": "الوحدات المطلوبة يجب أن تكون 1 على الأقل",
+      "reason_required": "السبب مطلوب",
+      "end_date_after_start": "تاريخ النهاية يجب أن يكون بعد أو يساوي تاريخ البداية"
+    }
   },
   "leave_types": {
     "title": "أنواع الإجازات",
@@ -334,6 +342,10 @@
       "name_invalid": "الاسم غير صالح",
       "spouse_name_required": "اسم الزوج/الزوجة مطلوب",
       "birthdate_invalid": "تاريخ الولادة غير صالح",
+      "date_birth_future": "تاريخ الميلاد لا يمكن أن يكون في المستقبل",
+      "birthdate_future": "تاريخ الولادة لا يمكن أن يكون في المستقبل",
+      "graduation_year_future": "سنة التخرج لا يمكن أن تكون في المستقبل",
+      "injury_date_format_invalid": "تاريخ الإصابة بصيغة YYYY-MM-DD",
       "country_required": "الدولة مطلوبة",
       "city_required": "المدينة مطلوبة",
       "region_required": "منطقة السكن مطلوبة"

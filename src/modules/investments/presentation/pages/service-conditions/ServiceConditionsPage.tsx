@@ -12,6 +12,7 @@ import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/Re
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { Pencil, Trash2, Star, Check, X, History } from 'lucide-react';
 
@@ -36,7 +37,7 @@ export function ServiceConditionsPage() {
       await remove(confirmDelete.id);
       toast.success(t('service_conditions.deleted', 'investments').replace('{name}', entityName));
     } catch (err: any) {
-      toast.error(err?.message || t('service_conditions.delete_error', 'investments').replace('{name}', entityName));
+      handleApiError(err, { module: "investments" });
     }
     setConfirmDelete(null);
   };
@@ -48,7 +49,7 @@ export function ServiceConditionsPage() {
       toast.success(t('common.set_default_success', 'shared')?.replace('{name}', entityName) || `${entityName} set as default successfully`);
       getAll();
     } catch (err: any) {
-      toast.error(err?.message || t('common.set_default_error', 'shared')?.replace('{name}', entityName) || `Failed to set ${entityName} as default`);
+      handleApiError(err, { module: "investments" });
     }
     setConfirmSetDefault(null);
   };
@@ -136,7 +137,7 @@ export function ServiceConditionsPage() {
             try {
               return await create(data);
     } catch (err: any) {
-      toast.error(err?.message || t('service_conditions.create_error', 'investments').replace('{name}', entityName)); throw err;
+      handleApiError(err, { module: "investments" }); throw err;
     }
           }}
           onSuccess={() => { toast.success(t('service_conditions.created', 'investments').replace('{name}', entityName)); getAll(); setIsCreateOpen(false); }}
@@ -158,7 +159,7 @@ export function ServiceConditionsPage() {
             try {
               await update(editItem!.id, data);
     } catch (err: any) {
-      toast.error(err?.message || t('common.update_error', 'shared')?.replace('{name}', entityName) || `Failed to update ${entityName}`); throw err;
+      handleApiError(err, { module: "investments" }); throw err;
     }
           }}
           onSuccess={() => { toast.success(t('common.updated', 'shared')?.replace('{name}', entityName) || `${entityName} updated successfully`); getAll(); setEditItem(null); }}

@@ -1,4 +1,3 @@
-// src/App.tsx
 import { useEffect, useState } from 'react'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import { autoRegisterModulesSync, getAllRoutes } from './core/moduleRegistry'
@@ -9,37 +8,36 @@ import { LanguageProvider } from './core/presentation/context/i18n/I18nProvider'
 import { ApiClientProvider } from './core/presentation/context/api/ApiClinetProvider'
 import { StorageProvider } from './core/registry/storage/StorageProvider'
 import { HrProvider } from './core/registry/hr/HrProvider'
+import { ChatProvider } from './core/registry/chat/ChatProvider'
 import { UserProvider } from './core/registry/user/UserProvider'
+import { PersonProvider } from './core/registry/person/PersonProvider'
 import { ProtectedRoute } from './core/infrastructure/auth/ProtectedRoute'
-import { AuthProvider } from './core/infrastructure/auth/AuthProvider'
+import { AuthProvider, useAuth } from './core/infrastructure/auth/AuthProvider'
 import { Spinner } from './core/presentation/layouts/ui/state/Spinner'
 import { NotFoundPage } from './core/presentation/pages/NotFoundPage'
 import { UnauthorizedPage } from './core/presentation/pages/UnauthorizedPage'
 import { Toaster } from 'sonner'
 import { Sandbox } from './Sabdbox'
 
-function App() {
-   const [isReady, setIsReady] = useState(false)
-
-  useEffect(() => {
-    autoRegisterModulesSync();
-    setIsReady(true);
-  }, []);
-
-  if (!isReady) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Spinner size="xl" className="mx-auto" />
-          <p className="mt-4 text-muted-foreground">Loading modules...</p>
-        </div>
+function FullPageSpinner({ text }: { text: string }) {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="text-center">
+        <Spinner size="xl" className="mx-auto text-primary" />
+        <p className="mt-4 text-text-muted">{text}</p>
       </div>
-    )
+    </div>
+  );
+}
+
+function AppContent() {
+  const { loading } = useAuth();
+
+  if (loading) {
+    return <FullPageSpinner text="جاري التحقق من المصادقة..." />;
   }
 
   const registeredRoutes = getAllRoutes();
-
-  // Build the routes array
   const routeConfigs = registeredRoutes.map(route => {
     const requiresAuth = route.requiresAuth !== false;
     const element = (
@@ -56,53 +54,45 @@ function App() {
         )}
       </LayoutSwitcher>
     );
-
-    return {
-      path: route.path,
-      element,
-    };
+    return { path: route.path, element };
   });
 
-  routeConfigs.push({
-    path: '/unauthorized',
-    element: <UnauthorizedPage />,
-  });
-
-  // Add catch‑all route (404) at the end
-  routeConfigs.push({
-    path: '*',
-    element: <NotFoundPage />,
-  });
-
-  routeConfigs.push({
-    path: '/',
-    element: (
-      // <LayoutSwitcher layout="default">
-      <Navigate to={'/hr'}/>
-        // <NotFoundPage />
-      // </LayoutSwitcher>
-    ),
-  });
-  routeConfigs.push({
-    path: '/my-sandbox',
-    element: (
-      // <LayoutSwitcher layout="default">
-      <Sandbox />
-        // <NotFoundPage />
-      // </LayoutSwitcher>
-    ),
-  });
-
-  // Optional: add a redirect from root to dashboard or home
-  // const hasRootRoute = registeredRoutes.some(r => r.path === '/');
-  // if (!hasRootRoute) {
-  //   routeConfigs.unshift({
-  //     path: '/',
-  //     element: <Navigate to="/hr" replace />,
-  //   });
-  // }
+  routeConfigs.push({ path: '/unauthorized', element: <UnauthorizedPage /> });
+  routeConfigs.push({ path: '*', element: <NotFoundPage /> });
+  routeConfigs.push({ path: '/', element: <Navigate to={'/hr'} /> });
+  routeConfigs.push({ path: '/my-sandbox', element: <Sandbox /> });
 
   const router = createBrowserRouter(routeConfigs);
+
+  return (
+    <>
+      <StorageProvider>
+        <HrProvider>
+        <ChatProvider>
+        <UserProvider>
+          <PersonProvider>
+          <Toaster position="bottom-center" dir="rtl" richColors />
+          <RouterProvider router={router} />
+          </PersonProvider>
+        </UserProvider>
+        </ChatProvider>
+        </HrProvider>
+      </StorageProvider>
+    </>
+  );
+}
+
+function App() {
+  const [isReady, setIsReady] = useState(false)
+
+  useEffect(() => {
+    autoRegisterModulesSync();
+    setIsReady(true);
+  }, []);
+
+  if (!isReady) {
+    return <FullPageSpinner text="جاري تحميل الوحدات..." />;
+  }
 
   return (
     <ThemeProvider>
@@ -110,18 +100,7 @@ function App() {
         <LanguageProvider>
           <ApiClientProvider>
             <AuthProvider>
-              <StorageProvider>
-                <HrProvider>
-                <UserProvider>
-                  <Toaster
-                    position="bottom-center"
-                    dir="rtl"
-                    richColors
-                  />
-                  <RouterProvider router={router} />
-                </UserProvider>
-                </HrProvider>
-              </StorageProvider>
+              <AppContent />
             </AuthProvider>
           </ApiClientProvider>
         </LanguageProvider>
@@ -129,4 +108,5 @@ function App() {
     </ThemeProvider>
   )
 }
+
 export default App

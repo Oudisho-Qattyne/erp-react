@@ -15,6 +15,7 @@ import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/Er
 import { EmptyState } from '../../../../../core/presentation/layouts/ui/state/EmptyState';
 import { MapPin, Pencil, Trash2, Star } from 'lucide-react';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { inputBaseClasses } from '../../../../../core/presentation/layouts/ui/inputs/styles';
 
 export function CitiesPage() {
@@ -42,7 +43,7 @@ export function CitiesPage() {
       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
       setConfirmDelete(null);
     } catch (err : any) {
-      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
+      handleApiError(err, { module: "hr" });
     }
   };
 
@@ -54,7 +55,7 @@ export function CitiesPage() {
       selectedCountry && getAllByCountry(selectedCountry);
       setConfirmSetDefault(null);
     } catch (err : any) {
-      toast.error(err?.message || t('lookups.set_default_error', 'hr').replace('{name}', entity));
+      handleApiError(err, { module: "hr" });
     }
   };
 
@@ -122,7 +123,7 @@ export function CitiesPage() {
             <GenericCreateForm
               fields={[{ name: 'name', type: 'alpha', label: t('employees.city', 'hr') || 'City name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
               schema={CityFormSchema.omit({ country_id: true })}
-              onSubmit={async (data) => { try { return await create({ ...data, name: { ar: data.name }, country_id: selectedCountry }); } catch (err : any) { toast.error(err?.message || t('lookups.create_error', 'hr').replace('{name}', entity)); throw {}; } }}
+              onSubmit={async (data) => { try { return await create({ ...data, name: { ar: data.name }, country_id: selectedCountry }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
               onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAllByCountry(selectedCountry); setIsCreateOpen(false); }}
               onCancel={() => setIsCreateOpen(false)}
               submitLabel={t('employee_form.add_city', 'hr') || 'Add City'}
@@ -135,7 +136,7 @@ export function CitiesPage() {
               fields={[{ name: 'name', type: 'alpha', label: t('employees.city', 'hr') || 'City name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
               schema={CityFormSchema.omit({ country_id: true })}
               defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), is_default: Boolean(editItem.is_default) } : undefined}
-              onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: { ar: data.name } }); } catch (err : any) { toast.error(err?.message || t('lookups.update_error', 'hr').replace('{name}', entity)); throw {}; } }}
+              onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: { ar: data.name } }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
               onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); selectedCountry && getAllByCountry(selectedCountry); setEditItem(null); }}
               onCancel={() => setEditItem(null)}
               submitLabel={t('common.save', 'shared') || 'Save'}

@@ -5,27 +5,33 @@ import type { Plot } from '../../../../domain/entities/plot';
 import { Button } from '../../../../../../core/presentation/layouts/ui/buttons/Button';
 import { LoadingState } from '../../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
+import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
 import { MapPin } from 'lucide-react';
 
 interface Props {
   plotId: string;
+  plot?: Plot | null;
 }
 
-export function PlotDetailsSection({ plotId }: Props) {
+export function PlotDetailsSection({ plotId, plot: plotProp }: Props) {
   const { t } = useLanguage();
   const { getById, loadingMap } = useEntityCrud<Plot>('/investments/plots', '/investments/plots');
   const [plot, setPlot] = useState<Plot | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (plotProp) {
+      setPlot(plotProp);
+      return;
+    }
     if (!plotId) return;
     getById(Number(plotId))
       .then((res) => {
         if (res?.data) setPlot(res.data);
         else setError(t('plots.not_found', 'investments') || 'Plot not found');
       })
-      .catch((err) => setError(err?.message || t('plots.load_error', 'investments') || 'Failed to load plot'));
-  }, [plotId]);
+      .catch((err) => setError(handleApiError(err, { module: "investments", silent: true })));
+  }, [plotId, plotProp]);
 
   if (!plotId) return null;
 

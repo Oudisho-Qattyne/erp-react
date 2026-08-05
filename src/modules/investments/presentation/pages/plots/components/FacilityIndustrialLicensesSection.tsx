@@ -21,6 +21,7 @@ import { getCreateIndustrialLicenseSourceFormSchema } from '../../../schemas/ind
 import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { FileCheck, Plus, Pencil, Trash2, Eye, Check, X, History } from 'lucide-react';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
 import { getLocalizedName } from '../../../../../../core/presentation/utils/helpes';
 
 interface FacilityIndustrialLicensesSectionProps {
@@ -65,7 +66,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
       setIsCreateOpen(false);
       return res;
     } catch (err: any) {
-      toast.error(err?.message || t('facility_industrial_licenses.create_error', 'investments') || 'Failed to create license');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -79,7 +80,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
       setEditingLicense(null);
       return res;
     } catch (err: any) {
-      toast.error(err?.message || t('facility_industrial_licenses.update_error', 'investments') || 'Failed to update license');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -91,7 +92,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
       toast.success(t('facility_industrial_licenses.deleted', 'investments') || 'License deleted successfully');
       getLicenses(listUrl);
     } catch (err: any) {
-      toast.error(err?.message || t('facility_industrial_licenses.delete_error', 'investments') || 'Failed to delete license');
+      handleApiError(err, { module: "investments" });
     }
     setDeletingLicense(null);
   };

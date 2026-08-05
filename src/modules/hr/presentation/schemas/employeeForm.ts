@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { notInTheFuture } from '../../../../core/presentation/schemas/dateSchema';
+
+const currentYear = new Date().getFullYear();
 
 export const getCreateEmployeeSchema = (t: (key: string, module?: string) => string) => {
   const EducationEntrySchema = z.object({
@@ -6,14 +9,17 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
     university_id: z.number().positive(t('employee_form.validation.university_required', 'hr') || 'رقم الجامعة يجب أن يكون موجباً').nullable().optional(),
     faculty_id: z.number().positive(t('employee_form.validation.faculty_required', 'hr') || 'رقم الكلية يجب أن يكون موجباً').nullable().optional(),
     specialization_id: z.number().positive(t('employee_form.validation.specialization_required', 'hr') || 'رقم التخصص يجب أن يكون موجباً').nullable().optional(),
-    graduation_year: z.string().regex(/^\d{4}$/, t('employee_form.validation.graduation_year_invalid', 'hr') || 'سنة التخرج غير صالحة (يجب أن تكون 4 أرقام)').or(z.literal('')).nullable().optional(),
+    graduation_year: z.string().regex(/^\d{4}$/, t('employee_form.validation.graduation_year_invalid', 'hr') || 'سنة التخرج غير صالحة (يجب أن تكون 4 أرقام)').or(z.literal('')).nullable().optional().refine((val) => {
+      if (!val) return true;
+      return parseInt(val, 10) <= currentYear;
+    }, t('employee_form.validation.graduation_year_future', 'hr') || 'سنة التخرج لا يمكن أن تكون في المستقبل'),
     academic_stage: z.string().or(z.literal('')).nullable().optional(),
     study_status: z.string().or(z.literal('')).nullable().optional(),
   });
 
   const EmployeeChildren = z.object({
     name: z.string().min(1, t('employee_form.validation.name_invalid', 'hr') || 'اسم الابن مطلوب'),
-    birthdate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, t('employee_form.validation.birthdate_invalid', 'hr') || 'تاريخ الولادة بصيغة YYYY-MM-DD'),
+    birthdate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, t('employee_form.validation.birthdate_invalid', 'hr') || 'تاريخ الولادة بصيغة YYYY-MM-DD').superRefine(notInTheFuture(t('employee_form.validation.birthdate_future', 'hr') || 'تاريخ الولادة لا يمكن أن يكون في المستقبل')),
   })
 
   const EmployeeSpouse = z.object({
@@ -32,7 +38,7 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
     mother_name: z.string().min(1, t('employee_form.validation.mother_name_required', 'hr') || 'اسم الأم مطلوب').or(z.literal('')).nullable().optional(),
     gender: z.enum(['male', 'female'], t('employee_form.validation.gender_invalid', 'hr') || 'الجنس يجب أن يكون ذكراً أو أنثى'),
 
-    date_birth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, t('employee_form.validation.date_birth_invalid', 'hr') || 'تاريخ الميلاد بصيغة YYYY-MM-DD').nullable().optional(),
+    date_birth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, t('employee_form.validation.date_birth_invalid', 'hr') || 'تاريخ الميلاد بصيغة YYYY-MM-DD').superRefine(notInTheFuture(t('employee_form.validation.date_birth_future', 'hr') || 'تاريخ الميلاد لا يمكن أن يكون في المستقبل')).nullable().optional(),
     place_birth: z.string().min(1, t('employee_form.validation.place_birth_required', 'hr') || 'مكان الميلاد مطلوب').or(z.literal('')).nullable().optional(),
     assigned_job: z.string(t('employee_form.validation.assigned_job_required', 'hr') || 'العمل المكلف به مطلوب').min(1, t('employee_form.validation.assigned_job_required', 'hr') || 'العمل المكلف به مطلوب'),
     marital_status: z.enum(['single', 'married', 'divorced', 'widowed'], t('employee_form.validation.marital_status_invalid', 'hr') || 'الحالة الاجتماعية غير صالحة').nullable(),
@@ -48,7 +54,7 @@ export const getCreateEmployeeSchema = (t: (key: string, module?: string) => str
     civil_registry_record: z.string().or(z.literal('')).nullable().optional(),
     health_status: z.string().or(z.literal('')).nullable().optional(),
     injury_details: z.string().or(z.literal('')).nullable().optional(),
-    injury_date: z.string().or(z.literal('')).nullable().optional(),
+    injury_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, t('employee_form.validation.injury_date_format_invalid', 'hr') || 'تاريخ الإصابة بصيغة YYYY-MM-DD').or(z.literal('')).nullable().optional(),
     chronic_disease_ids: z.array(z.number()).optional().default([]),
 
     // Employment (nested)

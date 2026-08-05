@@ -15,6 +15,7 @@ import { LoadingState } from '../../../../../../core/presentation/layouts/ui/sta
 import { FormInput } from '../../../../../../core/presentation/layouts/ui/inputs/FormInput';
 import { getCreateDossierSchema, type DossierFormData } from '../../../schemas/dossier.schema';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
 import { Plus, Eye, Trash2, CheckCircle, Pencil, XCircle } from 'lucide-react';
 import type { Dossier } from '../../../../domain/entities/dossier';
 import type { PlotStatus } from '../../../../domain/valueObjects/plots/plotStatus';
@@ -80,7 +81,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       }
       window.location.reload();
     } catch (err: any) {
-      toast.error(err?.message || t('dossier.create_error', 'investments') || 'Failed to create dossier');
+      handleApiError(err, { module: "investments" });
     }
   }
   const handleAdd = async (data: DossierFormData) => {
@@ -106,7 +107,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       form.reset();
       window.location.reload();
     } catch (err: any) {
-      toast.error(err?.message || t('dossier.update_error', 'investments') || 'Failed to update dossier');
+      handleApiError(err, { module: "investments" });
     }
   };
 
@@ -120,7 +121,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       form.reset();
       window.location.reload();
     } catch (err: any) {
-      toast.error(err?.message || t('dossier.allocate_error', 'investments') || 'Failed to allocate dossier');
+      handleApiError(err, { module: "investments" });
     }
   };
 
@@ -167,7 +168,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       setConfirmDelete(null);
       window.location.reload();
     } catch (err: any) {
-      toast.error(err?.message || t('dossier.delete_error', 'investments') || 'Failed to delete dossier');
+      handleApiError(err, { module: "investments" });
     }
   };
 
@@ -177,7 +178,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       toast.success(t('dossier.allocated', 'investments') || 'Dossier allocated successfully');
       window.location.reload();
     } catch (err: any) {
-      toast.error(err?.message || t('dossier.allocate_error', 'investments') || 'Failed to allocate dossier');
+      handleApiError(err, { module: "investments" });
     }
   };
 

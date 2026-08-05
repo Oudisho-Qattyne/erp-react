@@ -168,6 +168,9 @@
     "folder_id": "المجلد",
     "id": "ID",
     "picker_title": "اختيار مقسم",
+    "allocated_dossier": "الإضبارة",
+    "select_dossier": "اختر إضبارة",
+    "dossier_required": "يرجى اختيار إضبارة",
     "status_unsold": "غير مباعة",
     "status_announced": "معلن عنها",
     "status_subscribed": "مكتتب بها",
@@ -181,7 +184,9 @@
       "plot_area_id_invalid": "يجب أن تكون المنطقة رقماً",
       "plot_classification_id_invalid": "يجب أن يكون التصنيف رقماً",
       "latitude_required": "خط العرض مطلوب",
-      "longitude_required": "خط الطول مطلوب"
+      "longitude_required": "خط الطول مطلوب",
+      "status_date_format": "تاريخ الحالة بصيغة YYYY-MM-DD",
+      "status_date_future": "تاريخ الحالة لا يمكن أن يكون في المستقبل"
     }
   },
   "plot_status": {
@@ -257,7 +262,9 @@
     "validation": {
       "number_required": "رقم الإضبارة مطلوب",
       "date_required": "تاريخ الإضبارة مطلوب",
-      "status_required": "حالة الإضبارة مطلوبة"
+      "status_required": "حالة الإضبارة مطلوبة",
+      "date_format": "التاريخ بصيغة YYYY-MM-DD",
+      "date_future": "التاريخ لا يمكن أن يكون في المستقبل"
     }
   },
   "contract": {
@@ -306,7 +313,9 @@
       "contract_date_required": "تاريخ العقد مطلوب",
       "unit_price_positive": "يجب أن يكون سعر الوحدة موجباً",
       "weighting_factor_positive": "يجب أن يكون معامل الترجيح موجباً",
-      "payment_method_required": "طريقة الدفع مطلوبة"
+      "payment_method_required": "طريقة الدفع مطلوبة",
+      "contract_date_format": "تاريخ العقد بصيغة YYYY-MM-DD",
+      "contract_date_future": "تاريخ العقد لا يمكن أن يكون في المستقبل"
     }
   },
   "installments": {
@@ -326,7 +335,10 @@
     "edit_payment_date_dialog_title": "تحديث تاريخ الدفع",
     "update_date_success": "تم تحديث تاريخ الدفع بنجاح",
     "update_date_error": "فشل في تحديث تاريخ الدفع",
-    "no_installments": "لا توجد أقساط"
+    "no_installments": "لا توجد أقساط",
+    "validation": {
+      "payment_before_due": "تاريخ الدفع لا يمكن أن يكون قبل تاريخ الاستحقاق"
+    }
   },
   "facilities": {
     "title": "المنشآت",
@@ -724,7 +736,9 @@
       "decision_number_required": "رقم القرار مطلوب",
       "decision_date_required": "تاريخ القرار مطلوب",
       "decision_type_required": "نوع القرار مطلوب",
-      "license_source_required": "مصدر الترخيص مطلوب"
+      "license_source_required": "مصدر الترخيص مطلوب",
+      "decision_date_format": "تاريخ القرار بصيغة YYYY-MM-DD",
+      "decision_date_future": "تاريخ القرار لا يمكن أن يكون في المستقبل"
     }
   },
   "industry_categories": {
@@ -902,7 +916,12 @@
       "contract_number_required": "رقم العقد مطلوب",
       "contract_date_required": "تاريخ العقد مطلوب",
       "rent_area_positive": "يجب أن تكون المساحة رقماً موجباً",
-      "duration_required": "المدة مطلوبة"
+      "duration_required": "المدة مطلوبة",
+      "contract_date_format": "تاريخ العقد بصيغة YYYY-MM-DD",
+      "contract_date_future": "تاريخ العقد لا يمكن أن يكون في المستقبل",
+      "duration_date_format": "تاريخ النهاية بصيغة YYYY-MM-DD",
+      "duration_after_start": "تاريخ النهاية يجب أن يكون بعد تاريخ العقد",
+      "duration_past": "تاريخ النهاية لا يمكن أن يكون في الماضي"
     }
   },
   "licensing_statuses": {
@@ -988,7 +1007,19 @@
       "administrative_license_decision_date_required": "تاريخ القرار الإداري مطلوب",
       "by_duration_license_required": "الترخيص حسب المدة مطلوب",
       "by_industry_license_required": "الترخيص حسب الصناعة مطلوب",
-      "temp_administrative_license_expiration_date_required": "تاريخ انتهاء الرخصة المؤقتة مطلوب"
+      "temp_administrative_license_expiration_date_required": "تاريخ انتهاء الرخصة المؤقتة مطلوب",
+      "building_license_date_format": "تاريخ الرخصة بصيغة YYYY-MM-DD",
+      "building_license_date_future": "تاريخ الرخصة لا يمكن أن يكون في المستقبل",
+      "date_of_displaying_license_info_format": "تاريخ العرض بصيغة YYYY-MM-DD",
+      "date_of_displaying_license_info_future": "تاريخ العرض لا يمكن أن يكون في المستقبل",
+      "administrative_license_decision_date_future": "تاريخ القرار لا يمكن أن يكون في المستقبل",
+      "temp_administrative_license_expiration_date_past": "تاريخ الانتهاء لا يمكن أن يكون في الماضي",
+      "administrative_license_decision_date_format": "تاريخ القرار بصيغة YYYY-MM-DD",
+      "temp_administrative_license_expiration_date_format": "تاريخ الانتهاء بصيغة YYYY-MM-DD",
+      "expiration_after_decision": "تاريخ الانتهاء يجب أن يكون بعد تاريخ القرار الإداري",
+      "expiration_after_license": "تاريخ الانتهاء يجب أن يكون بعد تاريخ الرخصة",
+      "decision_after_license": "تاريخ القرار يجب أن يكون بعد أو يساوي تاريخ الرخصة",
+      "display_after_license": "تاريخ العرض يجب أن يكون بعد أو يساوي تاريخ الرخصة"
     }
   },
   "navigation": {

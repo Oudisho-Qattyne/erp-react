@@ -6,6 +6,7 @@ import { Button } from '../buttons/Button';
 import { z, type ZodSchema, type ZodObject } from 'zod';
 import { useDynamicForm } from '../../../hooks/useDynamicForm221';
 import { useLanguage } from '../../../context/i18n/I18nProvider';
+import { applyServerValidationErrors } from '../../../utils/handleApiError';
 import { useDialogClose } from '../dialog/Dialog';
 import type { InputType } from '../inputs/Input';
 import type { UseFormReturn } from 'react-hook-form';
@@ -169,16 +170,7 @@ export function GenericCreateForm({
       onSuccess(result?.data?.id, result);
       methods.reset();
     } catch (err: any) {
-      if (err.validationErrors) {
-        const entries = Object.entries(err.validationErrors);
-        entries.forEach(([field, msgs]) => {
-          const msg = Array.isArray(msgs) ? msgs[0] : String(msgs);
-          methods.setError(field as any, { message: msg });
-        });
-        const firstField = entries[0][0]
-        const el = document.querySelector(`[for="${firstField}"]`)
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" })
-      }
+      applyServerValidationErrors(err, methods.setError);
       throw err;
     }
   };

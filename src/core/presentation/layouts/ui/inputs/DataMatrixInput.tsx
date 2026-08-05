@@ -16,6 +16,8 @@ export interface MatrixFieldConfig {
   placeholder?: string;
   defaultValue?: any;
   searchable?: boolean;
+  decimalPlaces?: number;
+  allowNegative?: boolean;
   createTitle?: string;
   renderCreateForm?: (onSuccess: (value: number | string, item?: unknown) => void, onCancel: () => void, dependentData?: Record<string, unknown>) => React.ReactNode;
   labelPath?: string;
@@ -41,7 +43,7 @@ const getDefaultRow = (fields: MatrixFieldConfig[]) => {
   for (const field of fields) {
     if (field.defaultValue !== undefined) {
       row[field.name] = field.defaultValue;
-    } else if (field.type === 'number' || field.type === 'numeric') {
+    } else if (field.type === 'number' || field.type === 'numeric' || field.type === 'decimal') {
       row[field.name] = 0;
     } else if (field.type === 'select' || field.type === 'select-or-create') {
       row[field.name] = null;
@@ -168,6 +170,8 @@ export function DataMatrixInput({
                         dependentData={dependentData}
                         labelPath={field.labelPath}
                         createButtonPermission={field.createButtonPermission}
+                        decimalPlaces={field.decimalPlaces}
+                        allowNegative={field.allowNegative}
                         baseClasses={`${inputBaseClasses} border-0 focus:ring-0 rounded-none ${cellError ? 'border-danger ring-danger/10' : ''}`}
                       />
                       {cellError && <div className={errorClasses}>{cellError}</div>}

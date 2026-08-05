@@ -15,6 +15,7 @@ import { getCreateRentContractFormSchema } from '../../../schemas/rentContractFo
 import { getCreateRentContractIndustryFormSchema } from '../../../schemas/rentContractIndustryForm.schema';
 import { FileSignature, Plus, Pencil, Trash2, History } from 'lucide-react';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
 import { getLocalizedName } from '../../../../../../core/presentation/utils/helpes';
 
 interface RentContractSectionProps {
@@ -54,7 +55,7 @@ export function RentContractSection({ plotId, dossierId }: RentContractSectionPr
       setIsCreateOpen(false);
       return res;
     } catch (err: any) {
-      toast.error(err?.message || t('rent_contract.create_error', 'investments') || 'Failed to create rent contract');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -68,7 +69,7 @@ export function RentContractSection({ plotId, dossierId }: RentContractSectionPr
       setEditingContract(null);
       return res;
     } catch (err: any) {
-      toast.error(err?.message || t('rent_contract.update_error', 'investments') || 'Failed to update rent contract');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -80,7 +81,7 @@ export function RentContractSection({ plotId, dossierId }: RentContractSectionPr
       toast.success(t('rent_contract.deleted', 'investments') || 'Rent contract deleted successfully');
       getContracts(listUrl);
     } catch (err: any) {
-      toast.error(err?.message || t('rent_contract.delete_error', 'investments') || 'Failed to delete rent contract');
+      handleApiError(err, { module: "investments" });
     }
     setDeletingContract(null);
   };

@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 
 export function CreatePlotPage() {
   const { t } = useLanguage();
@@ -20,7 +21,7 @@ export function CreatePlotPage() {
     try {
       return await create(data);
     } catch (err: any) {
-      toast.error(err?.message || (t('plots.create_error', 'investments') || 'Failed to create plot').replace('{name}', entityName));
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };

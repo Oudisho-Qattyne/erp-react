@@ -28,6 +28,7 @@ import { EmployeeStatusFormSchema } from '../schemas/employeeStatus/employeeStat
 import { EmployeeStatusLogsDialog } from '../components/employee/EmployeeStatuseLogsDialog';
 import { JobStatusLogsDialog } from '../components/employee/JobStatusLogsDialog';
 import { cleanPayload } from '../../../../core/utils/cleanPayload';
+import { applyServerValidationErrors } from '../../../../core/presentation/utils/handleApiError';
 
 // -----------------------------------------------------------------------------
 // Helper: Generic Create Form wrapper (with explicit types)
@@ -686,16 +687,7 @@ export function EmployeeForm({
           await onSubmit(cleanPayload(data))
           methods.reset(data)
         } catch (err: any) {
-          if (err.validationErrors) {
-            const entries = Object.entries(err.validationErrors)
-            entries.forEach(([field, msgs]) => {
-              const msg = Array.isArray(msgs) ? msgs[0] : String(msgs)
-              methods.setError(field as any, { message: msg })
-            })
-            const firstField = entries[0][0]
-            const el = document.querySelector(`[for="${firstField}"]`)
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "center" })
-          }
+          applyServerValidationErrors(err, methods.setError)
           throw err
         }
       })} className="space-y-6">

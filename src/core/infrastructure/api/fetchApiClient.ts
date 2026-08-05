@@ -2,6 +2,17 @@
 import { getToken, removeToken, removeAuthUser } from '../auth/authStorage';
 import { createApiError } from '../../domain/common/errors/ApiError';
 import type { ApiClient, RequestConfig } from '../../domain/common/api/ApiClient';
+import enShared from '../../presentation/locales/en.json';
+import arShared from '../../presentation/locales/ar.json';
+
+function getLocalizedMessage(key: string, language: string): string {
+  const dict = language === 'ar' ? arShared : enShared;
+  const value = key.split('.').reduce<unknown>(
+    (acc, k) => (acc && typeof acc === 'object' && k in acc ? (acc as Record<string, unknown>)[k] : undefined),
+    dict
+  );
+  return typeof value === 'string' ? value : key;
+}
 
 export function createFetchApiClient(
   baseURL: string,
@@ -38,7 +49,13 @@ export function createFetchApiClient(
     }
 
     const requestUrl = buildUrl(url, config.params);
-    const response = await fetch(requestUrl, { ...config, headers });
+    let response: Response;
+    try {
+      response = await fetch(requestUrl, { ...config, headers });
+    } catch {
+      // Network failure (offline, DNS, CORS, etc.) — status 0 marks it as a connection error
+      throw createApiError('Failed to fetch', undefined, 0);
+    }
 
     // Handle error responses (non‑2xx)
     if (!response.ok) {
@@ -49,9 +66,11 @@ export function createFetchApiClient(
         throw createApiError('Unauthorized', undefined, 401);
       }
       const errorData = await response.json().catch(() => null);
-      const message = errorData?.message || `HTTP error! status: ${response.status}`;
+      const message = response.status >= 500
+        ? getLocalizedMessage('common.server_error', language)
+        : errorData?.message || `HTTP error! status: ${response.status}`;
       const validationErrors = errorData?.validationErrors;
-      throw createApiError(message, validationErrors, response.status);
+      throw createApiError(message, validationErrors, response.status, errorData);
     }
 
     // No content (204) or empty body – return null

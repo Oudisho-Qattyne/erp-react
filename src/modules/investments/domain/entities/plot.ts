@@ -25,5 +25,6 @@ export interface Plot {
   status_date?: string;
   updated_at?: string;
   folder_id?: string;
+  allocated_dossier_id?:number;
   user: User
 }

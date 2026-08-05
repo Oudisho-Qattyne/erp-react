@@ -13,6 +13,7 @@ import { SelectOrCreate } from './SelectOrCreate';
 import Input, { type InputType } from './Input';
 import type { ToggleVariant, ToggleSize } from './Toggle';
 import type { MatrixFieldConfig } from './DataMatrixInput';
+import type { PickerConfig } from '../picker/pickerTypes';
 import { useDependentField, type ComputedProps } from './hooks/useDependentField';
 import { AuthContext } from '../../../../infrastructure/auth/AuthProvider';
 
@@ -36,6 +37,9 @@ export interface FormInputProps<T extends FieldValues> {
   min?: number;
   max?: number;
   step?: number;
+  // For decimal
+  decimalPlaces?: number;
+  allowNegative?: boolean;
   // For select-or-create
   createTitle?: string;
   labelPath?: string;
@@ -51,6 +55,8 @@ export interface FormInputProps<T extends FieldValues> {
   maxRows?: number;
   matrixErrors?: Record<number, Record<string, string>>;
   rowSchema?: { safeParse: (data: any) => { success: boolean; error?: { flatten: () => { fieldErrors: Record<string, string[]> } } } };
+  // For table-picker
+  pickerConfig?: PickerConfig | null;
   // Dependency
   dependsOn?: Path<T>[];
   compute?: (values: Record<Path<T>, any>) => ComputedProps | Promise<ComputedProps>;
@@ -79,6 +85,8 @@ export function FormInput<T extends FieldValues>({
   min,
   max,
   step,
+  decimalPlaces,
+  allowNegative,
   createTitle = 'إضافة جديد',
   labelPath,
   renderCreateForm,
@@ -88,6 +96,7 @@ export function FormInput<T extends FieldValues>({
   maxRows,
   matrixErrors,
   rowSchema,
+  pickerConfig,
   dependsOn = [],
   compute,
   infoButton,
@@ -127,6 +136,8 @@ export function FormInput<T extends FieldValues>({
   const finalValue = computed.value !== undefined ? computed.value : currentValue;
   const finalMatrixFields = computed.matrixFields ?? matrixFields;
   const finalNumberOfRows = computed.numberOfRows ?? numberOfRows;
+  // compute can decide which picker dialog appears (or null to disable it)
+  const finalPickerConfig = computed.pickerConfig !== undefined ? computed.pickerConfig : pickerConfig;
 
   // Map nested array errors from react-hook-form (set by server validationErrors)
   // e.g. errors.service_conditions[0].id → { 0: { service_condition: "msg" } }
@@ -256,12 +267,15 @@ export function FormInput<T extends FieldValues>({
         min={min}
         max={max}
         step={step}
+        decimalPlaces={decimalPlaces}
+        allowNegative={allowNegative}
         matrixFields={finalMatrixFields}
         numberOfRows={finalNumberOfRows}
         minRows={minRows}
         maxRows={maxRows}
         matrixErrors={combinedMatrixErrors}
         rowSchema={rowSchema}
+        pickerConfig={finalPickerConfig}
         baseClasses={baseClasses}
         requiredPermission={requiredPermission}
         createButtonPermission={createButtonPermission}

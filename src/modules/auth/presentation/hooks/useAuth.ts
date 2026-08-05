@@ -1,17 +1,15 @@
 import { useState } from 'react';
 import { createAuthRepository } from '../../infrastructure/repositories/authRepository';
 import { createLoginUseCase } from '../../application/useCases/loginUseCase';
+import { handleApiError } from '../../../../core/presentation/utils/handleApiError';
 import { createFetchApiClient } from '../../../../core/infrastructure/api/fetchApiClient';
 import type { AuthResponse, LoginCredentials } from '../../domain/entities/AuthTypes';
 import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
-
-import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 
 // Singleton instances to be reused
 
 
 export function useAuth() {
-  const { t } = useLanguage();
   const apiClient = useApiClient()
   const authRepository = createAuthRepository(apiClient);
   const loginUseCase = createLoginUseCase(authRepository);
@@ -25,8 +23,7 @@ export function useAuth() {
       const response = await loginUseCase.execute(credentials);
       return response;
     } catch (err: any) {
-      const errorMessage = err.message || t('login.failed_message', 'auth');
-      setError(errorMessage);
+      setError(handleApiError(err, { module: "auth" }));
       throw err;
     } finally {
       setIsLoading(false);

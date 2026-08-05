@@ -3,9 +3,11 @@ import { useApiClient } from "../../../../core/presentation/context/api/ApiCline
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import { createInstallmentRepository } from "../../infrastructure/repositories/InstallmentRepository"
 import { createManageInstallmentsUseCase } from "../../application/usecases/manageInstallments"
+import { handleApiError } from "../../../../core/presentation/utils/handleApiError"
 import type { Contract } from "../../domain/entities/contract"
 import type { Installment } from "../../domain/entities/installment"
 import { toast } from "sonner"
+import { useIdempotency } from "../../../../core/presentation/hooks/useIdempotency"
 
 const OP_KEYS = ["payNextUnpaidInstallment", "updatePaymentDate"] as const
 
@@ -36,6 +38,7 @@ export const useInstallments = (): UseInstallmentsReturn => {
 
   const repository = createInstallmentRepository(apiClient)
   const useCase = createManageInstallmentsUseCase(repository)
+  const idem = useIdempotency()
 
   const setFnLoading = (fn: string, v: boolean) => setLoading((p) => ({ ...p, [fn]: v }))
   const setFnError = (fn: string, e: string | null) => setError((p) => ({ ...p, [fn]: e }))
@@ -46,35 +49,31 @@ export const useInstallments = (): UseInstallmentsReturn => {
     setFnLoading("payNextUnpaidInstallment", true)
     setFnError("payNextUnpaidInstallment", null)
     try {
-      const res = await useCase.payNextUnpaidInstallment(contractId, paymentDate)
+      const res = await idem.run('payInstallment', { contractId, paymentDate }, (key) => useCase.payNextUnpaidInstallment(contractId, paymentDate, key))
       setContract(res.data)
       toast.success(t("installments.pay_success", "investments") || "Installment paid successfully")
     } catch (err: any) {
-      const msg = err?.message || "Failed to pay installment"
-      setFnError("payNextUnpaidInstallment", msg)
-      toast.error(msg || t("installments.pay_error", "investments"))
+      setFnError("payNextUnpaidInstallment", handleApiError(err, { module: "investments" }))
       throw err
     } finally {
       setFnLoading("payNextUnpaidInstallment", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const updatePaymentDate = useCallback(async (installmentId: number, contractId: number, paymentDate: string) => {
     setFnLoading("updatePaymentDate", true)
     setFnError("updatePaymentDate", null)
     try {
-      const res = await useCase.updatePaymentDate(installmentId, contractId, paymentDate)
+      const res = await idem.run('updatePaymentDate', { installmentId, contractId, paymentDate }, (key) => useCase.updatePaymentDate(installmentId, contractId, paymentDate, key))
       setContract(res.data)
       toast.success(t("installments.update_date_success", "investments") || "Payment date updated successfully")
     } catch (err: any) {
-      const msg = err?.message || "Failed to update payment date"
-      setFnError("updatePaymentDate", msg)
-      toast.error(msg || t("installments.update_date_error", "investments"))
+      setFnError("updatePaymentDate", handleApiError(err, { module: "investments" }))
       throw err
     } finally {
       setFnLoading("updatePaymentDate", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])

@@ -1,6 +1,6 @@
-// src/core/auth/AuthProvider.tsx
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { getUserFromToken, getAuthUser, setAuthUser, removeAuthUser, isTokenValid, removeToken, setToken } from './authStorage';
+import { getUserApi } from '../../registry/user/userRegistry';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -27,16 +27,47 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       setUser(null);
       removeAuthUser();
+      setLoading(false);
     }
-    setLoading(false);
   }, []);
 
   useEffect(() => {
     checkAuth();
-    // Optional: listen for storage events (if token changes in another tab)
     window.addEventListener('storage', checkAuth);
     return () => window.removeEventListener('storage', checkAuth);
   }, [checkAuth]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    let cancelled = false;
+    const api = getUserApi();
+
+    if (!api?.getCurrentUser) {
+      setLoading(false);
+      return;
+    }
+
+    api.getCurrentUser()
+      .then(res => {
+        if (cancelled) return;
+        if (res?.data) {
+          setUser(res.data);
+          setAuthUser(res.data);
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        removeToken();
+        removeAuthUser();
+        setIsAuthenticated(false);
+        setUser(null);
+        setLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [isAuthenticated]);
 
   const login = (token: string, userData?: any) => {
     setToken(token);

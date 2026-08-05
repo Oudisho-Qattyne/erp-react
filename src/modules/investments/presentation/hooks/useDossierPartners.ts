@@ -3,9 +3,11 @@ import { useApiClient } from "../../../../core/presentation/context/api/ApiCline
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import { createDossierPartnersRepository } from "../../infrastructure/repositories/DossierPartnersRepository"
 import { createManageDossierPartnersUseCase } from "../../application/usecases/manageDossierPartners"
+import { handleApiError } from "../../../../core/presentation/utils/handleApiError"
 import type { Investor } from "../../domain/entities/investor"
 import type { Partner } from "../../domain/entities/partner"
 import { toast } from "sonner"
+import { useIdempotency } from "../../../../core/presentation/hooks/useIdempotency"
 
 const OP_KEYS = ["getPartners", "addPartners", "deletePartners", "listPartnersHistory"] as const
 
@@ -39,6 +41,7 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
 
   const repository = createDossierPartnersRepository(apiClient)
   const useCase = createManageDossierPartnersUseCase(repository)
+  const idem = useIdempotency()
 
   const setFnLoading = (fn: string, v: boolean) => setLoading((p) => ({ ...p, [fn]: v }))
   const setFnError = (fn: string, e: string | null) => setError((p) => ({ ...p, [fn]: e }))
@@ -52,47 +55,41 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
       const res = await useCase.getPartners(plotId, dossierId)
       setPartners(res.data?.partners || [])
     } catch (err: any) {
-      const msg = err?.message || "Failed to fetch partners"
-      setFnError("getPartners", msg)
-      toast.error(msg || t("dossier.load_error", "investments"))
+      setFnError("getPartners", handleApiError(err, { module: "investments" }))
     } finally {
       setFnLoading("getPartners", false)
     }
-  }, [useCase, t])
+  }, [useCase])
 
   const addPartners = useCallback(async (plotId: number, dossierId: number, investorIds: number[]) => {
     setFnLoading("addPartners", true)
     setFnError("addPartners", null)
     try {
-      const res = await useCase.addPartners(plotId, dossierId, investorIds)
+      const res = await idem.run('addPartners', { plotId, dossierId, investorIds }, (key) => useCase.addPartners(plotId, dossierId, investorIds, key))
       setPartners(res.data?.partners || [])
       toast.success(t("investors.add_investors_success", "investments") || "Partners added successfully")
     } catch (err: any) {
-      const msg = err?.message || "Failed to add partners"
-      setFnError("addPartners", msg)
-      toast.error(msg || t("investors.add_investors_error", "investments"))
+      setFnError("addPartners", handleApiError(err, { module: "investments" }))
       throw err
     } finally {
       setFnLoading("addPartners", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const deletePartners = useCallback(async (plotId: number, dossierId: number, investorIds: number[]) => {
     setFnLoading("deletePartners", true)
     setFnError("deletePartners", null)
     try {
-      const res = await useCase.deletePartners(plotId, dossierId, investorIds)
+      const res = await idem.run('removePartners', { plotId, dossierId, investorIds }, (key) => useCase.deletePartners(plotId, dossierId, investorIds, key))
       setPartners(res.data?.partners || [])
       toast.success(t("investors.remove_investors_success", "investments") || "Partners removed successfully")
     } catch (err: any) {
-      const msg = err?.message || "Failed to remove partners"
-      setFnError("deletePartners", msg)
-      toast.error(msg || t("investors.remove_investors_error", "investments"))
+      setFnError("deletePartners", handleApiError(err, { module: "investments" }))
       throw err
     } finally {
       setFnLoading("deletePartners", false)
     }
-  }, [useCase, t])
+  }, [useCase, t, idem])
 
   const listPartnersHistory = useCallback(async (plotId: number, dossierId: number) => {
     setFnLoading("listPartnersHistory", true)
@@ -101,13 +98,11 @@ export const useDossierPartners = (): UseDossierPartnersReturn => {
       const res = await useCase.listPartnersHistory(plotId, dossierId)
       setPartnersHistory(res.data || [])
     } catch (err: any) {
-      const msg = err?.message || "Failed to load partners history"
-      setFnError("listPartnersHistory", msg)
-      toast.error(msg || t("dossier.load_error", "investments"))
+      setFnError("listPartnersHistory", handleApiError(err, { module: "investments" }))
     } finally {
       setFnLoading("listPartnersHistory", false)
     }
-  }, [useCase, t])
+  }, [useCase])
 
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])

@@ -6,10 +6,12 @@ import { DatePicker } from './DatePicker';
 import { TimePicker } from './TimePicker';
 import { DateTimePicker } from './DateTimePicker';
 import { DataMatrixInput, type MatrixFieldConfig } from './DataMatrixInput';
+import { TablePickerInput } from './TablePickerInput';
+import type { PickerConfig } from '../picker/pickerTypes';
 import { Toggle, type ToggleSize, type ToggleVariant } from './Toggle';
 import { Info } from 'lucide-react';
 import { AuthContext } from '../../../../infrastructure/auth/AuthProvider';
-export type InputType = 'text' | 'number' | 'numeric' | 'alpha' | 'email' | 'password' | 'textarea' | 'date' | 'time' | 'datetime' | 'select' | 'select-or-create' | 'multi-select-or-create' | 'data-matrix' | 'checkbox' | 'toggle';
+export type InputType = 'text' | 'number' | 'numeric' | 'alpha' | 'alphanumeric' | 'decimal' | 'email' | 'password' | 'textarea' | 'date' | 'time' | 'datetime' | 'select' | 'select-or-create' | 'multi-select-or-create' | 'data-matrix' | 'table-picker' | 'checkbox' | 'toggle';
 
 interface InputProps {
   type: InputType;
@@ -32,6 +34,9 @@ interface InputProps {
   min?: number;
   max?: number;
   step?: number;
+  // For decimal
+  decimalPlaces?: number;
+  allowNegative?: boolean;
   baseClasses?: string;
   className?: string;
   // data-matrix
@@ -41,6 +46,8 @@ interface InputProps {
   maxRows?: number;
   matrixErrors?: Record<number, Record<string, string>>;
   rowSchema?: { safeParse: (data: any) => { success: boolean; error?: { flatten: () => { fieldErrors: Record<string, string[]> } } } };
+  // For table-picker
+  pickerConfig?: PickerConfig | null;
   infoButton?: () => void | null;
   requiredPermission?: string | string[];
   createButtonPermission?: string | string[];
@@ -48,6 +55,24 @@ interface InputProps {
   toggleVariant?: ToggleVariant;
   toggleSize?: ToggleSize;
   toggleLabel?: string;
+}
+
+function sanitizeDecimal(raw: string, decimalPlaces?: number, allowNegative?: boolean): string {
+  let v = raw.replace(/[^\d.-]/g, '')
+  const negative = !!allowNegative && v.startsWith('-')
+  v = v.replace(/-/g, '')
+  if (negative) v = '-' + v
+  const dotIdx = v.indexOf('.')
+  if (dotIdx !== -1) {
+    v = v.slice(0, dotIdx + 1) + v.slice(dotIdx + 1).replace(/\./g, '')
+  }
+  if (decimalPlaces !== undefined && decimalPlaces >= 0) {
+    const d = v.indexOf('.')
+    if (d !== -1) {
+      v = v.slice(0, d + 1 + decimalPlaces)
+    }
+  }
+  return v
 }
 
 const InputTypes: React.FC<InputProps> = ({
@@ -67,6 +92,8 @@ const InputTypes: React.FC<InputProps> = ({
   min,
   max,
   step,
+  decimalPlaces,
+  allowNegative,
   baseClasses = '',
   className = "",
   matrixFields,
@@ -75,6 +102,7 @@ const InputTypes: React.FC<InputProps> = ({
   maxRows,
   matrixErrors,
   rowSchema,
+  pickerConfig,
   createButtonPermission,
   toggleVariant,
   toggleSize,
@@ -185,6 +213,18 @@ const InputTypes: React.FC<InputProps> = ({
         />
       );
 
+    case 'table-picker':
+      return (
+        <TablePickerInput
+          value={value}
+          onChange={onChange}
+          pickerConfig={pickerConfig}
+          placeholder={finalPlaceholder}
+          disabled={finalDisabled}
+          baseClasses={localClass}
+        />
+      );
+
     case 'checkbox':
       return (
         <Toggle
@@ -284,6 +324,63 @@ const InputTypes: React.FC<InputProps> = ({
             if (allowed.includes(e.key)) return;
             if (e.ctrlKey && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase())) return;
             if (/^\d$/.test(e.key)) return;
+            e.preventDefault();
+          }}
+          placeholder={finalPlaceholder}
+          disabled={finalDisabled}
+          className={localClass}
+        />
+      );
+
+    case 'alphanumeric':
+      return (
+        <input
+          type="text"
+          value={finalValue}
+          onChange={(e) => onChange(e.target.value.replace(/\s/g, ''))}
+          onKeyDown={(e) => {
+            const allowed = [
+              'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+              'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+              'Home', 'End',
+            ];
+            if (allowed.includes(e.key)) return;
+            if (e.ctrlKey && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase())) return;
+            if (/^\p{L}$/u.test(e.key) || /^\d$/.test(e.key)) return;
+            e.preventDefault();
+          }}
+          placeholder={finalPlaceholder}
+          disabled={finalDisabled}
+          className={localClass}
+        />
+      );
+
+    case 'decimal':
+      return (
+        <input
+          type="text"
+          inputMode="decimal"
+          value={finalValue}
+          onChange={(e) => onChange(sanitizeDecimal(e.target.value, decimalPlaces, allowNegative))}
+          onKeyDown={(e) => {
+            const allowed = [
+              'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+              'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+              'Home', 'End',
+            ];
+            if (allowed.includes(e.key)) return;
+            if (e.ctrlKey && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase())) return;
+            if (/^\d$/.test(e.key)) return;
+            if (e.key === '.') {
+              const el = e.target as HTMLInputElement;
+              if (el.value.includes('.')) e.preventDefault();
+              return;
+            }
+            if (allowNegative && e.key === '-') {
+              const el = e.target as HTMLInputElement;
+              if (el.selectionStart !== 0 || el.value.includes('-')) e.preventDefault();
+              return;
+            }
             e.preventDefault();
           }}
           placeholder={finalPlaceholder}

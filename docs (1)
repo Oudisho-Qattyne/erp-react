@@ -986,6 +986,602 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
+  /chat/users/:
+    get:
+      summary: 'List all users'
+      description: "Returns a paginated list of all users. Used for chat user selection (e.g. starting a new conversation).\nSupports optional filtering by name, email, and status.\nNo broadcast events are fired by this endpoint.\n"
+      tags:
+        - 'Chat Module'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: 'Page number'
+        -
+          name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: 'Items per page'
+        -
+          name: name
+          in: query
+          schema:
+            type: string
+          description: 'Filter by name (partial match)'
+        -
+          name: email
+          in: query
+          schema:
+            type: string
+          description: 'Filter by email (partial match)'
+        -
+          name: status
+          in: query
+          schema:
+            type: string
+          description: 'Filter by status'
+      responses:
+        200:
+          description: 'Users retrieved successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/responses/PaginatedSuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/ChatUser' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  /chat/conversations/:
+    get:
+      summary: 'List user conversations'
+      description: "Returns a paginated list of all conversations where the authenticated user is a participant (either as user_one or user_two).\nEach conversation includes its two user objects, the most recent message, and the count of unread messages for the authenticated user.\nNo broadcast events are fired by this endpoint.\n"
+      tags:
+        - 'Chat Module'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: 'Page number'
+        -
+          name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: 'Items per page'
+      responses:
+        200:
+          description: 'Conversations retrieved successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/responses/PaginatedSuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Conversation' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+  '/chat/conversations/{conversationId}/read':
+    put:
+      summary: 'Mark conversation as read'
+      description: "Marks all unread messages in a conversation as read for the authenticated user.\nThe conversation must exist and the authenticated user must be a participant.\n\nReturns the list of messages that were marked as read (previously unread messages).\n\n**Broadcast events fired:**\n\nFor each message marked as read:\n- **Event name:** `message.read`\n- **Channel:** `private-messages.{conversationId}`\n- **Data:** `{ id, conversation_id, sender_id, receiver_id, body, read_at, created_at }`\n\nAfter all messages are marked as read:\n- **Event name:** `conversation.read`\n- **Channels:** `private-conversations.{user_one_id}`, `private-conversations.{user_two_id}`\n- **Data:** `{ id, user_one_id, user_two_id, created_at }`\n"
+      tags:
+        - 'Chat Module'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          $ref: '#/components/parameters/ConversationId'
+      responses:
+        200:
+          description: 'Conversation marked as read successfully. Returns the messages that were marked as read.'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/responses/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Message' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  '/chat/conversations/{conversationId}/messages/':
+    get:
+      summary: 'List conversation messages'
+      description: "Returns a paginated list of all messages in a specific conversation, ordered by creation date.\nEach message includes the sender and receiver user objects.\nNo broadcast events are fired by this endpoint.\n"
+      tags:
+        - 'Chat Module'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          $ref: '#/components/parameters/ConversationId'
+        -
+          name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: 'Page number'
+        -
+          name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: 'Items per page'
+      responses:
+        200:
+          description: 'Messages retrieved successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/responses/PaginatedSuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Message' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /chat/conversations/messages/:
+    post:
+      summary: 'Send a message'
+      description: "Sends a message to another user. A conversation is found or created automatically between the authenticated user and the receiver based on their IDs.\nThe sender is set from the authenticated user's ID (do not include `sender_id` in the request body).\n\n**Broadcast events fired:**\n\nIf a new conversation was created:\n- **Event name:** `conversation.created`\n- **Channels:** `private-conversations.{user_one_id}`, `private-conversations.{user_two_id}`\n- **Data:** `{ id, user_one_id, user_two_id, created_at }`\n\nAlways:\n- **Event name:** `message.sent`\n- **Channel:** `private-messages.{conversationId}`\n- **Data:** `{ id, conversation_id, sender_id, receiver_id, body, read_at, created_at }`\n"
+      tags:
+        - 'Chat Module'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        200:
+          description: 'Message sent successfully. Returns the created message with sender and receiver user objects.'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/responses/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/MessageInfo' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /financial-management/payment-fees:
+    get:
+      tags:
+        - 'Financial Management'
+      summary: 'Get all Payment Fees'
+      description: "List payment fees with pagination, filtering and sorting.\n\n**Filters:**\n- `search` - partial match (LIKE) on `name`\n- `code` - partial match (LIKE) on `code`\n- `status` - exact match on `fee_status` (`active`, `archived`)\n- `value` - exact match on `fee_value`\n- `value_from` - minimum `fee_value` (inclusive)\n- `value_to` - maximum `fee_value` (inclusive)\n\n**Sorting** via `sort_by[column]=asc|desc`: `fee_value`, `created_at` - default `created_at` desc if omitted.\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: 'Page number'
+        -
+          name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: 'Items per page'
+        -
+          name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'Partial match (LIKE) on `name`'
+        -
+          name: code
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'Partial match (LIKE) on `code`'
+        -
+          name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - active
+              - archived
+          description: 'Filter by fee status'
+        -
+          name: value
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+          description: 'Exact match on `fee_value`'
+        -
+          name: value_from
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+          description: 'Minimum `fee_value` (inclusive)'
+        -
+          name: value_to
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+          description: 'Maximum `fee_value` (inclusive)'
+        -
+          name: 'sort_by[fee_value]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `fee_value`'
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `created_at`'
+      responses:
+        200:
+          description: 'List of payment fees'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { pagination: { type: object, properties: { lastPage: { type: integer, example: 1 }, currentPage: { type: integer, example: 1 }, hasMore: { type: boolean, example: false }, total: { type: integer, example: 5 } } }, data: { type: array, items: { $ref: '#/components/schemas/PaymentFeeInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - 'Financial Management'
+      summary: 'Create a Payment Fee'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentFeeDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PaymentFeeInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  '/financial-management/payment-fees/{paymentFeeId}':
+    get:
+      tags:
+        - 'Financial Management'
+      summary: 'Get a Payment Fee by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: paymentFeeId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Payment fee details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PaymentFeeInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - 'Financial Management'
+      summary: 'Update a Payment Fee'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: paymentFeeId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentFeeUpdateRequest'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PaymentFeeInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /financial-management/transactions:
+    get:
+      tags:
+        - 'Financial Management'
+      summary: 'Get all Transactions'
+      description: "List transactions with pagination, filtering and sorting.\n\n**Filters:**\n- `search` - partial match (LIKE) on `reason`\n- `status` - exact match on `transaction_status` (`pending`, `approved`, `canceled`)\n- `type` - exact match on `transaction_type` (`incoming`, `outgoing`)\n- `value` - exact match on `transaction_value`\n- `value_from` - minimum `transaction_value` (inclusive)\n- `value_to` - maximum `transaction_value` (inclusive)\n- `from_date` - minimum `transaction_date` (inclusive)\n- `to_date` - maximum `transaction_date` (inclusive)\n\n**Sorting** via `sort_by[column]=asc|desc`: `transaction_value`, `transaction_date`, `created_at` - default `created_at` desc if omitted.\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: 'Page number'
+        -
+          name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: 'Items per page'
+        -
+          name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'Partial match (LIKE) on `reason`'
+        -
+          name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - pending
+              - approved
+              - canceled
+          description: 'Filter by transaction status'
+        -
+          name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - incoming
+              - outgoing
+          description: 'Filter by transaction type'
+        -
+          name: value
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+          description: 'Exact match on `transaction_value`'
+        -
+          name: value_from
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+          description: 'Minimum `transaction_value` (inclusive)'
+        -
+          name: value_to
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+          description: 'Maximum `transaction_value` (inclusive)'
+        -
+          name: from_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: 'Minimum `transaction_date` (inclusive)'
+        -
+          name: to_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: 'Maximum `transaction_date` (inclusive)'
+        -
+          name: 'sort_by[transaction_value]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `transaction_value`'
+        -
+          name: 'sort_by[transaction_date]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `transaction_date`'
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `created_at`'
+      responses:
+        200:
+          description: 'List of transactions'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { pagination: { type: object, properties: { lastPage: { type: integer, example: 1 }, currentPage: { type: integer, example: 1 }, hasMore: { type: boolean, example: false }, total: { type: integer, example: 5 } } }, data: { type: array, items: { $ref: '#/components/schemas/TransactionInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - 'Financial Management'
+      summary: 'Create a Transaction'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/TransactionInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  '/financial-management/transactions/{transactionId}/status':
+    put:
+      tags:
+        - 'Financial Management'
+      summary: 'Change Transaction status'
+      description: "Change a transaction status (e.g. from `pending` to `approved` or `canceled`).\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: transactionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeTransactionStatusRequest'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/TransactionInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /hr/organizational-levels:
     get:
       summary: 'List all organizational levels'
@@ -2488,11 +3084,30 @@ paths:
           in: query
           schema:
             type: string
+          description: 'Search by building license number'
         -
           name: facility_id
           in: query
           schema:
             type: integer
+        -
+          name: licensing_status_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by licensing status ID'
+        -
+          name: by_duration_license_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by by-duration license ID'
+        -
+          name: by_industry_license_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by by-industry license ID'
       responses:
         200:
           description: 'List of building licenses'
@@ -2930,11 +3545,44 @@ paths:
           in: query
           schema:
             type: string
+          description: 'Search by contract number'
         -
           name: dossier_id
           in: query
           schema:
             type: integer
+        -
+          name: contract_number
+          in: query
+          schema:
+            type: string
+          description: 'Filter by contract number (LIKE match)'
+        -
+          name: payment_method
+          in: query
+          schema:
+            type: string
+          description: 'Filter by payment method'
+        -
+          name: paid_full_amount
+          in: query
+          schema:
+            type: boolean
+          description: 'Filter by whether full amount is paid'
+        -
+          name: from_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 'Filter contracts with contract_date >= this date'
+        -
+          name: to_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 'Filter contracts with contract_date <= this date'
       responses:
         200:
           description: 'List of contracts'
@@ -3440,6 +4088,69 @@ paths:
           in: query
           schema:
             type: string
+          description: 'Search by code or identifier'
+        -
+          name: code
+          in: query
+          schema:
+            type: string
+          description: 'Filter by code (LIKE match)'
+        -
+          name: identifier
+          in: query
+          schema:
+            type: string
+          description: 'Filter by identifier (LIKE match)'
+        -
+          name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - unsold
+              - announced
+              - subscribed
+              - allocated
+              - separated
+          description: 'Filter by status'
+        -
+          name: plot_area_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by plot area ID'
+        -
+          name: plot_classification_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by plot classification ID'
+        -
+          name: user_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by creator user ID'
+        -
+          name: has_allocated_dossier
+          in: query
+          schema:
+            type: boolean
+          description: 'Filter by whether plot has an allocated dossier'
+        -
+          name: from_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 'Filter plots created on or after this date'
+        -
+          name: to_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 'Filter plots created on or before this date'
       responses:
         200:
           description: 'List of plots'
@@ -3652,6 +4363,30 @@ paths:
           sanctumAuth: {  }
       parameters:
         -
+          name: plot_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by plot ID'
+        -
+          name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - unsold
+              - announced
+              - subscribed
+              - allocated
+              - separated
+          description: 'Filter by status'
+        -
+          name: user_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by user ID'
+        -
           name: page
           in: query
           schema:
@@ -3824,6 +4559,33 @@ paths:
           in: query
           schema:
             type: boolean
+        -
+          name: nationality
+          in: query
+          schema:
+            type: string
+          description: 'Filter by nationality'
+        -
+          name: gender
+          in: query
+          schema:
+            type: string
+            enum:
+              - male
+              - female
+          description: 'Filter by gender'
+        -
+          name: email
+          in: query
+          schema:
+            type: string
+          description: 'Filter by email (LIKE match)'
+        -
+          name: user_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by linked user ID'
       responses:
         200:
           description: 'List of investors'
@@ -4262,6 +5024,11 @@ paths:
           schema:
             type: string
         -
+          name: is_active
+          in: query
+          schema:
+            type: boolean
+        -
           name: is_default
           in: query
           schema:
@@ -4405,6 +5172,11 @@ paths:
           in: query
           schema:
             type: string
+        -
+          name: is_active
+          in: query
+          schema:
+            type: boolean
         -
           name: is_default
           in: query
@@ -4550,6 +5322,51 @@ paths:
           required: true
           schema:
             type: integer
+        -
+          name: status
+          in: query
+          schema:
+            type: string
+            enum:
+              - active
+              - allocatable
+              - cancelled
+              - draft
+          description: 'Filter by status'
+        -
+          name: dossier_number
+          in: query
+          schema:
+            type: string
+          description: 'Filter by dossier number (LIKE match)'
+        -
+          name: from_dossier_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 'Filter dossiers with dossier_date >= this date'
+        -
+          name: to_dossier_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 'Filter dossiers with dossier_date <= this date'
+        -
+          name: from_subscription_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 'Filter dossiers with subscription_date >= this date'
+        -
+          name: to_subscription_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 'Filter dossiers with subscription_date <= this date'
         -
           name: page
           in: query
@@ -4722,11 +5539,24 @@ paths:
           in: query
           schema:
             type: string
+          description: 'Search by name, city, or address'
         -
           name: plot_id
           in: query
           schema:
             type: integer
+        -
+          name: plot_dossier_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by plot dossier ID'
+        -
+          name: email
+          in: query
+          schema:
+            type: string
+          description: 'Filter by email (LIKE match)'
         -
           name: ids
           in: query
@@ -4874,6 +5704,30 @@ paths:
           in: query
           schema:
             type: integer
+        -
+          name: industry_category_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by industry category ID'
+        -
+          name: industry_type_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by industry type ID'
+        -
+          name: industrial_decision_type_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by industrial decision type ID'
+        -
+          name: industrial_license_source_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by industrial license source ID'
       responses:
         200:
           description: 'List of facility industrial licenses'
@@ -5020,6 +5874,27 @@ paths:
           required: true
           schema:
             type: integer
+        -
+          name: investor_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by investor ID'
+        -
+          name: action
+          in: query
+          schema:
+            type: string
+            enum:
+              - attached
+              - detached
+          description: 'Filter by action type'
+        -
+          name: causer_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by causer user ID'
       responses:
         200:
           description: 'List of partner history records'
@@ -5293,6 +6168,309 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
+  /investments/rent-contract-industries:
+    get:
+      tags:
+        - 'Rent Contract Industries'
+      summary: 'Get all Rent Contract Industries'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: is_active
+          in: query
+          schema:
+            type: boolean
+        -
+          name: is_default
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'List of rent contract industries'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/RentContractIndustryInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Rent Contract Industries'
+      summary: 'Create a Rent Contract Industry'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentContractIndustryDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/RentContractIndustryInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/rent-contract-industries/{id}':
+    get:
+      tags:
+        - 'Rent Contract Industries'
+      summary: 'Get a Rent Contract Industry by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Rent contract industry details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/RentContractIndustryInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Rent Contract Industries'
+      summary: 'Update a Rent Contract Industry'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentContractIndustryDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/RentContractIndustryInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Rent Contract Industries'
+      summary: 'Delete a Rent Contract Industry'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /investments/rent-contracts:
+    get:
+      tags:
+        - 'Rent Contracts'
+      summary: 'Get all Rent Contracts'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: dossier_id
+          in: query
+          schema:
+            type: integer
+        -
+          name: rent_contract_industry_id
+          in: query
+          schema:
+            type: integer
+        -
+          name: renter_phone
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'List of rent contracts'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/RentContractInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Rent Contracts'
+      summary: 'Create a Rent Contract'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentContractDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/RentContractInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/rent-contracts/{id}':
+    get:
+      tags:
+        - 'Rent Contracts'
+      summary: 'Get a Rent Contract by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Rent contract details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/RentContractInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Rent Contracts'
+      summary: 'Update a Rent Contract'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentContractDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/RentContractInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Rent Contracts'
+      summary: 'Delete a Rent Contract'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
   /investments/service-conditions:
     get:
       tags:
@@ -5421,6 +6599,155 @@ paths:
       tags:
         - 'Service Conditions'
       summary: 'Delete a Service Condition'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /investments/service-status-conditions:
+    get:
+      tags:
+        - 'Service Status Conditions'
+      summary: 'Get all Service Status Conditions'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: is_active
+          in: query
+          schema:
+            type: boolean
+        -
+          name: is_default
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'List of service status conditions'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/ServiceStatusConditionInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Service Status Conditions'
+      summary: 'Create a Service Status Condition'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceStatusConditionDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ServiceStatusConditionInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/service-status-conditions/{id}':
+    get:
+      tags:
+        - 'Service Status Conditions'
+      summary: 'Get a Service Status Condition by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Service status condition details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ServiceStatusConditionInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Service Status Conditions'
+      summary: 'Update a Service Status Condition'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceStatusConditionDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ServiceStatusConditionInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Service Status Conditions'
+      summary: 'Delete a Service Status Condition'
       security:
         -
           sanctumAuth: {  }
@@ -6512,6 +7839,243 @@ components:
         created_at:
           type: string
           example: '2024-01-01 10:00:00'
+    ChatUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'John Doe'
+        email:
+          type: string
+          example: john@example.com
+        photo:
+          type: string
+          nullable: true
+          example: null
+        status:
+          type: string
+          example: active
+    Conversation:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        user_one_id:
+          type: integer
+          example: 1
+        user_two_id:
+          type: integer
+          example: 2
+        user_one:
+          $ref: '#/components/schemas/ChatUser'
+        user_two:
+          $ref: '#/components/schemas/ChatUser'
+        created_at:
+          type: string
+          example: '2026-07-25 10:00:00'
+        last_message:
+          $ref: '#/components/schemas/MessageInfo'
+          nullable: true
+        unread_messages_count:
+          type: integer
+          example: 3
+    Message:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        conversation_id:
+          type: integer
+          example: 1
+        sender_id:
+          type: integer
+          example: 1
+        receiver_id:
+          type: integer
+          example: 2
+        sender:
+          $ref: '#/components/schemas/ChatUser'
+        receiver:
+          $ref: '#/components/schemas/ChatUser'
+        body:
+          type: string
+          example: 'Hello, how are you?'
+        read_at:
+          type: string
+          nullable: true
+          example: null
+        created_at:
+          type: string
+          example: '2026-07-25 10:00:00'
+    MessageInfo:
+      allOf:
+        -
+          $ref: '#/components/schemas/Message'
+    SendMessageRequest:
+      type: object
+      required:
+        - body
+        - receiver_id
+      properties:
+        body:
+          type: string
+          example: 'Hello, how are you?'
+        receiver_id:
+          type: integer
+          description: 'The ID of the user receiving the message. A conversation will be found or created between the authenticated user and this receiver.'
+          example: 2
+    PaymentFeeDTO:
+      type: object
+      required:
+        - name
+        - code
+        - fee_status
+        - fee_value
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          example: 'Maintenance Fee'
+        code:
+          type: string
+          example: MTN-001
+        fee_status:
+          type: string
+          enum:
+            - active
+            - archived
+          example: active
+        fee_value:
+          type: number
+          format: float
+          example: 250.5
+    PaymentFeeUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          example: 'Maintenance Fee'
+        fee_status:
+          type: string
+          enum:
+            - active
+            - archived
+          example: archived
+    PaymentFeeInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Maintenance Fee'
+        code:
+          type: string
+          example: MTN-001
+        fee_value:
+          type: number
+          format: float
+          example: 250.5
+        fee_status:
+          type: string
+          enum:
+            - active
+            - archived
+          example: active
+        created_at:
+          type: string
+          format: date
+          example: 16-07-2026
+    TransactionDTO:
+      type: object
+      required:
+        - transaction_value
+        - transaction_type
+        - transaction_status
+      properties:
+        transaction_value:
+          type: number
+          format: float
+          example: 250.5
+        transaction_type:
+          type: string
+          enum:
+            - incoming
+            - outgoing
+          example: incoming
+        transaction_date:
+          type: string
+          format: date
+          example: '2026-08-04'
+          description: 'Optional. Defaults to the current date when omitted.'
+        transaction_status:
+          type: string
+          enum:
+            - pending
+            - approved
+            - canceled
+          example: pending
+        reason:
+          type: string
+          nullable: true
+          example: 'Monthly maintenance fee'
+    ChangeTransactionStatusRequest:
+      type: object
+      required:
+        - transaction_status
+      properties:
+        transaction_status:
+          type: string
+          enum:
+            - approved
+            - canceled
+          example: approved
+    TransactionInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        transaction_type:
+          type: string
+          enum:
+            - incoming
+            - outgoing
+          example: incoming
+        transaction_status:
+          type: string
+          enum:
+            - pending
+            - approved
+            - canceled
+          example: pending
+        transaction_value:
+          type: number
+          format: float
+          example: 250.5
+        transaction_date:
+          type: string
+          format: date
+          example: '2026-08-04'
+        formatted_transaction_date:
+          type: string
+          format: date
+          example: 04-08-2026
+        reason:
+          type: string
+          nullable: true
+          example: 'Monthly maintenance fee'
+        created_at:
+          type: string
+          format: date
+          example: 04-08-2026
     OrganizationalLevel:
       type: object
       properties:
@@ -6550,14 +8114,6 @@ components:
     Education:
       type: object
       properties:
-        category:
-          type: string
-          enum:
-            - initial
-            - adjusted
-            - latest
-            - current
-          example: latest
         degree_name:
           type: string
           nullable: true
@@ -6613,7 +8169,7 @@ components:
           type: string
           format: date
           example: 1602288000
-    EmployeeWife:
+    EmployeeSpouse:
       type: object
       properties:
         id:
@@ -6625,7 +8181,7 @@ components:
         name:
           type: string
           example: 'Nour Hassan'
-    EmployeeWifeInput:
+    EmployeeSpouseInput:
       type: object
       required:
         - name
@@ -6845,14 +8401,6 @@ components:
           type: integer
           nullable: true
           example: 2
-        spouses:
-          type: string
-          nullable: true
-          example: 'Nour Hassan'
-        spouse_workplace:
-          type: string
-          nullable: true
-          example: 'Ministry of Education'
         blood_type:
           type: string
           enum:
@@ -6917,7 +8465,7 @@ components:
         spouses:
           type: array
           items:
-            $ref: '#/components/schemas/EmployeeWife'
+            $ref: '#/components/schemas/EmployeeSpouse'
         chronic_diseases:
           type: array
           items:
@@ -7057,14 +8605,6 @@ components:
           nullable: true
           example: 2
           description: 'Required when `marital_status` is `married`.'
-        spouses:
-          type: string
-          nullable: true
-          example: 'Nour Hassan'
-        spouse_workplace:
-          type: string
-          nullable: true
-          example: 'Ministry of Education'
         blood_type:
           type: string
           enum:
@@ -7135,7 +8675,7 @@ components:
           type: array
           nullable: true
           items:
-            $ref: '#/components/schemas/EmployeeWifeInput'
+            $ref: '#/components/schemas/EmployeeSpouseInput'
         job_status_id:
           type: integer
           example: 1
@@ -7196,12 +8736,6 @@ components:
           nullable: true
         number_of_children:
           type: integer
-          nullable: true
-        spouses:
-          type: string
-          nullable: true
-        spouse_workplace:
-          type: string
           nullable: true
         blood_type:
           type: string
@@ -7264,7 +8798,7 @@ components:
           type: array
           nullable: true
           items:
-            $ref: '#/components/schemas/EmployeeWifeInput'
+            $ref: '#/components/schemas/EmployeeSpouseInput'
         job_status_id:
           type: integer
           nullable: true
@@ -8469,6 +10003,23 @@ components:
                 type: string
                 nullable: true
                 example: 'Some note'
+        service_status_conditions:
+          type: array
+          description: 'Array of service status condition objects with id and optional note and service_status'
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+              note:
+                type: string
+                nullable: true
+                example: 'Some note'
+              service_status:
+                type: string
+                nullable: true
+                example: pending
     ServiceCondition_WithPivot:
       type: object
       properties:
@@ -8491,6 +10042,32 @@ components:
               type: string
               nullable: true
               example: 'Some note'
+    ServiceStatusCondition_WithPivot:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Active
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+        pivot:
+          type: object
+          properties:
+            note:
+              type: string
+              nullable: true
+              example: 'Some note'
+            service_status:
+              type: string
+              nullable: true
+              example: pending
     PlotInfoResource:
       type: object
       properties:
@@ -8573,6 +10150,11 @@ components:
           nullable: true
           items:
             $ref: '#/components/schemas/ServiceCondition_WithPivot'
+        service_status_conditions:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/ServiceStatusCondition_WithPivot'
     ChangePlotStatusDTO:
       type: object
       required:
@@ -9449,6 +11031,121 @@ components:
           type: string
           format: date
           example: 12-07-2026
+    RentContractIndustryDTO:
+      type: object
+      required:
+        - name
+        - is_default
+        - is_active
+      properties:
+        name:
+          type: string
+          example: Manufacturing
+        is_default:
+          type: boolean
+          example: false
+        is_active:
+          type: boolean
+          example: true
+    RentContractIndustryInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Manufacturing
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date
+          example: 21-07-2026
+    RentContractDTO:
+      type: object
+      required:
+        - dossier_id
+        - renter_name
+        - renter_phone
+        - rent_contract_number
+        - rent_contract_date
+        - rent_area
+        - rent_contract_duration
+        - rent_contract_industry_id
+      properties:
+        dossier_id:
+          type: integer
+          example: 1
+        renter_name:
+          type: string
+          example: 'John Doe'
+        renter_phone:
+          type: string
+          example: '+963111111111'
+        rent_contract_number:
+          type: string
+          example: RC-2026-001
+        rent_contract_date:
+          type: string
+          format: date
+          example: '2026-07-21'
+        rent_area:
+          type: number
+          format: float
+          example: 500.5
+        rent_contract_duration:
+          type: string
+          format: date
+          example: '2028-07-21'
+        rent_contract_industry_id:
+          type: integer
+          example: 1
+    RentContractInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        dossier_id:
+          type: integer
+          example: 1
+        dossier:
+          $ref: '#/components/schemas/PlotDossierInfoResource'
+        renter_name:
+          type: string
+          example: 'John Doe'
+        renter_phone:
+          type: string
+          example: '+963111111111'
+        rent_contract_number:
+          type: string
+          example: RC-2026-001
+        rent_contract_date:
+          type: string
+          format: date
+          example: 21-07-2026
+        rent_area:
+          type: number
+          format: float
+          example: 500.5
+        rent_contract_duration:
+          type: string
+          format: date
+          example: '2028-07-21'
+        rent_contract_industry_id:
+          type: integer
+          example: 1
+        rent_contract_industry:
+          $ref: '#/components/schemas/RentContractIndustryInfoResource'
+        created_at:
+          type: string
+          format: date
+          example: 21-07-2026
     ServiceConditionDTO:
       type: object
       required:
@@ -9485,6 +11182,41 @@ components:
           format: date
           example: 16-07-2026
         updated_at:
+          type: string
+          format: date
+          example: 16-07-2026
+    ServiceStatusConditionDTO:
+      type: object
+      required:
+        - name
+        - is_default
+        - is_active
+      properties:
+        name:
+          type: string
+          example: Active
+        is_default:
+          type: boolean
+          example: false
+        is_active:
+          type: boolean
+          example: true
+    ServiceStatusConditionInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Active
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+        created_at:
           type: string
           format: date
           example: 16-07-2026
@@ -9843,6 +11575,13 @@ components:
       description: 'Filter specializations by faculty ID (optional when not scoped by path)'
       schema:
         type: integer
+    ConversationId:
+      name: conversationId
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: 'The conversation ID'
     HrPage:
       name: page
       in: query
@@ -10259,6 +11998,76 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
+    SuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Success
+        plan:
+          type: string
+          nullable: true
+          example: null
+        data:
+          type: object
+    PaginatedSuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Success
+        plan:
+          type: string
+          nullable: true
+          example: null
+        pagination:
+          type: object
+          properties:
+            lastPage:
+              type: integer
+              example: 5
+            currentPage:
+              type: integer
+              example: 1
+            hasMore:
+              type: boolean
+              example: true
+            total:
+              type: integer
+              example: 50
+        data:
+          type: array
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Error
+        message:
+          type: string
+          example: 'An error occurred'
+        data:
+          type: array
+          example: {  }
+    ValidationErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: Error
+        message:
+          type: string
+          example: 'validation errors'
+        data:
+          type: string
+          nullable: true
+          example: null
+        validationErrors:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            body: 'The body field is required.'
     BadRequest:
       description: 'Bad request'
       content:
@@ -10284,6 +12093,12 @@ tags:
   -
     name: Specializations
     description: 'Manage Specializations'
+  -
+    name: 'Chat Module'
+    description: 'Conversations and messages'
+  -
+    name: 'Financial Management'
+    description: 'Manage Payment Fee definitions'
   -
     name: 'Organizational Levels'
     description: 'Manage organizational hierarchy units'
@@ -10369,8 +12184,17 @@ tags:
     name: 'License Statuses'
     description: 'Manage License Status definitions'
   -
+    name: 'Rent Contract Industries'
+    description: 'Manage Rent Contract Industry definitions'
+  -
+    name: 'Rent Contracts'
+    description: 'Manage Rent Contracts'
+  -
     name: 'Service Conditions'
     description: 'Manage Service Condition definitions'
+  -
+    name: 'Service Status Conditions'
+    description: 'Manage Service Status Condition definitions'
   -
     name: Storage
     description: 'Resolve storage items by ID or list root-level items'

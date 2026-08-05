@@ -10,6 +10,7 @@ import { ErrorState } from '../../../../core/presentation/layouts/ui/state/Error
 import type { DetailedRole } from '../../domain/entities/role';
 import { useManageRoles } from '../hooks/useManageRoles';
 import { getPermissionDisplayName } from '../utils/getPermissionDisplayName';
+import { handleApiError } from '../../../../core/presentation/utils/handleApiError';
 
 export function ShowRolePage() {
   const { id } = useParams<{ id: string }>();
@@ -25,7 +26,7 @@ export function ShowRolePage() {
     if (!id) return;
     getById(Number(id))
       .then((res) => setRole(res.data))
-      .catch((err: any) => setError(err?.message || t('show_role.load_error', 'users') || 'Error loading role data'))
+      .catch((err: any) => setError(handleApiError(err, { module: "users", silent: true })))
       .finally(() => setLoading(false));
   }, [id]);
 

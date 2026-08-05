@@ -9,14 +9,14 @@ export const createLeaveRequesteRepository = (apiClient: ApiClient): ILeaveReque
   const baseUrl = '/hr/leave-requests';
 
 return{
-    createLeaveRequest : (leaveRequest : any) => apiClient.post<DomainResponse<LeaveRequest>>(baseUrl , leaveRequest),
+    createLeaveRequest : (leaveRequest : any, idempotencyKey?: string) => apiClient.post<DomainResponse<LeaveRequest>>(baseUrl , leaveRequest, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined),
 
     getAllLeaveRequests:(filter : any) => apiClient.get<DpomainResponsePaginated<LeaveRequest[]>>(baseUrl , {params:filter}),
     getAllMyLeaveRequests:(filter : any) => apiClient.get<DpomainResponsePaginated<LeaveRequest[]>>(`${baseUrl}/my` , {params:filter}),
     getLeaveRequestById:(id :number) => apiClient.get<DomainResponse<LeaveRequest>>(`${baseUrl}/${id}`),
 
-    updateLeaveRequest:(id :number , leaveRequest : any) => apiClient.put<DomainResponse<LeaveRequest>>(`${baseUrl}/${id}` , leaveRequest),
+    updateLeaveRequest:(id :number , leaveRequest : any, idempotencyKey?: string) => apiClient.put<DomainResponse<LeaveRequest>>(`${baseUrl}/${id}` , leaveRequest, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined),
 
-    processLeaveRequest : (id : number, operation : LeaveRequestProcessOperations, reviewNotes : string) => apiClient.post<DomainResponse<LeaveRequest>>(`${baseUrl}/${id}/${operation}` , {review_notes:reviewNotes})
+    processLeaveRequest : (id : number, operation : LeaveRequestProcessOperations, reviewNotes : string, idempotencyKey?: string) => apiClient.post<DomainResponse<LeaveRequest>>(`${baseUrl}/${id}/${operation}` , {review_notes:reviewNotes}, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined)
 }
 }

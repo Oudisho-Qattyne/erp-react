@@ -168,6 +168,9 @@
     "folder_id": "Folder",
     "id": "ID",
     "picker_title": "Select Plot",
+    "allocated_dossier": "Dossier",
+    "select_dossier": "Select a dossier",
+    "dossier_required": "Please select a dossier",
     "status_unsold": "Unsold",
     "status_announced": "Announced",
     "status_subscribed": "Subscribed",
@@ -181,7 +184,9 @@
       "plot_area_id_invalid": "Plot Area must be a number",
       "plot_classification_id_invalid": "Plot Classification must be a number",
       "latitude_required": "Latitude is required",
-      "longitude_required": "Longitude is required"
+      "longitude_required": "Longitude is required",
+      "status_date_format": "Status date must be in YYYY-MM-DD format",
+      "status_date_future": "Status date cannot be in the future"
     }
   },
   "plot_status": {
@@ -257,7 +262,9 @@
     "validation": {
       "number_required": "Dossier number is required",
       "date_required": "Dossier date is required",
-      "status_required": "Dossier status is required"
+      "status_required": "Dossier status is required",
+      "date_format": "Dossier date must be in YYYY-MM-DD format",
+      "date_future": "Dossier date cannot be in the future"
     }
   },
   "contract": {
@@ -306,7 +313,9 @@
       "contract_date_required": "Contract date is required",
       "unit_price_positive": "Unit price must be positive",
       "weighting_factor_positive": "Weighting factor must be positive",
-      "payment_method_required": "Payment method is required"
+      "payment_method_required": "Payment method is required",
+      "contract_date_format": "Contract date must be YYYY-MM-DD",
+      "contract_date_future": "Contract date cannot be in the future"
     }
   },
   "installments": {
@@ -326,7 +335,10 @@
     "edit_payment_date_dialog_title": "Update Payment Date",
     "update_date_success": "Payment date updated successfully",
     "update_date_error": "Failed to update payment date",
-    "no_installments": "No installments found"
+    "no_installments": "No installments found",
+    "validation": {
+      "payment_before_due": "Payment date cannot be before the due date"
+    }
   },
   "facilities": {
     "title": "Facilities",
@@ -724,7 +736,9 @@
       "decision_number_required": "Decision number is required",
       "decision_date_required": "Decision date is required",
       "decision_type_required": "Decision type is required",
-      "license_source_required": "License source is required"
+      "license_source_required": "License source is required",
+      "decision_date_format": "Decision date must be YYYY-MM-DD",
+      "decision_date_future": "Decision date cannot be in the future"
     }
   },
   "industry_categories": {
@@ -902,7 +916,12 @@
       "contract_number_required": "Contract number is required",
       "contract_date_required": "Contract date is required",
       "rent_area_positive": "Area must be a positive number",
-      "duration_required": "Duration is required"
+      "duration_required": "Duration is required",
+      "contract_date_format": "Contract date must be YYYY-MM-DD",
+      "contract_date_future": "Contract date cannot be in the future",
+      "duration_date_format": "End date must be YYYY-MM-DD",
+      "duration_after_start": "End date must be after the contract date",
+      "duration_past": "End date cannot be in the past"
     }
   },
   "licensing_statuses": {
@@ -988,7 +1007,19 @@
       "administrative_license_decision_date_required": "Admin decision date is required",
       "by_duration_license_required": "Duration license is required",
       "by_industry_license_required": "Industry license is required",
-      "temp_administrative_license_expiration_date_required": "Temp expiration date is required"
+      "temp_administrative_license_expiration_date_required": "Temp expiration date is required",
+      "building_license_date_format": "Building license date must be YYYY-MM-DD",
+      "building_license_date_future": "Building license date cannot be in the future",
+      "date_of_displaying_license_info_format": "Display date must be YYYY-MM-DD",
+      "date_of_displaying_license_info_future": "Display date cannot be in the future",
+      "administrative_license_decision_date_future": "Decision date cannot be in the future",
+      "temp_administrative_license_expiration_date_past": "Expiration date cannot be in the past",
+      "administrative_license_decision_date_format": "Decision date must be YYYY-MM-DD",
+      "temp_administrative_license_expiration_date_format": "Expiration date must be YYYY-MM-DD",
+      "expiration_after_decision": "Expiration date must be after the administrative decision date",
+      "expiration_after_license": "Expiration date must be after the building license date",
+      "decision_after_license": "Decision date must be on or after the building license date",
+      "display_after_license": "Display date must be on or after the building license date"
     }
   },
   "navigation": {

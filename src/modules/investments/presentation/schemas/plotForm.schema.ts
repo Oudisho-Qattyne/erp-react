@@ -20,7 +20,11 @@ export const getCreatePlotFormSchema = (t: (key: string, module?: string) => str
   service_conditions : z.array(z.object({note : z.string().nullable().optional() , id : z.number().nullable().optional()})).nullable().optional(),
   service_status_conditions : z.array(z.object({note : z.string().nullable().optional() , service_status : z.string().nullable().optional() , id : z.number().nullable().optional()})).nullable().optional(),
   // notes: z.string().or(z.literal('')).optional().nullable(),
-  status_date: z.string().or(z.literal('')).optional().nullable(),
+  status_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, t('plots.validation.status_date_format', 'investments') || 'تاريخ الحالة بصيغة YYYY-MM-DD').or(z.literal('')).optional().nullable().refine((val) => {
+    if (!val) return true;
+    const d = new Date(val);
+    return d <= new Date();
+  }, t('plots.validation.status_date_future', 'investments') || 'تاريخ الحالة لا يمكن أن يكون في المستقبل'),
 });
 
 const dummyT = (() => '') as (key: string, module?: string) => string;

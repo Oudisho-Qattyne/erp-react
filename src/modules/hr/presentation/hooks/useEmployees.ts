@@ -7,6 +7,8 @@ import type { DomainResponse } from '../../../../core/domain/common/responce/Dom
 import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
 import { createManageEmployeeUseCase } from '../../application/usecases/manageEmployeeUseCase';
 import { createEmployeeRepository } from '../../infrastructure/repositories';
+import { handleApiError } from '../../../../core/presentation/utils/handleApiError';
+import { useIdempotency } from '../../../../core/presentation/hooks/useIdempotency';
 
 export interface UseManageEmployeeParams {
   initialPage?: number;
@@ -84,6 +86,7 @@ export function useManageEmployee(params: UseManageEmployeeParams = {}): UseMana
   // Prepare CRUD (repository + usecase) for single entity operations
   const repository = useMemo(() => createEmployeeRepository(apiClient), [apiClient]);
   const usecase = useMemo(() => createManageEmployeeUseCase(repository), [repository]);
+  const idem = useIdempotency();
 
   // Fetch paginated list
   const fetchEmployees = useCallback(async () => {
@@ -113,7 +116,7 @@ export function useManageEmployee(params: UseManageEmployeeParams = {}): UseMana
         });
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch employees');
+      setError(handleApiError(err, { silent: true, module: 'hr' }));
     } finally {
       setLoading(false);
     }
@@ -142,18 +145,18 @@ export function useManageEmployee(params: UseManageEmployeeParams = {}): UseMana
   }, [usecase]);
 
   const create = useCallback(async (data: CreateEmployeeDTO) => {
-    const newEmployee = await usecase.create(data);
+    const newEmployee = await idem.run('createEmployee', data, (key) => usecase.create(data, key));
     // Optionally refresh list to include new employee
     await fetchEmployees();
     return newEmployee;
-  }, [usecase, fetchEmployees]);
+  }, [usecase, fetchEmployees, idem]);
 
   const update = useCallback(async (id: number, data: UpdateEmployeeDTO) => {
-    const updated = await usecase.update(id, data);
+    const updated = await idem.run('updateEmployee', { id, data }, (key) => usecase.update(id, data, key));
     // Update list optimistically or refetch
     setEmployees(prev => prev.map(emp => emp.id === id ? { ...emp, ...updated } : emp));
     return updated;
-  }, [usecase]);
+  }, [usecase, idem]);
 
   const remove = useCallback(async (id: number) => {
     await usecase.delete(id);

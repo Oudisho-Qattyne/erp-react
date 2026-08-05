@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useFormContext, type FieldValues, type Path} from 'react-hook-form';
 import type { MatrixFieldConfig } from '../DataMatrixInput';
+import type { PickerConfig } from '../../picker/pickerTypes';
 
 export interface ComputedProps {
   value?: any;
@@ -11,6 +12,8 @@ export interface ComputedProps {
   required?: boolean;
   matrixFields?: MatrixFieldConfig[];
   numberOfRows?: number;
+  // Decides which picker dialog appears for `table-picker` fields (null = disabled)
+  pickerConfig?: PickerConfig | null;
   [key: string]: any; // allow extra data
 }
 

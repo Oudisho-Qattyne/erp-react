@@ -13,11 +13,11 @@ export const createCrudRoleRepository = (apiClient: ApiClient): ICrudRoleReposit
             getRoleId(id: number) {
                 return (apiClient.get<DomainResponse<DetailedRole>>(`/users/roles/${id}`))
             },
-            createRole(data: CreateRoleData) {
-                return (apiClient.post<DomainResponse<Role>>(`/users/roles/store`, data))
+            createRole(data: CreateRoleData, idempotencyKey?: string) {
+                return (apiClient.post<DomainResponse<Role>>(`/users/roles/store`, data, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined))
             },
-            updateRole(id: number, data: UpdateRoleData) {
-                return (apiClient.post<DomainResponse<DetailedRole>>(`/users/roles/${id}`, data))
+            updateRole(id: number, data: UpdateRoleData, idempotencyKey?: string) {
+                return (apiClient.post<DomainResponse<DetailedRole>>(`/users/roles/${id}`, data, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined))
             },
             delteRole(id) {
                 return (apiClient.delete<DomainResponse<[]>>(`/users/roles/${id}`))

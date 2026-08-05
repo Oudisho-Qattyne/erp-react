@@ -1,0 +1,40 @@
+{
+  "dialog": {
+    "title_conversations": "Chats",
+    "title_new_chat": "New Chat"
+  },
+  "contact_list": {
+    "search_placeholder": "Search conversations...",
+    "loading": "Loading...",
+    "retry": "Retry",
+    "no_results": "No results"
+  },
+  "user_list": {
+    "search_name_placeholder": "Search by name...",
+    "search_email_placeholder": "Search by email...",
+    "loading": "Loading...",
+    "retry": "Retry",
+    "no_results": "No results",
+    "no_users": "No users",
+    "existing_conversation": "Existing conversation"
+  },
+  "chat_header": {
+    "online": "Online now",
+    "offline": "Offline"
+  },
+  "chat_input": {
+    "placeholder": "Type a message..."
+  },
+  "empty_state": {
+    "select_conversation": "Choose a conversation from the list"
+  },
+  "new_conversation_unavailable": "Creating a new conversation is not available yet",
+  "conversations_load_error": "Failed to load conversations",
+  "messages_load_error": "Failed to load messages",
+  "send_error": "Failed to send message",
+  "mark_read_error": "Failed to mark as read",
+  "users_load_error": "Failed to load users",
+  "message_list": {
+    "start_of_chat": "— Beginning of chat —"
+  }
+}

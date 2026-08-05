@@ -16,6 +16,7 @@ import Input from '../../../../core/presentation/layouts/ui/inputs/Input';
 import { inputBaseClasses } from '../../../../core/presentation/layouts/ui/inputs/styles';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../core/presentation/utils/handleApiError';
 
 type Tab = 'countries' | 'cities' | 'regions' | 'universities' | 'faculties' | 'specializations';
 
@@ -89,7 +90,7 @@ function CountriesSection() {
               try {
                 return await create({ name: { ar: data.name } });
     } catch (err : any) {
-      toast.error(err?.message || t('lookups.create_error', 'hr').replace('{name}', entity));
+      handleApiError(err, { module: "hr" });
               throw err;
             }
           }}
@@ -112,7 +113,7 @@ function CountriesSection() {
                   await remove(c.id);
                   toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
     } catch (err : any) {
-      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
+      handleApiError(err, { module: "hr" });
                 }
               }}>{t('common.delete') || 'حذف'}</Button>
             </li>
@@ -200,7 +201,7 @@ function CitiesSection() {
                       await remove(c.id);
                       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
                     } catch (err : any) {
-                      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
+                      handleApiError(err, { module: "hr" });
                     }
                   }}>{t('common.delete') || 'حذف'}</Button>
                 </li>
@@ -317,7 +318,7 @@ function RegionsSection() {
                       await remove(r.id);
                       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
                     } catch (err : any) {
-                      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
+                      handleApiError(err, { module: "hr" });
                     }
                   }}>{t('common.delete') || 'حذف'}</Button>
                 </li>
@@ -367,7 +368,7 @@ function UniversitiesSection() {
             try {
               return await create({ name: data.name });
     } catch (err : any) {
-      toast.error(err?.message || t('lookups.create_error', 'hr').replace('{name}', entity));
+      handleApiError(err, { module: "hr" });
               throw err;
             }
           }}
@@ -390,7 +391,7 @@ function UniversitiesSection() {
                   await remove(u.id);
                   toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
     } catch (err : any) {
-      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
+      handleApiError(err, { module: "hr" });
                 }
               }}>{t('common.delete') || 'حذف'}</Button>
             </li>
@@ -479,7 +480,7 @@ function FacultiesSection() {
                       await remove(f.id);
                       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
                     } catch (err : any) {
-                      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
+                      handleApiError(err, { module: "hr" });
                     }
                   }}>{t('common.delete') || 'حذف'}</Button>
                 </li>
@@ -596,7 +597,7 @@ function SpecializationsSection() {
                       await remove(s.id);
                       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
                     } catch (err : any) {
-                      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
+                      handleApiError(err, { module: "hr" });
                     }
                   }}>{t('common.delete') || 'حذف'}</Button>
                 </li>

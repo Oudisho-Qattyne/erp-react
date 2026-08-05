@@ -3,7 +3,6 @@ import type { ICrudRepository } from '../../../../core/domain/repositories/ICrud
 import { createManageEntityUsecase } from '../../../../core/application/usecases/manageEntityUseCase';
 import type { EmployeeData } from '../../domain/entities/employee';
 import type { CreateEmployeeDTO, UpdateEmployeeDTO } from '../dtos/employeeDto';
-import { createEmployeeValidator } from '../validators/employeeValidator';
 
 /**
  * Factory that creates a complete use case for managing employees.

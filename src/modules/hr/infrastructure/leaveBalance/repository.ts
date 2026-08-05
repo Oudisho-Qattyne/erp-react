@@ -13,8 +13,8 @@ return{
     findAllEmployeeLeaveBalances(employeeId : number | undefined, filter?: any) {
         return apiClient.get<DpomainResponsePaginated<LeaveBalance[]>>(baseUrl, { params: { ...filter, ...(employeeId !== undefined ? { employee_id: employeeId } : {}) } })
     },
-    adjustLeaveBalance(adjust : any) {
-        return apiClient.post<DpomainResponsePaginated<any>>(`${baseUrl}/adjust` , adjust)
+    adjustLeaveBalance(adjust : any, idempotencyKey?: string) {
+        return apiClient.post<DpomainResponsePaginated<any>>(`${baseUrl}/adjust` , adjust, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined)
     },
 }
 }

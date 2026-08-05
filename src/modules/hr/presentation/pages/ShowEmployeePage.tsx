@@ -29,6 +29,7 @@ import { Spinner } from '../../../../core/presentation/layouts/ui/state/Spinner'
 import { ErrorState } from '../../../../core/presentation/layouts/ui/state/ErrorState';
 import { EmptyState } from '../../../../core/presentation/layouts/ui/state/EmptyState';
 import { useStorage } from '../../../../core/registry/storage/StorageProvider';
+import { handleApiError } from '../../../../core/presentation/utils/handleApiError';
 import { EmployeeStatusLogsDialog } from '../components/employee/EmployeeStatuseLogsDialog';
 import { JobStatusLogsDialog } from '../components/employee/JobStatusLogsDialog';
 
@@ -60,7 +61,7 @@ export function ShowEmployeePage() {
         setError(t('show_employee.not_found', 'hr') || 'لم يتم العثور على الموظف');
       }
     } catch (err: any) {
-      setError(err.message || t('show_employee.load_error', 'hr') || 'حدث خطأ أثناء تحميل بيانات الموظف');
+      setError(handleApiError(err, { module: "hr", silent: true }));
     } finally {
       setLoading(false);
     }
@@ -98,7 +99,6 @@ export function ShowEmployeePage() {
       />
     );
   }
-  console.log(employee);
   
 
   return (

@@ -5,14 +5,14 @@ import type { CreateLeaveRequestDto, UpdateLeaveRequestDto } from "../../dtos/le
 
 export const createManageLeaveRequestUseCase = (repository: ILeaveRequestRepository) => {
   return {
-        createLeaveRequset : (leaveRequest : CreateLeaveRequestDto) => repository.createLeaveRequest(leaveRequest),
+        createLeaveRequset : (leaveRequest : CreateLeaveRequestDto, idempotencyKey?: string) => repository.createLeaveRequest(leaveRequest, idempotencyKey),
 
         findAllEmployeeLeaveRequests : (filter : FilterLeaveRequestDto) => repository.getAllLeaveRequests(filter),
         findAllMyLeaveRequests : (filter : FilterLeaveRequestDto) => repository.getAllMyLeaveRequests(filter),
         findLeaveRequestById : (id:number) => repository.getLeaveRequestById(id),
 
-        updateLeaveRequest : (id:number , leaveRequest : UpdateLeaveRequestDto) => repository.updateLeaveRequest(id , leaveRequest),
+        updateLeaveRequest : (id:number , leaveRequest : UpdateLeaveRequestDto, idempotencyKey?: string) => repository.updateLeaveRequest(id , leaveRequest, idempotencyKey),
 
-        processleaveRequest : (id:number , operation : LeaveRequestProcessOperations ,reviewNotes:string ) => repository.processLeaveRequest(id,operation,reviewNotes)
+        processleaveRequest : (id:number , operation : LeaveRequestProcessOperations ,reviewNotes:string, idempotencyKey?: string ) => repository.processLeaveRequest(id,operation,reviewNotes,idempotencyKey)
   }
 }
