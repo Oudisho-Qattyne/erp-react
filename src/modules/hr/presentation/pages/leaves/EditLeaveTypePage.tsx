@@ -11,6 +11,7 @@ import type { LeaveFormValues } from "../../schemas/leaveForm"
 import type { Leave } from "../../../domain/entities/leave/leave"
 import type { UpdateLeaveTypeDto } from "../../../application/dtos/leave/LeaveTypeDto"
 import { isValid } from "zod/v3"
+import { handleApiError } from "../../../../../core/presentation/utils/handleApiError"
 
 export function EditLeaveTypePage() {
   const { id } = useParams<{ id: string }>()
@@ -44,7 +45,7 @@ export function EditLeaveTypePage() {
       await update(Number(id), payload)
       navigate(`/hr/leaves/${id}`)
     } catch (err: any) {
-      setError(err.message || t("edit_leave.update_error", "hr"))
+      setError(handleApiError(err, { module: "hr", silent: true }))
     } finally {
       setSaving(false)
     }

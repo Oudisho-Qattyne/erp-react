@@ -14,6 +14,7 @@ import { getCreateFacilityFormSchema } from '../../../schemas/facilityForm.schem
 import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { Factory, Plus, Eye, Pencil, Trash2, History } from 'lucide-react';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
 
 interface FacilitiesSectionProps {
   plotId: string;
@@ -46,7 +47,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
       setIsCreateOpen(false);
       return res;
     } catch (err: any) {
-      toast.error(err?.message || t('facilities.create_error', 'investments') || 'Failed to create facility');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -60,7 +61,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
       setEditingFacility(null);
       return res;
     } catch (err: any) {
-      toast.error(err?.message || t('facilities.update_error', 'investments') || 'Failed to update facility');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -72,7 +73,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
       toast.success(t('facilities.deleted', 'investments') || 'Facility deleted successfully');
       getFacilities(listUrl);
     } catch (err: any) {
-      toast.error(err?.message || t('facilities.delete_error', 'investments') || 'Failed to delete facility');
+      handleApiError(err, { module: "investments" });
     }
     setDeletingFacility(null);
   };

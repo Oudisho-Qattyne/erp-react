@@ -2,6 +2,7 @@ import enLocales from './presentation/locales/en.json';
 import arLocales from './presentation/locales/ar.json';
 import { Map, List, FileCheck, BadgeCheck, Tags, Layers, Flag, SlidersHorizontal } from 'lucide-react';
 import type { Module } from '../../core/moduleRegistry';
+import { registerPersonDetailRoute } from '../../core/registry/person/personRegistry';
 import { PlotAreasPage } from './presentation/pages/plot-areas/PlotAreasPage';
 import { PlotClassificationsPage } from './presentation/pages/plot-classifications/PlotClassificationsPage';
 import { PlotsPage } from './presentation/pages/plots/PlotsPage';
@@ -29,6 +30,13 @@ import { ServiceStatusConditionsPage } from './presentation/pages/service-status
 import { MapPin, Users, Clock, Building2, FileText, Factory, FileSignature } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { ShowFacilityPage } from './presentation/pages/plots/ShowFacilityPage';
+
+registerPersonDetailRoute({
+  type: 'investor',
+  routePattern: '/investments/investors/:id/edit',
+  resolve: (id) => `/investments/investors/${id}/edit`,
+  permission: 'investments.investors.update',
+});
 
 const investmentsModule: Module = {
   name: 'investments',

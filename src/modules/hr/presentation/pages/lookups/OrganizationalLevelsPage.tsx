@@ -10,6 +10,7 @@ import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/Re
 import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { Pencil, Trash2, ChevronRight, ChevronDown } from 'lucide-react';
 import type { OrganizationalLevels } from '../../../../../core/domain/entities/organizationalLevels/organizationalLevels';
 
@@ -71,7 +72,7 @@ export function OrganizationalLevelsPage() {
       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
       setConfirmDelete(null);
     } catch (err : any) {
-      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
+      handleApiError(err, { module: "hr" });
       getAll();
     }
   };
@@ -141,7 +142,7 @@ export function OrganizationalLevelsPage() {
             { name: 'parent_id', label: t('organizational_unit.parent', 'hr') || 'Parent', type: 'select', options: [{ value: null, label: t('organizational_unit.none', 'hr') || 'None' }, ...parentOptions] },
           ]}
           schema={organizationalLevelFormSchema}
-          onSubmit={async (data) => { try { return await create({ ...data , parent_id:data.parent_id == 0 ? null : data.parent_id, name:  data.name  }); } catch (err : any) { toast.error(err?.message || t('lookups.create_error', 'hr').replace('{name}', entity)); throw {}; } }}
+          onSubmit={async (data) => { try { return await create({ ...data , parent_id:data.parent_id == 0 ? null : data.parent_id, name:  data.name  }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
           onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAll(); setIsCreateOpen(false); }}
           onCancel={() => setIsCreateOpen(false)}
           submitLabel={t('employee_form.add_org_unit', 'hr') || 'Add Organizational Unit'}
@@ -157,7 +158,7 @@ export function OrganizationalLevelsPage() {
           ]}
           schema={organizationalLevelFormSchema}
           defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), parent_id: editItem.parent_id  } : undefined}
-          onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: data.name }); } catch (err : any) { toast.error(err?.message || t('lookups.update_error', 'hr').replace('{name}', entity)); throw {}; } }}
+          onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: data.name }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
           onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); getAll(); setEditItem(null); }}
           onCancel={() => setEditItem(null)}
           submitLabel={t('common.save', 'shared') || 'Save'}

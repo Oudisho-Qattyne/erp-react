@@ -14,6 +14,7 @@ import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLo
 import { getCreateContractFormSchema } from '../../../schemas/contractForm.schema';
 import { FileSignature, Plus, Eye, Pencil, Trash2, History } from 'lucide-react';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
 
 interface ContractsSectionProps {
   plotId: string;
@@ -46,7 +47,7 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
       setIsCreateOpen(false);
       return res;
     } catch (err: any) {
-      toast.error(err?.message || t('contract.create_error', 'investments') || 'Failed to create contract');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -60,7 +61,7 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
       setEditingContract(null);
       return res;
     } catch (err: any) {
-      toast.error(err?.message || t('contract.update_error', 'investments') || 'Failed to update contract');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -72,7 +73,7 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
       toast.success(t('contract.deleted', 'investments') || 'Contract deleted successfully');
       getContracts(listUrl);
     } catch (err: any) {
-      toast.error(err?.message || t('contract.delete_error', 'investments') || 'Failed to delete contract');
+      handleApiError(err, { module: "investments" });
     }
     setDeletingContract(null);
   };

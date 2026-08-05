@@ -11,6 +11,7 @@ import { Plus, Trash2 } from "lucide-react"
 import { getCreateLeaveSchema, type LeaveFormValues } from "../../schemas/leaveForm"
 import { getEligibilityFields } from "../../utils/RulesFields"
 import { cleanPayload } from "../../../../../core/utils/cleanPayload"
+import { applyServerValidationErrors } from "../../../../../core/presentation/utils/handleApiError"
 
 
 type FieldConfig = Omit<FormInputProps<any>, "name"> & { name: string }
@@ -235,16 +236,7 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
       
       await onSubmit(payload)
     } catch (err: any) {
-      if (err.validationErrors) {
-        const entries = Object.entries(err.validationErrors)
-        entries.forEach(([field, msgs]) => {
-          const msg = Array.isArray(msgs) ? msgs[0] : String(msgs)
-          form.setError(field as any, { message: msg })
-        })
-        const firstField = entries[0][0]
-        const el = document.querySelector(`[for="${firstField}"]`)
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" })
-      }
+      applyServerValidationErrors(err, form.setError)
       throw err
     }
   }

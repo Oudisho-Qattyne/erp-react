@@ -9,6 +9,7 @@ import { getCreateRoleSchema, type RoleFormValues } from '../schemas/roleForm';
 import { useManageRoles } from '../hooks/useManageRoles';
 import type { Permissions, Permission } from '../../domain/entities/permissions';
 import { getPermissionDisplayName } from '../utils/getPermissionDisplayName';
+import { applyServerValidationErrors } from '../../../../core/presentation/utils/handleApiError';
 
 const ROLE_EMPTY_DEFAULTS: RoleFormValues = {
   name: '',
@@ -78,12 +79,7 @@ export function RoleForm({
         try {
           await onSubmit(data);
         } catch (err: any) {
-          if (err.validationErrors) {
-            Object.entries(err.validationErrors).forEach(([field, msgs]) => {
-              const msg = Array.isArray(msgs) ? msgs[0] : String(msgs);
-              methods.setError(field as any, { message: msg });
-            });
-          }
+          applyServerValidationErrors(err, methods.setError);
           throw err;
         }
       })} className="space-y-6">

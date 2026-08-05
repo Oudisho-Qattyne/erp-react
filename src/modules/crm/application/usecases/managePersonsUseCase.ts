@@ -6,8 +6,5 @@ export const createManagePersonsUseCase = (repository: IPersonRepository) => {
     findAllPersons: (params?: PersonFilters) => {
       return repository.findAllPersons(params)
     },
-    findPersonById: (id: number) => {
-      return repository.findPersonById(id)
-    },
   }
 }

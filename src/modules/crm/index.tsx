@@ -14,7 +14,7 @@ const crmModule: Module = {
       label: 'persons.title',
       nav: true,
       order: 1,
-      // requiredPermission: 'crm.persons.list',
+      // requiredPermission: 'crm.people.list',
       moduleName: 'crm',
       icon: <Users size={18} />,
       group: 'crm',

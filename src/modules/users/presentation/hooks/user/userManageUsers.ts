@@ -3,6 +3,7 @@ import { useApiClient } from "../../../../../core/presentation/context/api/ApiCl
 import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nProvider"
 import { createUserRepository } from "../../../infrastructure/repositories/user/repository"
 import { createManageUserUseCase } from "../../../application/usecases/user/manageUserUsecase"
+import { handleApiError } from "../../../../../core/presentation/utils/handleApiError"
 import { useIdempotency } from "../../../../../core/presentation/hooks/useIdempotency"
 import type { User } from "../../../domain/entities/user/user"
 import type { FilterUserDto } from "../../../application/dtos/user/filterUserDto"
@@ -45,7 +46,7 @@ export interface UseManageUsersReturn {
 
 export const useManageUsers = (): UseManageUsersReturn => {
   const apiClient = useApiClient()
-  const { language, t } = useLanguage()
+  const { t } = useLanguage()
 
   const [users, setUsers] = useState<User[]>([])
   const [currentUser, setCurrentUser] = useState<User | null>(null)
@@ -88,13 +89,11 @@ export const useManageUsers = (): UseManageUsersReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err?.message || "Failed to fetch users"
-      setFnError("getAllUsers", msg)
-      toast.error(t('load_error', 'users').replace('{message}', msg))
+      setFnError("getAllUsers", handleApiError(err, { module: "users" }))
     } finally {
       setFnLoading("getAllUsers", false)
     }
-  }, [useCase, filter, t])
+  }, [useCase, filter])
 
   const getCurrentUser = useCallback(async () => {
     setFnLoading("getCurrentUser", true)
@@ -103,13 +102,11 @@ export const useManageUsers = (): UseManageUsersReturn => {
       const res = await useCase.getCurrentUser()
       setCurrentUser(res.data)
     } catch (err: any) {
-      const msg = err?.message || "Failed to fetch current user"
-      setFnError("getCurrentUser", msg)
-      toast.error(t('load_current_error', 'users').replace('{message}', msg))
+      setFnError("getCurrentUser", handleApiError(err, { module: "users" }))
     } finally {
       setFnLoading("getCurrentUser", false)
     }
-  }, [useCase, t])
+  }, [useCase])
 
   const createUser = useCallback(async (data: CreateUserDto) => {
     setFnLoading("createUser", true)
@@ -119,9 +116,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
       toast.success(t('created', 'users'))
       await getAllUsers()
     } catch (err: any) {
-      const msg = err?.message || "Failed to create user"
-      setFnError("createUser", msg)
-      toast.error(t('create_error', 'users').replace('{message}', msg))
+      setFnError("createUser", handleApiError(err, { module: "users" }))
       throw err
     } finally {
       setFnLoading("createUser", false)
@@ -136,9 +131,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
       toast.success(t('updated', 'users'))
       await getAllUsers()
     } catch (err: any) {
-      const msg = err?.message || "Failed to update user"
-      setFnError("updateUser", msg)
-      toast.error(t('update_error', 'users').replace('{message}', msg))
+      setFnError("updateUser", handleApiError(err, { module: "users" }))
       throw err
     } finally {
       setFnLoading("updateUser", false)
@@ -152,9 +145,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
       await idem.run('uploadSignature', { signature: file }, (key) => useCase.updateSignature(file, key))
       toast.success(t('signature_updated', 'users'))
     } catch (err: any) {
-      const msg = err?.message || "Failed to update signature"
-      setFnError("updateSignature", msg)
-      toast.error(t('signature_update_error', 'users').replace('{message}', msg))
+      setFnError("updateSignature", handleApiError(err, { module: "users" }))
       throw err
     } finally {
       setFnLoading("updateSignature", false)
@@ -177,9 +168,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
       URL.revokeObjectURL(url)
       toast.success(t('exported', 'users'))
     } catch (err: any) {
-      const msg = err?.message || "Failed to export users"
-      setFnError("exportUsersExcel", msg)
-      toast.error(t('export_error', 'users').replace('{message}', msg))
+      setFnError("exportUsersExcel", handleApiError(err, { module: "users" }))
       throw err
     } finally {
       setFnLoading("exportUsersExcel", false)
@@ -202,9 +191,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
       URL.revokeObjectURL(url)
       toast.success(t('exported', 'users'))
     } catch (err: any) {
-      const msg = err?.message || "Failed to export users"
-      setFnError("exportUsersPdf", msg)
-      toast.error(t('export_error', 'users').replace('{message}', msg))
+      setFnError("exportUsersPdf", handleApiError(err, { module: "users" }))
       throw err
     } finally {
       setFnLoading("exportUsersPdf", false)
@@ -218,9 +205,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
       await idem.run('linkUserToEmployee', { userId, employeeId }, (key) => useCase.linkUserToEmployee(userId, employeeId, key))
       toast.success(t('linked', 'users'))
     } catch (err: any) {
-      const msg = err?.message || "Failed to link user to employee"
-      setFnError("linkUserToEmployee", msg)
-      toast.error(t('link_error', 'users').replace('{message}', msg))
+      setFnError("linkUserToEmployee", handleApiError(err, { module: "users" }))
       throw err
     } finally {
       setFnLoading("linkUserToEmployee", false)

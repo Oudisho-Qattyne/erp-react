@@ -4,6 +4,7 @@ import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEn
 import type { Investor } from '../../../domain/entities/investor';
 import { InvestorForm } from './components/InvestorForm';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
@@ -123,7 +124,7 @@ export function EditInvestorPage() {
       const response = await getById(Number(id));
       setInvestor(response?.data || null);
     } catch (err: any) {
-      setError(err?.message || t('common.error_loading', 'shared') || 'Error loading data');
+      setError(handleApiError(err, { module: "investments", silent: true }));
     } finally {
       setLoading(false);
     }
@@ -135,7 +136,7 @@ export function EditInvestorPage() {
     try {
       return await update(Number(id), data);
     } catch (err: any) {
-      toast.error(err?.message || t('investors.update_error', 'investments') || 'Failed to update investor');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -148,7 +149,7 @@ export function EditInvestorPage() {
       setInterestToDelete(null);
       fetchInvestor();
     } catch (e : any) {
-      toast.error(e?.message || t('common.error', 'shared') || 'An error occurred');
+      handleApiError(e, { module: "investments" });
     }
   };
 

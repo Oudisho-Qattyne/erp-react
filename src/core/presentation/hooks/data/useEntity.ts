@@ -6,6 +6,7 @@ import { createManageEntityUsecase } from '../../../application/usecases/manageE
 import type { EntityWithNameOnly } from '../../../domain/entities/EntityWithNameOnly';
 import { useApiClient } from '../../context/api/ApiClinetProvider';
 import { useIdempotency } from '../useIdempotency';
+import { handleApiError } from '../../utils/handleApiError';
 
 const OP_KEYS = ['getAll', 'getById', 'create', 'update', 'remove'] as const;
 
@@ -132,10 +133,8 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
       setEntities(response.data);
       setPagination(extractPagination(response));
       return response;
-    } catch (err: unknown) {
-      const msg =
-        err instanceof Error ? err.message : 'Failed to fetch entities';
-      setFnError('getAll', msg);
+    } catch (err: any) {
+      setFnError('getAll', handleApiError(err, { silent: true }));
       throw err;
     } finally {
       setFnLoading('getAll', false);
@@ -149,8 +148,7 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
       const entity = await usecase.getById(id);
       return entity;
     } catch (err: any) {
-      const msg = err.message || `Failed to fetch entities ${id}`;
-      setFnError('getById', msg);
+      setFnError('getById', handleApiError(err, { silent: true }));
       throw err;
     } finally {
       setFnLoading('getById', false);
@@ -165,8 +163,7 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
       setEntities(prev => [...prev, newEntity.data]);
       return newEntity;
     } catch (err: any) {
-      const msg = err.message || 'Failed to create entities';
-      setFnError('create', msg);
+      setFnError('create', handleApiError(err, { silent: true }));
       throw err;
     } finally {
       setFnLoading('create', false);
@@ -181,8 +178,7 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
       setEntities(prev => prev.map(u => u.id === id ? updated.data : u));
       return updated;
     } catch (err: any) {
-      const msg = err.message || `Failed to update entities ${id}`;
-      setFnError('update', msg);
+      setFnError('update', handleApiError(err, { silent: true }));
       throw err;
     } finally {
       setFnLoading('update', false);
@@ -196,8 +192,7 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
       await usecase.delete(id);
       setEntities(prev => prev.filter(u => u.id !== id));
     } catch (err: any) {
-      const msg = err.message || `Failed to delete entities ${id}`;
-      setFnError('remove', msg);
+      setFnError('remove', handleApiError(err, { silent: true }));
       throw err;
     } finally {
       setFnLoading('remove', false);

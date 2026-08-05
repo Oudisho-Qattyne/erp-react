@@ -12,6 +12,7 @@ import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialo
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { Eye, Trash2, Search, History, Factory, Filter, X, MapPin, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PlotPickerDialog } from '../plots/components/PlotPickerDialog';
@@ -94,7 +95,7 @@ export function FacilitiesPage() {
       setConfirmDelete(null);
       getAll(`/investments/facilities?page=${page}&per_page=${perPage}`);
     } catch (err: any) {
-      toast.error(err?.message || t('facilities.delete_error', 'investments') || 'Failed to delete facility');
+      handleApiError(err, { module: "investments" });
     }
   };
 

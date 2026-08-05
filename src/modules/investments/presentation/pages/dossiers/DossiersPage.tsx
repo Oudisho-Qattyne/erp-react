@@ -11,6 +11,7 @@ import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialo
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { Eye, Trash2, Search, History, FileText, Filter, X, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PlotPickerDialog } from '../plots/components/PlotPickerDialog';
@@ -167,7 +168,7 @@ export function DossiersPage() {
       toast.success(t('dossier.deleted', 'investments') || 'Dossier deleted successfully');
       setConfirmDelete(null);
     } catch (err: any) {
-      toast.error(err?.message || t('dossier.delete_error', 'investments') || 'Failed to delete dossier');
+      handleApiError(err, { module: "investments" });
     }
   };
 

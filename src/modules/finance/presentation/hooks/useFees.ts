@@ -3,6 +3,7 @@ import { useApiClient } from "../../../../core/presentation/context/api/ApiCline
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import { createFeeRepository } from "../../infrastructure/repositories/FeeRepository"
 import { createManageFeesUseCase } from "../../application/usecases/manageFeesUseCase"
+import { handleApiError } from "../../../../core/presentation/utils/handleApiError"
 import type { CreateFeeDto, FeeFilters, UpdateFeeDto } from "../../application/dtos/feeDtos"
 import type { Fee } from "../../domain/entities/Fee"
 import { toast } from "sonner"
@@ -86,9 +87,7 @@ export const useFees = (): UseFeesReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("fee.load_error", MODULE) || "Failed to load fees"
-      setFnError("findAllFees", msg)
-      toast.error(msg)
+      setFnError("findAllFees", handleApiError(err, { module: MODULE }))
     } finally {
       setFnLoading("findAllFees", false)
     }
@@ -101,9 +100,7 @@ export const useFees = (): UseFeesReturn => {
       const res = await useCase.findFeeById(id)
       setFee(res?.data ?? null)
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("fee.load_error", MODULE) || "Failed to load fee"
-      setFnError("findFeeById", msg)
-      toast.error(msg)
+      setFnError("findFeeById", handleApiError(err, { module: MODULE }))
       throw err
     } finally {
       setFnLoading("findFeeById", false)
@@ -117,9 +114,7 @@ export const useFees = (): UseFeesReturn => {
       await idem.run("createFee", data, (key) => useCase.createFee(data, key))
       toast.success(t("fee.created", MODULE) || "Fee created successfully")
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("fee.create_error", MODULE) || "Failed to create fee"
-      setFnError("createFee", msg)
-      toast.error(msg)
+      setFnError("createFee", handleApiError(err, { module: MODULE }))
       throw err
     } finally {
       setFnLoading("createFee", false)
@@ -134,9 +129,7 @@ export const useFees = (): UseFeesReturn => {
       setFee(res.data)
       toast.success(t("fee.updated", MODULE) || "Fee updated successfully")
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("fee.update_error", MODULE) || "Failed to update fee"
-      setFnError("updateFee", msg)
-      toast.error(msg)
+      setFnError("updateFee", handleApiError(err, { module: MODULE }))
       throw err
     } finally {
       setFnLoading("updateFee", false)
@@ -151,9 +144,7 @@ export const useFees = (): UseFeesReturn => {
       setFee(res.data)
       toast.success(t("fee.archived", MODULE) || "Fee archived successfully")
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("fee.archive_error", MODULE) || "Failed to archive fee"
-      setFnError("archiveFee", msg)
-      toast.error(msg)
+      setFnError("archiveFee", handleApiError(err, { module: MODULE }))
       throw err
     } finally {
       setFnLoading("archiveFee", false)
@@ -168,9 +159,7 @@ export const useFees = (): UseFeesReturn => {
       setFee(res.data)
       toast.success(t("fee.activated", MODULE) || "Fee activated successfully")
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("fee.activate_error", MODULE) || "Failed to activate fee"
-      setFnError("activeFee", msg)
-      toast.error(msg)
+      setFnError("activeFee", handleApiError(err, { module: MODULE }))
       throw err
     } finally {
       setFnLoading("activeFee", false)

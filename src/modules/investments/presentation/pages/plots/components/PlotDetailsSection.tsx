@@ -5,6 +5,7 @@ import type { Plot } from '../../../../domain/entities/plot';
 import { Button } from '../../../../../../core/presentation/layouts/ui/buttons/Button';
 import { LoadingState } from '../../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
+import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
 import { MapPin } from 'lucide-react';
 
 interface Props {
@@ -29,7 +30,7 @@ export function PlotDetailsSection({ plotId, plot: plotProp }: Props) {
         if (res?.data) setPlot(res.data);
         else setError(t('plots.not_found', 'investments') || 'Plot not found');
       })
-      .catch((err) => setError(err?.message || t('plots.load_error', 'investments') || 'Failed to load plot'));
+      .catch((err) => setError(handleApiError(err, { module: "investments", silent: true })));
   }, [plotId, plotProp]);
 
   if (!plotId) return null;

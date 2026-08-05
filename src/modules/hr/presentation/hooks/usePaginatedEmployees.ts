@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { EmployeeListItem } from '../../domain/entities/EmployeeListItem'; // define this interface
 import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
+import { handleApiError } from '../../../../core/presentation/utils/handleApiError';
 import type { DomainResponse } from '../../../../core/domain/common/responce/DomainResponse';
 
 interface UsePaginatedEmployeesParams {
@@ -51,7 +52,7 @@ export function usePaginatedEmployees({
         setPagination(response.pagination);
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch employees');
+      setError(handleApiError(err, { silent: true, module: 'hr' }));
     } finally {
       setLoading(false);
     }

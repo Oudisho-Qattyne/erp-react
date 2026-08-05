@@ -3,6 +3,7 @@ import type { AuditLog } from '../../../../domain/entities/auditLog/auditLog';
 import { useApiClient } from '../../../context/api/ApiClinetProvider';
 import { createAuditLogsRepository } from '../../../../infrastructure/repositories/AuditLogsRepository';
 import { createAuditLogsUseCase } from '../../../../application/usecases/manageAufitLogsUseCase';
+import { handleApiError } from '../../../utils/handleApiError';
 import type { DpomainResponsePaginated } from '../../../../../modules/hr/domain/entities/common/DomainResponsePaginated';
 
 interface PaginationInfo {
@@ -52,8 +53,7 @@ export const useAuditLogs = (): UseAuditLogsReturn => {
       setAuditLogs(res.data);
       setPagination(extractPagination(res));
     } catch (err: any) {
-      const msg = err.message || 'Failed to load audit logs';
-      setError(msg);
+      setError(handleApiError(err, { module: "core", silent: true }));
     } finally {
       setLoading(false);
     }

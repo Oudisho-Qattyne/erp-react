@@ -10,6 +10,7 @@ import { StorageProvider } from './core/registry/storage/StorageProvider'
 import { HrProvider } from './core/registry/hr/HrProvider'
 import { ChatProvider } from './core/registry/chat/ChatProvider'
 import { UserProvider } from './core/registry/user/UserProvider'
+import { PersonProvider } from './core/registry/person/PersonProvider'
 import { ProtectedRoute } from './core/infrastructure/auth/ProtectedRoute'
 import { AuthProvider, useAuth } from './core/infrastructure/auth/AuthProvider'
 import { Spinner } from './core/presentation/layouts/ui/state/Spinner'
@@ -69,8 +70,10 @@ function AppContent() {
         <HrProvider>
         <ChatProvider>
         <UserProvider>
+          <PersonProvider>
           <Toaster position="bottom-center" dir="rtl" richColors />
           <RouterProvider router={router} />
+          </PersonProvider>
         </UserProvider>
         </ChatProvider>
         </HrProvider>

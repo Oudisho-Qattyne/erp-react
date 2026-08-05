@@ -10,6 +10,7 @@ import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/Er
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { YesNo } from '../../../../../core/presentation/layouts/ui/card/YesNo';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { Eye, Trash2, Filter, Search, History } from 'lucide-react';
@@ -92,7 +93,7 @@ export function InvestorsPage() {
       await remove(confirmDelete.id);
       toast.success(t('investors.deleted', 'investments') || 'Investor deleted');
     } catch (err: any) {
-      toast.error(err?.message || t('investors.delete_error', 'investments') || 'Failed to delete investor');
+      handleApiError(err, { module: "investments" });
     }
     setConfirmDelete(null);
   };

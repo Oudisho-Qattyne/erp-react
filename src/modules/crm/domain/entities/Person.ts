@@ -1,14 +1,18 @@
+import type { PersonType } from "../valueObjects/PersoneType";
+
 export interface Person {
   id: number;
   name: string;
-  primary_phone: string | null;
-  secondary_phone: string | null;
   email: string | null;
+  primary_phone_number: string | null;
+  secondary_phone_number: string | null;
   whatsapp: string | null;
   telegram: string | null;
   x: string | null;
   linkedin: string | null;
-  address: string | null;
+  facebook: string | null;
+  type: PersonType;
+  personable: any;
   created_at?: string;
   updated_at?: string;
 }

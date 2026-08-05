@@ -5,6 +5,7 @@ import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProv
 import type { StorageItemDto } from "../../application/dtos/storageItem";
 import { createManageStorageRepository } from "../../infrastructure/repositories/ManageStorageRepository";
 import { createManageStorageUseCase } from "../../application/usecases/ManageStorageUseCase";
+import { handleApiError } from "../../../../core/presentation/utils/handleApiError";
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
 import { toast } from "sonner";
 import type { IApi } from "@svar-ui/react-filemanager";
@@ -86,7 +87,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
     const [rootFolder, setRootFolder] = useState<StorageItemDto | null>(null)
 
     const apiClient = useApiClient();
-    const { language, t } = useLanguage();
+    const { t } = useLanguage();
     const [data, setData] = useState<StorageItemDto[]>([]);
     const [loading, setLoading] = useState<Record<string, boolean>>(() => initRecord(false));
     const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null));
@@ -149,22 +150,12 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             const res = await useCase.getItemById(id);
             return (res)
         } catch (err: any) {
-            const errMsg = err?.message || `Failed to get item`;
-            switch (err.status) {
-                case 403:
-                    setFunctionError("getItemById", "Forbiden");
-                    toast.error(t('toasts.get_item_unauthorized', 'storage'));
-                    break;
-                default:
-                    setFunctionError("getItemById", errMsg);
-                    toast.error(t('toasts.get_item_error', 'storage').replace('{message}', errMsg));
-                    break;
-            }
+            setFunctionError("getItemById", handleApiError(err, { module: "storage" }));
             throw err;
         } finally {
             setFunctionLoading("getItemById", false)
         }
-    }, [useCase, language, t]);
+    }, [useCase]);
 
     const loadFolderByPath = useCallback(async (path: string, api: any) => {
         setFunctionLoading("loadFolderByPath", true);
@@ -189,14 +180,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             await preloadImagePreviews(data);
             api.exec("provide-data", { data: data, id: path });
         } catch (err: any) {
-            switch (err.status) {
-                case 403:
-                    setFunctionError("loadFolderByPath", "Forbiden");
-                    break;
-                default:
-                    setFunctionError("loadFolderByPath", err?.message || `Failed to load folder ${path}`);
-                    break;
-            }
+            setFunctionError("loadFolderByPath", handleApiError(err, { module: "storage", silent: true }));
         } finally {
             setFunctionLoading("loadFolderByPath", false);
         }
@@ -230,23 +214,13 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             await loadFolderByPath(parent, api);
             toast.success(t('toasts.folder_created', 'storage').replace('{name}', name));
         } catch (err: any) {
-            const errMsg = err?.message || `Failed to create folder`;
-            switch (err.status) {
-                case 403:
-                    setFunctionError("createFolder", "Forbiden");
-                    toast.error(t('toasts.folder_create_unauthorized', 'storage'));
-                    break;
-                default:
-                    setFunctionError("createFolder", errMsg);
-                    toast.error(t('toasts.folder_create_error', 'storage').replace('{message}', errMsg));
-                    break;
-            }
+            setFunctionError("createFolder", handleApiError(err, { module: "storage" }));
             throw err;
         } finally {
             setFunctionLoading("createFolder", false);
 
         }
-    }, [useCase, language, t, loadFolderByPath, rootFolder, idem]);
+    }, [useCase, t, loadFolderByPath, rootFolder, idem]);
 
     const deleteFolder = useCallback(async (parent: string, id: string, api: any) => {
         setFunctionLoading("deleteFolder", true);
@@ -261,23 +235,13 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
 
             toast.success(t('toasts.folder_deleted', 'storage'));
         } catch (err: any) {
-            const errMsg = err?.message || `Failed to delete folder`;
-            switch (err.status) {
-                case 403:
-                    setFunctionError("deleteFolder", "Forbiden");
-                    toast.error(t('toasts.folder_delete_unauthorized', 'storage'));
-                    break;
-                default:
-                    setFunctionError("deleteFolder", errMsg);
-                    toast.error(t('toasts.folder_delete_error', 'storage').replace('{message}', errMsg));
-                    break;
-            }
+            setFunctionError("deleteFolder", handleApiError(err, { module: "storage" }));
             throw err;
         } finally {
             setFunctionLoading("deleteFolder", false);
 
         }
-    }, [useCase, language, t]);
+    }, [useCase, t]);
 
     const renameFolder = useCallback(async (parent: string, id: string, name: string, api: any) => {
         setFunctionLoading("renameFolder", true);
@@ -291,22 +255,12 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
 
             toast.success(t('toasts.folder_renamed', 'storage').replace('{name}', name));
         } catch (err: any) {
-            const errMsg = err?.message || `Failed to rename`;
-            switch (err.status) {
-                case 403:
-                    setFunctionError("renameFolder", "Forbiden");
-                    toast.error(t('toasts.folder_rename_unauthorized', 'storage'));
-                    break;
-                default:
-                    setFunctionError("renameFolder", errMsg);
-                    toast.error(t('toasts.folder_rename_error', 'storage').replace('{message}', errMsg));
-                    break;
-            }
+            setFunctionError("renameFolder", handleApiError(err, { module: "storage" }));
             throw err;
         } finally {
             setFunctionLoading("renameFolder", false);
         }
-    }, [useCase, language, t, loadFolderByPath, idem]);
+    }, [useCase, t, loadFolderByPath, idem]);
 
     const uploadFile = useCallback(async (parent: string, file: File, isSecure: boolean = true, name: string, api: IApi) => {
         setFunctionLoading("uploadFile", true);
@@ -338,22 +292,12 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             toast.success(t('toasts.file_uploaded', 'storage').replace('{name}', name));
 
         } catch (err: any) {
-            const errMsg = err?.message || `Failed to upload file`;
-            switch (err.status) {
-                case 403:
-                    setFunctionError("uploadFile", "Forbiden");
-                    toast.error(t('toasts.file_upload_unauthorized', 'storage'));
-                    break;
-                default:
-                    setFunctionError("uploadFile", errMsg);
-                    toast.error(t('toasts.file_upload_error', 'storage').replace('{message}', errMsg));
-                    break;
-            }
+            setFunctionError("uploadFile", handleApiError(err, { module: "storage" }));
             throw err;
         } finally {
             setFunctionLoading("uploadFile", false);
         }
-    }, [useCase, language, t, loadFolderByPath, rootFolder, idem]);
+    }, [useCase, t, loadFolderByPath, rootFolder, idem]);
 
     const deleteFile = useCallback(async (parent: string, id: string, api: any) => {
         setFunctionLoading("deleteFile", true);
@@ -367,22 +311,12 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
 
             toast.success(t('toasts.file_deleted', 'storage'));
         } catch (err: any) {
-            const errMsg = err?.message || `Failed to delete file`;
-            switch (err.status) {
-                case 403:
-                    setFunctionError("deleteFile", "Forbiden");
-                    toast.error(t('toasts.file_delete_unauthorized', 'storage'));
-                    break;
-                default:
-                    setFunctionError("deleteFile", errMsg);
-                    toast.error(t('toasts.file_delete_error', 'storage').replace('{message}', errMsg));
-                    break;
-            }
+            setFunctionError("deleteFile", handleApiError(err, { module: "storage" }));
             throw err;
         } finally {
             setFunctionLoading("deleteFile", false);
         }
-    }, [useCase, language, t]);
+    }, [useCase, t]);
 
     const downloadFile = useCallback(async (id: string, signedUrl: string, api: any) => {
         setFunctionLoading("downloadFile", true);
@@ -402,22 +336,12 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             }
             toast.success(t('toasts.file_downloaded', 'storage'));
         } catch (err: any) {
-            const errMsg = err?.message || `Failed to download file`;
-            switch (err.status) {
-                case 403:
-                    setFunctionError("downloadFile", "Forbiden");
-                    toast.error(t('toasts.file_download_unauthorized', 'storage'));
-                    break;
-                default:
-                    setFunctionError("downloadFile", errMsg);
-                    toast.error(t('toasts.file_download_error', 'storage').replace('{message}', errMsg));
-                    break;
-            }
+            setFunctionError("downloadFile", handleApiError(err, { module: "storage" }));
             throw err;
         } finally {
             setFunctionLoading("downloadFile", false);
         }
-    }, [useCase, language, t]);
+    }, [useCase, t]);
 
     const getFileBlob = useCallback(async (storageItemId: string | number): Promise<Blob> => {
         return await useCase.getFileBlob(storageItemId);
@@ -445,17 +369,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             toast.success(t('toasts.item_moved', 'storage'));
             await loadFolderByPath(newParentPath, api)
         } catch (err: any) {
-            const errMsg = err?.message || `Failed to move item  `;
-            switch (err.status) {
-                case 403:
-                    setFunctionError("moveStorageItem", "Forbiden");
-                    toast.error(t('toasts.item_move_unauthorized', 'storage'));
-                    break;
-                default:
-                    setFunctionError("moveStorageItem", errMsg);
-                    toast.error(t('toasts.item_move_error', 'storage').replace('{message}', errMsg));
-                    break;
-            }
+            setFunctionError("moveStorageItem", handleApiError(err, { module: "storage" }));
             throw err;
         } finally {
             setFunctionLoading("moveStorageItem", false);
@@ -488,14 +402,7 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             setData(data);
         }
         catch (err: any) {
-            switch (err.status) {
-                case 403:
-                    setFunctionError("loadRoot", "Forbiden");
-                    break;
-                default:
-                    setFunctionError("loadRoot", err?.message || "Failed to load root items");
-                    break;
-            }
+            setFunctionError("loadRoot", handleApiError(err, { module: "storage", silent: true }));
 
         } finally {
             setFunctionLoading("loadRoot", false)

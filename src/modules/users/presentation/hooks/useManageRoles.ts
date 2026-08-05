@@ -5,6 +5,7 @@ import { useApiClient } from '../../../../core/presentation/context/api/ApiCline
 import { createManageRoleUseCase } from '../../application/usecases/manageRoleUseCase';
 import { createCrudRoleRepository } from '../../infrastructure/repositories';
 import { useIdempotency } from '../../../../core/presentation/hooks/useIdempotency';
+import { handleApiError } from '../../../../core/presentation/utils/handleApiError';
 import type { Permissions } from '../../domain/entities/permissions';
 import type { CreateRoleData, UpdateRoleData } from '../../application/dtos/roleDto';
 
@@ -47,7 +48,7 @@ export function useManageRoles(): UseManageRolesReturn {
     setError((prev) => ({ ...prev, [key]: null }));
     return fn()
       .catch((err: any) => {
-        setError((prev) => ({ ...prev, [key]: err?.message || 'An error occurred' }));
+        setError((prev) => ({ ...prev, [key]: handleApiError(err, { module: "users", silent: true }) }));
         throw err;
       })
       .finally(() => setLoading((prev) => ({ ...prev, [key]: false })));

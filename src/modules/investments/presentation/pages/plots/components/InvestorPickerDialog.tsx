@@ -5,6 +5,7 @@ import type { ColumnDef } from "../../../../../../core/presentation/layouts/ui/t
 import type { Investor } from "../../../../domain/entities/investor"
 import { useEntityCrud } from "../../../../../../core/presentation/hooks/data/useEntity"
 import { toast } from "sonner"
+import { handleApiError } from "../../../../../../core/presentation/utils/handleApiError"
 import { getCreateInvestorFormSchema } from "../../../schemas/investorForm.schema"
 
 interface InvestorPickerDialogProps {
@@ -191,7 +192,7 @@ export function InvestorPickerDialog({
             getAll(`/investments/investors?page=1&per_page=25`)
             return res
           } catch (err: any) {
-            toast.error(err?.message || t('investors.create_error', 'investments') || 'Failed to create investor')
+            handleApiError(err, { module: "investments" })
             throw err
           }
         },

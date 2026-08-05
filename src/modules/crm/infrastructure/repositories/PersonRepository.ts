@@ -1,5 +1,5 @@
 import type { ApiClient } from "../../../../core/domain/common/api/ApiClient";
-import type { DpomainResponsePaginated } from "../../../hr/domain/entities/common/DomainResponsePaginated";
+import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
 import type { PersonFilters } from "../../application/dtos/personDtos";
 import type { Person } from "../../domain/entities/Person";
 import type { IPersonRepository } from "../../domain/repositories/IPersonRepository";
@@ -22,12 +22,10 @@ function serializeParams(
 }
 
 export const createPersonRepository = (apiClient: ApiClient): IPersonRepository => {
-  const baseUrl = "/crm/persons";
+  const baseUrl = "/crm/people";
 
   return {
     findAllPersons: (params) =>
-      apiClient.get<DpomainResponsePaginated<Person[]>>(baseUrl, params ? { params: serializeParams(params) } : undefined),
-    findPersonById: (id) =>
-      apiClient.get<DpomainResponsePaginated<Person>>(`${baseUrl}/${id}`),
+      apiClient.get<DomainResponse<Person[]>>(baseUrl, params ? { params: serializeParams(params) } : undefined),
   };
 };

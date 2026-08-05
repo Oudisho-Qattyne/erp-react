@@ -1,15 +1,14 @@
 import { useState, useCallback, useEffect } from "react"
 import { useApiClient } from "../../../../core/presentation/context/api/ApiClinetProvider"
-import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import { createPersonRepository } from "../../infrastructure/repositories/PersonRepository"
 import { createManagePersonsUseCase } from "../../application/usecases/managePersonsUseCase"
+import { handleApiError } from "../../../../core/presentation/utils/handleApiError"
 import type { PersonFilters } from "../../application/dtos/personDtos"
 import type { Person } from "../../domain/entities/Person"
-import { toast } from "sonner"
 
 const MODULE = "crm"
 
-const OP_KEYS = ["findAllPersons", "findPersonById"] as const
+const OP_KEYS = ["findAllPersons"] as const
 
 function initRecord<T>(value: T): Record<string, T> {
   return Object.fromEntries(OP_KEYS.map((k) => [k, value]))
@@ -17,8 +16,6 @@ function initRecord<T>(value: T): Record<string, T> {
 
 export interface UsePersonsReturn {
   persons: Person[]
-  person: Person | null
-  setPerson: (person: Person | null) => void
   loading: Record<string, boolean>
   isLoading: () => boolean
   error: Record<string, string | null>
@@ -30,15 +27,12 @@ export interface UsePersonsReturn {
   resetFilter: () => void
   setPage: (page: number) => void
   findAllPersons: () => Promise<void>
-  findPersonById: (id: number) => Promise<void>
 }
 
 export const usePersons = (): UsePersonsReturn => {
   const apiClient = useApiClient()
-  const { t } = useLanguage()
 
   const [persons, setPersons] = useState<Person[]>([])
-  const [person, setPerson] = useState<Person | null>(null)
   const [loading, setLoading] = useState<Record<string, boolean>>(() => initRecord(false))
   const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null))
   const [filter, setFilterState] = useState<PersonFilters>({})
@@ -74,43 +68,23 @@ export const usePersons = (): UsePersonsReturn => {
       const res = await useCase.findAllPersons(filter)
       setPersons(res.data)
       setPagination({
-        currentPage: res.currentPage || 1,
-        lastPage: res.lastPage || 1,
-        total: Number(res.total) || 0,
-        hasMore: res.hasMore || false,
+        currentPage: res.pagination?.currentPage ?? 1,
+        lastPage: res.pagination?.lastPage ?? 1,
+        total: Number(res.pagination?.total) || 0,
+        hasMore: res.pagination?.hasMore ?? false,
       })
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("person.load_error", MODULE) || "Failed to load persons"
-      setFnError("findAllPersons", msg)
-      toast.error(msg)
+      setFnError("findAllPersons", handleApiError(err, { module: MODULE }))
     } finally {
       setFnLoading("findAllPersons", false)
     }
-  }, [useCase, filter, t])
-
-  const findPersonById = useCallback(async (id: number) => {
-    setFnLoading("findPersonById", true)
-    setFnError("findPersonById", null)
-    try {
-      const res = await useCase.findPersonById(id)
-      setPerson(res?.data ?? null)
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("person.load_error", MODULE) || "Failed to load person"
-      setFnError("findPersonById", msg)
-      toast.error(msg)
-      throw err
-    } finally {
-      setFnLoading("findPersonById", false)
-    }
-  }, [useCase, t])
+  }, [useCase, filter])
 
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])
 
   return {
     persons,
-    person,
-    setPerson,
     loading,
     isLoading,
     error,
@@ -122,6 +96,5 @@ export const usePersons = (): UsePersonsReturn => {
     resetFilter,
     setPage,
     findAllPersons,
-    findPersonById,
   }
 }

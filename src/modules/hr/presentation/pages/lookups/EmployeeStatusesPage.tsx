@@ -11,6 +11,7 @@ import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/Re
 import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { Pencil, Trash2, Star } from 'lucide-react';
 import type { EmployeeStatus } from '../../../domain/entities/employeeStatus/employeeStatus';
 import { EmployeeStatusFormSchema } from '../../schemas/employeeStatus/employeeStatus';
@@ -37,7 +38,7 @@ export function EmployeeStatusesPage() {
       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
       setConfirmDelete(null);
     } catch (err : any) {
-      toast.error(err?.message || t('lookups.delete_error', 'hr').replace('{name}', entity));
+      handleApiError(err, { module: "hr" });
     }
   };
 
@@ -49,7 +50,7 @@ export function EmployeeStatusesPage() {
       getAll();
       setConfirmSetDefault(null);
     } catch (err : any) {
-      toast.error(err?.message || t('lookups.set_default_error', 'hr').replace('{name}', entity));
+      handleApiError(err, { module: "hr" });
     }
   };
 
@@ -98,7 +99,7 @@ export function EmployeeStatusesPage() {
         <GenericCreateForm
           fields={[{ name: 'name', type: 'alpha', label: t('employee_form.employee_status', 'hr') || 'Employee Status', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
           schema={EmployeeStatusFormSchema}
-          onSubmit={async (data) => { try { return await create({ ...data, name: data.name}); } catch (err : any) { toast.error(err?.message || t('lookups.create_error', 'hr').replace('{name}', entity)); throw {}; } }}
+          onSubmit={async (data) => { try { return await create({ ...data, name: data.name}); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
           onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAll(); setIsCreateOpen(false); }}
           onCancel={() => setIsCreateOpen(false)}
           submitLabel={t('employee_form.add_employee_status', 'hr') || 'Add Employee Status'}
@@ -111,7 +112,7 @@ export function EmployeeStatusesPage() {
           fields={[{ name: 'name', type: 'alpha', label: t('employee_form.employee_status', 'hr') || 'Employee Status', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
           schema={EmployeeStatusFormSchema}
           defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), is_default: Boolean(editItem.is_default) } : undefined}
-          onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: data.name }); } catch (err : any) { toast.error(err?.message || t('lookups.update_error', 'hr').replace('{name}', entity)); throw {}; } }}
+          onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: data.name }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
           onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); getAll(); setEditItem(null); }}
           onCancel={() => setEditItem(null)}
           submitLabel={t('common.save', 'shared') || 'Save'}
