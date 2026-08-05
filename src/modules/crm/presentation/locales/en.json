@@ -1,0 +1,33 @@
+{
+  "title": "CRM",
+  "persons": {
+    "title": "Persons",
+    "search_placeholder": "Search by name, phone, email, or address...",
+    "no_data": "No persons found",
+    "add": "Add Person",
+    "load_error": "Failed to load persons",
+    "person_name": "Name",
+    "primary_phone": "Primary Phone",
+    "secondary_phone": "Secondary Phone",
+    "email": "Email",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "x": "X",
+    "linkedin": "LinkedIn",
+    "address": "Address",
+    "phone": "Phone"
+  },
+  "person": {
+    "name": "Name",
+    "primary_phone": "Primary Phone Number",
+    "secondary_phone": "Secondary Phone Number",
+    "email": "Email",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "x": "X Platform",
+    "linkedin": "LinkedIn",
+    "address": "Address",
+    "load_error": "Failed to load persons",
+    "not_found": "Person not found"
+  }
+}
