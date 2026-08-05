@@ -3,36 +3,43 @@ import type { TransactionStatus } from "../../domain/valueObjects/TransactionSta
 import type { TransactionType } from "../../domain/valueObjects/TransactionType";
 import type { SortOrder } from "./listParams";
 
-export type CreateTransactionDto = Omit<Transaction, "id" | "created_at" | "updated_at">;
+// formatted_transaction_date is computed by the backend
+export type CreateTransactionDto = Omit<
+  Transaction,
+  "id" | "created_at" | "updated_at" | "formatted_transaction_date"
+>;
 
 // Status can only move forward: pending -> approved | canceled (no going back, no reset to pending)
 export type UpdateTransactionStatusDto = {
-  status: Exclude<TransactionStatus, "pending">;
+  transaction_status: Exclude<TransactionStatus, "pending">;
 };
 
 // New transactions always start as pending
 export const TRANSACTION_DEFAULT_STATUS: TransactionStatus = "pending";
 
 export type TransactionSortField =
-  | "id"
-  | "type"
-  | "status"
-  | "date"
-  | "value"
-  | "created_at"
-  | "updated_at";
+  | "transaction_value"
+  | "transaction_date"
+  | "created_at";
 
 export interface TransactionFilters {
   page?: number;
   per_page?: number;
-  // Search on the reason field
+  // Partial match (LIKE) on reason
   search?: string;
   // Exact-match filters
   type?: TransactionType;
   status?: TransactionStatus;
-  date_from?: string;
-  date_to?: string;
+  // Exact match on transaction_value
   value?: number;
-  sort_by?: TransactionSortField;
-  sort_order?: SortOrder;
+  // Minimum transaction_value (inclusive)
+  value_from?: number;
+  // Maximum transaction_value (inclusive)
+  value_to?: number;
+  // Minimum transaction_date (inclusive)
+  from_date?: string;
+  // Maximum transaction_date (inclusive)
+  to_date?: string;
+  // Sent as sort_by[field]=asc|desc
+  sort_by?: Partial<Record<TransactionSortField, SortOrder>>;
 }

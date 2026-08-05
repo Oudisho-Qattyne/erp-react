@@ -1,1 +1,1 @@
-export type TransactionType = "addition" | "deduction" | "incoming" | "outgoing"
+export type TransactionType = "incoming" | "outgoing"

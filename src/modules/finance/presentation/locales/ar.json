@@ -23,6 +23,9 @@
     "code": "الكود",
     "fee_value": "قيمة الرسم",
     "fee_status": "الحالة",
+    "value": "القيمة",
+    "value_from": "أدنى قيمة",
+    "value_to": "أقصى قيمة",
     "status_active": "نشط",
     "status_archived": "مؤرشف",
     "created": "تم إنشاء الرسم بنجاح",
@@ -35,6 +38,8 @@
     "activate_error": "فشل تفعيل الرسم",
     "archive": "أرشفة",
     "activate": "تفعيل",
+    "archive_confirm": "هل أنت متأكد من أرشفة هذا الرسم؟",
+    "activate_confirm": "هل أنت متأكد من تفعيل هذا الرسم؟",
     "deleted": "تم حذف الرسم بنجاح",
     "delete_error": "فشل حذف الرسم",
     "load_error": "فشل تحميل الرسوم",
@@ -59,12 +64,15 @@
     "type": "النوع",
     "value": "القيمة",
     "date": "التاريخ",
-    "date_from": "من تاريخ",
-    "date_to": "إلى تاريخ",
+    "from_date": "من تاريخ",
+    "to_date": "إلى تاريخ",
+    "value_from": "أدنى قيمة",
+    "value_to": "أقصى قيمة",
     "reason": "السبب",
     "status": "الحالة",
-    "type_addition": "إضافة",
-    "type_deduction": "خصم",
+    "transactionable_type": "نوع المعاملة المرتبطة",
+    "transactionable_type_general": "عام",
+    "transactionable_id": "المعاملة المرتبطة",
     "type_incoming": "وارد",
     "type_outgoing": "صادر",
     "status_pending": "قيد الانتظار",
@@ -84,7 +92,8 @@
       "value_required": "القيمة مطلوبة",
       "value_negative": "لا يمكن أن تكون القيمة سالبة",
       "value_decimals": "يجب ألا تتجاوز القيمة منزلتين عشريتين",
-      "reason_max": "يجب ألا يتجاوز السبب 500 حرفاً"
+      "reason_max": "يجب ألا يتجاوز السبب 500 حرفاً",
+      "transactionable_id_required": "يرجى اختيار عنصر مرتبط بالمعاملة"
     }
   }
 }

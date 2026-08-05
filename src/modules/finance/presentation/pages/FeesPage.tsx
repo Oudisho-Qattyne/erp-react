@@ -4,6 +4,7 @@ import { Button } from "../../../../core/presentation/layouts/ui/buttons/Button"
 import { DataTable, type ColumnDef } from "../../../../core/presentation/layouts/ui/tables/ResizableTable"
 import { ErrorState } from "../../../../core/presentation/layouts/ui/state/ErrorState"
 import { FilterDialog, type FilterField } from "../../../../core/presentation/layouts/ui/filter/FilterDialog"
+import { ConfirmDialog } from "../../../../core/presentation/layouts/ui/dialog/ConfirmDialog"
 import Input from "../../../../core/presentation/layouts/ui/inputs/Input"
 import { inputBaseClasses } from "../../../../core/presentation/layouts/ui/inputs/styles"
 import { useFees } from "../hooks/useFees"
@@ -26,6 +27,7 @@ export function FeesPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [editFee, setEditFee] = useState<Fee | null>(null)
+  const [confirmAction, setConfirmAction] = useState<{ fee: Fee; action: "archive" | "activate" } | null>(null)
   const [localSearch, setLocalSearch] = useState("")
 
   const {
@@ -45,6 +47,30 @@ export function FeesPage() {
     setFilter({ search: localSearch, page: 1 })
   }
 
+  const handleConfirm = async () => {
+    if (!confirmAction) return
+    try {
+      const { id, name } = confirmAction.fee
+      if (confirmAction.action === "archive") {
+        await archiveFee({ id, name })
+      } else {
+        await activeFee({ id, name })
+      }
+      setConfirmAction(null)
+      findAllFees()
+    } catch {
+      setConfirmAction(null)
+    }
+  }
+
+  const sortColumn = filter.sort_by ? (Object.keys(filter.sort_by)[0] as string) : undefined
+  const sortOrder = sortColumn ? filter.sort_by?.[sortColumn as keyof FeeFilters["sort_by"]] : undefined
+
+  const handleSort = (key: string) => {
+    const order = sortColumn === key && sortOrder === "asc" ? "desc" : "asc"
+    setFilter({ sort_by: { [key]: order } as FeeFilters["sort_by"], page: 1 })
+  }
+
   useEffect(() => {
     findAllFees()
   }, [filter])
@@ -57,6 +83,7 @@ export function FeesPage() {
       key: "fee_value",
       label: t("fee.fee_value", MODULE) || "Fee Value",
       width: 120,
+      sortable: true,
       render: (row) => row.fee_value,
     },
     {
@@ -81,7 +108,7 @@ export function FeesPage() {
             size="sm"
             onClick={() => setEditFee(row)}
             title={t("fees.edit", MODULE) || "Edit"}
-            requiredPermission="financial.payment-fee.update"
+            requiredPermission="financial.payment-fees.update"
           >
             <Pencil size={16} />
           </Button>
@@ -89,9 +116,9 @@ export function FeesPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => activeFee(row)}
+              onClick={() => setConfirmAction({ fee: row, action: "activate" })}
               title={t("fee.activate", MODULE) || "Activate"}
-              requiredPermission="financial.payment-fee.update"
+              requiredPermission="financial.payment-fees.update"
             >
               <RotateCcw size={16} />
             </Button>
@@ -99,9 +126,9 @@ export function FeesPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => archiveFee(row)}
+              onClick={() => setConfirmAction({ fee: row, action: "archive" })}
               title={t("fee.archive", MODULE) || "Archive"}
-              requiredPermission="financial.payment-fee.update"
+              requiredPermission="financial.payment-fees.update"
             >
               <Archive size={16} />
             </Button>
@@ -112,6 +139,8 @@ export function FeesPage() {
   ]
 
   const filterFields: FilterField[] = [
+    { name: "search", type: "text", label: t("fee.name", MODULE) || "Name" },
+    { name: "code", type: "text", label: t("fee.code", MODULE) || "Code" },
     {
       name: "status",
       type: "select",
@@ -121,6 +150,24 @@ export function FeesPage() {
         { value: "active", label: t("fee.status_active", MODULE) || "Active" },
         { value: "archived", label: t("fee.status_archived", MODULE) || "Archived" },
       ],
+    },
+    {
+      name: "value",
+      type: "decimal",
+      label: t("fee.value", MODULE) || "Value",
+      decimalPlaces: 2,
+    },
+    {
+      name: "value_from",
+      type: "decimal",
+      label: t("fee.value_from", MODULE) || "Min Value",
+      decimalPlaces: 2,
+    },
+    {
+      name: "value_to",
+      type: "decimal",
+      label: t("fee.value_to", MODULE) || "Max Value",
+      decimalPlaces: 2,
     },
   ]
 
@@ -141,7 +188,7 @@ export function FeesPage() {
           variant="primary"
           onClick={() => setIsAddOpen(true)}
           leftIcon={<Plus size={16} />}
-          requiredPermission="financial.payment-fee.add"
+          requiredPermission="financial.payment-fees.add"
         >
           {t("fees.add", MODULE) || "Add Fee"}
         </Button>
@@ -187,6 +234,9 @@ export function FeesPage() {
             rowKey="id"
             onRowClick={() => {}}
             loading={loading.findAllFees}
+            sortColumn={sortColumn}
+            sortOrder={sortOrder}
+            onSort={handleSort}
             emptyMessage={t("fees.no_data", MODULE) || "No fees found"}
             pagination={{
               page: pagination.currentPage,
@@ -227,6 +277,24 @@ export function FeesPage() {
           />
         )}
       </Dialog>
+
+      <ConfirmDialog
+        isOpen={!!confirmAction}
+        title={confirmAction?.action === "activate"
+          ? t("fee.activate", MODULE) || "Activate"
+          : t("fee.archive", MODULE) || "Archive"}
+        message={confirmAction?.action === "activate"
+          ? t("fee.activate_confirm", MODULE) || "Are you sure you want to activate this fee?"
+          : t("fee.archive_confirm", MODULE) || "Are you sure you want to archive this fee?"}
+        type={confirmAction?.action === "activate" ? "friendly" : "danger"}
+        confirmLabel={confirmAction?.action === "activate"
+          ? t("fee.activate", MODULE) || "Activate"
+          : t("fee.archive", MODULE) || "Archive"}
+        cancelLabel={t("common.cancel", "shared") || "Cancel"}
+        confirmLoading={confirmAction?.action === "activate" ? loading.activeFee : loading.archiveFee}
+        onConfirm={handleConfirm}
+        onCancel={() => setConfirmAction(null)}
+      />
     </div>
   )
 }

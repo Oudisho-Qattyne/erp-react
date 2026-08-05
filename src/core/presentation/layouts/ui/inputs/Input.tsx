@@ -6,10 +6,12 @@ import { DatePicker } from './DatePicker';
 import { TimePicker } from './TimePicker';
 import { DateTimePicker } from './DateTimePicker';
 import { DataMatrixInput, type MatrixFieldConfig } from './DataMatrixInput';
+import { TablePickerInput } from './TablePickerInput';
+import type { PickerConfig } from '../picker/pickerTypes';
 import { Toggle, type ToggleSize, type ToggleVariant } from './Toggle';
 import { Info } from 'lucide-react';
 import { AuthContext } from '../../../../infrastructure/auth/AuthProvider';
-export type InputType = 'text' | 'number' | 'numeric' | 'alpha' | 'alphanumeric' | 'decimal' | 'email' | 'password' | 'textarea' | 'date' | 'time' | 'datetime' | 'select' | 'select-or-create' | 'multi-select-or-create' | 'data-matrix' | 'checkbox' | 'toggle';
+export type InputType = 'text' | 'number' | 'numeric' | 'alpha' | 'alphanumeric' | 'decimal' | 'email' | 'password' | 'textarea' | 'date' | 'time' | 'datetime' | 'select' | 'select-or-create' | 'multi-select-or-create' | 'data-matrix' | 'table-picker' | 'checkbox' | 'toggle';
 
 interface InputProps {
   type: InputType;
@@ -44,6 +46,8 @@ interface InputProps {
   maxRows?: number;
   matrixErrors?: Record<number, Record<string, string>>;
   rowSchema?: { safeParse: (data: any) => { success: boolean; error?: { flatten: () => { fieldErrors: Record<string, string[]> } } } };
+  // For table-picker
+  pickerConfig?: PickerConfig | null;
   infoButton?: () => void | null;
   requiredPermission?: string | string[];
   createButtonPermission?: string | string[];
@@ -98,6 +102,7 @@ const InputTypes: React.FC<InputProps> = ({
   maxRows,
   matrixErrors,
   rowSchema,
+  pickerConfig,
   createButtonPermission,
   toggleVariant,
   toggleSize,
@@ -205,6 +210,18 @@ const InputTypes: React.FC<InputProps> = ({
           errors={matrixErrors}
           rowSchema={rowSchema}
           dependentData={dependentData}
+        />
+      );
+
+    case 'table-picker':
+      return (
+        <TablePickerInput
+          value={value}
+          onChange={onChange}
+          pickerConfig={pickerConfig}
+          placeholder={finalPlaceholder}
+          disabled={finalDisabled}
+          baseClasses={localClass}
         />
       );
 

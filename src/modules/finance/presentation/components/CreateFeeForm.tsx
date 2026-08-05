@@ -14,7 +14,7 @@ export function CreateFeeForm({ onSuccess, onCancel }: CreateFeeFormProps) {
 
   const fields: FieldConfig[] = [
     { name: "name", label: t("fee.name", "finance") || "Name", type: "alpha", required: true },
-    { name: "code", label: t("fee.code", "finance") || "Code", type: "text", required: true },
+    { name: "code", label: t("fee.code", "finance") || "Code", type: "alphanumeric", required: true },
     {
       name: "fee_value",
       label: t("fee.fee_value", "finance") || "Fee Value",

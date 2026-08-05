@@ -23,6 +23,9 @@
     "code": "Code",
     "fee_value": "Fee Value",
     "fee_status": "Status",
+    "value": "Value",
+    "value_from": "Min Value",
+    "value_to": "Max Value",
     "status_active": "Active",
     "status_archived": "Archived",
     "created": "Fee created successfully",
@@ -35,6 +38,8 @@
     "activate_error": "Failed to activate fee",
     "archive": "Archive",
     "activate": "Activate",
+    "archive_confirm": "Are you sure you want to archive this fee?",
+    "activate_confirm": "Are you sure you want to activate this fee?",
     "deleted": "Fee deleted successfully",
     "delete_error": "Failed to delete fee",
     "load_error": "Failed to load fees",
@@ -59,12 +64,15 @@
     "type": "Type",
     "value": "Value",
     "date": "Date",
-    "date_from": "Date From",
-    "date_to": "Date To",
+    "from_date": "From Date",
+    "to_date": "To Date",
+    "value_from": "Min Value",
+    "value_to": "Max Value",
     "reason": "Reason",
     "status": "Status",
-    "type_addition": "Addition",
-    "type_deduction": "Deduction",
+    "transactionable_type": "Transactionable Type",
+    "transactionable_type_general": "General",
+    "transactionable_id": "Transactionable",
     "type_incoming": "Incoming",
     "type_outgoing": "Outgoing",
     "status_pending": "Pending",
@@ -84,7 +92,8 @@
       "value_required": "Value is required",
       "value_negative": "Value cannot be negative",
       "value_decimals": "Value must have at most 2 decimal places",
-      "reason_max": "Reason must be at most 500 characters"
+      "reason_max": "Reason must be at most 500 characters",
+      "transactionable_id_required": "Please select a transactionable item"
     }
   }
 }

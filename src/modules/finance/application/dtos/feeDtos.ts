@@ -11,23 +11,24 @@ export interface UpdateFeeDto {
 }
 
 export type FeeSortField =
-  | "id"
-  | "name"
-  | "code"
   | "fee_value"
-  | "fee_status"
-  | "created_at"
-  | "updated_at";
+  | "created_at";
 
 export interface FeeFilters {
   page?: number;
   per_page?: number;
-  // Search by name
+  // Partial match (LIKE) on name
   search?: string;
-  // Exact-match filters
-  name?: string;
+  // Partial match (LIKE) on code
   code?: string;
+  // Exact match on fee_status
   status?: FeeStatus;
-  sort_by?: FeeSortField;
-  sort_order?: SortOrder;
+  // Exact match on fee_value
+  value?: number;
+  // Minimum fee_value (inclusive)
+  value_from?: number;
+  // Maximum fee_value (inclusive)
+  value_to?: number;
+  // Sent as sort_by[column]=asc|desc (default: created_at desc)
+  sort_by?: Partial<Record<FeeSortField, SortOrder>>;
 }

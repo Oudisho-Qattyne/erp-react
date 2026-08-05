@@ -18,7 +18,7 @@ const financeModule: Module = {
       moduleName: 'finance',
       icon: <Receipt size={18} />,
       group: 'finance',
-      requiredPermission: 'financial.payment-fee.list',
+      requiredPermission: 'financial.payment-fees.list',
     },
     {
       path: '/finance/transactions',
@@ -30,7 +30,7 @@ const financeModule: Module = {
       moduleName: 'finance',
       icon: <ArrowLeftRight size={18} />,
       group: 'finance',
-      // requiredPermission: 'financial.transaction.list',
+      requiredPermission: 'financial.transactions.list',
     },
   ],
   locales: { en: enLocales, ar: arLocales },

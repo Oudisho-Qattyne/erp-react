@@ -17,8 +17,6 @@ import { Search, Filter, Plus, Check, X } from "lucide-react"
 const MODULE = "finance"
 
 const typeStyles: Record<string, string> = {
-  addition: "bg-success/10 text-success border-success/20",
-  deduction: "bg-danger/10 text-danger border-danger/20",
   incoming: "bg-blue-500/10 text-blue-600 border-blue-500/20",
   outgoing: "bg-orange-500/10 text-orange-600 border-orange-500/20",
 }
@@ -29,7 +27,7 @@ const statusStyles: Record<string, string> = {
   canceled: "bg-danger/10 text-danger border-danger/20",
 }
 
-const typeOptions = ["addition", "deduction", "incoming", "outgoing"]
+const typeOptions = ["incoming", "outgoing"]
 const statusOptions = ["pending", "approved", "canceled"]
 
 export function TransactionsPage() {
@@ -62,7 +60,7 @@ export function TransactionsPage() {
   const handleConfirm = async () => {
     if (!confirmAction) return
     try {
-      await updateTransactionStatus(confirmAction.id, { status: confirmAction.action })
+      await updateTransactionStatus(confirmAction.id, { transaction_status: confirmAction.action })
       setConfirmAction(null)
       findAllTransactions()
     } catch {
@@ -70,50 +68,80 @@ export function TransactionsPage() {
     }
   }
 
+  const sortColumn = filter.sort_by ? (Object.keys(filter.sort_by)[0] as string) : undefined
+  const sortOrder = sortColumn ? filter.sort_by?.[sortColumn as keyof TransactionFilters["sort_by"]] : undefined
+
+  const handleSort = (key: string) => {
+    const order = sortColumn === key && sortOrder === "asc" ? "desc" : "asc"
+    setFilter({ sort_by: { [key]: order } as TransactionFilters["sort_by"], page: 1 })
+  }
+
   const columns: ColumnDef<Transaction>[] = [
     { key: "id", label: "#", width: 60 },
     {
-      key: "type",
+      key: "transaction_type",
       label: t("transaction.type", MODULE) || "Type",
       width: 130,
       render: (row) => (
-        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold border ${typeStyles[row.type] || ""}`}>
-          {t(`transaction.type_${row.type}`, MODULE) || row.type}
+        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold border ${typeStyles[row.transaction_type] || ""}`}>
+          {t(`transaction.type_${row.transaction_type}`, MODULE) || row.transaction_type}
         </span>
       ),
     },
     {
-      key: "status",
+      key: "transaction_status",
       label: t("transaction.status", MODULE) || "Status",
       width: 110,
       render: (row) => (
-        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold border ${statusStyles[row.status] || ""}`}>
-          {t(`transaction.status_${row.status}`, MODULE) || row.status}
+        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold border ${statusStyles[row.transaction_status] || ""}`}>
+          {t(`transaction.status_${row.transaction_status}`, MODULE) || row.transaction_status}
         </span>
       ),
     },
-    { key: "date", label: t("transaction.date", MODULE) || "Date", width: 130, render: (row) => row.date || "—" },
     {
-      key: "value",
+      key: "transaction_date",
+      label: t("transaction.date", MODULE) || "Date",
+      width: 130,
+      sortable: true,
+      render: (row) => row.transaction_date || "—",
+    },
+    {
+      key: "transaction_value",
       label: t("transaction.value", MODULE) || "Value",
       width: 120,
-      render: (row) => row.value.toFixed(2),
+      sortable: true,
+      render: (row) => row.transaction_value.toFixed(2),
     },
     { key: "reason", label: t("transaction.reason", MODULE) || "Reason", width: 240, render: (row) => row.reason || "—" },
+    {
+      key: "transactionable_type",
+      label: t("transaction.transactionable_type", MODULE) || "Transactionable Type",
+      width: 150,
+      render: (row) =>
+        row.transactionable_type
+          ? t(`transaction.transactionable_type_${row.transactionable_type}`, MODULE) || row.transactionable_type
+          : "—",
+    },
+    {
+      key: "transactionable_id",
+      label: t("transaction.transactionable_id", MODULE) || "Transactionable",
+      width: 110,
+      render: (row) => row.transactionable_id ?? "—",
+    },
     {
       key: "actions",
       label: "",
       width: 100,
       align: "center",
       render: (row) =>
-        row.status === "pending" ? (
+        row.transaction_status === "pending" ? (
           <div className="flex items-center justify-center gap-1">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setConfirmAction({ id: row.id, action: "approved" })}
               title={t("transaction.approve", MODULE) || "Approve"}
-              // requiredPermission="financial.transaction.update"
+              requiredPermission="financial.transactions.change-status"
             >
               <Check size={16} className="text-success" />
             </Button>
@@ -122,7 +150,7 @@ export function TransactionsPage() {
               size="sm"
               onClick={() => setConfirmAction({ id: row.id, action: "canceled" })}
               title={t("transaction.cancel", MODULE) || "Cancel"}
-              // requiredPermission="financial.transaction.update"
+              requiredPermission="financial.transactions.change-status"
             >
               <X size={16} className="text-danger" />
             </Button>
@@ -156,12 +184,24 @@ export function TransactionsPage() {
         })),
       ],
     },
-    { name: "date_from", type: "date", label: t("transaction.date_from", MODULE) || "Date From" },
-    { name: "date_to", type: "date", label: t("transaction.date_to", MODULE) || "Date To" },
+    { name: "from_date", type: "date", label: t("transaction.from_date", MODULE) || "From Date" },
+    { name: "to_date", type: "date", label: t("transaction.to_date", MODULE) || "To Date" },
     {
       name: "value",
       type: "decimal",
       label: t("transaction.value", MODULE) || "Value",
+      decimalPlaces: 2,
+    },
+    {
+      name: "value_from",
+      type: "decimal",
+      label: t("transaction.value_from", MODULE) || "Min Value",
+      decimalPlaces: 2,
+    },
+    {
+      name: "value_to",
+      type: "decimal",
+      label: t("transaction.value_to", MODULE) || "Max Value",
       decimalPlaces: 2,
     },
   ]
@@ -183,7 +223,7 @@ export function TransactionsPage() {
           variant="primary"
           onClick={() => setIsAddOpen(true)}
           leftIcon={<Plus size={16} />}
-          // requiredPermission="financial.transaction.add"
+          requiredPermission="financial.transactions.add"
         >
           {t("transactions.add", MODULE) || "Add Transaction"}
         </Button>
@@ -229,6 +269,9 @@ export function TransactionsPage() {
             rowKey="id"
             onRowClick={() => {}}
             loading={loading.findAllTransactions}
+            sortColumn={sortColumn}
+            sortOrder={sortOrder}
+            onSort={handleSort}
             emptyMessage={t("transactions.no_data", MODULE) || "No transactions found"}
             pagination={{
               page: pagination.currentPage,
@@ -267,6 +310,7 @@ export function TransactionsPage() {
         confirmLabel={confirmAction?.action === "approved"
           ? t("transaction.approve", MODULE) || "Approve"
           : t("transaction.cancel", MODULE) || "Cancel"}
+        cancelLabel={t("common.cancel", "shared") || "Cancel"}
         confirmLoading={loading.updateTransactionStatus}
         onConfirm={handleConfirm}
         onCancel={() => setConfirmAction(null)}

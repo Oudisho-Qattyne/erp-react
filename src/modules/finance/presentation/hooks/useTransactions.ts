@@ -77,10 +77,10 @@ export const useTransactions = (): UseTransactionsReturn => {
       const res = await useCase.findAllTransactions(filter)
       setTransactions(res.data)
       setPagination({
-        currentPage: res.currentPage || 1,
-        lastPage: res.lastPage || 1,
-        total: Number(res.total) || 0,
-        hasMore: res.hasMore || false,
+        currentPage: res.pagination?.currentPage || 1,
+        lastPage: res.pagination?.lastPage || 1,
+        total: Number(res.pagination?.total) || 0,
+        hasMore: res.pagination?.hasMore || false,
       })
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : t("transaction.load_error", MODULE) || "Failed to load transactions"
