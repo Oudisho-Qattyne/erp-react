@@ -74,7 +74,6 @@ export function EditPlotPage() {
           plot_classification_id: plot.plot_classification_id,
           latitude: plot.latitude,
           longitude: plot.longitude,
-          service_conditions:plot.service_conditions.map(sc => ({id:sc.id , note:sc.note})),
           service_status_conditions:plot.service_status_conditions?.map(sc => ({id:sc.id , note:sc.note , service_status:sc.service_status})),
           status: plot.status
         }}

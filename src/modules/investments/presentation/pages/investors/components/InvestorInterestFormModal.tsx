@@ -1,14 +1,12 @@
 import React from 'react';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
-import { GenericCreateForm, type FieldConfig } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
+import { GenericCreateForm } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { useEntityCrud } from '../../../../../../core/presentation/hooks/data/useEntity';
 import { getCreateInvestorInterestFormSchema } from '../../../schemas/investorInterestForm.schema';
 import type { PlotArea } from '../../../../domain/entities/plotArea';
 import type { PlotClassification } from '../../../../domain/entities/plotClassification';
-
-import { getCreatePlotAreaFormSchema } from '../../../schemas/plotAreaForm.schema';
-import { getCreatePlotClassificationFormSchema } from '../../../schemas/plotClassificationForm.schema';
+import { buildInvestorInterestFormFields } from '../../../forms/investorInterestFormConfig';
 
 interface InvestorInterestFormModalProps {
   isOpen: boolean;
@@ -35,63 +33,12 @@ export function InvestorInterestFormModal({ isOpen, onClose, investorId, onSucce
     await createInterest(data);
   };
 
-  const fields: FieldConfig[] = [
-    {
-      name: 'plot_area_ids',
-      type: 'multi-select-or-create',
-      label: t('investors.plot_areas', 'investments') || 'Plot Areas',
-      searchable: true,
-      options: plotAreas.map(a => ({ value: a.id, label: a.name, is_default: a.is_default })),
-      createTitle: t('common.new', 'shared') || 'New',
-      labelPath: 'data.name',
-      renderCreateForm: (onSuccess, onCancel) => (
-        <GenericCreateForm
-          fields={[
-            { name: 'name', type: 'alpha', label: t('plot_areas.name', 'investments') || 'Name', required: true },
-          ]}
-          schema={getCreatePlotAreaFormSchema(t)}
-          onSubmit={(data) => createArea({ ...data, is_active: true })}
-          onSuccess={onSuccess}
-          onCancel={onCancel}
-        />
-      )
-    },
-    {
-      name: 'plot_classification_ids',
-      type: 'multi-select-or-create',
-      label: t('investors.plot_classifications', 'investments') || 'Plot Classifications',
-      searchable: true,
-      options: plotClassifications.map(c => ({ value: c.id, label: c.name, is_default: c.is_default })),
-      createTitle: t('common.new', 'shared') || 'New',
-      labelPath: 'data.name',
-      renderCreateForm: (onSuccess, onCancel) => (
-        <GenericCreateForm
-          fields={[
-            { name: 'name', type: 'alpha', label: t('plot_classifications.name', 'investments') || 'Name', required: true },
-          ]}
-          schema={getCreatePlotClassificationFormSchema(t)}
-          onSubmit={(data) => createClassification({ ...data, is_active: true })}
-          onSuccess={onSuccess}
-          onCancel={onCancel}
-        />
-      )
-    },
-    {
-      name: 'min_area',
-      type: 'number',
-      label: t('investors.min_area', 'investments') || 'Min Area',
-    },
-    {
-      name: 'max_area',
-      type: 'number',
-      label: t('investors.max_area', 'investments') || 'Max Area',
-    },
-    {
-      name: 'notes',
-      type: 'textarea',
-      label: t('common.notes', 'shared') || 'Notes',
-    }
-  ];
+  const fields = buildInvestorInterestFormFields(t, {
+    plotAreas,
+    plotClassifications,
+    createArea,
+    createClassification,
+  });
 
   return (
     <Dialog

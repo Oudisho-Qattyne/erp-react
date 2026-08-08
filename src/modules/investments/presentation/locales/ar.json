@@ -52,32 +52,7 @@
       "name_required": "الاسم مطلوب"
     }
   },
-  "service_conditions": {
-    "title": "شروط الخدمة",
-    "add": "إضافة شرط خدمة",
-    "name": "اسم الشرط",
-    "is_active": "نشط",
-    "is_default": "افتراضي",
-    "created": "تم إنشاء {name} بنجاح",
-    "create_error": "فشل في إنشاء {name}",
-    "deleted": "تم حذف {name} بنجاح",
-    "delete_error": "فشل في حذف {name}",
-    "no_records": "لا يوجد شروط خدمة",
-    "edit_log": "سجل التعديل",
-    "no_edit_log": "لا يوجد سجل تعديلات",
-    "event": "الحدث",
-    "created_at": "تاريخ الإنشاء",
-    "changed_by": "تم التغيير بواسطة",
-    "changes": "التغييرات",
-    "field": "الحقل",
-    "old_value": "القيمة القديمة",
-    "new_value": "القيمة الجديدة",
-    "subject_id": "رقم شرط الخدمة",
-    "id": "ID",
-    "validation": {
-      "name_required": "اسم الشرط مطلوب"
-    }
-  },
+ 
   "service_status_conditions": {
     "title": "الوضع الحالي للمقسم من حيث التخديم",
     "add": "إضافة شرط حالة خدمة",
@@ -534,13 +509,6 @@
         "create": "إنشاء تصنيف",
         "update": "تعديل تصنيف",
         "delete": "حذف تصنيف"
-      },
-      "service-conditions": {
-        "list": "قائمة شروط الخدمة",
-        "view": "عرض شرط خدمة",
-        "create": "إنشاء شرط خدمة",
-        "update": "تعديل شرط خدمة",
-        "delete": "حذف شرط خدمة"
       },
       "service-status-conditions": {
         "list": "قائمة الوضع الحالي للمقسم من حيث التخديم",
@@ -1022,6 +990,33 @@
       "display_after_license": "تاريخ العرض يجب أن يكون بعد أو يساوي تاريخ الرخصة"
     }
   },
+  "transactions": {
+    "title": "المعاملات",
+    "subscription": "اكتتاب",
+    "subscription_hint": "إنشاء اكتتاب جديد للمستثمرين",
+    "add_subscription": "إضافة اكتتاب جديد",
+    "create_title": "اكتتاب جديد",
+    "group_plot": "اختيار المقسم",
+    "plot": "المقسم",
+    "investors": "المستثمرون",
+    "group_investors": "المستثمرون",
+    "select_investors": "اختيار المستثمرين",
+    "validation": {
+      "plot_required": "المقسم مطلوب",
+      "investors_required": "يجب اختيار مستثمر واحد على الأقل"
+    },
+    "created": "تم إنشاء الاكتتاب بنجاح",
+    "bonds": "سندات",
+    "bonds_hint": "إنشاء إصدار سندات جديد",
+    "add_bonds": "إضافة سندات جديدة",
+    "financing": "تمويل",
+    "financing_hint": "إنشاء طلب تمويل جديد",
+    "add_financing": "إضافة تمويل جديد",
+    "dividends": "توزيعات الأرباح",
+    "dividends_hint": "إنشاء توزيع أرباح جديد",
+    "add_dividends": "إضافة توزيعات أرباح",
+    "soon": "نموذج إنشاء المعاملة قيد التطوير"
+  },
   "navigation": {
     "title": "الإستثمارات",
     "plot_areas": {
@@ -1030,9 +1025,7 @@
     "plot_classifications": {
       "title": "التصنيفات"
     },
-    "service_conditions": {
-      "title": "شروط الخدمة"
-    },
+   
     "service_status_conditions": {
       "title": "الوضع الحالي للمقسم من حيث التخديم"
     },
@@ -1077,6 +1070,9 @@
     },
     "contract": {
       "title": "العقود"
+    },
+    "transactions": {
+      "title": "المعاملات"
     }
   }
 }

@@ -4,27 +4,18 @@ import { useEntityCrud } from '../../../../../../core/presentation/hooks/data/us
 import { getCreatePlotFormSchema } from '../../../schemas/plotForm.schema';
 import type { PlotArea } from '../../../../domain/entities/plotArea';
 import type { PlotClassification } from '../../../../domain/entities/plotClassification';
-import { GenericCreateForm, type FieldConfig } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
-import { SelectOnMap } from '../../../../../../core/presentation/layouts/ui/inputs/SelectOnMap';
-import { PlotStatusStepper, PLOT_STATUSES } from './PlotStatusStepper';
-import { getCreatePlotAreaFormSchema } from '../../../schemas/plotAreaForm.schema';
-import { getCreatePlotClassificationFormSchema } from '../../../schemas/plotClassificationForm.schema';
+import { GenericCreateForm } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
+import { PlotStatusStepper } from './PlotStatusStepper';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { Button } from '../../../../../../core/presentation/layouts/ui/buttons/Button';
-import Input from '../../../../../../core/presentation/layouts/ui/inputs/Input';
-import { inputBaseClasses } from '../../../../../../core/presentation/layouts/ui/inputs/styles';
-import { CustomSelect } from '../../../../../../core/presentation/layouts/ui/inputs/CustomSelect';
 import { ChangePlotStatusModal } from './ChangePlotStatusModal';
 import { PlotStatusHistoryModal } from './PlotStatusHistoryModal';
 import { PlotAuditLogModal } from './PlotAuditLogModal';
 import { History, Pencil, MapPin } from 'lucide-react';
 import type { Plot } from '../../../../domain/entities/plot';
 import type { PlotStatus } from '../../../../domain/valueObjects/plots/plotStatus';
-import type { ServiceCondition } from '../../../../domain/entities/serviceCondition';
 import type { ServiceStatusCondition } from '../../../../domain/entities/serviceStatusCondition';
-import { getCreateServiceConditionFormSchema } from '../../../schemas/serviceConditionForm.schema';
-import { getCreateServiceStatusConditionFormSchema } from '../../../schemas/serviceStatusConditionForm.schema';
-import z from 'zod';
+import { buildPlotFormFields, buildPlotFormGroups } from '../../../forms/plotFormConfig';
 
 interface PlotFormProps {
   plot?: Plot;
@@ -40,7 +31,6 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
   const { t } = useLanguage();
   const { entities: plotAreas, getAll: getPlotAreas, create: createPlotArea } = useEntityCrud<PlotArea>('/investments/plot-areas', '/investments/plot-areas');
   const { entities: classifications, getAll: getClassifications, create: createClassification } = useEntityCrud<PlotClassification>('/investments/plot-classifications', '/investments/plot-classifications');
-  const { entities: serviceConditions, getAll: getServiceConditions, create: createServiceCondition, update, remove, loadingMap, errorMap } = useEntityCrud<ServiceCondition>('/investments/service-conditions', '/investments/service-conditions');
   const { entities: serviceStatusConditions, getAll: getServiceStatusConditions, create: createServiceStatusCondition } = useEntityCrud<ServiceStatusCondition>('/investments/service-status-conditions', '/investments/service-status-conditions');
 
   const [statusDate, setStatusDate] = React.useState(defaultValues?.status_date || new Date().toISOString().split('T')[0]);
@@ -54,249 +44,19 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
   useEffect(() => {
     getPlotAreas('/investments/plot-areas?is_active=true');
     getClassifications('/investments/plot-classifications?is_active=true');
-    getServiceConditions('/investments/service-conditions?is_active=true')
     getServiceStatusConditions('/investments/service-status-conditions?is_active=true')
   }, []);
 
-  const formFields: FieldConfig[] = [
-    { name: 'code', label: t('plots.code', 'investments') || 'Code', required: true, type: 'numeric', group: 'basic_info' },
-    { name: 'identifier', label: t('plots.identifier', 'investments') || 'Identifier', required: true, type: 'numeric', group: 'basic_info' },
-    { name: 'area', type: 'numeric', label: t('plots.area', 'investments') || 'Area', required: true, group: 'basic_info' },
-    {
-      name: 'plot_area_id',
-      type: 'select-or-create',
-      label: t('plots.plot_area_id', 'investments') || 'Plot Area',
-      required: true,
-      group: 'classification',
-      options: plotAreas.map(pa => ({ value: pa.id, label: pa.name, is_default: pa.is_default })),
-      createTitle: t('plot_areas.add', 'investments') || 'Add Plot Area',
-      labelPath: 'name',
-      renderCreateForm: (onSuccessForm, onCancelForm) => (
-        <GenericCreateForm
-          fields={[
-            { name: 'name', type: 'alpha', label: t('plot_areas.name', 'investments'), required: true },
-          ]}
-          schema={getCreatePlotAreaFormSchema(t)}
-          onSubmit={async (data) => createPlotArea({ ...data, is_active: true })}
-          onSuccess={onSuccessForm}
-          onCancel={onCancelForm}
-        />
-      )
-    },
-    {
-      name: 'plot_classification_id',
-      type: 'select-or-create',
-      label: t('plots.plot_classification_id', 'investments') || 'Classification',
-      required: true,
-      group: 'classification',
-      options: classifications.map(pc => ({ value: pc.id, label: pc.name, is_default: pc.is_default })),
-      createTitle: t('plot_classifications.add', 'investments') || 'Add Classification',
-      labelPath: 'name',
-      renderCreateForm: (onSuccessForm, onCancelForm) => (
-        <GenericCreateForm
-          fields={[
-            { name: 'name', type: 'alpha', label: t('plot_classifications.name', 'investments'), required: true },
-          ]}
-          schema={getCreatePlotClassificationFormSchema(t)}
-          onSubmit={async (data) => createClassification({ ...data, is_active: true })}
-          onSuccess={onSuccessForm}
-          onCancel={onCancelForm}
-        />
-      )
-    },
-    {
-      name: 'latitude',
-      label: t('plots.location', 'investments') || 'Location',
-      required: true,
-      group: 'location',
-      render: (methods) => {
-        const { watch, setValue, formState: { errors } } = methods;
-        const lat = watch('latitude') || '';
-        const lng = watch('longitude') || '';
-        const error = errors.latitude || errors.longitude;
+  const formFields = buildPlotFormFields(t, {
+    plotAreas,
+    classifications,
+    serviceStatusConditions,
+    createPlotArea,
+    createClassification,
+    createServiceStatusCondition,
+  });
 
-        return (
-          <div className="w-full mb-4">
-            <label className="block text-sm font-semibold text-text mb-1.5">
-              {t('plots.location', 'investments') || 'Location'} <span className="text-danger">*</span>
-            </label>
-            <SelectOnMap
-              latitude={lat}
-              longitude={lng}
-              onChange={(newLat, newLng) => {
-                setValue('latitude', newLat, { shouldValidate: true });
-                setValue('longitude', newLng, { shouldValidate: true });
-              }}
-            />
-            {error && <div className="text-danger text-xs mt-1 font-medium">{String(error.message)}</div>}
-          </div>
-        );
-      }
-    },
-    { name: 'longitude', hidden: true, group: 'location' },
-    // { name: 'current_condition', label: t('plots.current_condition', 'investments') || 'Current Condition', group: 'additional' },
-    // {
-    //   name: 'service_conditions', type: 'multi-select-or-create', label: t('plots.current_condition', 'investments') || 'Current Condition', group: 'additional',
-    //   searchable: true,
-    //   options: serviceConditions.map(a => ({ value: a.id, label: a.name, is_default: a.is_default })),
-    //   createTitle: t('common.new', 'shared') || 'New',
-    //   labelPath: 'data.name',
-    //   renderCreateForm: (onSuccess, onCancel) => (
-    //     <GenericCreateForm
-    //       fields={[
-    //         { name: 'name', type: 'alpha', label: t('service_conditions.name', 'investments'), required: true },
-    //       ]}
-    //       schema={getCreateServiceConditionFormSchema(t)}
-    //       onSubmit={(data) => createServiceCondition({ ...data, is_active: true })}
-    //       onSuccess={onSuccess}
-    //       onCancel={onCancel}
-    //     />
-    //   )
-    // },
-
-    // {
-    //   name: 'service_conditions_notes', type: 'data-matrix', label: t('plots.notes', 'investments') || 'Notes', group: 'additional',
-    //   matrixFields: [
-    //     {
-    //       label: t('service_conditions.name', 'investments'),
-    //       name: "service_condition",
-    //       type: "text",
-    //       disabled:true
-    //     },
-    //     {
-    //       label: t('plots.notes', 'investments') || 'Notes',
-    //       name: "note",
-    //       type: "text",
-    //       required: true
-    //     },
-    //   ],
-    //   rowSchema: z.object({
-    //     note: z.string(),
-    //     service_condition: z.string(),
-    //   }),
-    //   dependsOn:['service_conditions'],
-    //   compute:(values) => {
-    //     const currentNotes = values.service_conditions_notes || [];
-    //     const newValues = (values.service_conditions || []).map((sc: any) => {
-    //       const scObj = serviceConditions.find((scl: any) => scl.id === sc);
-    //       const scName = scObj?.name || '';
-    //       const existing = currentNotes.find((row: any) => row.service_condition === scName);
-    //       return { service_condition: scName, note: existing?.note || '' };
-    //     });
-    //     return { numberOfRows: values.service_conditions.length, value: newValues };
-    //   }
-    // },
-    {
-      name: 'service_conditions',
-      label: t('plots.current_condition', 'investments') || 'Current Condition', group: 'additional',
-      type: "data-matrix",
-      rowSchema: z.object({
-        note: z.string(),
-        id: z.number().nullable(),
-      }),
-      matrixFields: [
-        {
-          label: t('service_conditions.name', 'investments'),
-          name: "id",
-          type: "select-or-create",
-          searchable: true,
-          excludeSelected: true,
-          options: serviceConditions.map(a => ({ value: a.id, label: a.name, is_default: a.is_default })),
-          createTitle: t('common.new', 'shared') || 'New',
-          labelPath: 'data.name',
-          renderCreateForm: (onSuccess, onCancel) => (
-            <GenericCreateForm
-              fields={[
-                { name: 'name', type: 'alpha', label: t('service_conditions.name', 'investments'), required: true },
-              ]}
-              schema={getCreateServiceConditionFormSchema(t)}
-              onSubmit={(data) => createServiceCondition({ ...data, is_active: true })}
-              onSuccess={onSuccess}
-              onCancel={onCancel}
-            />
-          )
-        },
-        {
-          label: t('plots.notes', 'investments') || 'Notes',
-          name: "note",
-          type: "text",
-          required: true
-        },
-      ]
-    },
-    {
-      name: 'service_status_conditions',
-      label: t('plots.service_status_conditions', 'investments') || 'Service Status Conditions', group: 'additional',
-      type: "data-matrix",
-      rowSchema: z.object({
-        note: z.string(),
-        service_status: z.string(),
-        id: z.number().nullable(),
-      }),
-      matrixFields: [
-        {
-          label: t('service_status_conditions.name', 'investments'),
-          name: "id",
-          type: "select-or-create",
-          searchable: true,
-          excludeSelected: true,
-          options: serviceStatusConditions.map(a => ({ value: a.id, label: a.name, is_default: a.is_default })),
-          createTitle: t('common.new', 'shared') || 'New',
-          labelPath: 'data.name',
-          renderCreateForm: (onSuccess, onCancel) => (
-            <GenericCreateForm
-              fields={[
-                { name: 'name', type: 'alpha', label: t('service_status_conditions.name', 'investments'), required: true },
-              ]}
-              schema={getCreateServiceStatusConditionFormSchema(t)}
-              onSubmit={(data) => createServiceStatusCondition({ ...data, is_active: true })}
-              onSuccess={onSuccess}
-              onCancel={onCancel}
-            />
-          )
-        },
-        {
-          label: t('service_status_conditions.service_status', 'investments') || 'Service Status',
-          name: "service_status",
-          type: "text",
-          required: true
-        },
-        {
-          label: t('plots.notes', 'investments') || 'Notes',
-          name: "note",
-          type: "text",
-          required: true
-        },
-      ]
-    }
-  ];
-
-  const formGroups = [
-    {
-      group: 'basic_info',
-      title: t('plots.group_basic_info', 'investments') || 'Basic Information',
-      columns: 3,
-      rows: [['code', 'identifier', 'area']],
-    },
-    {
-      group: 'classification',
-      title: t('plots.group_classification', 'investments') || 'Classification',
-      columns: 2,
-      rows: [['plot_area_id', 'plot_classification_id']],
-    },
-    {
-      group: 'location',
-      title: t('plots.group_location', 'investments') || 'Location',
-      columns: 1,
-      rows: [['latitude']],
-    },
-    {
-      group: 'additional',
-      title: t('plots.group_additional', 'investments') || 'Additional Information',
-      columns: 1,
-      rows: [['service_conditions'], ['service_status_conditions']],
-    },
-  ];
+  const formGroups = buildPlotFormGroups(t);
 
   // const handleSaveStatus = () => {
   //   setStatusDate(tempStatusDate);
@@ -387,32 +147,19 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
               <p className="font-medium text-text">{plot?.plot_classification?.name || '—'}</p>
             </div>
             <div className="space-y-1">
-              <span className="text-sm text-text-muted">{t('plots.current_condition', 'investments') || 'Current Condition'}</span>
+              <span className="text-sm text-text-muted">{t('plots.service_status_conditions', 'investments') || 'Service Status Conditions'}</span>
               <div className="font-medium text-text">
-                {plot?.service_conditions?.length
-                  ? plot.service_conditions.map((sc, i) => (
-                      <div key={i} className="flex items-center gap-2">
-                        <span>{sc.name}</span>
-                      {sc.note && <span className="text-xs text-text-muted">({sc.note})</span>}
-                    </div>
-                  ))
-                : '—'}
-            </div>
-          </div>
-          <div className="space-y-1">
-            <span className="text-sm text-text-muted">{t('plots.service_status_conditions', 'investments') || 'Service Status Conditions'}</span>
-            <div className="font-medium text-text">
-              {plot?.service_status_conditions?.length
-                ? plot.service_status_conditions.map((sc, i) => (
+                {plot?.service_status_conditions?.length
+                  ? plot.service_status_conditions.map((sc, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <span>{sc.name}</span>
                       {sc.service_status && <span className="text-xs text-primary">[{sc.service_status}]</span>}
                       {sc.note && <span className="text-xs text-text-muted">({sc.note})</span>}
                     </div>
                   ))
-                : '—'}
+                  : '—'}
+              </div>
             </div>
-          </div>
             <div className="space-y-1">
               <span className="text-sm text-text-muted">{t('plots.location', 'investments') || 'Location'}</span>
               <div className="flex items-center gap-2">

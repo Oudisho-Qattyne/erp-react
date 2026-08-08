@@ -1,6 +1,6 @@
 import enLocales from './presentation/locales/en.json';
 import arLocales from './presentation/locales/ar.json';
-import { Map, List, FileCheck, BadgeCheck, Tags, Layers, Flag, SlidersHorizontal } from 'lucide-react';
+import { Map, List, FileCheck, BadgeCheck, Tags, Layers, Flag, SlidersHorizontal, Coins } from 'lucide-react';
 import type { Module } from '../../core/moduleRegistry';
 import { registerPersonDetailRoute } from '../../core/registry/person/personRegistry';
 import { PlotAreasPage } from './presentation/pages/plot-areas/PlotAreasPage';
@@ -17,6 +17,8 @@ import { DossiersPage } from './presentation/pages/dossiers/DossiersPage';
 import { FacilitiesPage } from './presentation/pages/facilities/FacilitiesPage';
 import { ShowContractPage } from './presentation/pages/contracts/ShowContractPage';
 import { ContractsPage } from './presentation/pages/contracts/ContractsPage';
+import { TransactionsPage } from './presentation/pages/transactions/TransactionsPage';
+import { CreateSubscriptionPage } from './presentation/pages/transactions/CreateSubscriptionPage';
 import { IndustrialDecisionTypesPage } from './presentation/pages/industrial-decision-types/IndustrialDecisionTypesPage';
 import { IndustrialLicenseSourcesPage } from './presentation/pages/industrial-license-sources/IndustrialLicenseSourcesPage';
 import { IndustryCategoriesPage } from './presentation/pages/industry-categories/IndustryCategoriesPage';
@@ -25,7 +27,6 @@ import { LicensingStatusesPage } from './presentation/pages/licensing-statuses/L
 import { ByDurationLicensesPage } from './presentation/pages/by-duration-licenses/ByDurationLicensesPage';
 import { ByIndustryLicensesPage } from './presentation/pages/by-industry-licenses/ByIndustryLicensesPage';
 import { RentContractIndustriesPage } from './presentation/pages/rent-contract-industries/RentContractIndustriesPage';
-import { ServiceConditionsPage } from './presentation/pages/service-conditions/ServiceConditionsPage';
 import { ServiceStatusConditionsPage } from './presentation/pages/service-status-conditions/ServiceStatusConditionsPage';
 import { MapPin, Users, Clock, Building2, FileText, Factory, FileSignature } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
@@ -120,6 +121,28 @@ const investmentsModule: Module = {
       group: 'investments',
     },
     {
+      path: '/investments/transactions',
+      element: <TransactionsPage />,
+      layout: 'dashboard',
+      label: 'transactions.title',
+      nav: true,
+      order: 10,
+      // requiredPermission: 'investments.transactions.list',
+      moduleName: 'investments',
+      icon: <Coins size={18} />,
+      group: 'investments',
+    },
+    {
+      path: '/investments/transactions/create',
+      element: <CreateSubscriptionPage />,
+      layout: 'dashboard',
+      label: 'transactions.create_title',
+      nav: false,
+      // requiredPermission: 'investments.transactions.create',
+      moduleName: 'investments',
+      group: 'investments',
+    },
+    {
       path: '/investments/plots/:plotId/dossiers/:dossierId/facilities/:facilityId',
       element: <ShowFacilityPage />,
       layout: 'dashboard',
@@ -161,18 +184,6 @@ const investmentsModule: Module = {
       moduleName: 'investments',
       requiredPermission: 'investments.plot-classifications.list',
       icon: <List size={18} />,
-      group: 'investments',
-    },
-    {
-      path: '/investments/service-conditions',
-      element: <ServiceConditionsPage />,
-      layout: 'dashboard',
-      label: 'service_conditions.title',
-      nav: true,
-      order: 15,
-      moduleName: 'investments',
-      requiredPermission: 'investments.service-conditions.list',
-      icon: <FileCheck size={18} />,
       group: 'investments',
     },
     {

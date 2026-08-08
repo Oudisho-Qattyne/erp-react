@@ -1,5 +1,7 @@
 import type { ColumnDef } from "../tables/ResizableTable";
 import type { FilterField } from "../filter/FilterDialog";
+import type { FieldConfig, GroupConfig } from "../forms/GenericCreateForm";
+import type { ZodSchema } from "zod";
 
 /**
  * Config for the `table-picker` input type.
@@ -45,4 +47,18 @@ export interface PickerConfig<T = any> {
   onPerPageChange?: (perPage: number) => void;
   emptyMessage?: string;
   requiredPermission?: string | string[];
+  // Create-inside-the-dialog form
+  createConfig?: {
+    schema: ZodSchema<any>;
+    fields?: FieldConfig[];
+    groups?: GroupConfig[];
+    defaultValues?: Record<string, any>;
+    onSubmit: (data: any) => Promise<any>;
+    onError?: (error: any) => void;
+    dialogTitle?: string;
+    dialogSize?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl";
+    buttonLabel?: string;
+    submitLabel?: string;
+    createButtonPermission?: string | string[];
+  };
 }

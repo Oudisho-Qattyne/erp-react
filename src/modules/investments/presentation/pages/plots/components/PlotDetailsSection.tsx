@@ -61,33 +61,20 @@ export function PlotDetailsSection({ plotId, plot: plotProp }: Props) {
             <span className="text-sm text-text-muted">{t('plots.plot_classification_id', 'investments') || 'Classification'}</span>
             <p className="font-medium text-text">{plot.plot_classification?.name || plot.plot_classification_name || '—'}</p>
           </div>
-              <div className="space-y-1">
-                  <span className="text-sm text-text-muted">{t('plots.current_condition', 'investments') || 'Current Condition'}</span>
-                  <div className="font-medium text-text">
-                    {plot?.service_conditions?.length
-                      ? plot.service_conditions.map((sc, i) => (
-                          <div key={i} className="flex items-center gap-2">
-                            <span>{sc.name}</span>
-                            {sc.note && <span className="text-xs text-text-muted">({sc.note})</span>}
-                          </div>
-                        ))
-                      : '—'}
+          <div className="space-y-1">
+            <span className="text-sm text-text-muted">{t('plots.service_status_conditions', 'investments') || 'Service Status Conditions'}</span>
+            <div className="font-medium text-text">
+              {plot?.service_status_conditions?.length
+                ? plot.service_status_conditions.map((sc, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <span>{sc.name}</span>
+                    {sc.service_status && <span className="text-xs text-primary">[{sc.service_status}]</span>}
+                    {sc.note && <span className="text-xs text-text-muted">({sc.note})</span>}
                   </div>
-                </div>
-              <div className="space-y-1">
-                  <span className="text-sm text-text-muted">{t('plots.service_status_conditions', 'investments') || 'Service Status Conditions'}</span>
-                  <div className="font-medium text-text">
-                    {plot?.service_status_conditions?.length
-                      ? plot.service_status_conditions.map((sc, i) => (
-                          <div key={i} className="flex items-center gap-2">
-                            <span>{sc.name}</span>
-                            {sc.service_status && <span className="text-xs text-primary">[{sc.service_status}]</span>}
-                            {sc.note && <span className="text-xs text-text-muted">({sc.note})</span>}
-                          </div>
-                        ))
-                      : '—'}
-                  </div>
-                </div>
+                ))
+                : '—'}
+            </div>
+          </div>
           <div className="space-y-1">
             <span className="text-sm text-text-muted">{t('plots.location', 'investments') || 'Location'}</span>
             <div className="flex items-center gap-2">
