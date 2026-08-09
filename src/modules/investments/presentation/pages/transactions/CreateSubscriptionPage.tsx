@@ -23,6 +23,7 @@ import { getCreateFacilityFormSchema } from '../../schemas/facilityForm.schema';
 import { getCreateInvestorFormSchema } from '../../schemas/investorForm.schema';
 import { buildInvestorFormFields, buildInvestorFormGroups } from '../../forms/investorFormConfig';
 import type { Investor } from '../../../domain/entities/investor';
+import type { PartnershipType } from '../../../domain/entities/partnershipType';
 
 type FetchParams = Record<string, string | number | boolean | undefined>;
 
@@ -36,6 +37,7 @@ export function CreateSubscriptionPage() {
   const decisionTypesCrud = useEntityCrud<IndustrialDecisionType>('/investments/industrial-decision-types', '/investments/industrial-decision-types');
   const licenseSourcesCrud = useEntityCrud<IndustrialLicenseSource>('/investments/industrial-license-sources', '/investments/industrial-license-sources');
   const investorsCrud = useEntityCrud<Investor>('/investments/investors', '/investments/investors');
+  const partnershipTypesCrud = useEntityCrud<PartnershipType>('/investments/partnership-types', '/investments/partnership-types');
 
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
@@ -65,6 +67,7 @@ fetchPlots({ page: 1, per_page: perPage });
     decisionTypesCrud.getAll('/investments/industrial-decision-types?is_active=true');
     licenseSourcesCrud.getAll('/investments/industrial-license-sources?is_active=true');
     investorsCrud.getAll('/investments/investors?page=1&per_page=25');
+    partnershipTypesCrud.getAll('/investments/partnership-types?is_active=true');
   }, []);
 
   const handleSearch = (query: string) => {
@@ -214,6 +217,11 @@ fetchPlots({ page: 1, per_page: perPage });
     createLicenseSource: licenseSourcesCrud.create,
   };
 
+  const facilityDeps = {
+    partnershipTypes: partnershipTypesCrud.entities,
+    createPartnershipType: partnershipTypesCrud.create,
+  };
+
   const fields: FieldConfig[] = [
     {
       name: 'plot_id',
@@ -231,7 +239,7 @@ fetchPlots({ page: 1, per_page: perPage });
       group: 'investors',
       pickerConfig: investorPickerConfig,
     },
-    ...buildFacilityFormFields(t),
+    ...buildFacilityFormFields(t, facilityDeps),
     ...buildFacilityIndustrialLicenseFormFields(t, licenseDeps),
   ];
 

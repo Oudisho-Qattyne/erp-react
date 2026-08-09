@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { Eye, Trash2, Search, History, Factory, Filter, X, MapPin, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 import { PlotPickerDialog } from '../plots/components/PlotPickerDialog';
 import { DossierPickerDialog } from '../plots/components/DossierPickerDialog';
 
@@ -206,6 +207,12 @@ export function FacilitiesPage() {
 
   const columns = [
     { key: "name", label: t("facilities.name", "investments") || "Name", width: 180, sortable: true },
+    {
+      key: "partnership_type",
+      label: t("facilities.partnership_type", "investments") || "Partnership Type",
+      width: 150,
+      render: (row: Facility) => row.partnership_type ? getLocalizedName(row.partnership_type.name) : '—',
+    },
     { key: "city", label: t("facilities.city", "investments") || "City", width: 120, sortable: true },
     { key: "first_phone_number", label: t("facilities.first_phone_number", "investments") || "Phone", width: 140 },
     { key: "email", label: t("facilities.email", "investments") || "Email", width: 180 },

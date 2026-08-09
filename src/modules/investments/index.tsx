@@ -1,6 +1,6 @@
 import enLocales from './presentation/locales/en.json';
 import arLocales from './presentation/locales/ar.json';
-import { Map, List, FileCheck, BadgeCheck, Tags, Layers, Flag, SlidersHorizontal, Coins } from 'lucide-react';
+import { Map, List, FileCheck, BadgeCheck, Tags, Layers, Flag, SlidersHorizontal, Coins, Handshake } from 'lucide-react';
 import type { Module } from '../../core/moduleRegistry';
 import { registerPersonDetailRoute } from '../../core/registry/person/personRegistry';
 import { PlotAreasPage } from './presentation/pages/plot-areas/PlotAreasPage';
@@ -19,6 +19,7 @@ import { ShowContractPage } from './presentation/pages/contracts/ShowContractPag
 import { ContractsPage } from './presentation/pages/contracts/ContractsPage';
 import { TransactionsPage } from './presentation/pages/transactions/TransactionsPage';
 import { CreateSubscriptionPage } from './presentation/pages/transactions/CreateSubscriptionPage';
+import { PartnershipTypesPage } from './presentation/pages/partnership-types/PartnershipTypesPage';
 import { IndustrialDecisionTypesPage } from './presentation/pages/industrial-decision-types/IndustrialDecisionTypesPage';
 import { IndustrialLicenseSourcesPage } from './presentation/pages/industrial-license-sources/IndustrialLicenseSourcesPage';
 import { IndustryCategoriesPage } from './presentation/pages/industry-categories/IndustryCategoriesPage';
@@ -140,6 +141,18 @@ const investmentsModule: Module = {
       nav: false,
       // requiredPermission: 'investments.transactions.create',
       moduleName: 'investments',
+      group: 'investments',
+    },
+    {
+      path: '/investments/partnership-types',
+      element: <PartnershipTypesPage />,
+      layout: 'dashboard',
+      label: 'partnership_types.title',
+      nav: true,
+      order: 11,
+      // requiredPermission: 'investments.partnership-types.list',
+      moduleName: 'investments',
+      icon: <Handshake size={18} />,
       group: 'investments',
     },
     {

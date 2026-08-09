@@ -12,6 +12,8 @@ import { GenericCreateForm } from '../../../../../../core/presentation/layouts/u
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { getCreateFacilityFormSchema } from '../../../schemas/facilityForm.schema';
 import { buildFacilityFormFields, buildFacilityFormGroups, buildFacilityDefaultValues } from '../../../forms/facilityFormConfig';
+import type { PartnershipType } from '../../../../domain/entities/partnershipType';
+import { getLocalizedName } from '../../../../../../core/presentation/utils/helpes';
 import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { Factory, Plus, Eye, Pencil, Trash2, History } from 'lucide-react';
 import { toast } from 'sonner';
@@ -28,6 +30,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
 
   const baseUrl = `/investments/facilities`;
   const { entities: facilities, getAll: getFacilities, create: createFacility, update: updateFacility, remove: deleteFacility, loadingMap: facLoading, errorMap: facError } = useEntityCrud<Facility>(baseUrl, baseUrl);
+  const { entities: partnershipTypes, getAll: getPartnershipTypes, create: createPartnershipType } = useEntityCrud<PartnershipType>('/investments/partnership-types', '/investments/partnership-types');
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingFacility, setEditingFacility] = useState<Facility | null>(null);
@@ -38,6 +41,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
 
   useEffect(() => {
     if (dossierId && plotId) getFacilities(listUrl);
+    getPartnershipTypes('/investments/partnership-types?is_active=true');
   }, [dossierId, plotId]);
 
   const handleCreate = async (data: any) => {
@@ -79,11 +83,17 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
     setDeletingFacility(null);
   };
 
-  const fields = buildFacilityFormFields(t);
+  const fields = buildFacilityFormFields(t, { partnershipTypes, createPartnershipType });
   const formGroups = buildFacilityFormGroups(t);
 
   const columns = [
     { key: "name", label: t("facilities.name", "investments") || "Name", width: 180 },
+    {
+      key: "partnership_type",
+      label: t("facilities.partnership_type", "investments") || "Partnership Type",
+      width: 150,
+      render: (row: Facility) => row.partnership_type ? getLocalizedName(row.partnership_type.name) : '—',
+    },
     { key: "city", label: t("facilities.city", "investments") || "City", width: 120 },
     { key: "first_phone_number", label: t("facilities.first_phone_number", "investments") || "Phone", width: 130 },
     { key: "email", label: t("facilities.email", "investments") || "Email", width: 180 },

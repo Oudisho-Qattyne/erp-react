@@ -1,10 +1,44 @@
 import type { FieldConfig, GroupConfig } from '../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
+import { GenericCreateForm } from '../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import type { Facility } from '../../domain/entities/facility';
+import type { PartnershipType } from '../../domain/entities/partnershipType';
+import type { UseEntityCrudReturn } from '../../../../core/presentation/hooks/data/useEntity';
+import { getCreatePartnershipTypeFormSchema } from '../schemas/partnershipTypeForm.schema';
+import { getLocalizedName } from '../../../../core/presentation/utils/helpes';
 
 type Translate = (key: string, module?: string) => string;
 
-export const buildFacilityFormFields = (t: Translate): FieldConfig[] => [
+interface FacilityFormDeps {
+  partnershipTypes: PartnershipType[];
+  createPartnershipType: UseEntityCrudReturn<PartnershipType>['create'];
+}
+
+export const buildFacilityFormFields = (t: Translate, deps: FacilityFormDeps): FieldConfig[] => [
   { name: 'name', type: 'alpha', label: t('facilities.name', 'investments') || 'Name', required: true, group: 'basic_info' },
+  {
+    name: 'partnership_type_id',
+    type: 'select-or-create',
+    label: t('facilities.partnership_type', 'investments') || 'Partnership Type',
+    required: true,
+    group: 'basic_info',
+    options: deps.partnershipTypes.map(pt => ({ value: pt.id, label: getLocalizedName(pt.name), is_default: pt.is_default })),
+    createTitle: t('partnership_types.create', 'investments') || 'Create Partnership Type',
+    labelPath: 'name',
+    // createButtonPermission: 'investments.partnership-types.create',
+    renderCreateForm: (onSuccessForm, onCancelForm) => (
+      <GenericCreateForm
+        schema={getCreatePartnershipTypeFormSchema(t)}
+        fields={[
+          { name: 'name', type: 'alpha', label: t('common.name', 'shared') || 'Name', required: true },
+          { name: 'is_default', type: 'checkbox', label: t('common.is_default', 'shared') || 'Set as Default' },
+        ]}
+        onSubmit={(data) => deps.createPartnershipType({ ...data, is_active: true })}
+        onSuccess={onSuccessForm}
+        onCancel={onCancelForm}
+        submitLabel={t('common.create', 'shared') || 'Create'}
+      />
+    ),
+  },
   { name: 'address', type: 'text', label: t('facilities.address', 'investments') || 'Address', required: true, group: 'basic_info' },
   { name: 'city', type: 'alpha', label: t('facilities.city', 'investments') || 'City', required: true, group: 'basic_info' },
   { name: 'first_phone_number', type: 'numeric', label: t('facilities.first_phone_number', 'investments') || 'Phone', required: true, group: 'contact' },
@@ -27,7 +61,10 @@ export const buildFacilityFormGroups = (t: Translate): GroupConfig[] => [
     group: 'basic_info',
     title: t('facilities.group_basic_info', 'investments') || 'Basic Information',
     columns: 3,
-    rows: [['name', 'address', 'city']],
+    rows: [
+      ['name', 'partnership_type_id', 'city'],
+      ['address'],
+    ],
   },
   {
     group: 'contact',
@@ -63,6 +100,7 @@ export const buildFacilityFormGroups = (t: Translate): GroupConfig[] => [
 
 export const buildFacilityDefaultValues = (facility: Facility): Record<string, string | number | null | undefined> => ({
   name: facility.name,
+  partnership_type_id: facility.partnership_type?.id ?? facility.partnership_type_id ?? null,
   address: facility.address,
   city: facility.city,
   first_phone_number: facility.first_phone_number,

@@ -6,10 +6,11 @@ import { InvestorForm } from './components/InvestorForm';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, FolderOpen } from 'lucide-react';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
+import { useStorage } from '../../../../../core/registry/storage/StorageProvider';
 import { InvestorInterestFormModal } from './components/InvestorInterestFormModal';
 import { Trash2, Map, List } from 'lucide-react';
 import { Dialog } from '../../../../../core/presentation/layouts/ui/dialog/Dialog';
@@ -104,6 +105,7 @@ export function EditInvestorPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const storage = useStorage();
   const { getById, update } = useEntityCrud<Investor>('/investments/investors', '/investments/investors');
   const { remove: removeInterest } = useEntityCrud(`/investments/investors/${id || 0}/interests`, `/investments/investors/${id || 0}/interests`);
   const [investor, setInvestor] = useState<Investor | null>(null);
@@ -111,6 +113,7 @@ export function EditInvestorPage() {
   const [error, setError] = useState<string | null>(null);
   const [showInterestModal, setShowInterestModal] = useState(false);
   const [interestToDelete, setInterestToDelete] = useState<number | null>(null);
+  const [fileExplorerOpen, setFileExplorerOpen] = useState(false);
 
   useEffect(() => {
     fetchInvestor();
@@ -158,11 +161,18 @@ export function EditInvestorPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={handleBack}>
-          <ArrowRight size={16} /> {t('investors.back_to_list', 'investments') || 'Back to Investors'}
-        </Button>
-        <h1 className="text-2xl font-bold">{t('investors.edit', 'investments') || 'Edit Investor'}</h1>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" onClick={handleBack}>
+            <ArrowRight size={16} /> {t('investors.back_to_list', 'investments') || 'Back to Investors'}
+          </Button>
+          <h1 className="text-2xl font-bold">{t('investors.edit', 'investments') || 'Edit Investor'}</h1>
+        </div>
+        {storage?.FileExplorerDialogComponent && investor?.folder && (
+          <Button variant="outline" onClick={() => setFileExplorerOpen(true)} requiredPermission="storage.storage.view" leftIcon={<FolderOpen size={16} />}>
+            {t('investors.folder', 'investments') || 'Investor Folder'}
+          </Button>
+        )}
       </div>
 
 
@@ -221,6 +231,10 @@ export function EditInvestorPage() {
         onConfirm={handleDeleteInterest}
         onCancel={() => setInterestToDelete(null)}
       />
+
+      {storage?.FileExplorerDialogComponent && investor?.folder &&
+        <storage.FileExplorerDialogComponent isOpen={fileExplorerOpen} onClose={() => { setFileExplorerOpen(false) }} folderId={investor.folder} />
+      }
     </div>
   );
 }

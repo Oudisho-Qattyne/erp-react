@@ -323,6 +323,7 @@
     "name": "الاسم",
     "plot_code": "رمز المقسم",
     "dossier_number": "رقم الملف",
+    "partnership_type": "نوع الشراكة",
     "address": "العنوان",
     "city": "المدينة",
     "first_phone_number": "رقم الهاتف",
@@ -370,6 +371,7 @@
     "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب",
+      "partnership_type_required": "نوع الشراكة مطلوب",
       "address_required": "العنوان مطلوب",
       "city_required": "المدينة مطلوبة",
       "first_phone_number_required": "رقم الهاتف مطلوب",
@@ -431,6 +433,7 @@
     "remove_investors_error": "فشل في إزالة الشركاء",
     "add_interest": "إضافة اهتمام",
     "interests": "اهتمامات المستثمر",
+    "folder": "مجلد المستثمر",
     "filter_has_social_account": "لديه حساب تواصل",
     "filter_has_facebook_account": "لديه فيسبوك",
     "filter_has_instagram_account": "لديه انستغرام",
@@ -533,6 +536,13 @@
         "create": "إنشاء سجل حالة إضبارة",
         "update": "تعديل سجل حالة الإضبارة",
         "delete": "حذف سجل حالة الإضبارة"
+      },
+      "partnership-types": {
+        "list": "قائمة أنواع الشراكة",
+        "view": "عرض نوع شراكة",
+        "create": "إنشاء نوع شراكة",
+        "update": "تعديل نوع شراكة",
+        "delete": "حذف نوع شراكة"
       },
       "industry-categories": {
         "list": "قائمة تصنيفات الصناعة",
@@ -758,6 +768,33 @@
     "old_value": "القيمة القديمة",
     "new_value": "القيمة الجديدة",
     "subject_id": "رقم نوع الصناعة",
+    "id": "ID",
+    "validation": {
+      "name_required": "الاسم مطلوب"
+    }
+  },
+  "partnership_types": {
+    "title": "أنواع الشراكة",
+    "add": "إضافة نوع شراكة",
+    "create": "إنشاء نوع شراكة",
+    "name": "اسم النوع",
+    "is_active": "نشط",
+    "is_default": "افتراضي",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا يوجد أنواع شراكة",
+    "edit_log": "سجل التعديل",
+    "no_edit_log": "لا يوجد سجل تعديلات",
+    "event": "الحدث",
+    "created_at": "تاريخ الإنشاء",
+    "changed_by": "تم التغيير بواسطة",
+    "changes": "التغييرات",
+    "field": "الحقل",
+    "old_value": "القيمة القديمة",
+    "new_value": "القيمة الجديدة",
+    "subject_id": "رقم نوع الشراكة",
     "id": "ID",
     "validation": {
       "name_required": "الاسم مطلوب"
@@ -1073,6 +1110,9 @@
     },
     "transactions": {
       "title": "المعاملات"
+    },
+    "partnership_types": {
+      "title": "أنواع الشراكة"
     }
   }
 }

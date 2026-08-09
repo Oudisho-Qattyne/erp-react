@@ -15,6 +15,7 @@ import { PlotDetailsSection } from './components/PlotDetailsSection';
 import { FacilityIndustrialLicensesSection } from './components/FacilityIndustrialLicensesSection';
 import { BuildingLicenseSection } from './components/BuildingLicenseSection';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
+import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 import { ArrowRight, Factory, History } from 'lucide-react';
 
 export function ShowFacilityPage() {
@@ -112,6 +113,7 @@ export function ShowFacilityPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InfoRow label={t('facilities.name', 'investments') || 'Name'} value={facility.name} />
+          <InfoRow label={t('facilities.partnership_type', 'investments') || 'Partnership Type'} value={facility.partnership_type ? getLocalizedName(facility.partnership_type.name) : '—'} />
           <InfoRow label={t('facilities.city', 'investments') || 'City'} value={facility.city} />
           <InfoRow label={t('facilities.address', 'investments') || 'Address'} value={facility.address} />
           <InfoRow label={t('facilities.first_phone_number', 'investments') || 'Phone'} value={facility.first_phone_number} />
