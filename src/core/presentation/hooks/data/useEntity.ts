@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback, useState, useEffect } from 'react';
 import type { CreateEntityDTO, UpdateEntityDTO } from '../../../../modules/hr/application/dtos/entityDto';
 import type { DpomainResponsePaginated } from '../../../../modules/hr/domain/entities/common/DomainResponsePaginated';
 import { createCrufRepository } from '../../../infrastructure/repositories/CrudRepository';
@@ -34,6 +34,31 @@ function buildFlatParams(params: QueryParams): Record<string, string | boolean |
     }
   }
   return flat;
+}
+
+export interface ListStateFilter {
+  search?: string;
+  sortColumn?: string;
+  sortOrder?: 'asc' | 'desc';
+  [key: string]: string | boolean | number | undefined;
+}
+
+export interface EntityListState {
+  filter: ListStateFilter;
+  setFilter: (patch: Partial<ListStateFilter> | ((prev: ListStateFilter) => ListStateFilter)) => void;
+  setSearch: (query: string) => void;
+  setSort: (column: string) => void;
+  resetFilter: () => void;
+  page: number;
+  perPage: number;
+  setPage: (page: number) => void;
+  setPerPage: (size: number) => void;
+}
+
+export interface UseEntityCrudOptions {
+  listState?: boolean;
+  defaultPerPage?: number;
+  searchParamName?: string;
 }
 
 interface PaginationInfo {
@@ -72,7 +97,25 @@ export interface UseEntityCrudReturn<T> {
   clearError: () => void;
 }
 
-export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:string): UseEntityCrudReturn<T> {
+export interface UseEntityCrudWithListStateReturn<T> extends UseEntityCrudReturn<T> {
+  list: EntityListState;
+}
+
+export function useEntityCrud<T extends { id: number }>(
+  getUrl: string,
+  restUrl: string,
+  options: { listState: true } & Omit<UseEntityCrudOptions, 'listState'>
+): UseEntityCrudWithListStateReturn<T>;
+export function useEntityCrud<T extends { id: number }>(
+  getUrl: string,
+  restUrl: string,
+  options?: UseEntityCrudOptions
+): UseEntityCrudReturn<T>;
+export function useEntityCrud<T extends { id: number }>(
+  getUrl: string,
+  restUrl: string,
+  options?: UseEntityCrudOptions
+): UseEntityCrudReturn<T> {
   const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>(() => initRecord(false));
   const [errorMap, setErrorMap] = useState<Record<string, string | null>>(() => initRecord(null));
   const [entities, setEntities] = useState<T[]>([]);
@@ -102,6 +145,49 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
   );
 
   const clearError = useCallback(() => setErrorMap(initRecord(null)), []);
+
+  const listStateEnabled = options?.listState ?? false;
+  const searchParamName = options?.searchParamName ?? 'search';
+  const defaultPerPage = options?.defaultPerPage ?? 25;
+
+  const [filter, setFilterState] = useState<ListStateFilter>({ sortOrder: 'asc' });
+  const [page, setPageState] = useState(1);
+  const [perPage, setPerPageState] = useState(defaultPerPage);
+
+  const setFilter = useCallback(
+    (patch: Partial<ListStateFilter> | ((prev: ListStateFilter) => ListStateFilter)) => {
+      setPageState(1);
+      setFilterState((prev) => (typeof patch === 'function' ? patch(prev) : { ...prev, ...patch }));
+    },
+    []
+  );
+
+  const setSearch = useCallback((query: string) => {
+    setPageState(1);
+    setFilterState((prev) => ({ ...prev, search: query || undefined }));
+  }, []);
+
+  const setSort = useCallback((column: string) => {
+    setPageState(1);
+    setFilterState((prev) => {
+      if (prev.sortColumn === column) {
+        return { ...prev, sortOrder: prev.sortOrder === 'asc' ? 'desc' : 'asc' };
+      }
+      return { ...prev, sortColumn: column, sortOrder: 'asc' };
+    });
+  }, []);
+
+  const resetFilter = useCallback(() => {
+    setPageState(1);
+    setFilterState({ sortOrder: 'asc' });
+  }, []);
+
+  const setPage = useCallback((p: number) => setPageState(p), []);
+
+  const setPerPage = useCallback((size: number) => {
+    setPageState(1);
+    setPerPageState(size);
+  }, []);
 
   const isLoading = useCallback(() => Object.values(loadingMap).some(Boolean), [loadingMap]);
   const hasErrors = useCallback(() => Object.values(errorMap).some((e) => e !== null), [errorMap]);
@@ -140,6 +226,34 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
       setFnLoading('getAll', false);
     }
   }, [apiClient, getUrl, restUrl, usecase]);
+
+  const buildListParams = useCallback(() => {
+    const params = new URLSearchParams();
+    if (filter.search) params.append(searchParamName, filter.search);
+    for (const [key, val] of Object.entries(filter)) {
+      if (key === 'search' || key === 'sortColumn' || key === 'sortOrder') continue;
+      if (val !== undefined && val !== '') params.append(key, String(val));
+    }
+    if (filter.sortColumn) {
+      params.append('sortColumn', filter.sortColumn);
+      params.append('sortOrder', filter.sortOrder ?? 'asc');
+    }
+    params.append('page', String(page));
+    params.append('per_page', String(perPage));
+    return params;
+  }, [filter, page, perPage, searchParamName]);
+
+  useEffect(() => {
+    if (!listStateEnabled || !getUrl) return;
+    const sep = getUrl.includes('?') ? '&' : '?';
+    getAll(`${getUrl}${sep}${buildListParams().toString()}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listStateEnabled, getUrl, buildListParams]);
+
+  const list = useMemo<EntityListState | undefined>(() => {
+    if (!listStateEnabled) return undefined;
+    return { filter, setFilter, setSearch, setSort, resetFilter, page, perPage, setPage, setPerPage };
+  }, [listStateEnabled, filter, setFilter, setSearch, setSort, resetFilter, page, perPage, setPage, setPerPage]);
 
   const getById = useCallback(async (id: number) => {
     setFnLoading('getById', true);
@@ -214,5 +328,6 @@ export function useEntityCrud<T extends {id:number}>(getUrl:string , restUrl:str
     update,
     remove,
     clearError,
+    ...(list ? { list } : {}),
   };
 }
