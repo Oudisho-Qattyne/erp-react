@@ -59,7 +59,7 @@ export function PlotForm({ plot, defaultValues, onSubmit, onSuccess, onCancel, s
   }, []);
 
   const formFields: FieldConfig[] = [
-    { name: 'code', label: t('plots.code', 'investments') || 'Code', required: true, type: 'numeric', group: 'basic_info' },
+    { name: 'code', label: t('plots.code', 'investments') || 'Code', required: true, type: 'text', regex: /\S/, group: 'basic_info' },
     { name: 'identifier', label: t('plots.identifier', 'investments') || 'Identifier', required: true, type: 'numeric', group: 'basic_info' },
     { name: 'area', type: 'numeric', label: t('plots.area', 'investments') || 'Area', required: true, group: 'basic_info' },
     {

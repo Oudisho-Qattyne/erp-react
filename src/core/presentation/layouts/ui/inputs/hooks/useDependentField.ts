@@ -14,6 +14,8 @@ export interface ComputedProps {
   numberOfRows?: number;
   // Decides which picker dialog appears for `table-picker` fields (null = disabled)
   pickerConfig?: PickerConfig | null;
+  // Per-character whitelist for text-like inputs
+  regex?: RegExp;
   [key: string]: any; // allow extra data
 }
 

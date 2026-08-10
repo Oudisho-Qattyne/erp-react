@@ -40,6 +40,9 @@ export interface FormInputProps<T extends FieldValues> {
   // For decimal
   decimalPlaces?: number;
   allowNegative?: boolean;
+  // For text-like inputs: only characters matching this regex can be typed/pasted
+  // e.g. no whitespace: /\S/ — letters only: /^\p{L}$/u
+  regex?: RegExp;
   // For select-or-create
   createTitle?: string;
   labelPath?: string;
@@ -87,6 +90,7 @@ export function FormInput<T extends FieldValues>({
   step,
   decimalPlaces,
   allowNegative,
+  regex,
   createTitle = 'إضافة جديد',
   labelPath,
   renderCreateForm,
@@ -138,6 +142,8 @@ export function FormInput<T extends FieldValues>({
   const finalNumberOfRows = computed.numberOfRows ?? numberOfRows;
   // compute can decide which picker dialog appears (or null to disable it)
   const finalPickerConfig = computed.pickerConfig !== undefined ? computed.pickerConfig : pickerConfig;
+  // compute can change the allowed characters
+  const finalRegex = computed.regex !== undefined ? computed.regex : regex;
 
   // Map nested array errors from react-hook-form (set by server validationErrors)
   // e.g. errors.service_conditions[0].id → { 0: { service_condition: "msg" } }
@@ -269,6 +275,7 @@ export function FormInput<T extends FieldValues>({
         step={step}
         decimalPlaces={decimalPlaces}
         allowNegative={allowNegative}
+        regex={finalRegex}
         matrixFields={finalMatrixFields}
         numberOfRows={finalNumberOfRows}
         minRows={minRows}
