@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import type { DpomainResponsePaginated } from '../../../../modules/hr/domain/entities/common/DomainResponsePaginated';
 import type { ManageEntityUsecase } from '../../../domain/usecase/IManageUseCase';
+import { handleApiError } from '../../utils/handleApiError';
 
 interface PaginationInfo {
   lastPage: number;
@@ -47,7 +48,7 @@ export function useEntityCrud<T, TCreate, TUpdate, ID = number>(
       });
       return response;
     } catch (err: any) {
-      setState(prev => ({ ...prev, loading: false, error: err.message }));
+      setState(prev => ({ ...prev, loading: false, error: handleApiError(err, { silent: true }) }));
       throw err;
     }
   }, [usecase]);
@@ -59,7 +60,7 @@ export function useEntityCrud<T, TCreate, TUpdate, ID = number>(
       setState(prev => ({ ...prev, loading: false }));
       return entity;
     } catch (err: any) {
-      setState(prev => ({ ...prev, loading: false, error: err.message }));
+      setState(prev => ({ ...prev, loading: false, error: handleApiError(err, { silent: true }) }));
       throw err;
     }
   }, [usecase]);
@@ -75,7 +76,7 @@ export function useEntityCrud<T, TCreate, TUpdate, ID = number>(
       }));
       return newEntity;
     } catch (err: any) {
-      setState(prev => ({ ...prev, loading: false, error: err.message }));
+      setState(prev => ({ ...prev, loading: false, error: handleApiError(err, { silent: true }) }));
       throw err;
     }
   }, [usecase]);
@@ -92,7 +93,7 @@ export function useEntityCrud<T, TCreate, TUpdate, ID = number>(
       }));
       return updated;
     } catch (err: any) {
-      setState(prev => ({ ...prev, loading: false, error: err.message }));
+      setState(prev => ({ ...prev, loading: false, error: handleApiError(err, { silent: true }) }));
       throw err;
     }
   }, [usecase]);
@@ -107,7 +108,7 @@ export function useEntityCrud<T, TCreate, TUpdate, ID = number>(
         loading: false,
       }));
     } catch (err: any) {
-      setState(prev => ({ ...prev, loading: false, error: err.message }));
+      setState(prev => ({ ...prev, loading: false, error: handleApiError(err, { silent: true }) }));
       throw err;
     }
   }, [usecase]);

@@ -8,13 +8,14 @@ import { ErrorState } from '../../../../../../core/presentation/layouts/ui/state
 import { DataTable } from '../../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
-import { GenericCreateForm, type FieldConfig } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
+import { GenericCreateForm } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { getCreateRentContractFormSchema } from '../../../schemas/rentContractForm.schema';
-import { getCreateRentContractIndustryFormSchema } from '../../../schemas/rentContractIndustryForm.schema';
+import { buildRentContractFormFields, buildRentContractFormGroups, buildRentContractDefaultValues } from '../../../forms/rentContractFormConfig';
 import { FileSignature, Plus, Pencil, Trash2, History } from 'lucide-react';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
 import { getLocalizedName } from '../../../../../../core/presentation/utils/helpes';
 
 interface RentContractSectionProps {
@@ -54,7 +55,7 @@ export function RentContractSection({ plotId, dossierId }: RentContractSectionPr
       setIsCreateOpen(false);
       return res;
     } catch (err: any) {
-      toast.error(err?.message || t('rent_contract.create_error', 'investments') || 'Failed to create rent contract');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -68,7 +69,7 @@ export function RentContractSection({ plotId, dossierId }: RentContractSectionPr
       setEditingContract(null);
       return res;
     } catch (err: any) {
-      toast.error(err?.message || t('rent_contract.update_error', 'investments') || 'Failed to update rent contract');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -80,51 +81,13 @@ export function RentContractSection({ plotId, dossierId }: RentContractSectionPr
       toast.success(t('rent_contract.deleted', 'investments') || 'Rent contract deleted successfully');
       getContracts(listUrl);
     } catch (err: any) {
-      toast.error(err?.message || t('rent_contract.delete_error', 'investments') || 'Failed to delete rent contract');
+      handleApiError(err, { module: "investments" });
     }
     setDeletingContract(null);
   };
 
-  const fields: FieldConfig[] = [
-    { name: 'renter_name', type: 'alpha', label: t('rent_contract.renter_name', 'investments') || 'Renter Name', required: true, group: 'renter_info' },
-    { name: 'renter_phone', type: 'numeric', label: t('rent_contract.renter_phone', 'investments') || 'Phone', required: true, group: 'renter_info' },
-    { name: 'rent_contract_number', type: 'numeric', label: t('rent_contract.rent_contract_number', 'investments') || 'Contract Number', required: true, group: 'contract_details' },
-    { name: 'rent_contract_date', type: 'date', label: t('rent_contract.rent_contract_date', 'investments') || 'Contract Date', required: true, group: 'contract_details' },
-    { name: 'rent_area', type: 'number', label: t('rent_contract.rent_area', 'investments') || 'Rent Area (㎡)', required: true, group: 'renter_info' },
-    { name: 'rent_contract_duration', type: 'date', label: t('rent_contract.rent_contract_duration', 'investments') || 'Duration', required: true, group: 'contract_details' },
-    {
-      name: 'rent_contract_industry_id',
-      type: 'select-or-create',
-      searchable: true,
-      label: t('rent_contract.rent_contract_industry_id', 'investments') || 'Industry',
-      options: industries.map(i => ({ value: i.id, label: getLocalizedName(i.name), is_default: i.is_default })),
-      createTitle: t('rent_contract_industries.add', 'investments') || 'Add Industry',
-      renderCreateForm: (onSuccess, onCancel) => (
-        <GenericCreateForm
-          schema={getCreateRentContractIndustryFormSchema(t)}
-          fields={[
-            { name: 'name', type: 'alpha', label: t('rent_contract_industries.name', 'investments') || 'Name', required: true },
-          ]}
-          onSubmit={async (data) => {
-            const res = await createIndustry(data);
-            await getIndustries('/investments/rent-contract-industries?is_active=true');
-            return res;
-          }}
-          onSuccess={(id, result) => {
-            onSuccess(id ?? result?.data?.id, result?.data ?? result);
-          }}
-          onCancel={onCancel}
-          submitLabel={t('rent_contract_industries.add', 'investments') || 'Add Industry'}
-        />
-      ),
-      group: 'contract_details',
-    },
-  ];
-
-  const formGroups = [
-    { group: 'renter_info', title: t('rent_contract.group_renter_info', 'investments') || 'Renter Information', columns: 2 },
-    { group: 'contract_details', title: t('rent_contract.group_contract_details', 'investments') || 'Contract Details', columns: 2 },
-  ];
+  const fields = buildRentContractFormFields(t, { industries, createIndustry, getIndustries });
+  const formGroups = buildRentContractFormGroups(t);
 
   const columns = [
     { key: "renter_name", label: t("rent_contract.renter_name", "investments") || "Renter Name", width: 160 },
@@ -205,15 +168,7 @@ export function RentContractSection({ plotId, dossierId }: RentContractSectionPr
             schema={getCreateRentContractFormSchema(t)}
             fields={fields}
             groups={formGroups}
-            defaultValues={{
-              renter_name: editingContract.renter_name,
-              renter_phone: editingContract.renter_phone,
-              rent_contract_number: editingContract.rent_contract_number,
-              rent_contract_date: editingContract.rent_contract_date,
-              rent_area: editingContract.rent_area,
-              rent_contract_duration: editingContract.rent_contract_duration,
-              rent_contract_industry_id: editingContract.rent_contract_industry_id ?? null,
-            }}
+            defaultValues={buildRentContractDefaultValues(editingContract)}
             onSubmit={handleUpdate}
             onSuccess={() => setEditingContract(null)}
             onCancel={() => setEditingContract(null)}

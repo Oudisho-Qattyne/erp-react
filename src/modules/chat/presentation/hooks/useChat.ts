@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react"
 import { useApiClient } from "../../../../core/presentation/context/api/ApiClinetProvider"
-import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import { createChatRepository } from "../../infrastructure/repositories/ChatRepository"
 import { createManageChatUseCase } from "../../application/usecases/manageChatUseCase"
+import { handleApiError } from "../../../../core/presentation/utils/handleApiError"
 import { createEcho } from "../../../../core/infrastructure/echo/echo"
 import { subscribeUserChannel, subscribeOnlineChannel, createMessageChannelUseCase } from "../../application/usecases/chatEchoUseCase"
 import type { ChatEchoCallbacks } from "../../application/usecases/chatEchoUseCase"
@@ -13,7 +13,6 @@ import type { SendMessageDto } from "../../application/dtos/SendMessageDto"
 import type { MessageEventData, ConversationEventData } from "../../application/dtos/chatEventData"
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse"
 import type { DpomainResponsePaginated } from "../../../hr/domain/entities/common/DomainResponsePaginated"
-import { toast } from "sonner"
 import { playSentSound, playReceivedSound } from "../../../../core/infrastructure/audio/chatSounds"
 import { useIdempotency } from "../../../../core/presentation/hooks/useIdempotency"
 
@@ -61,7 +60,6 @@ export interface UseChatReturn {
 
 export const useChat = (currentUserId?: number): UseChatReturn => {
   const apiClient = useApiClient()
-  const { t } = useLanguage()
 
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [messages, setMessages] = useState<Message[]>([])
@@ -113,13 +111,11 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
       if (res.pagination?.hasMore !== undefined) setConversationsHasMore(res.pagination?.hasMore)
       return res
     } catch (err: any) {
-      const msg = err?.message || t("chat.conversations_load_error", "chat")
-      setFnError("fetchConversations", msg)
-      toast.error(msg)
+      setFnError("fetchConversations", handleApiError(err, { module: "chat" }))
     } finally {
       setFnLoading("fetchConversations", false)
     }
-  }, [useCase, t])
+  }, [useCase])
 
   const fetchMoreConversations = useCallback(async () => {
     if (conversationsLoadingMore || !conversationsHasMore) return
@@ -131,11 +127,11 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
       setConversationsPage(nextPage)
       if (res.pagination?.hasMore !== undefined) setConversationsHasMore(res.pagination?.hasMore)
     } catch (err: any) {
-      toast.error(err?.message || t("chat.conversations_load_error", "chat"))
+      handleApiError(err, { module: "chat" })
     } finally {
       setConversationsLoadingMore(false)
     }
-  }, [useCase, conversationsPage, conversationsHasMore, conversationsLoadingMore, t])
+  }, [useCase, conversationsPage, conversationsHasMore, conversationsLoadingMore])
 
   const fetchMessages = useCallback(async (conversationId: number) => {
     setFnLoading("fetchMessages", true)
@@ -149,13 +145,11 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
       if (res.pagination?.hasMore !== undefined) setMessagesHasMore(res.pagination?.hasMore)
       return res
     } catch (err: any) {
-      const msg = err?.message || t("chat.messages_load_error", "chat")
-      setFnError("fetchMessages", msg)
-      toast.error(msg)
+      setFnError("fetchMessages", handleApiError(err, { module: "chat" }))
     } finally {
       setFnLoading("fetchMessages", false)
     }
-  }, [useCase, t])
+  }, [useCase])
 
   const fetchMoreMessages = useCallback(async () => {
     const convId = currentConversationRef.current?.id
@@ -169,11 +163,11 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
       setMessagesPage(nextPage)
       if (res.pagination?.hasMore !== undefined) setMessagesHasMore(res.pagination?.hasMore)
     } catch (err: any) {
-      toast.error(err?.message || t("chat.messages_load_error", "chat"))
+      handleApiError(err, { module: "chat" })
     } finally {
       setMessagesLoadingMore(false)
     }
-  }, [useCase, messagesPage, messagesHasMore, messagesLoadingMore, t])
+  }, [useCase, messagesPage, messagesHasMore, messagesLoadingMore])
 
   const selectConversation = useCallback(async (conversation: Conversation) => {
     setCurrentConversation(conversation)
@@ -192,14 +186,12 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
       if (res) playSentSound()
       return res
     } catch (err: any) {
-      const msg = err?.message || t("chat.send_error", "chat")
-      setFnError("sendMessage", msg)
-      toast.error(msg)
+      setFnError("sendMessage", handleApiError(err, { module: "chat" }))
       throw err
     } finally {
       setFnLoading("sendMessage", false)
     }
-  }, [useCase, idem, t])
+  }, [useCase, idem])
 
   const fetchUsers = useCallback(async (name?: string, email?: string) => {
     setFnLoading("fetchUsers", true)
@@ -212,13 +204,11 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
       if (res.pagination?.hasMore !== undefined) setUsersHasMore(res.pagination?.hasMore)
       return res
     } catch (err: any) {
-      const msg = err?.message || t("chat.users_load_error", "chat")
-      setFnError("fetchUsers", msg)
-      toast.error(msg)
+      setFnError("fetchUsers", handleApiError(err, { module: "chat" }))
     } finally {
       setFnLoading("fetchUsers", false)
     }
-  }, [useCase, t])
+  }, [useCase])
 
   const fetchMoreUsers = useCallback(async () => {
     if (usersLoadingMore || !usersHasMore) return
@@ -230,11 +220,11 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
       setUsersPage(nextPage)
       if (res.pagination?.hasMore !== undefined) setUsersHasMore(res.pagination?.hasMore)
     } catch (err: any) {
-      toast.error(err?.message || t("chat.users_load_error", "chat"))
+      handleApiError(err, { module: "chat" })
     } finally {
       setUsersLoadingMore(false)
     }
-  }, [useCase, usersPage, usersNameSearch, usersEmailSearch, usersHasMore, usersLoadingMore, t])
+  }, [useCase, usersPage, usersNameSearch, usersEmailSearch, usersHasMore, usersLoadingMore])
 
   const clearMessages = useCallback(() => {
     setMessages([])
@@ -252,12 +242,11 @@ export const useChat = (currentUserId?: number): UseChatReturn => {
     try {
       await idem.run('markAsRead', { conversationId }, (key) => useCase.markAsRead(conversationId, key))
     } catch (err: any) {
-      const msg = err?.message || t("chat.mark_read_error", "chat")
-      setFnError("markAsRead", msg)
+      setFnError("markAsRead", handleApiError(err, { module: "chat" }))
     } finally {
       setFnLoading("markAsRead", false)
     }
-  }, [useCase, idem, t])
+  }, [useCase, idem])
 
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])

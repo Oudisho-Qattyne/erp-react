@@ -7,6 +7,7 @@ import type { DomainResponse } from '../../../../core/domain/common/responce/Dom
 import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
 import { createManageEmployeeUseCase } from '../../application/usecases/manageEmployeeUseCase';
 import { createEmployeeRepository } from '../../infrastructure/repositories';
+import { handleApiError } from '../../../../core/presentation/utils/handleApiError';
 import { useIdempotency } from '../../../../core/presentation/hooks/useIdempotency';
 
 export interface UseManageEmployeeParams {
@@ -115,7 +116,7 @@ export function useManageEmployee(params: UseManageEmployeeParams = {}): UseMana
         });
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to fetch employees');
+      setError(handleApiError(err, { silent: true, module: 'hr' }));
     } finally {
       setLoading(false);
     }

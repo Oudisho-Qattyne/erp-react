@@ -8,12 +8,14 @@ import { ErrorState } from '../../../../../../core/presentation/layouts/ui/state
 import { DataTable } from '../../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
-import { GenericCreateForm, type FieldConfig } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
+import { GenericCreateForm } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { getCreateContractFormSchema } from '../../../schemas/contractForm.schema';
+import { buildContractFormFields, buildContractDefaultValues } from '../../../forms/contractFormConfig';
 import { FileSignature, Plus, Eye, Pencil, Trash2, History } from 'lucide-react';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
 
 interface ContractsSectionProps {
   plotId: string;
@@ -46,7 +48,7 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
       setIsCreateOpen(false);
       return res;
     } catch (err: any) {
-      toast.error(err?.message || t('contract.create_error', 'investments') || 'Failed to create contract');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -60,7 +62,7 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
       setEditingContract(null);
       return res;
     } catch (err: any) {
-      toast.error(err?.message || t('contract.update_error', 'investments') || 'Failed to update contract');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -72,23 +74,12 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
       toast.success(t('contract.deleted', 'investments') || 'Contract deleted successfully');
       getContracts(listUrl);
     } catch (err: any) {
-      toast.error(err?.message || t('contract.delete_error', 'investments') || 'Failed to delete contract');
+      handleApiError(err, { module: "investments" });
     }
     setDeletingContract(null);
   };
 
-  const fields: FieldConfig[] = [
-    { name: 'contract_number', type: 'numeric', label: t('contract.contract_number', 'investments') || 'Contract Number', required: true },
-    { name: 'contract_date', type: 'date', label: t('contract.contract_date', 'investments') || 'Contract Date', required: true },
-    { name: 'unit_price_per_square_meter', type: 'number', label: t('contract.unit_price_per_square_meter', 'investments') || 'Unit Price / m²', required: true },
-    { name: 'weighting_factor', type: 'number', label: t('contract.weighting_factor', 'investments') || 'Weighting Factor', required: true },
-    {
-      name: 'payment_method', type: 'select', label: t('contract.payment_method', 'investments') || 'Payment Method', required: true, options: [
-        { value: 'cash', label: t('contract.payment_method_cash', 'investments') || 'Cash' },
-        { value: 'installment', label: t('contract.payment_method_installment', 'investments') || 'Installment' },
-      ]
-    },
-  ];
+  const fields = buildContractFormFields(t);
 
   const columns = [
     { key: "contract_number", label: t("contract.contract_number", "investments") || "Contract Number", width: 160 },
@@ -176,13 +167,7 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
           <GenericCreateForm
             schema={getCreateContractFormSchema(t)}
             fields={fields}
-            defaultValues={{
-              contract_number: editingContract.contract_number,
-              contract_date: editingContract.contract_date,
-              unit_price_per_square_meter: editingContract.unit_price_per_square_meter,
-              weighting_factor: editingContract.weighting_factor,
-              payment_method: editingContract.payment_method,
-            }}
+            defaultValues={buildContractDefaultValues(editingContract)}
             onSubmit={handleUpdate}
             onSuccess={() => setEditingContract(null)}
             onCancel={() => setEditingContract(null)}

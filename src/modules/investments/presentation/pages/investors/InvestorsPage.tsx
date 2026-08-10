@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import type { Investor } from '../../../domain/entities/investor';
@@ -10,6 +10,7 @@ import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/Er
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { YesNo } from '../../../../../core/presentation/layouts/ui/card/YesNo';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { Eye, Trash2, Filter, Search, History } from 'lucide-react';
@@ -18,54 +19,18 @@ import { useNavigate } from 'react-router-dom';
 export function InvestorsPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { entities: investors, getAll, remove, loadingMap, errorMap, pagination } = useEntityCrud<Investor>('/investments/investors', '/investments/investors');
+  const { entities: investors, getAll, remove, loadingMap, errorMap, pagination, list } = useEntityCrud<Investor>(
+    '/investments/investors',
+    '/investments/investors',
+    { listState: true }
+  );
 
   const [localSearch, setLocalSearch] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<Investor | null>(null);
   const [auditItem, setAuditItem] = useState<Investor | null>(null);
 
-  // Table State
-  const [sortColumn, setSortColumn] = useState<string | undefined>(undefined);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(25);
-
   // Filter State
-  const [extraFilters, setExtraFilters] = useState<Record<string, any>>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-  // Fetch Data (Server Side)
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (searchQuery) params.append('search', searchQuery);
-
-    for (const [key, val] of Object.entries(extraFilters)) {
-      if (val !== undefined && val !== '') {
-        params.append(key, String(val));
-      }
-    }
-
-    if (sortColumn) {
-      params.append('sortColumn', sortColumn);
-      params.append('sortOrder', sortOrder);
-    }
-
-    params.append('page', String(page));
-    params.append('per_page', String(perPage));
-
-    getAll(`/investments/investors?${params.toString()}`);
-  }, [searchQuery, sortColumn, sortOrder, page, perPage, extraFilters]);
-
-  const handleSort = (key: string) => {
-    if (sortColumn === key) {
-      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortColumn(key);
-      setSortOrder('asc');
-    }
-    setPage(1);
-  };
 
   const handleApplyFilter = (values: Record<string, any>) => {
     const parsed: Record<string, any> = {};
@@ -75,16 +40,20 @@ export function InvestorsPage() {
       else if (val === 'false') parsed[key] = false;
       else parsed[key] = val;
     }
-    setExtraFilters(parsed);
-    setPage(1);
+    list.setFilter(parsed);
     setIsFilterOpen(false);
   };
 
   const handleResetFilter = () => {
-    setExtraFilters({});
-    setPage(1);
+    list.resetFilter();
+    setLocalSearch('');
     setIsFilterOpen(false);
   };
+
+  const filterInitialValues = useMemo(() => {
+    const { search, sortColumn, sortOrder, ...rest } = list.filter;
+    return rest;
+  }, [list.filter]);
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
@@ -92,7 +61,7 @@ export function InvestorsPage() {
       await remove(confirmDelete.id);
       toast.success(t('investors.deleted', 'investments') || 'Investor deleted');
     } catch (err: any) {
-      toast.error(err?.message || t('investors.delete_error', 'investments') || 'Failed to delete investor');
+      handleApiError(err, { module: "investments" });
     }
     setConfirmDelete(null);
   };
@@ -210,7 +179,7 @@ export function InvestorsPage() {
         <Input type="text" value={localSearch} onChange={setLocalSearch}
           placeholder={t('common.search', 'shared') || 'Search...'}
           baseClasses={inputBaseClasses} className="w-64" />
-        <Button variant="primary" onClick={() => { setSearchQuery(localSearch); setPage(1) }} size="sm" leftIcon={<Search size={14} />}>
+        <Button variant="primary" onClick={() => { list.setSearch(localSearch) }} size="sm" leftIcon={<Search size={14} />}>
           {t('common.search', 'shared') || 'Search'}
         </Button>
         <Button variant="outline" onClick={() => setIsFilterOpen(true)} size="sm" leftIcon={<Filter size={14} />}>
@@ -224,13 +193,13 @@ export function InvestorsPage() {
       <FilterDialog
         isOpen={isFilterOpen}
         fields={filterFields}
-        initialValues={extraFilters}
+        initialValues={filterInitialValues}
         onFilter={handleApplyFilter}
         onCancel={() => setIsFilterOpen(false)}
         onReset={handleResetFilter}
       />
 
-      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => setPage(prev => prev)} />}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll(`/investments/investors?page=${list.page}&per_page=${list.perPage}`)} />}
 
       {!errorMap['getAll'] && (
         <DataTable
@@ -239,16 +208,16 @@ export function InvestorsPage() {
           rowKey="id"
           loading={loadingMap['getAll']}
           emptyMessage={t('investors.no_records', 'investments') || 'No investors found'}
-          sortColumn={sortColumn}
-          sortOrder={sortOrder}
-          onSort={handleSort}
+          sortColumn={list.filter.sortColumn}
+          sortOrder={list.filter.sortOrder}
+          onSort={list.setSort}
           pagination={{
             page: pagination?.currentPage || 1,
             totalPages: pagination?.lastPage || 1,
             totalItems: pagination?.total || 0,
-            onPageChange: (newPage: number) => setPage(newPage),
-            itemsPerPage: perPage,
-            onItemsPerPageChange: (size: number) => { setPerPage(size); setPage(1) },
+            onPageChange: list.setPage,
+            itemsPerPage: list.perPage,
+            onItemsPerPageChange: (size: number) => list.setPerPage(size),
             itemsPerPageOptions: [10, 25, 50, 100],
           }}
         />

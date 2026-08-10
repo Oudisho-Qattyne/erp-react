@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import type { Facility } from '../../../domain/entities/facility';
@@ -12,8 +12,10 @@ import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialo
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { Eye, Trash2, Search, History, Factory, Filter, X, MapPin, FileText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 import { PlotPickerDialog } from '../plots/components/PlotPickerDialog';
 import { DossierPickerDialog } from '../plots/components/DossierPickerDialog';
 
@@ -94,7 +96,7 @@ export function FacilitiesPage() {
       setConfirmDelete(null);
       getAll(`/investments/facilities?page=${page}&per_page=${perPage}`);
     } catch (err: any) {
-      toast.error(err?.message || t('facilities.delete_error', 'investments') || 'Failed to delete facility');
+      handleApiError(err, { module: "investments" });
     }
   };
 
@@ -205,6 +207,12 @@ export function FacilitiesPage() {
 
   const columns = [
     { key: "name", label: t("facilities.name", "investments") || "Name", width: 180, sortable: true },
+    {
+      key: "partnership_type",
+      label: t("facilities.partnership_type", "investments") || "Partnership Type",
+      width: 150,
+      render: (row: Facility) => row.partnership_type ? getLocalizedName(row.partnership_type.name) : '—',
+    },
     { key: "city", label: t("facilities.city", "investments") || "City", width: 120, sortable: true },
     { key: "first_phone_number", label: t("facilities.first_phone_number", "investments") || "Phone", width: 140 },
     { key: "email", label: t("facilities.email", "investments") || "Email", width: 180 },

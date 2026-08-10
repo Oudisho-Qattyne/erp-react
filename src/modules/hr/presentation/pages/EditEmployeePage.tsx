@@ -10,6 +10,7 @@ import { ErrorState } from '../../../../core/presentation/layouts/ui/state/Error
 import { ArrowRight } from 'lucide-react';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import { useManageEmployee } from '../hooks/useEmployees';
+import { handleApiError } from '../../../../core/presentation/utils/handleApiError';
 
 export function EditEmployeePage() {
   const { id } = useParams<{ id: string }>();
@@ -94,7 +95,7 @@ export function EditEmployeePage() {
           setError(t('edit_employee.not_found', 'hr') || 'لم يتم العثور على الموظف');
         }
       } catch (err: any) {
-        setError(err.message || t('edit_employee.load_error', 'hr') || 'حدث خطأ أثناء تحميل بيانات الموظف');
+        setError(handleApiError(err, { module: "hr", silent: true }));
       } finally {
         setLoading(false);
       }
@@ -114,7 +115,7 @@ export function EditEmployeePage() {
       navigate('/hr/employees')
     } catch (err: any) {
       
-      setError(err.message || t('edit_employee.update_error', 'hr') || 'فشل في تحديث بيانات الموظف');
+      setError(handleApiError(err, { silent: true, module: "hr" }));
       throw err
     } finally {
       setSaving(false);

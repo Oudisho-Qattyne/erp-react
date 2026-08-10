@@ -4,6 +4,7 @@ import arLocales from './presentation/locales/ar.json'
 import { Users, CalendarClock, Database, BarChart3, CalendarDays, UserCheck, Wallet, Gauge, FileText, FileSearch, SlidersHorizontal, Flag, Building2, Map, GraduationCap, BookOpen, Beaker, Briefcase, BadgeCheck, Heart, StarIcon,  } from 'lucide-react'
 import type { Module } from '../../core/moduleRegistry'
 import { registerHrApi, type HrApi } from '../../core/registry/hr/hrRegistry'
+import { registerPersonDetailRoute } from '../../core/registry/person/personRegistry'
 import { EmployeePickerDialog } from './presentation/components/employee/EmployeePickerDialog'
 import { Navigate } from 'react-router-dom'
 // import CreateUserPage from './presentation/pages/CreateUserPage'
@@ -42,6 +43,13 @@ const createHrApi = (): HrApi => ({
 
 const hrApi = createHrApi()
 registerHrApi(hrApi)
+
+registerPersonDetailRoute({
+  type: 'employee',
+  routePattern: '/hr/employees/:id',
+  resolve: (id) => `/hr/employees/${id}`,
+  permission: 'hr.employees.view',
+})
 
 const usersModule: Module = {
   name: 'hr',

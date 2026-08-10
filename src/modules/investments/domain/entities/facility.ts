@@ -1,5 +1,6 @@
 import type { Dossier } from "./dossier";
 import type { Plot } from "./plot";
+import type { PartnershipType } from "./partnershipType";
 
 export interface Facility {
   id: number;
@@ -8,6 +9,8 @@ export interface Facility {
   plot_dossier_id: number;
   plot_dossier?:Dossier;
   name: string;
+  partnership_type_id?: number;
+  partnership_type?: PartnershipType;
   address: string;
   city: string;
   first_phone_number: string;

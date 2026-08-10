@@ -5,6 +5,7 @@ import type { Plot } from '../../../../domain/entities/plot';
 import { Button } from '../../../../../../core/presentation/layouts/ui/buttons/Button';
 import { LoadingState } from '../../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
+import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
 import { MapPin } from 'lucide-react';
 
 interface Props {
@@ -29,7 +30,7 @@ export function PlotDetailsSection({ plotId, plot: plotProp }: Props) {
         if (res?.data) setPlot(res.data);
         else setError(t('plots.not_found', 'investments') || 'Plot not found');
       })
-      .catch((err) => setError(err?.message || t('plots.load_error', 'investments') || 'Failed to load plot'));
+      .catch((err) => setError(handleApiError(err, { module: "investments", silent: true })));
   }, [plotId, plotProp]);
 
   if (!plotId) return null;
@@ -60,33 +61,20 @@ export function PlotDetailsSection({ plotId, plot: plotProp }: Props) {
             <span className="text-sm text-text-muted">{t('plots.plot_classification_id', 'investments') || 'Classification'}</span>
             <p className="font-medium text-text">{plot.plot_classification?.name || plot.plot_classification_name || '—'}</p>
           </div>
-              <div className="space-y-1">
-                  <span className="text-sm text-text-muted">{t('plots.current_condition', 'investments') || 'Current Condition'}</span>
-                  <div className="font-medium text-text">
-                    {plot?.service_conditions?.length
-                      ? plot.service_conditions.map((sc, i) => (
-                          <div key={i} className="flex items-center gap-2">
-                            <span>{sc.name}</span>
-                            {sc.note && <span className="text-xs text-text-muted">({sc.note})</span>}
-                          </div>
-                        ))
-                      : '—'}
+          <div className="space-y-1">
+            <span className="text-sm text-text-muted">{t('plots.service_status_conditions', 'investments') || 'Service Status Conditions'}</span>
+            <div className="font-medium text-text">
+              {plot?.service_status_conditions?.length
+                ? plot.service_status_conditions.map((sc, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <span>{sc.name}</span>
+                    {sc.service_status && <span className="text-xs text-primary">[{sc.service_status}]</span>}
+                    {sc.note && <span className="text-xs text-text-muted">({sc.note})</span>}
                   </div>
-                </div>
-              <div className="space-y-1">
-                  <span className="text-sm text-text-muted">{t('plots.service_status_conditions', 'investments') || 'Service Status Conditions'}</span>
-                  <div className="font-medium text-text">
-                    {plot?.service_status_conditions?.length
-                      ? plot.service_status_conditions.map((sc, i) => (
-                          <div key={i} className="flex items-center gap-2">
-                            <span>{sc.name}</span>
-                            {sc.service_status && <span className="text-xs text-primary">[{sc.service_status}]</span>}
-                            {sc.note && <span className="text-xs text-text-muted">({sc.note})</span>}
-                          </div>
-                        ))
-                      : '—'}
-                  </div>
-                </div>
+                ))
+                : '—'}
+            </div>
+          </div>
           <div className="space-y-1">
             <span className="text-sm text-text-muted">{t('plots.location', 'investments') || 'Location'}</span>
             <div className="flex items-center gap-2">

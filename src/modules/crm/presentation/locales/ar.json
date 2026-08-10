@@ -1,0 +1,43 @@
+{
+  "title": "إدارة العملاء",
+  "navigation": {
+    "title": "إدارة العملاء",
+    "persons": {
+      "title": "الأشخاص"
+    }
+  },
+  "persons": {
+    "title": "الأشخاص",
+    "search_placeholder": "ابحث بالاسم أو رقم الهاتف أو البريد الإلكتروني أو واتساب...",
+    "no_data": "لا يوجد أشخاص",
+    "add": "إضافة شخص",
+    "load_error": "فشل تحميل الأشخاص",
+    "person_name": "الاسم",
+    "primary_phone": "الهاتف الأساسي",
+    "secondary_phone": "الهاتف الثانوي",
+    "email": "البريد الإلكتروني",
+    "whatsapp": "واتساب",
+    "telegram": "تيليغرام",
+    "x": "إكس",
+    "linkedin": "لينكد إن",
+    "facebook": "فيسبوك",
+    "type": "النوع",
+    "type_employee": "موظف",
+    "type_investor": "مستثمر"
+  },
+  "person": {
+    "name": "الاسم",
+    "primary_phone": "رقم الهاتف الأساسي",
+    "secondary_phone": "رقم الهاتف الثانوي",
+    "email": "البريد الإلكتروني",
+    "whatsapp": "واتساب",
+    "telegram": "تيليغرام",
+    "x": "منصة إكس",
+    "linkedin": "لينكد إن",
+    "facebook": "فيسبوك",
+    "personable_type": "نوع السجل المرتبط",
+    "personable_id": "السجل المرتبط",
+    "load_error": "فشل تحميل الأشخاص",
+    "not_found": "الشخص غير موجود"
+  }
+}

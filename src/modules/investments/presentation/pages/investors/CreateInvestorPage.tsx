@@ -5,6 +5,7 @@ import type { Investor } from '../../../domain/entities/investor';
 import { InvestorForm } from './components/InvestorForm';
 import { InvestorInterestFormModal } from './components/InvestorInterestFormModal';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
@@ -21,7 +22,7 @@ export function CreateInvestorPage() {
     try {
       return await create(data);
     } catch (err: any) {
-      toast.error(err?.message || t('investors.create_error', 'investments') || 'Failed to create investor');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };

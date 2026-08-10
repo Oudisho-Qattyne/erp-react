@@ -6,6 +6,7 @@ import Input from '../../../../../../core/presentation/layouts/ui/inputs/Input';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
 import { DossierPickerDialog } from './DossierPickerDialog';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
 import type { Plot } from '../../../../domain/entities/plot';
 import type { Dossier } from '../../../../domain/entities/dossier';
 import type { PlotStatusBody } from '../../../../domain/repositories/IPlotRepository';
@@ -62,7 +63,7 @@ export function ChangePlotStatusModal({ isOpen, onClose, plot, onSuccess }: Chan
       onSuccess();
       onClose();
     } catch (err: any) {
-      toast.error(err?.message || t('plots.status_update_error', 'investments') || 'Failed to update status');
+      handleApiError(err, { module: "investments" });
     } finally {
       setLoading(false);
     }

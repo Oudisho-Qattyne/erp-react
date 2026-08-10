@@ -3,6 +3,7 @@ import { useApiClient } from "../../../../../core/presentation/context/api/ApiCl
 import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nProvider"
 import { createLeaveBalanceRepository } from "../../../infrastructure/leaveBalance/repository"
 import { createManageLeaveBalanceUseCase } from "../../../application/usecases/leaveBalance/manageLeaveBalanceUseCase"
+import { handleApiError } from "../../../../../core/presentation/utils/handleApiError"
 import type { LeaveBalance } from "../../../domain/entities/leaveBalance/leaveBalance"
 import type { FilterLeaveBalancesDto } from "../../../application/dtos/LeaveBalance/FilterLeaveBalanceDto"
 import type { AdjustLeaveBalanceDto } from "../../../application/dtos/LeaveBalance/AdjustLeaveBalanceDto"
@@ -41,7 +42,7 @@ export interface UseLeaveBalanceReturn {
 
 export const useLeaveBalance = (): UseLeaveBalanceReturn => {
   const apiClient = useApiClient()
-  const { language, t } = useLanguage()
+  const { t } = useLanguage()
 
   const [myLeaveBalances, setMyLeaveBalances] = useState<LeaveBalance[]>([])
   const [employeeLeaveBalances, setEmployeeLeaveBalances] = useState<LeaveBalance[]>([])
@@ -94,13 +95,11 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err?.message || "Failed to fetch my leave balances"
-      setFnError("findAllMyLeaveBalances", msg)
-      toast.error(t("leave_balance.load_error", "hr").replace("{message}", msg))
+      setFnError("findAllMyLeaveBalances", handleApiError(err, { module: "hr" , passThrough:true }))
     } finally {
       setFnLoading("findAllMyLeaveBalances", false)
     }
-  }, [useCase, filter, t])
+  }, [useCase, filter])
 
   const findAllEmployeeLeaveBalances = useCallback(async (employeeId?: number) => {
     setFnLoading("findAllEmployeeLeaveBalances", true)
@@ -115,13 +114,11 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      const msg = err?.message || "Failed to fetch employee leave balances"
-      setFnError("findAllEmployeeLeaveBalances", msg)
-      toast.error(t("leave_balance.employee_load_error", "hr").replace("{message}", msg))
+      setFnError("findAllEmployeeLeaveBalances", handleApiError(err, { module: "hr" }))
     } finally {
       setFnLoading("findAllEmployeeLeaveBalances", false)
     }
-  }, [useCase, filter, t])
+  }, [useCase, filter])
 
   const adjustLeaveBalance = useCallback(async (adjust: AdjustLeaveBalanceDto) => {
     setFnLoading("adjustLeaveBalance", true)
@@ -130,9 +127,7 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
       await idem.run('adjust', adjust, (key) => useCase.adjustLeaveBalance(adjust, key))
       toast.success(t("leave_balance.adjusted", "hr"))
     } catch (err: any) {
-      const msg = err?.message || "Failed to adjust leave balance"
-      setFnError("adjustLeaveBalance", msg)
-      toast.error(t("leave_balance.adjust_error", "hr").replace("{message}", msg))
+      setFnError("adjustLeaveBalance", handleApiError(err, { module: "hr" }))
       throw err
     } finally {
       setFnLoading("adjustLeaveBalance", false)

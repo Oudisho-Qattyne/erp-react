@@ -11,6 +11,7 @@ import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialo
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { Eye, Trash2, Search, History, FileText, Filter, X, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { PlotPickerDialog } from '../plots/components/PlotPickerDialog';
@@ -167,7 +168,7 @@ export function DossiersPage() {
       toast.success(t('dossier.deleted', 'investments') || 'Dossier deleted successfully');
       setConfirmDelete(null);
     } catch (err: any) {
-      toast.error(err?.message || t('dossier.delete_error', 'investments') || 'Failed to delete dossier');
+      handleApiError(err, { module: "investments" });
     }
   };
 
@@ -227,9 +228,8 @@ export function DossiersPage() {
       render: (row: Dossier) => (
         <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
           <Button variant="ghost" size="sm" onClick={() => {
-            if (row.plot?.id) {
-              navigate(`/investments/plots/${row.plot_id}/dossiers/${row.id}`);
-            }
+            const pid = row.plot?.id || row.plot_id;
+              navigate(`/investments/plots/${pid}/dossiers/${row.id}`);
           }} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.plot-dossier.view"
             disabled={!row.plot?.id}>
             <Eye size={16} />

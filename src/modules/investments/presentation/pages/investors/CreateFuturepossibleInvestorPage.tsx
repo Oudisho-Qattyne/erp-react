@@ -5,6 +5,7 @@ import type { Investor } from '../../../domain/entities/investor';
 import { InvestorForm } from './components/InvestorForm';
 import { InvestorInterestFormModal } from './components/InvestorInterestFormModal';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
@@ -22,7 +23,7 @@ export function CreateFuturePossibleInvestorPage() {
       const newdata = {...data , is_possible_investor_in_future : true}
       return await create(newdata);
     } catch (err: any) {
-      toast.error(err?.message || t('investors.create_error', 'investments') || 'Failed to create possible investor');
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };

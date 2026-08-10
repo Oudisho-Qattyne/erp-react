@@ -3,6 +3,7 @@ import { useApiClient } from "../../../../core/presentation/context/api/ApiCline
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import { createInstallmentRepository } from "../../infrastructure/repositories/InstallmentRepository"
 import { createManageInstallmentsUseCase } from "../../application/usecases/manageInstallments"
+import { handleApiError } from "../../../../core/presentation/utils/handleApiError"
 import type { Contract } from "../../domain/entities/contract"
 import type { Installment } from "../../domain/entities/installment"
 import { toast } from "sonner"
@@ -52,9 +53,7 @@ export const useInstallments = (): UseInstallmentsReturn => {
       setContract(res.data)
       toast.success(t("installments.pay_success", "investments") || "Installment paid successfully")
     } catch (err: any) {
-      const msg = err?.message || "Failed to pay installment"
-      setFnError("payNextUnpaidInstallment", msg)
-      toast.error(msg || t("installments.pay_error", "investments"))
+      setFnError("payNextUnpaidInstallment", handleApiError(err, { module: "investments" }))
       throw err
     } finally {
       setFnLoading("payNextUnpaidInstallment", false)
@@ -69,9 +68,7 @@ export const useInstallments = (): UseInstallmentsReturn => {
       setContract(res.data)
       toast.success(t("installments.update_date_success", "investments") || "Payment date updated successfully")
     } catch (err: any) {
-      const msg = err?.message || "Failed to update payment date"
-      setFnError("updatePaymentDate", msg)
-      toast.error(msg || t("installments.update_date_error", "investments"))
+      setFnError("updatePaymentDate", handleApiError(err, { module: "investments" }))
       throw err
     } finally {
       setFnLoading("updatePaymentDate", false)

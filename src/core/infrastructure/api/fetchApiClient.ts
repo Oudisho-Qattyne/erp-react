@@ -49,7 +49,13 @@ export function createFetchApiClient(
     }
 
     const requestUrl = buildUrl(url, config.params);
-    const response = await fetch(requestUrl, { ...config, headers });
+    let response: Response;
+    try {
+      response = await fetch(requestUrl, { ...config, headers });
+    } catch {
+      // Network failure (offline, DNS, CORS, etc.) — status 0 marks it as a connection error
+      throw createApiError('Failed to fetch', undefined, 0);
+    }
 
     // Handle error responses (non‑2xx)
     if (!response.ok) {

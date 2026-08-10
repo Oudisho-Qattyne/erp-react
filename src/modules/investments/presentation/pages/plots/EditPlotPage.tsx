@@ -10,6 +10,7 @@ import { ArrowRight } from 'lucide-react';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { useStorage } from '../../../../../core/registry/storage/StorageProvider';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 
 export function EditPlotPage() {
   const { t } = useLanguage();
@@ -37,7 +38,7 @@ export function EditPlotPage() {
     try {
       return await update(Number(id), data);
     } catch (err: any) {
-      toast.error(err?.message || (t('plots.update_error', 'investments') || 'Failed to update plot').replace('{name}', entityName));
+      handleApiError(err, { module: "investments" });
       throw err;
     }
   };
@@ -73,7 +74,6 @@ export function EditPlotPage() {
           plot_classification_id: plot.plot_classification_id,
           latitude: plot.latitude,
           longitude: plot.longitude,
-          service_conditions:plot.service_conditions.map(sc => ({id:sc.id , note:sc.note})),
           service_status_conditions:plot.service_status_conditions?.map(sc => ({id:sc.id , note:sc.note , service_status:sc.service_status})),
           status: plot.status
         }}

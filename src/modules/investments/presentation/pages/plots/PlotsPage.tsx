@@ -10,6 +10,7 @@ import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/Er
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { toast } from 'sonner';
+import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { Eye, Trash2, MapPin, History, Filter, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { EntityWithNameOnly } from '../../../../../core/domain/entities/EntityWithNameOnly';
@@ -103,7 +104,7 @@ export function PlotsPage() {
       toast.success((t('plots.deleted', 'investments') || 'Plot deleted').replace('{name}', entityName));
       setPage(prev => prev);
     } catch (err: any) {
-      toast.error(err?.message || (t('plots.delete_error', 'investments') || 'Failed to delete plot').replace('{name}', entityName));
+      handleApiError(err, { module: "investments" });
     }
     setConfirmDelete(null);
   };

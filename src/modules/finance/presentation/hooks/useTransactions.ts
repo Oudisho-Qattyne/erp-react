@@ -3,6 +3,7 @@ import { useApiClient } from "../../../../core/presentation/context/api/ApiCline
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import { createTransactionRepository } from "../../infrastructure/repositories/TransactionRepository"
 import { createManageTransactionsUseCase } from "../../application/usecases/manageTransactionsUseCase"
+import { handleApiError } from "../../../../core/presentation/utils/handleApiError"
 import type { CreateTransactionDto, TransactionFilters, UpdateTransactionStatusDto } from "../../application/dtos/transactionDtos"
 import type { Transaction } from "../../domain/entities/Transaction"
 import { toast } from "sonner"
@@ -83,9 +84,7 @@ export const useTransactions = (): UseTransactionsReturn => {
         hasMore: res.pagination?.hasMore || false,
       })
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("transaction.load_error", MODULE) || "Failed to load transactions"
-      setFnError("findAllTransactions", msg)
-      toast.error(msg)
+      setFnError("findAllTransactions", handleApiError(err, { module: MODULE }))
     } finally {
       setFnLoading("findAllTransactions", false)
     }
@@ -99,9 +98,7 @@ export const useTransactions = (): UseTransactionsReturn => {
       setTransaction(res.data)
       toast.success(t("transaction.created", MODULE) || "Transaction created successfully")
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("transaction.create_error", MODULE) || "Failed to create transaction"
-      setFnError("createTransaction", msg)
-      toast.error(msg)
+      setFnError("createTransaction", handleApiError(err, { module: MODULE }))
       throw err
     } finally {
       setFnLoading("createTransaction", false)
@@ -116,9 +113,7 @@ export const useTransactions = (): UseTransactionsReturn => {
       setTransaction(res.data)
       toast.success(t("transaction.updated", MODULE) || "Transaction updated successfully")
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : t("transaction.update_error", MODULE) || "Failed to update transaction"
-      setFnError("updateTransactionStatus", msg)
-      toast.error(msg)
+      setFnError("updateTransactionStatus", handleApiError(err, { module: MODULE }))
       throw err
     } finally {
       setFnLoading("updateTransactionStatus", false)

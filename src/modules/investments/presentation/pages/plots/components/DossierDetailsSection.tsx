@@ -5,6 +5,7 @@ import type { Dossier } from '../../../../domain/entities/dossier';
 import { LoadingState } from '../../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { InfoRow } from '../../../../../../core/presentation/layouts/ui/card/InfoRow';
+import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
 import { FileText } from 'lucide-react';
 
 interface Props {
@@ -40,7 +41,7 @@ export function DossierDetailsSection({ dossierId, plotId, dossier: dossierProp 
         if (res?.data) setDossier(res.data);
         else setError(t('dossier.not_found', 'investments') || 'Dossier not found');
       })
-      .catch((err) => setError(err?.message || t('dossier.load_error', 'investments') || 'Failed to load dossier'));
+      .catch((err) => setError(handleApiError(err, { module: "investments", silent: true })));
   }, [dossierId, plotId, dossierProp]);
 
   if (!dossierId || !plotId) return null;

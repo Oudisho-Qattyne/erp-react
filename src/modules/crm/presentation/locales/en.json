@@ -1,0 +1,43 @@
+{
+  "title": "CRM",
+  "navigation": {
+    "title": "CRM",
+    "persons": {
+      "title": "Persons"
+    }
+  },
+  "persons": {
+    "title": "Persons",
+    "search_placeholder": "Search by name, phone, email, or whatsapp...",
+    "no_data": "No persons found",
+    "add": "Add Person",
+    "load_error": "Failed to load persons",
+    "person_name": "Name",
+    "primary_phone": "Primary Phone",
+    "secondary_phone": "Secondary Phone",
+    "email": "Email",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "x": "X",
+    "linkedin": "LinkedIn",
+    "facebook": "Facebook",
+    "type": "Type",
+    "type_employee": "Employee",
+    "type_investor": "Investor"
+  },
+  "person": {
+    "name": "Name",
+    "primary_phone": "Primary Phone Number",
+    "secondary_phone": "Secondary Phone Number",
+    "email": "Email",
+    "whatsapp": "WhatsApp",
+    "telegram": "Telegram",
+    "x": "X Platform",
+    "linkedin": "LinkedIn",
+    "facebook": "Facebook",
+    "personable_type": "Person Type",
+    "personable_id": "Linked Record",
+    "load_error": "Failed to load persons",
+    "not_found": "Person not found"
+  }
+}

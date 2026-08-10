@@ -19,7 +19,6 @@ export interface Plot {
   plot_classification?: PlotClassification;
   plot_area_name: string;
   plot_classification_name: string;
-  service_conditions:PlotServiceCondition[]
   service_status_conditions:PlotServiceStatusCondition[]
   // notes?: string;
   status_date?: string;

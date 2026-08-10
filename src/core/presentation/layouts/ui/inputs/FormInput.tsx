@@ -146,7 +146,6 @@ export function FormInput<T extends FieldValues>({
   const finalRegex = computed.regex !== undefined ? computed.regex : regex;
 
   // Map nested array errors from react-hook-form (set by server validationErrors)
-  // e.g. errors.service_conditions[0].id → { 0: { service_condition: "msg" } }
   const combinedMatrixErrors = useMemo(() => {
     if (type !== 'data-matrix') return matrixErrors;
     const merged: Record<number, Record<string, string>> = {};
@@ -287,7 +286,7 @@ export function FormInput<T extends FieldValues>({
         requiredPermission={requiredPermission}
         createButtonPermission={createButtonPermission}
       />
-      {error && <div className={errorClasses}>{t(`validation.${error}`, 'shared') || error}</div>}
+      {error && <div className={errorClasses}>{error}</div>}
       {hint && !error && <div className={hintClasses}>{hint}</div>}
     </div>
   );
