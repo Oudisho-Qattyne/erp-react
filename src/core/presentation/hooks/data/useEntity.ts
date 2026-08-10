@@ -246,6 +246,7 @@ export function useEntityCrud<T extends { id: number }>(
   useEffect(() => {
     if (!listStateEnabled || !getUrl) return;
     const sep = getUrl.includes('?') ? '&' : '?';
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     getAll(`${getUrl}${sep}${buildListParams().toString()}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listStateEnabled, getUrl, buildListParams]);

@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import type { Facility } from '../../../domain/entities/facility';
@@ -22,38 +22,23 @@ import { DossierPickerDialog } from '../plots/components/DossierPickerDialog';
 export function FacilitiesPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { entities: facilities, getAll, remove, loadingMap, errorMap, pagination } = useEntityCrud<Facility>('/investments/facilities', '/investments/facilities');
+  const { entities: facilities, getAll, remove, loadingMap, errorMap, pagination, list } = useEntityCrud<Facility>(
+    '/investments/facilities',
+    '/investments/facilities',
+    { listState: true }
+  );
 
   const [localSearch, setLocalSearch] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<Facility | null>(null);
   const [auditItem, setAuditItem] = useState<Facility | null>(null);
 
-  const [sortColumn, setSortColumn] = useState<string | undefined>(undefined);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(25);
-
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterPlotId, setFilterPlotId] = useState<number | undefined>(undefined);
   const [filterPlotName, setFilterPlotName] = useState<string>('');
-  const [filterDossierId, setFilterDossierId] = useState<number | undefined>(undefined);
   const [filterDossierName, setFilterDossierName] = useState<string>('');
   const confirmedFilterRef = useRef<{ plotName: string; dossierName: string }>({ plotName: '', dossierName: '' });
   const [plotPickerOpen, setPlotPickerOpen] = useState(false);
   const [dossierPickerOpen, setDossierPickerOpen] = useState(false);
   const formRef = useRef<any>(null);
-
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (searchQuery) params.append('search', searchQuery);
-    if (sortColumn) { params.append('sortColumn', sortColumn); params.append('sortOrder', sortOrder); }
-    if (filterPlotId) params.append('plot_id', String(filterPlotId));
-    if (filterDossierId) params.append('plot_dossier_id', String(filterDossierId));
-    params.append('page', String(page));
-    params.append('per_page', String(perPage));
-    getAll(`/investments/facilities?${params.toString()}`);
-  }, [searchQuery, sortColumn, sortOrder, page, perPage, filterPlotId, filterDossierId]);
 
   const handlePlotPicked = (plots: Plot[]) => {
     const p = plots[0];
@@ -74,18 +59,7 @@ export function FacilitiesPage() {
   };
 
   const handleSearch = () => {
-    setSearchQuery(localSearch);
-    setPage(1);
-  };
-
-  const handleSort = (column: string) => {
-    if (sortColumn === column) {
-      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortColumn(column);
-      setSortOrder('asc');
-    }
-    setPage(1);
+    list.setSearch(localSearch);
   };
 
   const handleDelete = async () => {
@@ -94,9 +68,8 @@ export function FacilitiesPage() {
       await remove(confirmDelete.id);
       toast.success(t('facilities.deleted', 'investments') || 'Facility deleted successfully');
       setConfirmDelete(null);
-      getAll(`/investments/facilities?page=${page}&per_page=${perPage}`);
+      getAll(`/investments/facilities?page=${list.page}&per_page=${list.perPage}`);
     } catch (err: any) {
-      handleApiError(err, { module: "investments" });
       handleApiError(err, { module: "investments" });
     }
   };
@@ -159,12 +132,12 @@ export function FacilitiesPage() {
   ];
 
   const filterInitialValues = useMemo(() => ({
-    plot_id: filterPlotId || '',
-    plot_dossier_id: filterDossierId || '',
-  }), [filterPlotId, filterDossierId]);
+    plot_id: (list.filter.plot_id as number | undefined) || '',
+    plot_dossier_id: (list.filter.plot_dossier_id as number | undefined) || '',
+  }), [list.filter]);
 
   const handleApplyFilter = (values: Record<string, any>) => {
-    const parsed: Record<string, any> = { page: 1, per_page: perPage };
+    const parsed: Record<string, any> = {};
     for (const [key, val] of Object.entries(values)) {
       if (val === '' || val === undefined) continue;
       if (key === 'plot_id' || key === 'plot_dossier_id') {
@@ -174,33 +147,29 @@ export function FacilitiesPage() {
       }
     }
     if (parsed.plot_id) {
-      setFilterPlotId(parsed.plot_id);
       confirmedFilterRef.current.plotName = filterPlotName;
     } else {
-      setFilterPlotId(undefined);
       setFilterPlotName('');
       confirmedFilterRef.current.plotName = '';
     }
     if (parsed.plot_dossier_id) {
-      setFilterDossierId(parsed.plot_dossier_id);
       confirmedFilterRef.current.dossierName = filterDossierName;
     } else {
-      setFilterDossierId(undefined);
       setFilterDossierName('');
       confirmedFilterRef.current.dossierName = '';
     }
-    setPage(1);
-    setSearchQuery('');
+    list.setFilter(parsed);
+    list.setSearch('');
     setLocalSearch('');
     setIsFilterOpen(false);
   };
 
   const handleResetFilter = () => {
-    setFilterPlotId(undefined);
+    list.resetFilter();
     setFilterPlotName('');
-    setFilterDossierId(undefined);
     setFilterDossierName('');
     confirmedFilterRef.current = { plotName: '', dossierName: '' };
+    setLocalSearch('');
     setIsFilterOpen(false);
   };
 
@@ -208,12 +177,6 @@ export function FacilitiesPage() {
 
   const columns = [
     { key: "name", label: t("facilities.name", "investments") || "Name", width: 180, sortable: true },
-    {
-      key: "partnership_type",
-      label: t("facilities.partnership_type", "investments") || "Partnership Type",
-      width: 150,
-      render: (row: Facility) => row.partnership_type ? getLocalizedName(row.partnership_type.name) : '—',
-    },
     {
       key: "partnership_type",
       label: t("facilities.partnership_type", "investments") || "Partnership Type",
@@ -315,7 +278,7 @@ export function FacilitiesPage() {
       </div>
 
       {errorMap["getAll"] ? (
-        <ErrorState message={errorMap["getAll"]} onRetry={() => getAll(`/investments/facilities?page=${page}&per_page=${perPage}`)} />
+        <ErrorState message={errorMap["getAll"]} onRetry={() => getAll(`/investments/facilities?page=${list.page}&per_page=${list.perPage}`)} />
       ) : (
         <DataTable
           columns={columns}
@@ -323,16 +286,16 @@ export function FacilitiesPage() {
           rowKey="id"
           loading={loadingMap["getAll"]}
           emptyMessage={t('facilities.no_records', 'investments') || 'No facilities found'}
-          sortColumn={sortColumn}
-          sortOrder={sortOrder}
-          onSort={handleSort}
+          sortColumn={list.filter.sortColumn}
+          sortOrder={list.filter.sortOrder}
+          onSort={list.setSort}
           pagination={{
             page: pagination?.currentPage || 1,
             totalPages: pagination?.lastPage || 1,
             totalItems: pagination?.total || 0,
-            onPageChange: (newPage: number) => setPage(newPage),
-            itemsPerPage: perPage,
-            onItemsPerPageChange: (size: number) => { setPerPage(size); setPage(1); },
+            onPageChange: list.setPage,
+            itemsPerPage: list.perPage,
+            onItemsPerPageChange: (size: number) => list.setPerPage(size),
             itemsPerPageOptions: [10, 25, 50, 100],
           }}
         />

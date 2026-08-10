@@ -85,8 +85,10 @@ export interface UseIdempotencyReturn {
   reset: () => void;
 }
 
+
 export function useIdempotency(): UseIdempotencyReturn {
   const keysRef = useRef<Map<string, string>>(new Map());
+  console.log(keysRef);
 
   const getKey = useCallback((action: string, data?: unknown): string => {
     const hash = hashString(`${action}|${hashData(data)}`).toString(36);

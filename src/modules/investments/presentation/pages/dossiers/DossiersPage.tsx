@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import type { Dossier } from '../../../domain/entities/dossier';
@@ -25,40 +25,24 @@ const statusStyles: Record<string, { color: string; bg: string }> = {
 export function DossiersPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { entities: dossiers, getAll, remove, loadingMap, errorMap, pagination } = useEntityCrud<Dossier>('/investments/dossiers', '/investments/dossiers');
+  const { entities: dossiers, getAll, remove, loadingMap, errorMap, pagination, list } = useEntityCrud<Dossier>(
+    '/investments/dossiers',
+    '/investments/dossiers',
+    { listState: true }
+  );
 
   const [localSearch, setLocalSearch] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<Dossier | null>(null);
   const [auditItem, setAuditItem] = useState<Dossier | null>(null);
 
-  const [sortColumn, setSortColumn] = useState<string | undefined>(undefined);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(25);
-
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [filterPlotId, setFilterPlotId] = useState<number | undefined>(undefined);
   const [filterPlotName, setFilterPlotName] = useState<string>('');
-  const [filterStatus, setFilterStatus] = useState<string>('');
   const confirmedFilterRef = useRef<{ plotName: string; status: string }>({ plotName: '', status: '' });
   const [plotPickerOpen, setPlotPickerOpen] = useState(false);
   const formRef = useRef<any>(null);
 
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (searchQuery) params.append('search', searchQuery);
-    if (sortColumn) { params.append('sortColumn', sortColumn); params.append('sortOrder', sortOrder); }
-    if (filterPlotId) params.append('plot_id', String(filterPlotId));
-    if (filterStatus) params.append('status', filterStatus);
-    params.append('page', String(page));
-    params.append('per_page', String(perPage));
-    getAll(`/investments/dossiers?${params.toString()}`);
-  }, [searchQuery, sortColumn, sortOrder, page, perPage, filterPlotId, filterStatus]);
-
   const handleSearch = () => {
-    setSearchQuery(localSearch);
-    setPage(1);
+    list.setSearch(localSearch);
   };
 
   const handlePlotPicked = (plots: Plot[]) => {
@@ -113,12 +97,12 @@ export function DossiersPage() {
   ];
 
   const filterInitialValues = useMemo(() => ({
-    plot_id: filterPlotId || '',
-    status: filterStatus || '',
-  }), [filterPlotId, filterStatus]);
+    plot_id: (list.filter.plot_id as number | undefined) || '',
+    status: (list.filter.status as string | undefined) || '',
+  }), [list.filter]);
 
   const handleApplyFilter = (values: Record<string, any>) => {
-    const parsed: Record<string, any> = { page: 1, per_page: perPage };
+    const parsed: Record<string, any> = {};
     for (const [key, val] of Object.entries(values)) {
       if (val === '' || val === undefined) continue;
       if (key === 'plot_id') {
@@ -128,37 +112,26 @@ export function DossiersPage() {
       }
     }
     if (parsed.plot_id) {
-      setFilterPlotId(parsed.plot_id);
       confirmedFilterRef.current.plotName = filterPlotName;
     } else {
-      setFilterPlotId(undefined);
       setFilterPlotName('');
       confirmedFilterRef.current.plotName = '';
     }
-    setFilterStatus(parsed.status || '');
-    confirmedFilterRef.current.status = parsed.status || '';
-    setPage(1);
-    setSearchQuery('');
+    const status = String(parsed.status || '');
+    if (status) parsed.status = status;
+    confirmedFilterRef.current.status = status;
+    list.setFilter(parsed);
+    list.setSearch('');
     setLocalSearch('');
     setIsFilterOpen(false);
   };
 
   const handleResetFilter = () => {
-    setFilterPlotId(undefined);
+    list.resetFilter();
     setFilterPlotName('');
-    setFilterStatus('');
     confirmedFilterRef.current = { plotName: '', status: '' };
+    setLocalSearch('');
     setIsFilterOpen(false);
-  };
-
-  const handleSort = (column: string) => {
-    if (sortColumn === column) {
-      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortColumn(column);
-      setSortOrder('asc');
-    }
-    setPage(1);
   };
 
   const handleDelete = async () => {
@@ -278,7 +251,7 @@ export function DossiersPage() {
       </div>
 
       {errorMap["getAll"] ? (
-        <ErrorState message={errorMap["getAll"]} onRetry={() => getAll(`/investments/dossiers?page=${page}&per_page=${perPage}`)} />
+        <ErrorState message={errorMap["getAll"]} onRetry={() => getAll(`/investments/dossiers?page=${list.page}&per_page=${list.perPage}`)} />
       ) : (
         <DataTable
           columns={columns}
@@ -286,16 +259,16 @@ export function DossiersPage() {
           rowKey="id"
           loading={loadingMap["getAll"]}
           emptyMessage={t('dossier.no_records', 'investments') || 'No dossiers found'}
-          sortColumn={sortColumn}
-          sortOrder={sortOrder}
-          onSort={handleSort}
+          sortColumn={list.filter.sortColumn}
+          sortOrder={list.filter.sortOrder}
+          onSort={list.setSort}
           pagination={{
             page: pagination?.currentPage || 1,
             totalPages: pagination?.lastPage || 1,
             totalItems: pagination?.total || 0,
-            onPageChange: (newPage: number) => setPage(newPage),
-            itemsPerPage: perPage,
-            onItemsPerPageChange: (size: number) => { setPerPage(size); setPage(1); },
+            onPageChange: list.setPage,
+            itemsPerPage: list.perPage,
+            onItemsPerPageChange: (size: number) => list.setPerPage(size),
             itemsPerPageOptions: [10, 25, 50, 100],
           }}
         />
@@ -308,7 +281,6 @@ export function DossiersPage() {
         onFilter={handleApplyFilter}
         onCancel={() => {
           setFilterPlotName(confirmedFilterRef.current.plotName);
-          setFilterStatus(confirmedFilterRef.current.status);
           setIsFilterOpen(false);
         }}
         onReset={handleResetFilter}

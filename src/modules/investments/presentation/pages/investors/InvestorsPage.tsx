@@ -50,10 +50,10 @@ export function InvestorsPage() {
     setIsFilterOpen(false);
   };
 
-  const filterInitialValues = useMemo(() => {
-    const { search, sortColumn, sortOrder, ...rest } = list.filter;
-    return rest;
-  }, [list.filter]);
+  const filterInitialValues = useMemo(
+    () => Object.fromEntries(Object.entries(list.filter).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k))),
+    [list.filter]
+  );
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
