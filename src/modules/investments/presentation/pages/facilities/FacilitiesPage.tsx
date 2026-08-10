@@ -97,6 +97,7 @@ export function FacilitiesPage() {
       getAll(`/investments/facilities?page=${page}&per_page=${perPage}`);
     } catch (err: any) {
       handleApiError(err, { module: "investments" });
+      handleApiError(err, { module: "investments" });
     }
   };
 
@@ -207,6 +208,12 @@ export function FacilitiesPage() {
 
   const columns = [
     { key: "name", label: t("facilities.name", "investments") || "Name", width: 180, sortable: true },
+    {
+      key: "partnership_type",
+      label: t("facilities.partnership_type", "investments") || "Partnership Type",
+      width: 150,
+      render: (row: Facility) => row.partnership_type ? getLocalizedName(row.partnership_type.name) : '—',
+    },
     {
       key: "partnership_type",
       label: t("facilities.partnership_type", "investments") || "Partnership Type",
