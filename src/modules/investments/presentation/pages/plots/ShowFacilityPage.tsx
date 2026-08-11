@@ -98,7 +98,7 @@ export function ShowFacilityPage() {
             {t('facilities.view', 'investments') || 'View Facility'}
           </h1>
         </div>
-        {storage?.FileExplorerDialogComponent && facility?.folder && (
+        {storage?.FileExplorerDialogComponent && facility?.folder_id && (
           <Button variant="outline" onClick={() => setFileExplorerOpen(true)} requiredPermission="storage.storage.view" leftIcon={<FolderOpen size={16} />}>
             {t('facilities.folder', 'investments') || 'Facility Folder'}
           </Button>
@@ -182,8 +182,8 @@ export function ShowFacilityPage() {
         translateValues={handleTranslateValues}
       />
 
-      {storage?.FileExplorerDialogComponent && facility?.folder &&
-        <storage.FileExplorerDialogComponent isOpen={fileExplorerOpen} onClose={() => { setFileExplorerOpen(false) }} folderId={facility.folder} />
+      {storage?.FileExplorerDialogComponent && facility?.folder_id &&
+        <storage.FileExplorerDialogComponent isOpen={fileExplorerOpen} onClose={() => { setFileExplorerOpen(false) }} folderId={facility.folder_id} />
       }
     </div>
   );
