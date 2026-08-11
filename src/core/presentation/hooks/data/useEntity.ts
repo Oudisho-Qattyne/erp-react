@@ -275,7 +275,9 @@ export function useEntityCrud<T extends { id: number }>(
     setFnError('create', null);
     try {
       const newEntity = await idem.run('create', data, (key) => usecase.create(data, key));
-      setEntities(prev => [...prev, newEntity.data]);
+      if (newEntity && newEntity.data) {
+        setEntities(prev => [...prev, newEntity.data]);
+      } 
       return newEntity;
     } catch (err: any) {
       setFnError('create', handleApiError(err, { silent: true }));
@@ -283,14 +285,19 @@ export function useEntityCrud<T extends { id: number }>(
     } finally {
       setFnLoading('create', false);
     }
-  }, [usecase, idem]);
+  }, [usecase, idem, getAll, getUrl]);
 
   const update = useCallback(async (id: number, data: UpdateEntityDTO<T>) => {
     setFnLoading('update', true);
     setFnError('update', null);
     try {
       const updated = await idem.run('update', { id, data }, (key) => usecase.update(id, data, key));
-      setEntities(prev => prev.map(u => u.id === id ? updated.data : u));
+      if (updated && updated.data) {
+        setEntities(prev => prev.map(u => u.id === id ? updated.data : u));
+      } else if (getUrl) {
+        // Idempotency replay returned no body (server already processed) — refresh the list
+        getAll().catch(() => undefined);
+      }
       return updated;
     } catch (err: any) {
       setFnError('update', handleApiError(err, { silent: true }));
@@ -298,7 +305,7 @@ export function useEntityCrud<T extends { id: number }>(
     } finally {
       setFnLoading('update', false);
     }
-  }, [usecase, idem]);
+  }, [usecase, idem, getAll, getUrl]);
 
   const remove = useCallback(async (id: number) => {
     setFnLoading('remove', true);

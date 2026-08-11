@@ -18,6 +18,8 @@ export function createFetchApiClient(
   baseURL: string,
   getLanguage: () => string
 ): ApiClient {
+  const DEFAULT_TIMEOUT = 60_000;
+
   const buildUrl = (url: string, params?: Record<string, string | boolean | number>): string => {
     const fullUrl = new URL(baseURL + url);
     if (params) {
@@ -29,6 +31,7 @@ export function createFetchApiClient(
   };
 
   const request = async <T>(url: string, config: RequestConfig = {}): Promise<T> => {
+    const { timeout = DEFAULT_TIMEOUT, signal: externalSignal, ...restConfig } = config;
     const token = getToken();
     const headers = new Headers(config.headers || {});
 
@@ -49,12 +52,30 @@ export function createFetchApiClient(
     }
 
     const requestUrl = buildUrl(url, config.params);
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+    const onExternalAbort = () => controller.abort();
+    if (externalSignal) {
+      if (externalSignal.aborted) {
+        controller.abort();
+      } else {
+        externalSignal.addEventListener('abort', onExternalAbort);
+      }
+    }
+
     let response: Response;
     try {
-      response = await fetch(requestUrl, { ...config, headers });
+      response = await fetch(requestUrl, { ...restConfig, signal: controller.signal, headers });
     } catch {
-      // Network failure (offline, DNS, CORS, etc.) — status 0 marks it as a connection error
+      // Network failure (offline, DNS, CORS, etc.) or timeout — status 0 marks it as a connection error
+      if (controller.signal.aborted && !externalSignal?.aborted) {
+        throw createApiError('Request timeout', undefined, 0);
+      }
       throw createApiError('Failed to fetch', undefined, 0);
+    } finally {
+      clearTimeout(timer);
+      externalSignal?.removeEventListener('abort', onExternalAbort);
     }
 
     // Handle error responses (non‑2xx)
@@ -84,21 +105,17 @@ export function createFetchApiClient(
       return response[responseType]() as any;
     }
 
-    // Check if the response actually has JSON content
-    const contentType = response.headers.get('content-type');
-    const contentLength = response.headers.get('content-length');
-
-    if (
-      (!contentType || !contentType.includes('application/json')) ||
-      (contentLength === '0')
-    ) {
-      // Not JSON or empty body – return null (or empty array if T is array)
+    // Parse JSON body. Some servers (idempotency replays, proxies) send a real body
+    // with a misleading Content-Length: 0 or missing Content-Type, so we must not
+    // trust those headers — only the actual parse decides.
+    const text = await response.text();
+    if (!text) return null as any as T;
+    try {
+      return JSON.parse(text);
+    } catch {
+      // Not JSON – return null (or empty array if T is array)
       return null as any as T;
     }
-
-    // Try to parse JSON – this may still fail if body is malformed,
-    // but we assume the backend returns proper JSON.
-    return response.json();
   };
 
   return {
