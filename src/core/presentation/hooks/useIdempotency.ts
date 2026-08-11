@@ -90,8 +90,6 @@ export interface UseIdempotencyReturn {
 
 export function useIdempotency(): UseIdempotencyReturn {
   const keysRef = useRef<Map<string, string>>(new Map());
-  console.log(keysRef);
-
   const getKey = useCallback((action: string, data?: unknown): string => {
     const hash = hashString(`${action}|${hashData(data)}`).toString(36);
     const existing = keysRef.current.get(hash);
@@ -122,10 +120,7 @@ export function useIdempotency(): UseIdempotencyReturn {
     for (let attempt = 0; ; attempt++) {
       try {
         const result = await fn(key);
-        console.log(result);
-        
         onSettled(undefined, key);
-        console.log(result);
         return result;
       } catch (e) {
         err = e;

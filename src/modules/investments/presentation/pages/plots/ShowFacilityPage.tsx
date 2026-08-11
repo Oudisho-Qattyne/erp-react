@@ -16,12 +16,14 @@ import { FacilityIndustrialLicensesSection } from './components/FacilityIndustri
 import { BuildingLicenseSection } from './components/BuildingLicenseSection';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
-import { ArrowRight, Factory, History } from 'lucide-react';
+import { ArrowRight, Factory, History, FolderOpen } from 'lucide-react';
+import { useStorage } from '../../../../../core/registry/storage/StorageProvider';
 
 export function ShowFacilityPage() {
   const { t } = useLanguage();
   const { plotId, dossierId, facilityId } = useParams<{ plotId: string; dossierId: string; facilityId: string }>();
   const navigate = useNavigate();
+  const storage = useStorage();
 
   const { getById } = useEntityCrud<Facility>(`/investments/facilities`, `/investments/facilities`);
 
@@ -42,6 +44,7 @@ export function ShowFacilityPage() {
   const [relationsLoading, setRelationsLoading] = useState(!!(plotId && dossierId));
   const [error, setError] = useState<string | null>(null);
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+  const [fileExplorerOpen, setFileExplorerOpen] = useState(false);
 
   useEffect(() => {
     if (!facilityId) return;
@@ -95,6 +98,11 @@ export function ShowFacilityPage() {
             {t('facilities.view', 'investments') || 'View Facility'}
           </h1>
         </div>
+        {storage?.FileExplorerDialogComponent && facility?.folder && (
+          <Button variant="outline" onClick={() => setFileExplorerOpen(true)} requiredPermission="storage.storage.view" leftIcon={<FolderOpen size={16} />}>
+            {t('facilities.folder', 'investments') || 'Facility Folder'}
+          </Button>
+        )}
       </div>
 
       <SectionCard
@@ -173,6 +181,10 @@ export function ShowFacilityPage() {
         translateField={(key) => t(`facilities.${key}`, 'investments') || key}
         translateValues={handleTranslateValues}
       />
+
+      {storage?.FileExplorerDialogComponent && facility?.folder &&
+        <storage.FileExplorerDialogComponent isOpen={fileExplorerOpen} onClose={() => { setFileExplorerOpen(false) }} folderId={facility.folder} />
+      }
     </div>
   );
 }

@@ -19,7 +19,6 @@ export const UserEligibleLeaveTypes = () => {
             render: (row: any) => typeof row.name === "string" ? row.name : (row.name?.ar || row.name?.en || "")
         },
     ]
-    console.log(error);
     
     return (
         <div className="p-6">

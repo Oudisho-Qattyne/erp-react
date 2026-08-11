@@ -278,7 +278,6 @@ fetchPlots({ page: 1, per_page: perPage });
   const handleSubmit = async (data: Record<string, unknown>) => {
     try {
       // TODO: wire to the subscription backend endpoint when available
-      console.log('SUBSCRIPTION PAYLOAD', data);
       await new Promise((resolve) => setTimeout(resolve, 500));
       toast.success(t('transactions.created', 'investments') || 'Subscription created successfully');
       return { data: { id: Date.now() } };

@@ -26,4 +26,5 @@ export interface Facility {
   yearly_production_capacity?: number;
   electrical_power_capacity?: string;
   yearly_estimated_water_consumption?: number ;
+  folder?: string;
 }
