@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const getCreateFacilityFormSchema = (t: (key: string, module?: string) => string) => z.object({
   name: z.string().min(1, t('facilities.validation.name_required', 'investments') || 'Name is required'),
+  partnership_type_id: z.number( t('facilities.validation.partnership_type_required', 'investments') || 'Partnership type is required' ),
   address: z.string().min(1, t('facilities.validation.address_required', 'investments') || 'Address is required'),
   city: z.string().min(1, t('facilities.validation.city_required', 'investments') || 'City is required'),
   first_phone_number: z.string().min(1, t('facilities.validation.first_phone_number_required', 'investments') || 'Phone is required'),

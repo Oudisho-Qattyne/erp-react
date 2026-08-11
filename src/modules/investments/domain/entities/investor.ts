@@ -18,6 +18,7 @@ export interface Investor {
     name: string;
   } | null;
   is_possible_investor_in_future: boolean;
+  folder?: string;
   interests?: InvestorInterest[];
   facebook?: string;
   instagram?: string;

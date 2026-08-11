@@ -101,7 +101,7 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      setFnError("findAllMyLeaveRequests", handleApiError(err, { module: "hr" }))
+      setFnError("findAllMyLeaveRequests", handleApiError(err, { module: "hr" , passThrough:true }))
     } finally {
       setFnLoading("findAllMyLeaveRequests", false)
     }

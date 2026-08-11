@@ -52,32 +52,6 @@
       "name_required": "Name is required"
     }
   },
-  "service_conditions": {
-    "title": "Service Conditions",
-    "add": "Add Service Condition",
-    "name": "Condition Name",
-    "is_active": "Is Active",
-    "is_default": "Default",
-    "created": "{name} created successfully",
-    "create_error": "Failed to create {name}",
-    "deleted": "{name} deleted successfully",
-    "delete_error": "Failed to delete {name}",
-    "no_records": "No Service Conditions found",
-    "edit_log": "Edit Log",
-    "no_edit_log": "No edit logs found",
-    "event": "Event",
-    "created_at": "Created At",
-    "changed_by": "Changed By",
-    "changes": "Changes",
-    "field": "Field",
-    "old_value": "Old Value",
-    "new_value": "New Value",
-    "subject_id": "Service Condition ID",
-    "id": "ID",
-    "validation": {
-      "name_required": "Condition name is required"
-    }
-  },
   "service_status_conditions": {
     "title": "Service Status Conditions",
     "add": "Add Service Status Condition",
@@ -348,6 +322,8 @@
     "name": "Name",
     "plot_code": "Plot Code",
     "dossier_number": "Dossier Number",
+    "partnership_type": "Partnership Type",
+    "folder": "Facility Folder",
     "address": "Address",
     "city": "City",
     "first_phone_number": "Phone",
@@ -395,6 +371,7 @@
     "id": "ID",
     "validation": {
       "name_required": "Name is required",
+      "partnership_type_required": "Partnership type is required",
       "address_required": "Address is required",
       "city_required": "City is required",
       "first_phone_number_required": "Phone is required",
@@ -456,6 +433,7 @@
     "remove_investors_error": "Failed to remove partners",
     "add_interest": "Add Interest",
     "interests": "Investor Interests",
+    "folder": "Investor Folder",
     "filter_has_social_account": "Has Social Account",
     "filter_has_facebook_account": "Has Facebook",
     "filter_has_instagram_account": "Has Instagram",
@@ -535,13 +513,6 @@
         "update": "Edit Plot Classification",
         "delete": "Delete Plot Classification"
       },
-      "service-conditions": {
-        "list": "List Service Conditions",
-        "view": "View Service Condition",
-        "create": "Create Service Condition",
-        "update": "Edit Service Condition",
-        "delete": "Delete Service Condition"
-      },
       "service-status-conditions": {
         "list": "List Service Status Conditions",
         "view": "View Service Status Condition",
@@ -565,6 +536,13 @@
         "create": "Create Dossier Status History",
         "update": "Edit Dossier Status History",
         "delete": "Delete Dossier Status History"
+      },
+      "partnership-types": {
+        "list": "List Partnership Types",
+        "view": "View Partnership Type",
+        "create": "Create Partnership Type",
+        "update": "Edit Partnership Type",
+        "delete": "Delete Partnership Type"
       },
       "industry-categories": {
         "list": "List Industry Categories",
@@ -790,6 +768,33 @@
     "old_value": "Old Value",
     "new_value": "New Value",
     "subject_id": "Industry Type ID",
+    "id": "ID",
+    "validation": {
+      "name_required": "Name is required"
+    }
+  },
+  "partnership_types": {
+    "title": "Partnership Types",
+    "add": "Add Partnership Type",
+    "create": "Create Partnership Type",
+    "name": "Type Name",
+    "is_active": "Is Active",
+    "is_default": "Default",
+    "created": "{name} created successfully",
+    "create_error": "Failed to create {name}",
+    "deleted": "{name} deleted successfully",
+    "delete_error": "Failed to delete {name}",
+    "no_records": "No Partnership Types found",
+    "edit_log": "Edit Log",
+    "no_edit_log": "No edit logs found",
+    "event": "Event",
+    "created_at": "Created At",
+    "changed_by": "Changed By",
+    "changes": "Changes",
+    "field": "Field",
+    "old_value": "Old Value",
+    "new_value": "New Value",
+    "subject_id": "Partnership Type ID",
     "id": "ID",
     "validation": {
       "name_required": "Name is required"
@@ -1022,6 +1027,33 @@
       "display_after_license": "Display date must be on or after the building license date"
     }
   },
+  "transactions": {
+    "title": "Transactions",
+    "subscription": "Subscription",
+    "subscription_hint": "Create a new subscription for investors",
+    "add_subscription": "New Subscription",
+    "create_title": "New Subscription",
+    "group_plot": "Plot Selection",
+    "plot": "Plot",
+    "investors": "Investors",
+    "group_investors": "Investors",
+    "select_investors": "Select Investors",
+    "validation": {
+      "plot_required": "Plot is required",
+      "investors_required": "At least one investor is required"
+    },
+    "created": "Subscription created successfully",
+    "bonds": "Bonds",
+    "bonds_hint": "Create a new bonds issuance",
+    "add_bonds": "New Bonds",
+    "financing": "Financing",
+    "financing_hint": "Create a new financing request",
+    "add_financing": "New Financing",
+    "dividends": "Dividends",
+    "dividends_hint": "Create a new dividends distribution",
+    "add_dividends": "New Dividends",
+    "soon": "Subscription creation form is under development"
+  },
   "navigation": {
     "title": "Investments",
     "plot_areas": {
@@ -1030,9 +1062,7 @@
     "plot_classifications": {
       "title": "Plot Classifications"
     },
-    "service_conditions": {
-      "title": "Service Conditions"
-    },
+   
     "service_status_conditions": {
       "title": "Service Status Conditions"
     },
@@ -1077,6 +1107,12 @@
     },
     "contract": {
       "title": "Contracts"
+    },
+    "transactions": {
+      "title": "Transactions"
+    },
+    "partnership_types": {
+      "title": "Partnership Types"
     }
   }
 }

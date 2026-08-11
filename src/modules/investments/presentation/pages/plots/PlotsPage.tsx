@@ -21,24 +21,21 @@ import { getLocalizedName } from '../../../../../core/presentation/utils/helpes'
 export function PlotsPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { entities: plots, getAll, remove, loadingMap, errorMap, pagination } = useEntityCrud<Plot>('/investments/plots', '/investments/plots');
+  const { entities: plots, getAll, remove, loadingMap, errorMap, pagination, list } = useEntityCrud<Plot>(
+    '/investments/plots',
+    '/investments/plots',
+    { listState: true, searchParamName: 'code' }
+  );
   const { entities: areas, getAll: getAreas } = useEntityCrud<EntityWithNameOnly>('/investments/plot-areas', '/investments/plot-areas');
   const { entities: classifications, getAll: getClassifications } = useEntityCrud<EntityWithNameOnly>('/investments/plot-classifications', '/investments/plot-classifications');
 
   const entityName = t('plots.title', 'investments') || 'Plot';
   const [localSearch, setLocalSearch] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<Plot | null>(null);
   // const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [auditItem, setAuditItem] = useState<Plot | null>(null);
 
-  // Table State
-  const [sortColumn, setSortColumn] = useState<string | undefined>(undefined);
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [page, setPage] = useState(1);
-
   // Filter State
-  const [extraFilters, setExtraFilters] = useState<Record<string, string>>({});
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Fetch Lookups
@@ -47,62 +44,31 @@ export function PlotsPage() {
     getClassifications();
   }, []);
 
-  // Fetch Data (Server Side)
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (searchQuery) params.append('code', searchQuery);
-
-    for (const [key, val] of Object.entries(extraFilters)) {
-      if (val) params.append(key, val);
-    }
-
-    if (sortColumn) {
-      params.append('sortColumn', sortColumn);
-      params.append('sortOrder', sortOrder);
-    }
-
-    params.append('page', String(page));
-
-    getAll(`/investments/plots?${params.toString()}`);
-  }, [searchQuery, sortColumn, sortOrder, page, extraFilters]);
-
-  const handleSearch = () => {
-    setSearchQuery(localSearch);
-    setPage(1);
-  };
-
-  const handleSort = (key: string) => {
-    if (sortColumn === key) {
-      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortColumn(key);
-      setSortOrder('asc');
-    }
-    setPage(1);
-  };
-
   const handleApplyFilter = (values: Record<string, any>) => {
     const parsed: Record<string, string> = {};
     for (const [key, val] of Object.entries(values)) {
       if (val !== '' && val !== undefined) parsed[key] = val;
     }
-    setExtraFilters(parsed);
-    setPage(1);
+    list.setFilter(parsed);
     setIsFilterOpen(false);
   };
 
   const handleResetFilter = () => {
-    setExtraFilters({});
-    setPage(1);
+    list.resetFilter();
+    setLocalSearch('');
     setIsFilterOpen(false);
   };
+
+  const filterInitialValues = useMemo(
+    () => Object.fromEntries(Object.entries(list.filter).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k))),
+    [list.filter]
+  );
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
     try {
       await remove(confirmDelete.id);
       toast.success((t('plots.deleted', 'investments') || 'Plot deleted').replace('{name}', entityName));
-      setPage(prev => prev);
     } catch (err: any) {
       handleApiError(err, { module: "investments" });
     }
@@ -212,7 +178,7 @@ export function PlotsPage() {
     page: pagination?.currentPage || 1,
     totalPages: pagination?.lastPage || 1,
     totalItems: pagination?.total || 0,
-    onPageChange: (newPage: number) => setPage(newPage),
+    onPageChange: list.setPage,
   };
 
   const handleTranslateValues = (field: string, value: string) => {
@@ -242,7 +208,7 @@ export function PlotsPage() {
           <Input type="text" value={localSearch} onChange={setLocalSearch}
             placeholder={t('common.search', 'shared') || 'Search by code...'}
             baseClasses={inputBaseClasses} className="w-64" />
-          <Button variant="primary" onClick={handleSearch} size="sm" leftIcon={<Search size={14} />}>
+          <Button variant="primary" onClick={() => list.setSearch(localSearch)} size="sm" leftIcon={<Search size={14} />}>
             {t('common.search', 'shared') || 'Search'}
           </Button>
           <Button variant="outline" onClick={() => setIsFilterOpen(true)} size="sm" leftIcon={<Filter size={14} />}>
@@ -256,13 +222,13 @@ export function PlotsPage() {
       <FilterDialog
         isOpen={isFilterOpen}
         fields={filterFields}
-        initialValues={extraFilters}
+        initialValues={filterInitialValues}
         onFilter={handleApplyFilter}
         onCancel={() => setIsFilterOpen(false)}
         onReset={handleResetFilter}
       />
 
-      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => setPage(prev => prev)} />}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll(`/investments/plots?page=${list.page}&per_page=${list.perPage}`)} />}
 
       {!errorMap['getAll'] && (
         <DataTable
@@ -271,9 +237,9 @@ export function PlotsPage() {
           rowKey="id"
           loading={loadingMap['getAll']}
           emptyMessage={t('plots.no_records', 'investments') || 'No plots found'}
-          sortColumn={sortColumn}
-          sortOrder={sortOrder}
-          onSort={handleSort}
+          sortColumn={list.filter.sortColumn}
+          sortOrder={list.filter.sortOrder}
+          onSort={list.setSort}
           pagination={tablePagination}
         />
       )}

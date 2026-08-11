@@ -128,6 +128,7 @@ export function TablePickerInput({
             onPageChange={pickerConfig.onPageChange ?? (() => {})}
             onPerPageChange={pickerConfig.onPerPageChange ?? (() => {})}
             emptyMessage={pickerConfig.emptyMessage || t("common.no_data", "shared") || "No data"}
+            createConfig={pickerConfig.createConfig}
           />
         </Suspense>
       )}

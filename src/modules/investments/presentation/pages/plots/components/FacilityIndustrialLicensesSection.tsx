@@ -11,13 +11,10 @@ import { ErrorState } from '../../../../../../core/presentation/layouts/ui/state
 import { DataTable } from '../../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
-import { GenericCreateForm, type FieldConfig } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
+import { GenericCreateForm } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { getCreateFacilityIndustrialLicenseFormSchema } from '../../../schemas/facilityIndustrialLicenseForm.schema';
-import { getCreateIndustryCategoryFormSchema } from '../../../schemas/industryCategoryForm.schema';
-import { getCreateIndustryTypeFormSchema } from '../../../schemas/industryTypeForm.schema';
-import { getCreateIndustrialDecisionTypeFormSchema } from '../../../schemas/industrialDecisionTypeForm.schema';
-import { getCreateIndustrialLicenseSourceFormSchema } from '../../../schemas/industrialLicenseSourceForm.schema';
+import { buildFacilityIndustrialLicenseFormFields, buildFacilityIndustrialLicenseFormGroups, buildFacilityIndustrialLicenseDefaultValues } from '../../../forms/facilityIndustrialLicenseFormConfig';
 import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { FileCheck, Plus, Pencil, Trash2, Eye, Check, X, History } from 'lucide-react';
 import { toast } from 'sonner';
@@ -97,124 +94,8 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
     setDeletingLicense(null);
   };
 
-  const fields: FieldConfig[] = [
-    {
-      name: 'industry_category_id',
-      type: 'select-or-create',
-      label: t('facility_industrial_licenses.industry_category', 'investments') || 'Industry Category',
-      required: true,
-      group: 'industry',
-      options: categories.map(c => ({ value: c.id, label: getLocalizedName(c.name), is_default: c.is_default })),
-      createTitle: t('industry_categories.create', 'investments') || 'Create Industry Category',
-      labelPath: 'name',
-      createButtonPermission: 'investments.industry-categories.create',
-      renderCreateForm: (onSuccessForm, onCancelForm) => (
-        <GenericCreateForm
-          schema={getCreateIndustryCategoryFormSchema(t)}
-          fields={[
-            { name: 'name', type: 'alpha', label: t('common.name', 'shared') || 'Name', required: true },
-            { name: 'is_default', type: 'checkbox', label: t('common.is_default', 'shared') || 'Set as Default' },
-          ]}
-          onSubmit={(data) => createCategory({ ...data, is_active: true })}
-          onSuccess={onSuccessForm}
-          onCancel={onCancelForm}
-          submitLabel={t('common.create', 'shared') || 'Create'}
-        />
-      ),
-    },
-    {
-      name: 'industry_type_id',
-      type: 'select-or-create',
-      label: t('facility_industrial_licenses.industry_type', 'investments') || 'Industry Type',
-      required: true,
-      group: 'industry',
-      options: industryTypes.map(t => ({ value: t.id, label: getLocalizedName(t.name), is_default: t.is_default })),
-      createTitle: t('industry_types.create', 'investments') || 'Create Industry Type',
-      labelPath: 'name',
-      createButtonPermission: 'investments.industry-types.create',
-      renderCreateForm: (onSuccessForm, onCancelForm) => (
-        <GenericCreateForm
-          schema={getCreateIndustryTypeFormSchema(t)}
-          fields={[
-            { name: 'name', type: 'alpha', label: t('common.name', 'shared') || 'Name', required: true },
-            { name: 'is_default', type: 'checkbox', label: t('common.is_default', 'shared') || 'Set as Default' },
-          ]}
-          onSubmit={(data) => createIndustryType({ ...data, is_active: true })}
-          onSuccess={onSuccessForm}
-          onCancel={onCancelForm}
-          submitLabel={t('common.create', 'shared') || 'Create'}
-        />
-      ),
-    },
-    { name: 'industrial_decision_number', type: 'numeric', label: t('facility_industrial_licenses.decision_number', 'investments') || 'Decision Number', required: true, group: 'decision' },
-    { name: 'industrial_decision_date', type: 'date', label: t('facility_industrial_licenses.decision_date', 'investments') || 'Decision Date', required: true, group: 'decision' },
-    {
-      name: 'industrial_decision_type_id',
-      type: 'select-or-create',
-      label: t('facility_industrial_licenses.decision_type', 'investments') || 'Decision Type',
-      required: true,
-      group: 'decision',
-      options: decisionTypes.map(d => ({ value: d.id, label: getLocalizedName(d.name), is_default: d.is_default })),
-      createTitle: t('industrial_decision_types.create', 'investments') || 'Create Decision Type',
-      labelPath: 'name',
-      createButtonPermission: 'investments.industrial-decision-types.create',
-      renderCreateForm: (onSuccessForm, onCancelForm) => (
-        <GenericCreateForm
-          schema={getCreateIndustrialDecisionTypeFormSchema(t)}
-          fields={[
-            { name: 'name', type: 'alpha', label: t('common.name', 'shared') || 'Name', required: true },
-            { name: 'is_default', type: 'checkbox', label: t('common.is_default', 'shared') || 'Set as Default' },
-          ]}
-          onSubmit={(data) => createDecisionType({ ...data, is_active: true })}
-          onSuccess={onSuccessForm}
-          onCancel={onCancelForm}
-          submitLabel={t('common.create', 'shared') || 'Create'}
-        />
-      ),
-    },
-    {
-      name: 'industrial_license_source_id',
-      type: 'select-or-create',
-      label: t('facility_industrial_licenses.license_source', 'investments') || 'License Source',
-      required: true,
-      group: 'decision',
-      options: licenseSources.map(s => ({ value: s.id, label: getLocalizedName(s.name), is_default: s.is_default })),
-      createTitle: t('industrial_license_sources.create', 'investments') || 'Create License Source',
-      labelPath: 'name',
-      createButtonPermission: 'investments.industrial-license-sources.create',
-      renderCreateForm: (onSuccessForm, onCancelForm) => (
-        <GenericCreateForm
-          schema={getCreateIndustrialLicenseSourceFormSchema(t)}
-          fields={[
-            { name: 'name', type: 'alpha', label: t('common.name', 'shared') || 'Name', required: true },
-            { name: 'is_default', type: 'checkbox', label: t('common.is_default', 'shared') || 'Set as Default' },
-          ]}
-          onSubmit={(data) => createLicenseSource({ ...data, is_active: true })}
-          onSuccess={onSuccessForm}
-          onCancel={onCancelForm}
-          submitLabel={t('common.create', 'shared') || 'Create'}
-        />
-      ),
-    },
-  ];
-
-  const formGroups = [
-    {
-      group: 'industry',
-      title: t('facility_industrial_licenses.group_industry', 'investments') || 'Industry Selection',
-      columns: 2,
-      rows: [['industry_category_id', 'industry_type_id']],
-    },
-    {
-      group: 'decision',
-      title: t('facility_industrial_licenses.group_decision', 'investments') || 'Decision Details',
-      columns: 2,
-      rows: [
-        ['industrial_decision_number', 'industrial_decision_date'],
-        ['industrial_decision_type_id', 'industrial_license_source_id'],
-      ],
-    },
-  ];
+  const fields = buildFacilityIndustrialLicenseFormFields(t, { categories, createCategory, industryTypes, createIndustryType, decisionTypes, createDecisionType, licenseSources, createLicenseSource });
+  const formGroups = buildFacilityIndustrialLicenseFormGroups(t);
 
   const columns = [
     { key: "industrial_decision_number", label: t("facility_industrial_licenses.decision_number", "investments") || "Decision #", width: 160 },
@@ -319,14 +200,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
             schema={getCreateFacilityIndustrialLicenseFormSchema(t)}
             fields={fields}
             groups={formGroups}
-            defaultValues={{
-              industry_category_id: editingLicense?.industry_category?.id,
-              industry_type_id: editingLicense?.industry_type?.id,
-              industrial_decision_number: editingLicense?.industrial_decision_number,
-              industrial_decision_date: editingLicense?.industrial_decision_date,
-              industrial_decision_type_id: editingLicense?.industrial_decision_type?.id,
-              industrial_license_source_id: editingLicense?.industrial_license_source?.id,
-            }}
+            defaultValues={buildFacilityIndustrialLicenseDefaultValues(editingLicense)}
             onSubmit={handleUpdate}
             onSuccess={() => setEditingLicense(null)}
             onCancel={() => setEditingLicense(null)}

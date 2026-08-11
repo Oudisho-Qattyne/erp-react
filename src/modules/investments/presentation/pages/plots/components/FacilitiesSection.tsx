@@ -8,9 +8,12 @@ import { ErrorState } from '../../../../../../core/presentation/layouts/ui/state
 import { DataTable } from '../../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
-import { GenericCreateForm, type FieldConfig } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
+import { GenericCreateForm } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { getCreateFacilityFormSchema } from '../../../schemas/facilityForm.schema';
+import { buildFacilityFormFields, buildFacilityFormGroups, buildFacilityDefaultValues } from '../../../forms/facilityFormConfig';
+import type { PartnershipType } from '../../../../domain/entities/partnershipType';
+import { getLocalizedName } from '../../../../../../core/presentation/utils/helpes';
 import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { Factory, Plus, Eye, Pencil, Trash2, History } from 'lucide-react';
 import { toast } from 'sonner';
@@ -27,6 +30,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
 
   const baseUrl = `/investments/facilities`;
   const { entities: facilities, getAll: getFacilities, create: createFacility, update: updateFacility, remove: deleteFacility, loadingMap: facLoading, errorMap: facError } = useEntityCrud<Facility>(baseUrl, baseUrl);
+  const { entities: partnershipTypes, getAll: getPartnershipTypes, create: createPartnershipType } = useEntityCrud<PartnershipType>('/investments/partnership-types', '/investments/partnership-types');
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingFacility, setEditingFacility] = useState<Facility | null>(null);
@@ -37,6 +41,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
 
   useEffect(() => {
     if (dossierId && plotId) getFacilities(listUrl);
+    getPartnershipTypes('/investments/partnership-types?is_active=true');
   }, [dossierId, plotId]);
 
   const handleCreate = async (data: any) => {
@@ -78,66 +83,17 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
     setDeletingFacility(null);
   };
 
-  const fields: FieldConfig[] = [
-    { name: 'name', type: 'alpha', label: t('facilities.name', 'investments') || 'Name', required: true, group: 'basic_info' },
-    { name: 'address', type: 'text', label: t('facilities.address', 'investments') || 'Address', required: true, group: 'basic_info' },
-    { name: 'city', type: 'alpha', label: t('facilities.city', 'investments') || 'City', required: true, group: 'basic_info' },
-    { name: 'first_phone_number', type: 'numeric', label: t('facilities.first_phone_number', 'investments') || 'Phone', required: true, group: 'contact' },
-    { name: 'second_phone_number', type: 'numeric', label: t('facilities.second_phone_number', 'investments') || 'Phone 2', group: 'contact' },
-    { name: 'email', type: 'email', label: t('facilities.email', 'investments') || 'Email', group: 'contact' },
-    { name: 'capital_in_syp', type: 'number', label: t('facilities.capital_in_syp', 'investments') || 'Capital (SYP)', required: true, group: 'financial' },
-    { name: 'capital_in_usd', type: 'number', label: t('facilities.capital_in_usd', 'investments') || 'Capital (USD)', required: true, group: 'financial' },
-    { name: 'value_of_machines_in_syp', type: 'number', label: t('facilities.value_of_machines_in_syp', 'investments') || 'Machinery Value (SYP)', required: true, group: 'financial' },
-    { name: 'value_of_machines_in_usd', type: 'number', label: t('facilities.value_of_machines_in_usd', 'investments') || 'Machinery Value (USD)', required: true, group: 'financial' },
-    { name: 'number_of_workers', type: 'number', label: t('facilities.number_of_workers', 'investments') || 'Workers', required: true, group: 'production' },
-    { name: 'daily_production_capacity', type: 'number', label: t('facilities.daily_production_capacity', 'investments') || 'Daily Capacity', required: true, group: 'production' },
-    { name: 'monthly_production_capacity', type: 'number', label: t('facilities.monthly_production_capacity', 'investments') || 'Monthly Capacity', required: true, group: 'production' },
-    { name: 'yearly_production_capacity', type: 'number', label: t('facilities.yearly_production_capacity', 'investments') || 'Annual Capacity', required: true, group: 'production' },
-    { name: 'electrical_power_capacity', type: 'text', label: t('facilities.electrical_power_capacity', 'investments') || 'Power Capacity', required: true, group: 'utilities' },
-    { name: 'yearly_estimated_water_consumption', type: 'number', label: t('facilities.yearly_estimated_water_consumption', 'investments') || 'Water Consumption', required: true, group: 'utilities' },
-  ];
-
-  const formGroups = [
-    {
-      group: 'basic_info',
-      title: t('facilities.group_basic_info', 'investments') || 'Basic Information',
-      columns: 3,
-      rows: [['name', 'address', 'city']],
-    },
-    {
-      group: 'contact',
-      title: t('facilities.group_contact', 'investments') || 'Contact Information',
-      columns: 3,
-      rows: [['first_phone_number', 'second_phone_number', 'email']],
-    },
-    {
-      group: 'financial',
-      title: t('facilities.group_financial', 'investments') || 'Financial Information',
-      columns: 2,
-      rows: [
-        ['capital_in_syp', 'capital_in_usd'],
-        ['value_of_machines_in_syp', 'value_of_machines_in_usd'],
-      ],
-    },
-    {
-      group: 'production',
-      title: t('facilities.group_production', 'investments') || 'Production Capacity',
-      columns: 2,
-      rows: [
-        ['number_of_workers', 'daily_production_capacity'],
-        ['monthly_production_capacity', 'yearly_production_capacity'],
-      ],
-    },
-    {
-      group: 'utilities',
-      title: t('facilities.group_utilities', 'investments') || 'Utilities',
-      columns: 2,
-      rows: [['electrical_power_capacity', 'yearly_estimated_water_consumption']],
-    },
-  ];
+  const fields = buildFacilityFormFields(t, { partnershipTypes, createPartnershipType });
+  const formGroups = buildFacilityFormGroups(t);
 
   const columns = [
     { key: "name", label: t("facilities.name", "investments") || "Name", width: 180 },
+    {
+      key: "partnership_type",
+      label: t("facilities.partnership_type", "investments") || "Partnership Type",
+      width: 150,
+      render: (row: Facility) => row.partnership_type ? getLocalizedName(row.partnership_type.name) : '—',
+    },
     { key: "city", label: t("facilities.city", "investments") || "City", width: 120 },
     { key: "first_phone_number", label: t("facilities.first_phone_number", "investments") || "Phone", width: 130 },
     { key: "email", label: t("facilities.email", "investments") || "Email", width: 180 },
@@ -215,24 +171,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
             schema={getCreateFacilityFormSchema(t)}
             fields={fields}
             groups={formGroups}
-            defaultValues={{
-              name: editingFacility.name,
-              address: editingFacility.address,
-              city: editingFacility.city,
-              first_phone_number: editingFacility.first_phone_number,
-              second_phone_number: editingFacility.second_phone_number ?? null,
-              email: editingFacility.email || '',
-              capital_in_syp: editingFacility.capital_in_syp,
-              capital_in_usd: editingFacility.capital_in_usd,
-              value_of_machines_in_syp: editingFacility.value_of_machines_in_syp,
-              value_of_machines_in_usd: editingFacility.value_of_machines_in_usd,
-              number_of_workers: editingFacility.number_of_workers,
-              daily_production_capacity: editingFacility.daily_production_capacity,
-              monthly_production_capacity: editingFacility.monthly_production_capacity,
-              yearly_production_capacity: editingFacility.yearly_production_capacity,
-              electrical_power_capacity: String(editingFacility.electrical_power_capacity ?? ''),
-              yearly_estimated_water_consumption: editingFacility.yearly_estimated_water_consumption,
-            }}
+            defaultValues={buildFacilityDefaultValues(editingFacility)}
             onSubmit={handleUpdate}
             onSuccess={() => setEditingFacility(null)}
             onCancel={() => setEditingFacility(null)}

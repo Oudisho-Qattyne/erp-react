@@ -128,7 +128,7 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      setFnError("findAll", handleApiError(err, { module: "hr" }))
+      setFnError("findAll", handleApiError(err, { module: "hr" , passThrough:true } ))
     } finally {
       setFnLoading("findAll", false)
     }
@@ -213,7 +213,7 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
       const res = await useCase.findUserEligibleLeaveTypes()
       setUserEligibleLeaveTypes(res.data)
     } catch (err: any) {
-      setFnError("findUserEligibleLeaveTypes", handleApiError(err, { module: "hr" }))
+      setFnError("findUserEligibleLeaveTypes", handleApiError(err, { module: "hr" , passThrough:true }))
     } finally {
       setFnLoading("findUserEligibleLeaveTypes", false)
     }

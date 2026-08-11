@@ -95,7 +95,7 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
         hasMore: res.hasMore || false,
       })
     } catch (err: any) {
-      setFnError("findAllMyLeaveBalances", handleApiError(err, { module: "hr" }))
+      setFnError("findAllMyLeaveBalances", handleApiError(err, { module: "hr" , passThrough:true }))
     } finally {
       setFnLoading("findAllMyLeaveBalances", false)
     }

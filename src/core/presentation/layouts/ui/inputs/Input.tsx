@@ -37,6 +37,9 @@ interface InputProps {
   // For decimal
   decimalPlaces?: number;
   allowNegative?: boolean;
+  // For text-like inputs: only characters matching this regex can be typed/pasted
+  // e.g. no whitespace: /\S/ — letters only: /^\p{L}$/u
+  regex?: RegExp;
   baseClasses?: string;
   className?: string;
   // data-matrix
@@ -75,6 +78,16 @@ function sanitizeDecimal(raw: string, decimalPlaces?: number, allowNegative?: bo
   return v
 }
 
+function sanitizeRegex(raw: string, regex: RegExp): string {
+  return raw
+    .split('')
+    .filter((c) => {
+      regex.lastIndex = 0;
+      return regex.test(c);
+    })
+    .join('');
+}
+
 const InputTypes: React.FC<InputProps> = ({
   type,
   value,
@@ -94,6 +107,7 @@ const InputTypes: React.FC<InputProps> = ({
   step,
   decimalPlaces,
   allowNegative,
+  regex,
   baseClasses = '',
   className = "",
   matrixFields,
@@ -395,9 +409,24 @@ const InputTypes: React.FC<InputProps> = ({
         <input
           type={type}
           value={type === 'number' ? finalValue : finalValue}
-          onChange={(e) =>
-            onChange(type === 'number' ? Number(e.target.value) : e.target.value)
-          }
+          onChange={(e) => {
+            const raw = e.target.value;
+            const filtered = regex ? sanitizeRegex(raw, regex) : raw;
+            onChange(type === 'number' ? Number(filtered) : filtered);
+          }}
+          onKeyDown={(e) => {
+            if (!regex) return;
+            const allowed = [
+              'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+              'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+              'Home', 'End',
+            ];
+            if (allowed.includes(e.key)) return;
+            if (e.ctrlKey && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase())) return;
+            regex.lastIndex = 0;
+            if (regex.test(e.key)) return;
+            e.preventDefault();
+          }}
           placeholder={finalPlaceholder}
           disabled={finalDisabled}
           min={min}

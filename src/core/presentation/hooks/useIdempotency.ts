@@ -74,7 +74,9 @@ function shouldRegenerateAndRetry(err: unknown): boolean {
 function shouldKeepKey(err: unknown): boolean {
   if (err === undefined || err === null) return false;
   const status = typeof err === 'object' ? (err as { status?: unknown }).status : undefined;
-  if (status === undefined || status === null) return true;
+  // No status / status 0 = no response from the server (network failure, timeout, CORS...)
+  // keep the key so a retry reuses the same idempotency key (the server may have processed it)
+  if (status === undefined || status === null || status === 0) return true;
   return status === 409 && getIdempotencyCode(err) === 'idempotency_request_process';
 }
 
@@ -85,9 +87,9 @@ export interface UseIdempotencyReturn {
   reset: () => void;
 }
 
+
 export function useIdempotency(): UseIdempotencyReturn {
   const keysRef = useRef<Map<string, string>>(new Map());
-
   const getKey = useCallback((action: string, data?: unknown): string => {
     const hash = hashString(`${action}|${hashData(data)}`).toString(36);
     const existing = keysRef.current.get(hash);
@@ -142,3 +144,17 @@ export function useIdempotency(): UseIdempotencyReturn {
 
   return { getKey, onSettled, run, reset };
 }
+
+// const t = { "status": "Success", "plan": null, "data": { "id": 4, "name": "\u0643\u0631\u0645 \u0627\u0644\u0634\u0627\u0645\u064a", "is_active": true, "is_default": false, "created_at": "11-08-2026" } }
+
+// {
+//     "status": "Success",
+//     "plan": null,
+//     "data": {
+//         "id": 5,
+//         "name": "\u0627\u0644\u062d\u0645\u064a\u062f\u064a\u0629",
+//         "is_active": true,
+//         "is_default": false,
+//         "created_at": "11-08-2026"
+//     }
+// }

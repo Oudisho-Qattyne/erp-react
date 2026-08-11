@@ -19,6 +19,7 @@ export const UserEligibleLeaveTypes = () => {
             render: (row: any) => typeof row.name === "string" ? row.name : (row.name?.ar || row.name?.en || "")
         },
     ]
+    
     return (
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-6">{t("leave.user_eligible_leave_types", "hr") || "User Eligible Leave Types"}</h1>
