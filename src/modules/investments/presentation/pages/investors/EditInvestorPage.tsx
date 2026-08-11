@@ -168,7 +168,7 @@ export function EditInvestorPage() {
           </Button>
           <h1 className="text-2xl font-bold">{t('investors.edit', 'investments') || 'Edit Investor'}</h1>
         </div>
-        {storage?.FileExplorerDialogComponent && investor?.folder && (
+        {storage?.FileExplorerDialogComponent && investor?.folder_id && (
           <Button variant="outline" onClick={() => setFileExplorerOpen(true)} requiredPermission="storage.storage.view" leftIcon={<FolderOpen size={16} />}>
             {t('investors.folder', 'investments') || 'Investor Folder'}
           </Button>
@@ -232,8 +232,8 @@ export function EditInvestorPage() {
         onCancel={() => setInterestToDelete(null)}
       />
 
-      {storage?.FileExplorerDialogComponent && investor?.folder &&
-        <storage.FileExplorerDialogComponent isOpen={fileExplorerOpen} onClose={() => { setFileExplorerOpen(false) }} folderId={investor.folder} />
+      {storage?.FileExplorerDialogComponent && investor?.folder_id &&
+        <storage.FileExplorerDialogComponent isOpen={fileExplorerOpen} onClose={() => { setFileExplorerOpen(false) }} folderId={investor.folder_id} />
       }
     </div>
   );
