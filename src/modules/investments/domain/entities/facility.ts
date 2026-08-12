@@ -1,6 +1,7 @@
 import type { Dossier } from "./dossier";
 import type { Plot } from "./plot";
 import type { PartnershipType } from "./partnershipType";
+import type { AuthorizedPerson } from "./authorizedPerson";
 
 export interface Facility {
   id: number;
@@ -27,4 +28,6 @@ export interface Facility {
   electrical_power_capacity?: string;
   yearly_estimated_water_consumption?: number ;
   folder_id?: string;
+  require_all_persons_for_legal_matters:boolean;
+  authorized_persons?:AuthorizedPerson[]
 }

@@ -5,6 +5,8 @@ import type { PartnershipType } from '../../domain/entities/partnershipType';
 import type { UseEntityCrudReturn } from '../../../../core/presentation/hooks/data/useEntity';
 import { getCreatePartnershipTypeFormSchema } from '../schemas/partnershipTypeForm.schema';
 import { getLocalizedName } from '../../../../core/presentation/utils/helpes';
+import { AuthorizedPersonsField } from './AuthorizedPersonsInput';
+import type { AuthorizedPersonPayload } from './authorizedPersons';
 
 type Translate = (key: string, module?: string) => string;
 
@@ -24,7 +26,7 @@ export const buildFacilityFormFields = (t: Translate, deps: FacilityFormDeps): F
     options: deps.partnershipTypes.map(pt => ({ value: pt.id, label: getLocalizedName(pt.name), is_default: pt.is_default })),
     createTitle: t('partnership_types.create', 'investments') || 'Create Partnership Type',
     labelPath: 'name',
-    // createButtonPermission: 'investments.partnership-types.create',
+    createButtonPermission: 'investments.partnership-types.create',
     renderCreateForm: (onSuccessForm, onCancelForm) => (
       <GenericCreateForm
         schema={getCreatePartnershipTypeFormSchema(t)}
@@ -54,6 +56,12 @@ export const buildFacilityFormFields = (t: Translate, deps: FacilityFormDeps): F
   { name: 'yearly_production_capacity', type: 'number', label: t('facilities.yearly_production_capacity', 'investments') || 'Annual Capacity', required: true, group: 'production' },
   { name: 'electrical_power_capacity', type: 'text', label: t('facilities.electrical_power_capacity', 'investments') || 'Power Capacity', required: true, group: 'utilities' },
   { name: 'yearly_estimated_water_consumption', type: 'number', label: t('facilities.yearly_estimated_water_consumption', 'investments') || 'Water Consumption', required: true, group: 'utilities' },
+  {
+    name: 'authorized_persons',
+    label: t('facilities.authorized_persons', 'investments') || 'Authorized Persons',
+    group: 'authorized_persons',
+    render: (methods) => <AuthorizedPersonsField methods={methods} />,
+  },
 ];
 
 export const buildFacilityFormGroups = (t: Translate): GroupConfig[] => [
@@ -96,9 +104,15 @@ export const buildFacilityFormGroups = (t: Translate): GroupConfig[] => [
     columns: 2,
     rows: [['electrical_power_capacity', 'yearly_estimated_water_consumption']],
   },
+  {
+    group: 'authorized_persons',
+    title: t('facilities.group_authorized_persons', 'investments') || 'Authorized Persons',
+    columns: 1,
+    rows: [['authorized_persons']],
+  },
 ];
 
-export const buildFacilityDefaultValues = (facility: Facility): Record<string, string | number | null | undefined> => ({
+export const buildFacilityDefaultValues = (facility: Facility): Record<string, string | number | null | undefined | AuthorizedPersonPayload[] > => ({
   name: facility.name,
   partnership_type_id: facility.partnership_type?.id ?? facility.partnership_type_id ?? null,
   address: facility.address,
@@ -116,4 +130,5 @@ export const buildFacilityDefaultValues = (facility: Facility): Record<string, s
   yearly_production_capacity: facility.yearly_production_capacity,
   electrical_power_capacity: String(facility.electrical_power_capacity ?? ''),
   yearly_estimated_water_consumption: facility.yearly_estimated_water_consumption,
+  authorized_persons: facility.authorized_persons as AuthorizedPersonPayload[] | undefined,
 });

@@ -324,6 +324,7 @@
     "plot_code": "رمز المقسم",
     "dossier_number": "رقم الملف",
     "partnership_type": "نوع الشراكة",
+    "partnership_type_name": "اسم نوع الشراكة",
     "folder": "مجلد المنشأة",
     "address": "العنوان",
     "city": "المدينة",
@@ -367,6 +368,15 @@
     "group_financial": "المعلومات المالية",
     "group_production": "الطاقة الإنتاجية",
     "group_utilities": "المرافق",
+    "group_authorized_persons": "الأشخاص المخولون",
+    "authorized_persons": "الأشخاص المخولون",
+    "authorized_persons_person": "الشخص (الاسم / البريد الإلكتروني / الهاتف)",
+    "authorized_persons_role": "الدور في المنشأة",
+    "authorized_persons_role_placeholder": "الدور بالنسبة للمنشأة",
+    "authorized_persons_required_label": "مطلوب للمسائل القانونية",
+    "authorized_persons_primary_phone": "الهاتف الأساسي",
+    "authorized_persons_whatsapp": "واتساب",
+    "authorized_persons_facebook": "فيسبوك",
     "plot_id": "المقسم",
     "plot_dossier_id": "الإضبارة",
     "id": "ID",
@@ -386,7 +396,9 @@
       "monthly_production_capacity_positive": "يجب أن يكون رقماً موجباً",
       "yearly_production_capacity_positive": "يجب أن يكون رقماً موجباً",
       "electrical_power_capacity_required": "هذا الحقل مطلوب",
-      "yearly_estimated_water_consumption_positive": "يجب أن يكون رقماً موجباً"
+      "yearly_estimated_water_consumption_positive": "يجب أن يكون رقماً موجباً",
+      "authorized_person_name_required": "اسم الشخص مطلوب",
+      "authorized_person_identity_required": "أدخل اسم الشخص أو اختر شخصاً موجوداً"
     }
   },
   "investors": {
