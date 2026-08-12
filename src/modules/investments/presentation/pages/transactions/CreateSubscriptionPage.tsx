@@ -11,19 +11,14 @@ import type { PickerConfig } from '../../../../../core/presentation/layouts/ui/p
 import type { ColumnDef } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import type { Plot } from '../../../domain/entities/plot';
-import type { IndustryCategory } from '../../../domain/entities/industryCategory';
-import type { IndustryType } from '../../../domain/entities/industryType';
-import type { IndustrialDecisionType } from '../../../domain/entities/industrialDecisionType';
-import type { IndustrialLicenseSource } from '../../../domain/entities/industrialLicenseSource';
-
-import { getCreateFacilityIndustrialLicenseFormSchema } from '../../schemas/facilityIndustrialLicenseForm.schema';
-import { buildFacilityFormFields, buildFacilityFormGroups } from '../../forms/facilityFormConfig';
-import { buildFacilityIndustrialLicenseFormFields, buildFacilityIndustrialLicenseFormGroups } from '../../forms/facilityIndustrialLicenseFormConfig';
 import { getCreateFacilityFormSchema } from '../../schemas/facilityForm.schema';
+import { buildFacilityFormFields, buildFacilityFormGroups } from '../../forms/facilityFormConfig';
 import { getCreateInvestorFormSchema } from '../../schemas/investorForm.schema';
 import { buildInvestorFormFields, buildInvestorFormGroups } from '../../forms/investorFormConfig';
 import type { Investor } from '../../../domain/entities/investor';
 import type { PartnershipType } from '../../../domain/entities/partnershipType';
+import { useSubscription } from '../../hooks/useSubscription';
+import type { CreateSubscriptionDTO, SubscriptionAuthorizedPersonPayload } from '../../../domain/repositories/ISubscriptionRepository';
 
 type FetchParams = Record<string, string | number | boolean | undefined>;
 
@@ -32,12 +27,9 @@ export function CreateSubscriptionPage() {
   const navigate = useNavigate();
 
   const plotsCrud = useEntityCrud<Plot>('/investments/plots', '/investments/plots');
-  const categoriesCrud = useEntityCrud<IndustryCategory>('/investments/industry-categories', '/investments/industry-categories');
-  const industryTypesCrud = useEntityCrud<IndustryType>('/investments/industry-types', '/investments/industry-types');
-  const decisionTypesCrud = useEntityCrud<IndustrialDecisionType>('/investments/industrial-decision-types', '/investments/industrial-decision-types');
-  const licenseSourcesCrud = useEntityCrud<IndustrialLicenseSource>('/investments/industrial-license-sources', '/investments/industrial-license-sources');
   const investorsCrud = useEntityCrud<Investor>('/investments/investors', '/investments/investors');
   const partnershipTypesCrud = useEntityCrud<PartnershipType>('/investments/partnership-types', '/investments/partnership-types');
+  const { createSubscription } = useSubscription();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
@@ -62,10 +54,6 @@ export function CreateSubscriptionPage() {
 
   useEffect(() => {
 fetchPlots({ page: 1, per_page: perPage });
-    categoriesCrud.getAll('/investments/industry-categories?is_active=true');
-    industryTypesCrud.getAll('/investments/industry-types?is_active=true');
-    decisionTypesCrud.getAll('/investments/industrial-decision-types?is_active=true');
-    licenseSourcesCrud.getAll('/investments/industrial-license-sources?is_active=true');
     investorsCrud.getAll('/investments/investors?page=1&per_page=25');
     partnershipTypesCrud.getAll('/investments/partnership-types?is_active=true');
   }, []);
@@ -206,17 +194,6 @@ fetchPlots({ page: 1, per_page: perPage });
     },
   };
 
-  const licenseDeps = {
-    categories: categoriesCrud.entities,
-    createCategory: categoriesCrud.create,
-    industryTypes: industryTypesCrud.entities,
-    createIndustryType: industryTypesCrud.create,
-    decisionTypes: decisionTypesCrud.entities,
-    createDecisionType: decisionTypesCrud.create,
-    licenseSources: licenseSourcesCrud.entities,
-    createLicenseSource: licenseSourcesCrud.create,
-  };
-
   const facilityDeps = {
     partnershipTypes: partnershipTypesCrud.entities,
     createPartnershipType: partnershipTypesCrud.create,
@@ -233,14 +210,13 @@ fetchPlots({ page: 1, per_page: perPage });
     },
     {
       name: 'investor_ids',
-      label: t('transactions.investors', 'investments') || 'Investors',
+      label: t('transactions.partners', 'investments') || 'Partners',
       type: 'table-picker',
       required: true,
-      group: 'investors',
+      group: 'partners',
       pickerConfig: investorPickerConfig,
     },
     ...buildFacilityFormFields(t, facilityDeps),
-    ...buildFacilityIndustrialLicenseFormFields(t, licenseDeps),
   ];
 
   const groups: GroupConfig[] = [
@@ -251,20 +227,15 @@ fetchPlots({ page: 1, per_page: perPage });
       rows: [['plot_id']],
     },
     {
-      group: 'investors',
-      title: t('transactions.group_investors', 'investments') || 'Investors',
+      group: 'partners',
+      title: t('transactions.group_partners', 'investments') || 'Partners',
       columns: 1,
       rows: [['investor_ids']],
     },
     {
       group: 'facility',
       title: t('facilities.title', 'investments') || 'Facility',
-      children: [...buildFacilityFormGroups(t)],
-    },
-    {
-      group: 'facility_license',
-      title: t('facility_industrial_licenses.title', 'investments') || 'Facility License',
-      children: [...buildFacilityIndustrialLicenseFormGroups(t)],
+      children: buildFacilityFormGroups(t),
     },
   ];
 
@@ -272,15 +243,40 @@ fetchPlots({ page: 1, per_page: perPage });
     plot_id: z.number( t('transactions.validation.plot_required', 'investments') || 'Plot is required' ),
     investor_ids: z.array(z.number()).min(1, t('transactions.validation.investors_required', 'investments') || 'At least one investor is required'),
     ...getCreateFacilityFormSchema(t).shape,
-    ...getCreateFacilityIndustrialLicenseFormSchema(t).shape,
   });
 
   const handleSubmit = async (data: Record<string, unknown>) => {
     try {
-      // TODO: wire to the subscription backend endpoint when available
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      toast.success(t('transactions.created', 'investments') || 'Subscription created successfully');
-      return { data: { id: Date.now() } };
+      const plotId = Number(data.plot_id);
+      const payload: CreateSubscriptionDTO = {
+        facility: {
+          name: String(data.name ?? ''),
+          partnership_type_id: (data.partnership_type_id as number | null) ?? null,
+          address: String(data.address ?? ''),
+          city: String(data.city ?? ''),
+          first_phone_number: String(data.first_phone_number ?? ''),
+          second_phone_number: (data.second_phone_number as string) || null,
+          email: (data.email as string) || null,
+          capital_in_usd: Number(data.capital_in_usd),
+          capital_in_syp: Number(data.capital_in_syp),
+          value_of_machines_in_usd: Number(data.value_of_machines_in_usd),
+          value_of_machines_in_syp: Number(data.value_of_machines_in_syp),
+          number_of_workers: Number(data.number_of_workers),
+          daily_production_capacity: Number(data.daily_production_capacity),
+          monthly_production_capacity: Number(data.monthly_production_capacity),
+          yearly_production_capacity: Number(data.yearly_production_capacity),
+          electrical_power_capacity: String(data.electrical_power_capacity ?? ''),
+          yearly_estimated_water_consumption: Number(data.yearly_estimated_water_consumption),
+          require_all_persons_for_legal_matters: Boolean(data.require_all_persons_for_legal_matters),
+        },
+        authorized_persons: ((data.authorized_persons as SubscriptionAuthorizedPersonPayload[] | undefined) ?? []),
+        partners: {
+          investors_ids: (data.investor_ids as number[] | undefined) ?? [],
+        },
+      };
+      await createSubscription(plotId, payload);
+      navigate('/investments/plots');
+      return { data: { id: plotId } };
     } catch (err: unknown) {
       handleApiError(err, { module: 'investments' });
       throw err;
@@ -304,6 +300,7 @@ fetchPlots({ page: 1, per_page: perPage });
           schema={schema}
           fields={fields}
           groups={groups}
+          defaultValues={{ require_all_persons_for_legal_matters: true }}
           onSubmit={handleSubmit}
           onSuccess={() => {}}
           onCancel={() => navigate('/investments/transactions')}

@@ -33,10 +33,10 @@ export function ChatFloatingButton() {
 
   return (
     <>
-      <div className="fixed bottom-6 left-6 z-50 flex flex-row items-end gap-2">
+      <div className="fixed bottom-6 left-0 z-50 flex flex-row items-end gap-2">
         {visibleNotification && (
           <div
-            className="bg-card border border-border rounded-xl shadow-xl p-3 max-w-65 animate-zoom-in cursor-pointer"
+            className={`bg-card border border-border rounded-xl shadow-xl p-3 max-w-65 animate-zoom-in cursor-pointer transition-transform duration-300 ${open ? 'translate-x-0' : '-translate-x-11 hover:translate-x-0'}`}
         onClick={() => setOpen(true)}
           >
             <div className="flex items-start justify-between gap-2">
@@ -52,18 +52,20 @@ export function ChatFloatingButton() {
             <p className="text-xs text-text-muted mt-0.5 line-clamp-2">{visibleNotification.body}</p>
           </div>
         )}
-        <Button
-          variant="primary"
-          className="rounded-full w-14 h-14 shadow-lg flex items-center justify-center relative"
-          onClick={() => setOpen(true)}
-        >
-          <MessageCircle />
-          {totalUnread > 0 && (
-            <span className="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-bold rounded-full min-w-4.5 h-4.5 flex items-center justify-center px-1 leading-none">
-              {totalUnread > 99 ? "99+" : totalUnread}
-            </span>
-          )}
-        </Button>
+        <div className={`transition-transform duration-300 ${open ? 'translate-x-0' : '-translate-x-11 hover:translate-x-0'}`}>
+          <Button
+            variant="primary"
+            className="rounded-full w-14 h-14 shadow-lg flex items-center justify-center relative"
+            onClick={() => setOpen(true)}
+          >
+            <MessageCircle />
+            {totalUnread > 0 && (
+              <span className="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-bold rounded-full min-w-4.5 h-4.5 flex items-center justify-center px-1 leading-none">
+                {totalUnread > 99 ? "99+" : totalUnread}
+              </span>
+            )}
+          </Button>
+        </div>
       </div>
       <ChatDialog
         isOpen={open}

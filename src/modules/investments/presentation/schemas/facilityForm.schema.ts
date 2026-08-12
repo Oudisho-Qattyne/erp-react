@@ -29,7 +29,22 @@ export const getAuthorizedPersonSchema = (t: (key: string, module?: string) => s
         ),
       role_in_facility: z.string().optional(),
       is_required_for_legal_matters: z.boolean().optional(),
-    });
+    })
+    .refine(
+      (entry) => {
+        const hasPerson =
+          entry.person.id !== undefined ||
+          (entry.person.name !== undefined && entry.person.name.trim().length > 0);
+        if (!hasPerson) return true;
+        return !!entry.role_in_facility?.trim();
+      },
+      {
+        message:
+          t('facilities.validation.authorized_person_role_required', 'investments') ||
+          'Role in Facility is required',
+        path: ['role_in_facility'],
+      }
+    );
 
 export const getCreateFacilityFormSchema = (t: (key: string, module?: string) => string) => z.object({
   name: z.string().min(1, t('facilities.validation.name_required', 'investments') || 'Name is required'),
@@ -50,6 +65,7 @@ export const getCreateFacilityFormSchema = (t: (key: string, module?: string) =>
   electrical_power_capacity: z.string().min(1, t('facilities.validation.electrical_power_capacity_required', 'investments') || 'Required'),
   yearly_estimated_water_consumption: z.number().positive(t('facilities.validation.yearly_estimated_water_consumption_positive', 'investments') || 'Must be positive'),
   authorized_persons: z.array(getAuthorizedPersonSchema(t)).optional(),
+  require_all_persons_for_legal_matters: z.boolean().optional().default(true),
 });
 
 const dummyT = (() => '') as (key: string, module?: string) => string;

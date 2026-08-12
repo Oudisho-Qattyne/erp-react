@@ -184,6 +184,9 @@
     "status_cancelled": "Cancelled",
     "status_active": "Allocated",
     "status_allocatable": "Allocatable",
+    "status_pending_subscription_fee": "Pending Subscription Fee",
+    "status_subscription_fee_paid": "Subscription Fee Paid",
+    "status_subscription_approved": "Subscription Approved",
     "view": "View Dossier",
     "allocate": "Allocate",
     "created": "Dossier created successfully",
@@ -373,6 +376,7 @@
     "authorized_persons_role": "Role in Facility",
     "authorized_persons_role_placeholder": "Role based on facility",
     "authorized_persons_required_label": "Required for Legal Matters",
+    "require_all_persons_for_legal_matters": "Require All Persons for Legal Matters",
     "authorized_persons_primary_phone": "Primary Phone",
     "authorized_persons_whatsapp": "WhatsApp",
     "authorized_persons_facebook": "Facebook",
@@ -397,7 +401,9 @@
       "electrical_power_capacity_required": "This field is required",
       "yearly_estimated_water_consumption_positive": "Must be a positive number",
       "authorized_person_name_required": "Person name is required",
-      "authorized_person_identity_required": "Provide a person name or select an existing person"
+      "authorized_person_identity_required": "Provide a person name or select an existing person",
+      "authorized_person_role_required": "Role in Facility is required",
+      "authorized_person_phone_invalid": "Invalid phone number"
     }
   },
   "investors": {
@@ -1049,6 +1055,8 @@
     "plot": "Plot",
     "investors": "Investors",
     "group_investors": "Investors",
+    "partners": "Partners",
+    "group_partners": "Partners",
     "select_investors": "Select Investors",
     "validation": {
       "plot_required": "Plot is required",

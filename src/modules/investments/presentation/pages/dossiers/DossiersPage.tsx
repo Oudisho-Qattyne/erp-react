@@ -20,6 +20,9 @@ const statusStyles: Record<string, { color: string; bg: string }> = {
   cancelled: { color: '#dc2626', bg: '#fef2f2' },
   allocatable: { color: '#2563eb', bg: '#dbeafe' },
   draft: { color: '#ca8a04', bg: '#fefce8' },
+  pending_subscription_fee: { color: '#d97706', bg: '#fef3c7' },
+  subscription_fee_paid: { color: '#059669', bg: '#d1fae5' },
+  subscription_approved: { color: '#16a34a', bg: '#dcfce7' },
 };
 
 export function DossiersPage() {
@@ -89,8 +92,11 @@ export function DossiersPage() {
       options: [
         { value: '', label: t('common.all', 'shared') || 'All' },
         { value: 'draft', label: t('dossier.status_draft', 'investments') || 'Draft' },
-        { value: 'active', label: t('dossier.status_active', 'investments') || 'Allocated' },
+        { value: 'pending_subscription_fee', label: t('dossier.status_pending_subscription_fee', 'investments') || 'Pending Subscription Fee' },
+        { value: 'subscription_fee_paid', label: t('dossier.status_subscription_fee_paid', 'investments') || 'Subscription Fee Paid' },
         { value: 'allocatable', label: t('dossier.status_allocatable', 'investments') || 'Allocatable' },
+        { value: 'active', label: t('dossier.status_active', 'investments') || 'Allocated' },
+        { value: 'subscription_approved', label: t('dossier.status_subscription_approved', 'investments') || 'Subscription Approved' },
         { value: 'cancelled', label: t('dossier.status_cancelled', 'investments') || 'Cancelled' },
       ],
     },

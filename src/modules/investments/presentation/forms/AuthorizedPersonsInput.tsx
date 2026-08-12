@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
-import type { FieldValues, UseFormReturn } from 'react-hook-form';
+import { useFormState, type FieldValues, type UseFormReturn } from 'react-hook-form';
 import { DataMatrixInput, type MatrixFieldConfig } from '../../../../core/presentation/layouts/ui/inputs/DataMatrixInput';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
@@ -25,6 +25,8 @@ export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps)
   const [rows, setRows] = useState<Record<string, unknown>[]>(() =>
     authorizedPersonsPayloadToRows((getValues('authorized_persons') as AuthorizedPersonPayload[] | undefined) ?? undefined)
   );
+
+  const { errors } = useFormState({ name: 'authorized_persons' as any });
 
   const prevSubmitSuccessfulRef = useRef(false);
   const { isSubmitSuccessful } = formState;
@@ -63,6 +65,7 @@ export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps)
     { name: 'id', label: 'ID', type: 'numeric', disabled: true, defaultValue: null },
     {
       name: 'name',
+      type:'alpha',
       label: t('facilities.authorized_persons_person', 'investments') || 'Person (name / email / phone)',
       required: true,
       hints: {
@@ -86,12 +89,12 @@ export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps)
     {
       name: 'primary_phone_number',
       label: t('facilities.authorized_persons_primary_phone', 'investments') || 'Primary Phone',
-      type: 'text',
+      type: 'numeric',
     },
     {
       name: 'whatsapp',
       label: t('facilities.authorized_persons_whatsapp', 'investments') || 'WhatsApp',
-      type: 'text',
+      type: 'numeric',
     },
     {
       name: 'facebook',
@@ -112,20 +115,62 @@ export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps)
     },
   ];
 
-  const rowSchema = z.object({
-    id: z.number().nullable().optional(),
-    name: z
-      .string()
-      .min(1, t('facilities.validation.authorized_person_name_required', 'investments') || 'Person name is required'),
-    email: z.string().optional(),
-    primary_phone_number: z.string().optional(),
-    whatsapp: z.string().optional(),
-    facebook: z.string().optional(),
-    role_in_facility: z.string().optional(),
-    is_required_for_legal_matters: z.boolean().optional(),
-    __original_name: z.string().optional(),
-    __original_email: z.string().optional(),
-  });
+  const rowSchema = z
+    .object({
+      id: z.number().nullable().optional(),
+      name: z
+        .string()
+        .min(1, t('facilities.validation.authorized_person_name_required', 'investments') || 'Person name is required'),
+      email: z
+        .union([
+          z.literal(''),
+          z.string().email(t('facilities.validation.email_invalid', 'investments') || 'Invalid email address'),
+        ])
+        .optional(),
+      primary_phone_number: z
+        .union([
+          z.literal(''),
+          z.string().regex(/^[0-9+\s()\-]*$/, t('facilities.validation.authorized_person_phone_invalid', 'investments') || 'Invalid phone number'),
+        ])
+        .optional(),
+      whatsapp: z
+        .union([
+          z.literal(''),
+          z.string().regex(/^[0-9+\s()\-]*$/, t('facilities.validation.authorized_person_phone_invalid', 'investments') || 'Invalid phone number'),
+        ])
+        .optional(),
+      facebook: z.string().optional(),
+      role_in_facility: z.string().optional(),
+      is_required_for_legal_matters: z.boolean().optional(),
+      __original_name: z.string().optional(),
+      __original_email: z.string().optional(),
+    })
+    .superRefine((row, ctx) => {
+      const hasPerson = String(row.name ?? '').trim().length > 0;
+      if (hasPerson && !String(row.role_in_facility ?? '').trim()) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['role_in_facility'],
+          message: t('facilities.validation.authorized_person_role_required', 'investments') || 'Role in Facility is required',
+        });
+      }
+    });
 
-  return <DataMatrixInput value={rows} onChange={setRows} matrixFields={matrixFields} rowSchema={rowSchema} />;
+  const matrixErrors = useMemo(() => {
+    const errs: Record<number, Record<string, string>> = {};
+    const raw = (errors as any)?.authorized_persons;
+    if (!Array.isArray(raw)) return errs;
+    const fieldNames = matrixFields.map((f) => f.name);
+    raw.forEach((rowErr: any, rowIndex: number) => {
+      if (!rowErr || typeof rowErr !== 'object') return;
+      if (!errs[rowIndex]) errs[rowIndex] = {};
+      Object.entries(rowErr).forEach(([fieldName, val]: [string, any]) => {
+        const msg = typeof val === 'object' && val?.message ? String(val.message) : String(val);
+        if (fieldNames.includes(fieldName)) errs[rowIndex][fieldName] = msg;
+      });
+    });
+    return errs;
+  }, [errors, matrixFields]);
+
+  return <DataMatrixInput value={rows} onChange={setRows} matrixFields={matrixFields} rowSchema={rowSchema} errors={matrixErrors} />;
 }
