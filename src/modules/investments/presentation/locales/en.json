@@ -366,6 +366,12 @@
     "group_financial": "Financial Information",
     "group_production": "Production Capacity",
     "group_utilities": "Utilities",
+    "group_authorized_persons": "Authorized Persons",
+    "authorized_persons": "Authorized Persons",
+    "authorized_persons_person": "Person (name / email / phone)",
+    "authorized_persons_role": "Role in Facility",
+    "authorized_persons_role_placeholder": "e.g. General Manager",
+    "authorized_persons_required_label": "Required for Legal Matters",
     "plot_id": "Plot",
     "plot_dossier_id": "Dossier",
     "id": "ID",
@@ -385,7 +391,9 @@
       "monthly_production_capacity_positive": "Must be a positive number",
       "yearly_production_capacity_positive": "Must be a positive number",
       "electrical_power_capacity_required": "This field is required",
-      "yearly_estimated_water_consumption_positive": "Must be a positive number"
+      "yearly_estimated_water_consumption_positive": "Must be a positive number",
+      "authorized_person_name_required": "Person name is required",
+      "authorized_person_identity_required": "Provide a person name or select an existing person"
     }
   },
   "investors": {

@@ -72,7 +72,7 @@ export function HintsInput({
     return () => {
       cancelled = true;
     };
-  }, [trimmedQuery, minChars, searchApi, dependentData]);
+  }, [trimmedQuery, minChars, dependentData]);
 
   const resultsMatch = results?.query === trimmedQuery;
   const hints = resultsMatch ? results!.items : [];
