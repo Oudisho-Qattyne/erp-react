@@ -21,9 +21,9 @@ interface TransactionCardConfig {
 
 const transactionCards: TransactionCardConfig[] = [
   { key: 'subscription', icon: Coins },
-  { key: 'bonds', icon: Landmark },
-  { key: 'financing', icon: Banknote },
-  { key: 'dividends', icon: TrendingUp },
+  // { key: 'bonds', icon: Landmark },
+  // { key: 'financing', icon: Banknote },
+  // { key: 'dividends', icon: TrendingUp },
 ];
 
 export function TransactionsPage() {
@@ -70,7 +70,7 @@ export function TransactionsPage() {
               <div className="w-16 h-16 rounded-2xl bg-gold/15 text-gold flex items-center justify-center shadow-inner">
                 <Icon size={32} />
               </div>
-              <h3 className="text-3xl font-black text-text">
+              <h3 className="text-3xl font-black text-black">
                 {t(`transactions.${key}`, 'investments') || key}
               </h3>
               <p className="text-sm text-text-muted text-center leading-relaxed">

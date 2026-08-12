@@ -131,7 +131,7 @@ const investmentsModule: Module = {
       // requiredPermission: 'investments.transactions.list',
       moduleName: 'investments',
       icon: <Coins size={18} />,
-      group: 'investments',
+      group: 'investments_transactions',
     },
     {
       path: '/investments/transactions/create',
@@ -141,7 +141,7 @@ const investmentsModule: Module = {
       nav: false,
       // requiredPermission: 'investments.transactions.create',
       moduleName: 'investments',
-      group: 'investments',
+      group: 'investments_transactions',
     },
     {
       path: '/investments/partnership-types',
@@ -373,6 +373,7 @@ const investmentsModule: Module = {
   locales: { en: enLocales, ar: arLocales },
   navGroups: [
     { id: 'investments', label: 'title', order: 20, icon: <Map size={10} className="shrink-0" /> },
+    { id: 'investments_transactions', label: 'transactions.title', order: 21, icon: <Coins size={10} className="shrink-0" /> },
   ],
 };
 

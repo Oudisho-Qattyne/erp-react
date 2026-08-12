@@ -185,6 +185,9 @@
     "status_cancelled": "ملغي",
     "status_active": "مخصص",
     "status_allocatable": "قابل للتخصيص",
+    "status_pending_subscription_fee": "في انتظار رسم الاكتتاب",
+    "status_subscription_fee_paid": "تم دفع رسم الاكتتاب",
+    "status_subscription_approved": "تمت الموافقة على الاكتتاب",
     "view": "عرض الإضبارة",
     "allocate": "تخصيص",
     "created": "تم إنشاء الإضبارة بنجاح",
@@ -374,6 +377,7 @@
     "authorized_persons_role": "الدور في المنشأة",
     "authorized_persons_role_placeholder": "الدور بالنسبة للمنشأة",
     "authorized_persons_required_label": "مطلوب للمسائل القانونية",
+    "require_all_persons_for_legal_matters": "مطلوب جميع الأشخاص للمسائل القانونية",
     "authorized_persons_primary_phone": "الهاتف الأساسي",
     "authorized_persons_whatsapp": "واتساب",
     "authorized_persons_facebook": "فيسبوك",
@@ -398,7 +402,9 @@
       "electrical_power_capacity_required": "هذا الحقل مطلوب",
       "yearly_estimated_water_consumption_positive": "يجب أن يكون رقماً موجباً",
       "authorized_person_name_required": "اسم الشخص مطلوب",
-      "authorized_person_identity_required": "أدخل اسم الشخص أو اختر شخصاً موجوداً"
+      "authorized_person_identity_required": "أدخل اسم الشخص أو اختر شخصاً موجوداً",
+      "authorized_person_role_required": "الدور في المنشأة مطلوب",
+      "authorized_person_phone_invalid": "رقم هاتف غير صالح"
     }
   },
   "investors": {
@@ -1050,6 +1056,8 @@
     "plot": "المقسم",
     "investors": "المستثمرون",
     "group_investors": "المستثمرون",
+    "partners": "الشركاء",
+    "group_partners": "الشركاء",
     "select_investors": "اختيار المستثمرين",
     "validation": {
       "plot_required": "المقسم مطلوب",

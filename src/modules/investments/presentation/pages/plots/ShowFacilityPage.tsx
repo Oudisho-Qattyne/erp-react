@@ -12,8 +12,6 @@ import { SectionCard } from '../../../../../core/presentation/layouts/ui/card/Se
 import { InfoRow } from '../../../../../core/presentation/layouts/ui/card/InfoRow';
 import { DossierDetailsSection } from './components/DossierDetailsSection';
 import { PlotDetailsSection } from './components/PlotDetailsSection';
-import { FacilityIndustrialLicensesSection } from './components/FacilityIndustrialLicensesSection';
-import { BuildingLicenseSection } from './components/BuildingLicenseSection';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 import { ArrowRight, Factory, History, FolderOpen, Users } from 'lucide-react';
@@ -74,9 +72,6 @@ export function ShowFacilityPage() {
   }, [dossierId, plotId]);
 
   const handleBack = () => navigate(`/investments/plots/${plotId}/dossiers/${dossierId}`);
-
-  const plotStatus = plot?.status ?? null;
-  const canShowLicenses = plotStatus === 'allocated' && dossier?.status === 'active';
 
   if (loading) return <div className="p-6"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>;
   if (error) return <div className="p-6"><ErrorState message={error} onRetry={() => window.location.reload()} /></div>;
@@ -180,14 +175,6 @@ export function ShowFacilityPage() {
           ? <div className="py-8"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>
           : <PlotDetailsSection plotId={plotId} plot={plot} />
         )
-      }
-      {
-        facilityId && canShowLicenses &&
-        <FacilityIndustrialLicensesSection facilityId={facilityId} />
-      }
-      {
-        facilityId && canShowLicenses &&
-        <BuildingLicenseSection facilityId={facilityId} />
       }
 
       <AuditLog

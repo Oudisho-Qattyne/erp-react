@@ -66,7 +66,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
     defaultValues: {
       dossier_number: '',
       dossier_date: new Date().toISOString().split('T')[0],
-      status: plotStatus == "allocated" ? "active" : 'allocatable',
+      status: 'pending_subscription_fee',
     },
   });
 
@@ -256,7 +256,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
         <h2 className="text-lg font-semibold">{t('dossier.title', 'investments') || 'Dossiers'}</h2>
         <div className="flex items-center gap-2">
           {canManage && (
-            <Button size="sm" onClick={() => { form.reset({ dossier_number: '', dossier_date: new Date().toISOString().split('T')[0], status: 'allocatable' }); form.setValue('status' , plotStatus == "allocated" ? "active" : "allocatable"); setShowAdd(true); }}
+            <Button size="sm" onClick={() => { form.reset({ dossier_number: '', dossier_date: new Date().toISOString().split('T')[0], status: 'pending_subscription_fee' }); setShowAdd(true); }}
               requiredPermission="investments.plot-dossier.create">
               <Plus size={16} className="mr-1" />
               {t('dossier.add', 'investments') || 'Add Dossier'}
@@ -309,14 +309,19 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
               type="select"
               options={isEditing ? [
                 { value: 'draft', label: t('dossier.status_draft', 'investments') || 'Draft' },
-                { value: 'active', label: t('dossier.status_active', 'investments') || 'Allocated' },
+                { value: 'pending_subscription_fee', label: t('dossier.status_pending_subscription_fee', 'investments') || 'Pending Subscription Fee' },
+                { value: 'subscription_fee_paid', label: t('dossier.status_subscription_fee_paid', 'investments') || 'Subscription Fee Paid' },
                 { value: 'allocatable', label: t('dossier.status_allocatable', 'investments') || 'Allocatable' },
+                { value: 'active', label: t('dossier.status_active', 'investments') || 'Allocated' },
+                { value: 'subscription_approved', label: t('dossier.status_subscription_approved', 'investments') || 'Subscription Approved' },
                 { value: 'cancelled', label: t('dossier.status_cancelled', 'investments') || 'Cancelled' },
-                
               ] : [
                 { value: 'draft', label: t('dossier.status_draft', 'investments') || 'Draft' },
-                { value: 'active', label: t('dossier.status_active', 'investments') || 'Allocated' },
+                { value: 'pending_subscription_fee', label: t('dossier.status_pending_subscription_fee', 'investments') || 'Pending Subscription Fee' },
+                { value: 'subscription_fee_paid', label: t('dossier.status_subscription_fee_paid', 'investments') || 'Subscription Fee Paid' },
                 { value: 'allocatable', label: t('dossier.status_allocatable', 'investments') || 'Allocatable' },
+                { value: 'active', label: t('dossier.status_active', 'investments') || 'Allocated' },
+                { value: 'subscription_approved', label: t('dossier.status_subscription_approved', 'investments') || 'Subscription Approved' },
                 { value: 'cancelled', label: t('dossier.status_cancelled', 'investments') || 'Cancelled' },
               ]}
             />

@@ -1,1 +1,1 @@
-export type DossierStatus = "draft"  | "active" | "allocatable" | "cancelled"
+export type DossierStatus = "draft"  | "active" | "allocatable" | "cancelled" | "pending_subscription_fee" | "subscription_fee_paid" | "subscription_approved"

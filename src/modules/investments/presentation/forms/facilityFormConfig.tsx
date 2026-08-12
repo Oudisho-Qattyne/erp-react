@@ -62,6 +62,12 @@ export const buildFacilityFormFields = (t: Translate, deps: FacilityFormDeps): F
     group: 'authorized_persons',
     render: (methods) => <AuthorizedPersonsField methods={methods} />,
   },
+  {
+    name: 'require_all_persons_for_legal_matters',
+    label: t('facilities.require_all_persons_for_legal_matters', 'investments') || 'Require All Persons for Legal Matters',
+    type: 'checkbox',
+    group: 'authorized_persons',
+  },
 ];
 
 export const buildFacilityFormGroups = (t: Translate): GroupConfig[] => [
@@ -108,11 +114,11 @@ export const buildFacilityFormGroups = (t: Translate): GroupConfig[] => [
     group: 'authorized_persons',
     title: t('facilities.group_authorized_persons', 'investments') || 'Authorized Persons',
     columns: 1,
-    rows: [['authorized_persons']],
+    rows: [['authorized_persons'], ['require_all_persons_for_legal_matters']],
   },
 ];
 
-export const buildFacilityDefaultValues = (facility: Facility): Record<string, string | number | null | undefined | AuthorizedPersonPayload[] > => ({
+export const buildFacilityDefaultValues = (facility: Facility): Record<string, string | number | null | undefined | boolean | AuthorizedPersonPayload[] > => ({
   name: facility.name,
   partnership_type_id: facility.partnership_type?.id ?? facility.partnership_type_id ?? null,
   address: facility.address,
@@ -130,5 +136,6 @@ export const buildFacilityDefaultValues = (facility: Facility): Record<string, s
   yearly_production_capacity: facility.yearly_production_capacity,
   electrical_power_capacity: String(facility.electrical_power_capacity ?? ''),
   yearly_estimated_water_consumption: facility.yearly_estimated_water_consumption,
+  require_all_persons_for_legal_matters: facility.require_all_persons_for_legal_matters ?? true,
   authorized_persons: facility.authorized_persons as AuthorizedPersonPayload[] | undefined,
 });
