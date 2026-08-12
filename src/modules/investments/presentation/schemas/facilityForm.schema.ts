@@ -15,6 +15,9 @@ export const getAuthorizedPersonSchema = (t: (key: string, module?: string) => s
             .email(t('facilities.validation.email_invalid', 'investments') || 'Invalid email address')
             .optional()
             .nullable(),
+          primary_phone_number: z.string().optional().nullable(),
+          whatsapp: z.string().optional().nullable(),
+          facebook: z.string().optional().nullable(),
         })
         .refine(
           (p) => p.id !== undefined || (p.name !== undefined && p.name.trim().length > 0),

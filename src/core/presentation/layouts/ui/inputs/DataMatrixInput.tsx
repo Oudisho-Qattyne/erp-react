@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { Button } from '../buttons/Button';
 import Input, { type InputType } from './Input';
@@ -118,6 +118,8 @@ export function DataMatrixInput({
   const { t } = useLanguage();
   const tableRef = useRef<HTMLTableElement>(null);
   const defaultRow = useMemo(() => getDefaultRow(matrixFields), [matrixFields]);
+  const [colWidths, setColWidths] = useState<Record<string, number>>({});
+  const dragRef = useRef<{ field: string; startX: number; startWidth: number } | null>(null);
   const rows = numberOfRows !== undefined
     ? Array.from({ length: numberOfRows }, (_, i) => value[i] || { ...defaultRow })
     : value;
@@ -181,6 +183,51 @@ export function DataMatrixInput({
   const canAdd = numberOfRows === undefined && rows.length < maxRows;
   const canRemove = numberOfRows === undefined && rows.length > minRows;
 
+  const getColumnWidth = (field: string): number => {
+    const table = tableRef.current;
+    if (!table) return 150;
+    const index = matrixFields.findIndex((f) => f.name === field);
+    const th = table.querySelectorAll('thead th')[index] as HTMLElement | undefined;
+    return th ? th.getBoundingClientRect().width : 150;
+  };
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const drag = dragRef.current;
+      if (!drag) return;
+      const table = tableRef.current;
+      const tableWidth = table ? table.getBoundingClientRect().width : 0;
+      const next = Math.min(Math.max(drag.startWidth + (e.clientX - drag.startX), 60), Math.max(tableWidth, 500));
+      setColWidths((prev) => ({ ...prev, [drag.field]: next }));
+    };
+    const handleMouseUp = () => {
+      if (dragRef.current) {
+        dragRef.current = null;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      if (dragRef.current) {
+        dragRef.current = null;
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    };
+  }, []);
+
+  const startResize = (e: React.MouseEvent, field: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragRef.current = { field, startX: e.clientX, startWidth: getColumnWidth(field) };
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
+
   const getTableAnchorRect = (rowIndex: number): HintRect | null => {
     const table = tableRef.current;
     if (!table) return null;
@@ -195,14 +242,24 @@ export function DataMatrixInput({
     <div className="space-y-2">
       <div className=" border border-border rounded-md">
 <table ref={tableRef} className="w-full border-collapse table-fixed">
+          <colgroup>
+            {matrixFields.map((field) => (
+              <col key={field.name} style={colWidths[field.name] ? { width: colWidths[field.name] } : undefined} />
+            ))}
+          </colgroup>
           <thead>
             <tr className="bg-muted/50">
               {matrixFields.map((field) => (
                 <th
                   key={field.name}
-                  className={`px-3 py-2 text-xs font-semibold text-text text-left border-b border-border ${baseClasses}`}
+                  className={`group relative px-3 py-2 text-xs font-semibold text-text text-left border-b border-border ${baseClasses}`}
                 >
                   {field.label}
+                  <div
+                    onMouseDown={(e) => startResize(e, field.name)}
+                    className="absolute top-0 bottom-0 right-0 w-1.5 cursor-col-resize bg-transparent hover:bg-primary/40 opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ touchAction: 'none' }}
+                  />
                 </th>
               ))}
               {canRemove && (

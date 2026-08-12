@@ -16,8 +16,10 @@ import { FacilityIndustrialLicensesSection } from './components/FacilityIndustri
 import { BuildingLicenseSection } from './components/BuildingLicenseSection';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
-import { ArrowRight, Factory, History, FolderOpen } from 'lucide-react';
+import { ArrowRight, Factory, History, FolderOpen, Users } from 'lucide-react';
 import { useStorage } from '../../../../../core/registry/storage/StorageProvider';
+import { DataMatrixInput, type MatrixFieldConfig } from '../../../../../core/presentation/layouts/ui/inputs/DataMatrixInput';
+import { authorizedPersonsPayloadToRows } from '../../forms/authorizedPersons';
 
 export function ShowFacilityPage() {
   const { t } = useLanguage();
@@ -121,7 +123,7 @@ export function ShowFacilityPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <InfoRow label={t('facilities.name', 'investments') || 'Name'} value={facility.name} />
-          <InfoRow label={t('facilities.partnership_type', 'investments') || 'Partnership Type'} value={facility.partnership_type ? getLocalizedName(facility.partnership_type.name) : '—'} />
+          <InfoRow label={t('facilities.partnership_type_name', 'investments') || 'Partnership Type Name'} value={facility.partnership_type ? getLocalizedName(facility.partnership_type.name) : '—'} />
           <InfoRow label={t('facilities.city', 'investments') || 'City'} value={facility.city} />
           <InfoRow label={t('facilities.address', 'investments') || 'Address'} value={facility.address} />
           <InfoRow label={t('facilities.first_phone_number', 'investments') || 'Phone'} value={facility.first_phone_number} />
@@ -138,6 +140,34 @@ export function ShowFacilityPage() {
           <InfoRow label={t('facilities.electrical_power_capacity', 'investments') || 'Power Capacity'} value={facility.electrical_power_capacity || '—'} />
           <InfoRow label={t('facilities.yearly_estimated_water_consumption', 'investments') || 'Water Consumption'} value={facility.yearly_estimated_water_consumption ?? '—'} />
         </div>
+      </SectionCard>
+
+      <SectionCard>
+        <div className='relative w-full flex justify-between items-center mb-6 pb-4'>
+          <h2 className="text-lg font-bold text-text flex items-center gap-2 border-b border-border/50">
+            <span className="text-primary"><Users size={20} /></span>
+            {t('facilities.authorized_persons', 'investments') || 'Authorized Persons'}
+          </h2>
+        </div>
+        {facility.authorized_persons?.length ? (
+          <DataMatrixInput
+            value={authorizedPersonsPayloadToRows(facility.authorized_persons)}
+            onChange={() => {}}
+            disabled
+            matrixFields={[
+              { name: 'id', label: 'ID', type: 'numeric', disabled: true },
+              { name: 'name', label: t('facilities.authorized_persons_person', 'investments') || 'Person (name / email / phone)', type: 'text' },
+              { name: 'email', label: t('facilities.email', 'investments') || 'Email', type: 'text' },
+              { name: 'primary_phone_number', label: t('facilities.authorized_persons_primary_phone', 'investments') || 'Primary Phone', type: 'text' },
+              { name: 'whatsapp', label: t('facilities.authorized_persons_whatsapp', 'investments') || 'WhatsApp', type: 'text' },
+              { name: 'facebook', label: t('facilities.authorized_persons_facebook', 'investments') || 'Facebook', type: 'text' },
+              { name: 'role_in_facility', label: t('facilities.authorized_persons_role', 'investments') || 'Role in Facility', type: 'text' },
+              { name: 'is_required_for_legal_matters', label: t('facilities.authorized_persons_required_label', 'investments') || 'Required', type: 'checkbox', defaultValue: true },
+            ]}
+          />
+        ) : (
+          <div className="text-sm text-muted-foreground">—</div>
+        )}
       </SectionCard>
       {plotId && dossierId &&
         (relationsLoading

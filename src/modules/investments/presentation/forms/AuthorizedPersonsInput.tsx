@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { z } from 'zod';
 import type { FieldValues, UseFormReturn } from 'react-hook-form';
 import { DataMatrixInput, type MatrixFieldConfig } from '../../../../core/presentation/layouts/ui/inputs/DataMatrixInput';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
-import { usePersons } from '../../../crm/presentation/hooks/usePersons';
+import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
+import { createPersonRepository } from '../../../crm/infrastructure/repositories/PersonRepository';
+import { createManagePersonsUseCase } from '../../../crm/application/usecases/managePersonsUseCase';
 import { authorizedPersonsPayloadToRows, authorizedPersonsRowsToPayload, emptyAuthorizedPersonRow, type AuthorizedPersonPayload } from './authorizedPersons';
 
 interface AuthorizedPersonsFieldProps {
@@ -12,60 +14,50 @@ interface AuthorizedPersonsFieldProps {
 
 export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps) {
   const { t } = useLanguage();
-  const { persons, setFilter, loading } = usePersons();
   const { setValue, getValues, formState } = methods;
 
-  const personsRef = useRef(persons);
-  const pendingSearchRef = useRef(false);
-  const prevSubmitSuccessful = useRef(false);
+  const apiClient = useApiClient();
+  const managePersons = useMemo(
+    () => createManagePersonsUseCase(createPersonRepository(apiClient)),
+    [apiClient]
+  );
 
   const [rows, setRows] = useState<Record<string, unknown>[]>(() =>
     authorizedPersonsPayloadToRows((getValues('authorized_persons') as AuthorizedPersonPayload[] | undefined) ?? undefined)
   );
 
-  useEffect(() => {
-    personsRef.current = persons;
-  }, [persons]);
-
-  useEffect(() => {
-    if (!loading.findAllPersons) pendingSearchRef.current = false;
-  }, [loading.findAllPersons]);
-
+  const prevSubmitSuccessfulRef = useRef(false);
   const { isSubmitSuccessful } = formState;
   useEffect(() => {
-    if (isSubmitSuccessful && !prevSubmitSuccessful.current) {
+    if (isSubmitSuccessful && !prevSubmitSuccessfulRef.current) {
       setRows([emptyAuthorizedPersonRow()]);
     }
-    prevSubmitSuccessful.current = isSubmitSuccessful;
+    prevSubmitSuccessfulRef.current = isSubmitSuccessful;
   }, [isSubmitSuccessful]);
 
   useEffect(() => {
     setValue('authorized_persons', authorizedPersonsRowsToPayload(rows), { shouldValidate: true });
   }, [rows, setValue]);
 
-  const searchPersonsApi = async (query: string): Promise<Record<string, unknown>[]> => {
-    if (!query.trim()) return [];
-    pendingSearchRef.current = true;
-    setFilter({ search: query.trim(), per_page: 10 });
-    const deadline = Date.now() + 8000;
-    while (pendingSearchRef.current && Date.now() < deadline) {
-      await new Promise((resolve) => setTimeout(resolve, 75));
-    }
-    const q = query.trim().toLowerCase();
-    return personsRef.current
-      .filter(
-        (p) =>
-          String(p.name ?? '').toLowerCase().includes(q) ||
-          String(p.email ?? '').toLowerCase().includes(q) ||
-          String(p.primary_phone_number ?? '').toLowerCase().includes(q)
-      )
-      .map((p) => ({
-        id: p.id,
-        name: p.name,
-        email: p.email ?? '',
-        phone: p.primary_phone_number ?? '',
-      }));
-  };
+  const searchPersonsApi = useCallback(
+    async (query: string): Promise<Record<string, unknown>[]> => {
+      if (!query.trim()) return [];
+      try {
+        const res = await managePersons.findAllPersons({ search: query.trim(), per_page: 10 });
+        return (res.data ?? []).map((p) => ({
+          id: p.id,
+          name: p.name,
+          email: p.email ?? '',
+          primary_phone_number: p.primary_phone_number ?? '',
+          whatsapp: p.whatsapp ?? '',
+          facebook: p.facebook ?? '',
+        }));
+      } catch {
+        return [];
+      }
+    },
+    [managePersons]
+  );
 
   const matrixFields: MatrixFieldConfig[] = [
     { name: 'id', label: 'ID', type: 'numeric', disabled: true, defaultValue: null },
@@ -82,12 +74,30 @@ export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps)
           id: (item.id as number) ?? null,
           name: String(item.name ?? ''),
           email: String(item.email ?? ''),
+          primary_phone_number: String(item.primary_phone_number ?? ''),
+          whatsapp: String(item.whatsapp ?? ''),
+          facebook: String(item.facebook ?? ''),
           __original_name: String(item.name ?? ''),
           __original_email: String(item.email ?? ''),
         }),
       },
     },
     { name: 'email', label: t('facilities.email', 'investments') || 'Email', type: 'text' },
+    {
+      name: 'primary_phone_number',
+      label: t('facilities.authorized_persons_primary_phone', 'investments') || 'Primary Phone',
+      type: 'text',
+    },
+    {
+      name: 'whatsapp',
+      label: t('facilities.authorized_persons_whatsapp', 'investments') || 'WhatsApp',
+      type: 'text',
+    },
+    {
+      name: 'facebook',
+      label: t('facilities.authorized_persons_facebook', 'investments') || 'Facebook',
+      type: 'text',
+    },
     {
       name: 'role_in_facility',
       label: t('facilities.authorized_persons_role', 'investments') || 'Role in Facility',
@@ -108,6 +118,9 @@ export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps)
       .string()
       .min(1, t('facilities.validation.authorized_person_name_required', 'investments') || 'Person name is required'),
     email: z.string().optional(),
+    primary_phone_number: z.string().optional(),
+    whatsapp: z.string().optional(),
+    facebook: z.string().optional(),
     role_in_facility: z.string().optional(),
     is_required_for_legal_matters: z.boolean().optional(),
     __original_name: z.string().optional(),

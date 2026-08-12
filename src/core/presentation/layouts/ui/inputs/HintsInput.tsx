@@ -72,7 +72,7 @@ export function HintsInput({
     return () => {
       cancelled = true;
     };
-  }, [trimmedQuery, minChars, dependentData]);
+  }, [trimmedQuery, minChars, searchApi, dependentData]);
 
   const resultsMatch = results?.query === trimmedQuery;
   const hints = resultsMatch ? results!.items : [];
@@ -152,7 +152,7 @@ export function HintsInput({
   const showDropdown = open && trimmedQuery.length >= minChars;
 
   const dropdownBox = (content: React.ReactNode): React.ReactNode => {
-    const boxClass = 'z-110 border border-border rounded-md shadow-2xl overflow-hidden animate-slide-up backdrop-blur-md bg-card/95';
+    const boxClass = 'z-[100001] border border-border rounded-md shadow-2xl overflow-hidden animate-slide-up backdrop-blur-md bg-card/95';
     if (anchorRect) {
       const anchor = anchorRect();
       if (!anchor) return null;
@@ -174,6 +174,7 @@ export function HintsInput({
       </div>
     );
   };
+console.log("rendered");
 
   return (
     <div ref={containerRef} className="relative w-full">

@@ -26,7 +26,7 @@ export const buildFacilityFormFields = (t: Translate, deps: FacilityFormDeps): F
     options: deps.partnershipTypes.map(pt => ({ value: pt.id, label: getLocalizedName(pt.name), is_default: pt.is_default })),
     createTitle: t('partnership_types.create', 'investments') || 'Create Partnership Type',
     labelPath: 'name',
-    // createButtonPermission: 'investments.partnership-types.create',
+    createButtonPermission: 'investments.partnership-types.create',
     renderCreateForm: (onSuccessForm, onCancelForm) => (
       <GenericCreateForm
         schema={getCreatePartnershipTypeFormSchema(t)}
@@ -112,7 +112,7 @@ export const buildFacilityFormGroups = (t: Translate): GroupConfig[] => [
   },
 ];
 
-export const buildFacilityDefaultValues = (facility: Facility): Record<string, unknown> => ({
+export const buildFacilityDefaultValues = (facility: Facility): Record<string, string | number | null | undefined | AuthorizedPersonPayload[] > => ({
   name: facility.name,
   partnership_type_id: facility.partnership_type?.id ?? facility.partnership_type_id ?? null,
   address: facility.address,
