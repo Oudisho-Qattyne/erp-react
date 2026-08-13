@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import { useLocation } from 'react-router-dom'
-import MainNav from './ui/navs/MainNav'
 import { Sidebar } from './ui/layout/Sidebar'
 import { TopBar } from './ui/layout/TopBar';
 import { useLanguage } from '../context/i18n/I18nProvider';
@@ -28,11 +27,7 @@ const DefaultLayout = ({ children }: { children: ReactNode }) => {
       <div className="flex h-screen bg-background" dir={direction}>
         <Sidebar user={currentUser} unreadNotifications={2} />
         <div className="flex-1 flex flex-col overflow-hidden">
-          <TopBar
-            unreadNotifications={2}
-            onNotificationClick={() => alert('Notifications clicked')}
-            user={currentUser}
-          />
+          <TopBar user={currentUser} />
           <main className="flex-1 overflow-auto">{children}</main>
         </div>
       </div>

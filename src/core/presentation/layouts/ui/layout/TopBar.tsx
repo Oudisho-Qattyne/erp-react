@@ -1,10 +1,8 @@
-import { Menu, Bell, LayoutDashboard } from 'lucide-react';
+import { Menu, LayoutDashboard } from 'lucide-react';
 
 interface TopBarProps {
   title?: string;
   icon?: React.ReactNode;
-  unreadNotifications?: number;
-  onNotificationClick?: () => void;
   user: {
     full_name: string;
     position?: string;
@@ -14,14 +12,13 @@ interface TopBarProps {
 }
 
 import { ThemeToggle } from './ThemeToggle';
+import { NotificationsBell } from '../notifications/NotificationsBell';
 import { useSidebar } from '../../../context/SidebarContext/SidebarContext';
 import { useLanguage } from '../../../context/i18n/I18nProvider';
 
 export function TopBar({
   title,
   icon = <LayoutDashboard size={18} className="text-primary" />,
-  unreadNotifications = 0,
-  onNotificationClick,
   user,
 }: TopBarProps) {
   const { toggleCollapsed } = useSidebar();
@@ -50,23 +47,8 @@ export function TopBar({
 
       {/* Right side: notifications + user info */}
       <div className="flex items-center gap-4">
-        <ThemeToggle />
-        
-        {/* Notifications button */}
-        {/* {onNotificationClick && (
-          <button
-            onClick={onNotificationClick}
-            className="relative p-1.5 rounded-md hover:bg-primary-light transition-colors"
-            aria-label={t('topbar.notifications', 'shared')}
-          >
-            <Bell size={20} className="text-text" />
-            {unreadNotifications > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                {unreadNotifications > 9 ? '9+' : unreadNotifications}
-              </span>
-            )}
-          </button>
-        )} */}
+<ThemeToggle />
+        <NotificationsBell />
 
         {/* User info */}
         <div className="flex items-center gap-2">

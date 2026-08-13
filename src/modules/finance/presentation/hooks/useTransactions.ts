@@ -36,7 +36,7 @@ export interface UseTransactionsReturn {
   updateTransactionStatus: (id: number, data: UpdateTransactionStatusDto) => Promise<void>
 }
 
-export const useTransactions = (): UseTransactionsReturn => {
+export const useTransactions = (initialFilter?: Partial<TransactionFilters>): UseTransactionsReturn => {
   const apiClient = useApiClient()
   const { t } = useLanguage()
 
@@ -44,7 +44,7 @@ export const useTransactions = (): UseTransactionsReturn => {
   const [transaction, setTransaction] = useState<Transaction | null>(null)
   const [loading, setLoading] = useState<Record<string, boolean>>(() => initRecord(false))
   const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null))
-  const [filter, setFilterState] = useState<TransactionFilters>({})
+  const [filter, setFilterState] = useState<TransactionFilters>(() => ({ ...initialFilter }))
   const [pagination, setPagination] = useState({ currentPage: 1, lastPage: 1, total: 0, hasMore: false })
 
   const repository = createTransactionRepository(apiClient)
@@ -54,41 +54,42 @@ export const useTransactions = (): UseTransactionsReturn => {
   const setFnLoading = (fn: string, v: boolean) => setLoading((p) => ({ ...p, [fn]: v }))
   const setFnError = (fn: string, e: string | null) => setError((p) => ({ ...p, [fn]: e }))
 
-  const clearError = useCallback(() => setError(initRecord(null)), [])
+const clearError = useCallback(() => setError(initRecord(null)), [])
 
-  useEffect(() => {
-    findAllTransactions()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter])
+const setFilter = useCallback((patch: Partial<TransactionFilters>) => {
+  setFilterState((prev) => ({ ...prev, ...patch, page: 1 }))
+}, [])
 
-  const setFilter = useCallback((patch: Partial<TransactionFilters>) => {
-    setFilterState((prev) => ({ ...prev, ...patch, page: 1 }))
-  }, [])
+const resetFilter = useCallback(() => setFilterState({}), [])
 
-  const resetFilter = useCallback(() => setFilterState({}), [])
+const setPage = useCallback((page: number) => {
+  setFilterState((prev) => ({ ...prev, page }))
+}, [])
 
-  const setPage = useCallback((page: number) => {
-    setFilterState((prev) => ({ ...prev, page }))
-  }, [])
+const findAllTransactions = useCallback(async () => {
+  setFnLoading("findAllTransactions", true)
+  setFnError("findAllTransactions", null)
+  try {
+    const res = await useCase.findAllTransactions(filter)
+    setTransactions(res.data)
+    setPagination({
+      currentPage: res.pagination?.currentPage || 1,
+      lastPage: res.pagination?.lastPage || 1,
+      total: Number(res.pagination?.total) || 0,
+      hasMore: res.pagination?.hasMore || false,
+    })
+  } catch (err: unknown) {
+    setFnError("findAllTransactions", handleApiError(err, { module: MODULE }))
+  } finally {
+    setFnLoading("findAllTransactions", false)
+  }
+}, [useCase, filter])
 
-  const findAllTransactions = useCallback(async () => {
-    setFnLoading("findAllTransactions", true)
-    setFnError("findAllTransactions", null)
-    try {
-      const res = await useCase.findAllTransactions(filter)
-      setTransactions(res.data)
-      setPagination({
-        currentPage: res.pagination?.currentPage || 1,
-        lastPage: res.pagination?.lastPage || 1,
-        total: Number(res.pagination?.total) || 0,
-        hasMore: res.pagination?.hasMore || false,
-      })
-    } catch (err: unknown) {
-      setFnError("findAllTransactions", handleApiError(err, { module: MODULE }))
-    } finally {
-      setFnLoading("findAllTransactions", false)
-    }
-  }, [useCase, filter, t])
+useEffect(() => {
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  findAllTransactions()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [filter])
 
   const createTransaction = useCallback(async (data: CreateTransactionDto) => {
     setFnLoading("createTransaction", true)

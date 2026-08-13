@@ -89,5 +89,11 @@
     "back_home" : "Back Home",
     "message" : "You do not have permission to access this page",
     "title" : "Unauthorized"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "mark_all_read": "Mark all as read",
+    "empty": "No notifications",
+    "error": "Failed to load notifications"
   }
 }

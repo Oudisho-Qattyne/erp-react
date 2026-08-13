@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import { Button } from "../../../../core/presentation/layouts/ui/buttons/Button"
 import { DataTable, type ColumnDef } from "../../../../core/presentation/layouts/ui/tables/ResizableTable"
@@ -16,6 +17,10 @@ import { Search, Filter, Plus, Check, X } from "lucide-react"
 
 const MODULE = "finance"
 
+interface TransactionsNavState {
+  filter?: { search?: string }
+}
+
 const typeStyles: Record<string, string> = {
   incoming: "bg-blue-500/10 text-blue-600 border-blue-500/20",
   outgoing: "bg-orange-500/10 text-orange-600 border-orange-500/20",
@@ -32,10 +37,17 @@ const statusOptions = ["pending", "approved", "canceled"]
 
 export function TransactionsPage() {
   const { t } = useLanguage()
+  const location = useLocation()
+  const navigate = useNavigate()
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [confirmAction, setConfirmAction] = useState<{ id: number; action: "approved" | "canceled" } | null>(null)
-  const [localSearch, setLocalSearch] = useState("")
+
+  const [initialSearch] = useState(
+    () => (location.state as TransactionsNavState | null)?.filter?.search ?? ""
+  )
+  const [localSearch, setLocalSearch] = useState(initialSearch)
+  const appliedStateRef = useRef<unknown>(location.state)
 
   const {
     transactions,
@@ -47,14 +59,32 @@ export function TransactionsPage() {
     resetFilter,
     findAllTransactions,
     updateTransactionStatus,
-  } = useTransactions()
+  } = useTransactions(initialSearch ? { search: initialSearch, page: 1 } : undefined)
 
   const handleSearch = () => {
     setFilter({ search: localSearch, page: 1 })
   }
 
   useEffect(() => {
+    if (!initialSearch) return
+    navigate(location.pathname, { replace: true, state: null })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (location.state === appliedStateRef.current) return
+    appliedStateRef.current = location.state
+    const search = (location.state as TransactionsNavState | null)?.filter?.search
+    if (!search) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLocalSearch(search)
+    setFilter({ search, page: 1 })
+    navigate(location.pathname, { replace: true, state: null })
+  }, [location.state, location.pathname, navigate, setFilter])
+
+  useEffect(() => {
     findAllTransactions()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter])
 
   const handleConfirm = async () => {
@@ -206,10 +236,10 @@ export function TransactionsPage() {
     },
   ]
 
-  const handleApplyFilter = (values: Record<string, any>) => {
+  const handleApplyFilter = (values: Record<string, unknown>) => {
     const parsed: Partial<TransactionFilters> = { page: 1, per_page: filter.per_page }
     for (const [key, val] of Object.entries(values)) {
-      if (val !== "" && val !== undefined) parsed[key as keyof TransactionFilters] = val as any
+      if (val !== "" && val !== undefined && val !== null) parsed[key as keyof TransactionFilters] = val as never
     }
     setFilter(parsed)
     setIsFilterOpen(false)

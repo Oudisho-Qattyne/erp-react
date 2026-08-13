@@ -95,5 +95,9 @@
       "reason_max": "Reason must be at most 500 characters",
       "transactionable_id_required": "Please select a transactionable item"
     }
+  },
+  "notifications": {
+    "subscription_request_transaction_created_title": "Subscription request transaction created",
+    "subscription_request_transaction_created_description": "A transaction was created for the subscription request"
   }
 }

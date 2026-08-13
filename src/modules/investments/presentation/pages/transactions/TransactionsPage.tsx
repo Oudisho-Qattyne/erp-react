@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Coins, Landmark, Banknote, TrendingUp, Plus, type LucideIcon } from 'lucide-react';
+import { Coins, Plus, type LucideIcon } from 'lucide-react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
+import { useAuth } from '../../../../../core/infrastructure/auth/AuthProvider';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { Dialog } from '../../../../../core/presentation/layouts/ui/dialog/Dialog';
 
@@ -17,10 +18,11 @@ const paperLayers = [
 interface TransactionCardConfig {
   key: string;
   icon: LucideIcon;
+  permission?: string;
 }
 
 const transactionCards: TransactionCardConfig[] = [
-  { key: 'subscription', icon: Coins },
+  { key: 'subscription', icon: Coins, permission: 'investments.plot-reqeusts.subscription_request' },
   // { key: 'bonds', icon: Landmark },
   // { key: 'financing', icon: Banknote },
   // { key: 'dividends', icon: TrendingUp },
@@ -29,8 +31,12 @@ const transactionCards: TransactionCardConfig[] = [
 export function TransactionsPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { hasPermission } = useAuth();
   const [createOpen, setCreateOpen] = useState(false);
   const [activeCard, setActiveCard] = useState('subscription');
+
+  const visibleCards = transactionCards.filter(({ permission }) => !permission || hasPermission(permission));
+console.log(hasPermission("investments.plot-reqeusts.subscription_request"));
 
   const openCreate = (key: string) => {
     if (key === 'subscription') {
@@ -40,7 +46,6 @@ export function TransactionsPage() {
     setActiveCard(key);
     setCreateOpen(true);
   };
-
   return (
     <div className="p-6 w-full mx-auto space-y-6">
       <div className="flex items-center justify-between">
@@ -51,7 +56,7 @@ export function TransactionsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-10 justify-items-center">
-        {transactionCards.map(({ key, icon: Icon }) => (
+        {visibleCards.map(({ key, icon: Icon }) => (
           <div key={key} className="group relative w-72 h-80" style={{ perspective: '800px' }}>
             {paperLayers.map((layer, i) => (
               <div

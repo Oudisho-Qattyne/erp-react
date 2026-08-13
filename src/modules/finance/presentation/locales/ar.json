@@ -95,5 +95,9 @@
       "reason_max": "يجب ألا يتجاوز السبب 500 حرفاً",
       "transactionable_id_required": "يرجى اختيار عنصر مرتبط بالمعاملة"
     }
+  },
+  "notifications": {
+    "subscription_request_transaction_created_title": "تم إنشاء معاملة طلب الاكتتاب",
+    "subscription_request_transaction_created_description": "تم إنشاء معاملة لطلب الاكتتاب"
   }
 }
