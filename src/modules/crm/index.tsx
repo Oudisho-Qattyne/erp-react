@@ -1,8 +1,12 @@
 import { Users } from 'lucide-react';
 import type { Module } from '../../core/moduleRegistry';
+import { registerPersonsHook } from '../../core/registry/person/personRegistry';
 import { PersonsPage } from './presentation/pages/PersonsPage';
+import { usePersons } from './presentation/hooks/usePersons';
 import enLocales from './presentation/locales/en.json';
 import arLocales from './presentation/locales/ar.json';
+
+registerPersonsHook(() => usePersons());
 
 const crmModule: Module = {
   name: 'crm',

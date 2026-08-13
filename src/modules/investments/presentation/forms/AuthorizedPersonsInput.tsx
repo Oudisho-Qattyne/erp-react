@@ -3,30 +3,34 @@ import { z } from 'zod';
 import { useFormState, type FieldValues, type UseFormReturn } from 'react-hook-form';
 import { DataMatrixInput, type MatrixFieldConfig } from '../../../../core/presentation/layouts/ui/inputs/DataMatrixInput';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
-import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
-import { createPersonRepository } from '../../../crm/infrastructure/repositories/PersonRepository';
-import { createManagePersonsUseCase } from '../../../crm/application/usecases/managePersonsUseCase';
+import { usePersons } from '../../../../core/registry/person/usePersons';
 import { authorizedPersonsPayloadToRows, authorizedPersonsRowsToPayload, emptyAuthorizedPersonRow, type AuthorizedPersonPayload } from './authorizedPersons';
 
 interface AuthorizedPersonsFieldProps {
   methods: UseFormReturn<FieldValues>;
 }
 
+const MATRIX_FIELD_NAMES: string[] = [
+  'id',
+  'name',
+  'email',
+  'primary_phone_number',
+  'whatsapp',
+  'facebook',
+  'role_in_facility',
+  'is_required_for_legal_matters',
+];
+
 export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps) {
   const { t } = useLanguage();
   const { setValue, getValues, formState } = methods;
-
-  const apiClient = useApiClient();
-  const managePersons = useMemo(
-    () => createManagePersonsUseCase(createPersonRepository(apiClient)),
-    [apiClient]
-  );
+  const { isRegistered, searchPersons } = usePersons();
 
   const [rows, setRows] = useState<Record<string, unknown>[]>(() =>
     authorizedPersonsPayloadToRows((getValues('authorized_persons') as AuthorizedPersonPayload[] | undefined) ?? undefined)
   );
 
-  const { errors } = useFormState({ name: 'authorized_persons' as any });
+  const { errors } = useFormState({ name: 'authorized_persons' as const });
 
   const prevSubmitSuccessfulRef = useRef(false);
   const { isSubmitSuccessful } = formState;
@@ -44,46 +48,47 @@ export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps)
   const searchPersonsApi = useCallback(
     async (query: string): Promise<Record<string, unknown>[]> => {
       if (!query.trim()) return [];
-      try {
-        const res = await managePersons.findAllPersons({ search: query.trim(), per_page: 10 });
-        return (res.data ?? []).map((p) => ({
-          id: p.id,
-          name: p.name,
-          email: p.email ?? '',
-          primary_phone_number: p.primary_phone_number ?? '',
-          whatsapp: p.whatsapp ?? '',
-          facebook: p.facebook ?? '',
-        }));
-      } catch {
-        return [];
-      }
+      const items = await searchPersons(query.trim());
+      return items.map((p) => ({
+        id: p.id,
+        name: p.name,
+        email: p.email ?? '',
+        primary_phone_number: p.primary_phone_number ?? '',
+        whatsapp: p.whatsapp ?? '',
+        facebook: p.facebook ?? '',
+      }));
     },
-    [managePersons]
+    [searchPersons]
   );
 
-  const matrixFields: MatrixFieldConfig[] = [
+  const hints = useMemo<MatrixFieldConfig['hints']>(() => {
+    if (!isRegistered) return undefined;
+    return {
+      searchApi: searchPersonsApi,
+      minChars: 2,
+      debounceMs: 300,
+      displayValue: (item: Record<string, unknown>) => String(item.name ?? ''),
+      fill: (item: Record<string, unknown>) => ({
+        id: (item.id as number) ?? null,
+        name: String(item.name ?? ''),
+        email: String(item.email ?? ''),
+        primary_phone_number: String(item.primary_phone_number ?? ''),
+        whatsapp: String(item.whatsapp ?? ''),
+        facebook: String(item.facebook ?? ''),
+        __original_name: String(item.name ?? ''),
+        __original_email: String(item.email ?? ''),
+      }),
+    };
+  }, [isRegistered, searchPersonsApi]);
+
+  const matrixFields = useMemo<MatrixFieldConfig[]>(() => [
     { name: 'id', label: 'ID', type: 'numeric', disabled: true, defaultValue: null },
     {
       name: 'name',
-      type:'alpha',
+      type: 'alpha',
       label: t('facilities.authorized_persons_person', 'investments') || 'Person (name / email / phone)',
       required: true,
-      hints: {
-        searchApi: searchPersonsApi,
-        minChars: 2,
-        debounceMs: 300,
-        displayValue: (item: Record<string, unknown>) => String(item.name ?? ''),
-        fill: (item: Record<string, unknown>) => ({
-          id: (item.id as number) ?? null,
-          name: String(item.name ?? ''),
-          email: String(item.email ?? ''),
-          primary_phone_number: String(item.primary_phone_number ?? ''),
-          whatsapp: String(item.whatsapp ?? ''),
-          facebook: String(item.facebook ?? ''),
-          __original_name: String(item.name ?? ''),
-          __original_email: String(item.email ?? ''),
-        }),
-      },
+      hints,
     },
     { name: 'email', label: t('facilities.email', 'investments') || 'Email', type: 'text' },
     {
@@ -113,7 +118,7 @@ export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps)
       type: 'checkbox',
       defaultValue: true,
     },
-  ];
+  ], [t, hints]);
 
   const rowSchema = z
     .object({
@@ -130,13 +135,13 @@ export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps)
       primary_phone_number: z
         .union([
           z.literal(''),
-          z.string().regex(/^[0-9+\s()\-]*$/, t('facilities.validation.authorized_person_phone_invalid', 'investments') || 'Invalid phone number'),
+          z.string().regex(/^[0-9+\s()-]*$/, t('facilities.validation.authorized_person_phone_invalid', 'investments') || 'Invalid phone number'),
         ])
         .optional(),
       whatsapp: z
         .union([
           z.literal(''),
-          z.string().regex(/^[0-9+\s()\-]*$/, t('facilities.validation.authorized_person_phone_invalid', 'investments') || 'Invalid phone number'),
+          z.string().regex(/^[0-9+\s()-]*$/, t('facilities.validation.authorized_person_phone_invalid', 'investments') || 'Invalid phone number'),
         ])
         .optional(),
       facebook: z.string().optional(),
@@ -158,19 +163,22 @@ export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps)
 
   const matrixErrors = useMemo(() => {
     const errs: Record<number, Record<string, string>> = {};
-    const raw = (errors as any)?.authorized_persons;
+    const raw: unknown = errors?.authorized_persons;
     if (!Array.isArray(raw)) return errs;
-    const fieldNames = matrixFields.map((f) => f.name);
-    raw.forEach((rowErr: any, rowIndex: number) => {
+    raw.forEach((rowErr: unknown, rowIndex: number) => {
       if (!rowErr || typeof rowErr !== 'object') return;
       if (!errs[rowIndex]) errs[rowIndex] = {};
-      Object.entries(rowErr).forEach(([fieldName, val]: [string, any]) => {
-        const msg = typeof val === 'object' && val?.message ? String(val.message) : String(val);
-        if (fieldNames.includes(fieldName)) errs[rowIndex][fieldName] = msg;
+      Object.entries(rowErr).forEach(([fieldName, val]) => {
+        const candidate: unknown = val;
+        const msg =
+          typeof candidate === 'object' && candidate !== null && 'message' in candidate
+            ? String((candidate as { message: unknown }).message)
+            : String(candidate);
+        if (MATRIX_FIELD_NAMES.includes(fieldName)) errs[rowIndex][fieldName] = msg;
       });
     });
     return errs;
-  }, [errors, matrixFields]);
+  }, [errors]);
 
   return <DataMatrixInput value={rows} onChange={setRows} matrixFields={matrixFields} rowSchema={rowSchema} errors={matrixErrors} />;
 }

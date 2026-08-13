@@ -1,22 +1,19 @@
-import { useState, useEffect, useMemo, useCallback, useContext } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm, FormProvider } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useApiClient } from '../../../../../../core/presentation/context/api/ApiClinetProvider';
 import { useEntityCrud } from '../../../../../../core/presentation/hooks/data/useEntity';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
-import { AuthContext, useAuth } from '../../../../../../core/infrastructure/auth/AuthProvider';
 import { DataTable } from '../../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { Button } from '../../../../../../core/presentation/layouts/ui/buttons/Button';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { ErrorState } from '../../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { LoadingState } from '../../../../../../core/presentation/layouts/ui/state/LoadingState';
-import { FormInput } from '../../../../../../core/presentation/layouts/ui/inputs/FormInput';
+import { GenericCreateForm } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { getCreateDossierSchema, type DossierFormData } from '../../../schemas/dossier.schema';
+import { buildDossierDefaultValues, buildDossierFormFields } from '../../../forms/dossierFormConfig';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
-import { Plus, Eye, Trash2, CheckCircle, Pencil, XCircle } from 'lucide-react';
+import { Plus, Eye, Trash2, CheckCircle, Pencil } from 'lucide-react';
 import type { Dossier } from '../../../../domain/entities/dossier';
 import type { PlotStatus } from '../../../../domain/valueObjects/plots/plotStatus';
 
@@ -25,23 +22,27 @@ interface Props {
   plotStatus: PlotStatus;
 }
 
+interface Deferred {
+  resolve: (value: unknown) => void;
+  reject: (reason: unknown) => void;
+}
+
 export function DossiersSection({ plotId, plotStatus }: Props) {
   const { t } = useLanguage();
-  const apiClient = useApiClient();
   const navigate = useNavigate();
-  const {hasPermission} = useAuth()
 
   const canManage = plotStatus === 'allocated' || plotStatus === 'subscribed';
 
   const [showAdd, setShowAdd] = useState(false);
   const [editDossier, setEditDossier] = useState<Dossier | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Dossier | null>(null);
-
-  const [confirmAllocateNewDossier, setConfirmAllocatedNewDossier] = useState<DossierFormData | null>(null)
-  const [confirmAllocate, setConfirmAllocate] = useState<Dossier | null>(null)
-  const [confirmEditAllocate, setConfirmEditAllocate] = useState<DossierFormData | null>(null)
+  const [confirmAllocateNewDossier, setConfirmAllocatedNewDossier] = useState<DossierFormData | null>(null);
+  const [confirmAllocate, setConfirmAllocate] = useState<Dossier | null>(null);
+  const [confirmEditAllocate, setConfirmEditAllocate] = useState<DossierFormData | null>(null);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
+
+  const pendingSubmitRef = useRef<Deferred | null>(null);
 
   const { entities: dossiers, getAll, create, remove, loadingMap, errorMap, pagination, update } = useEntityCrud<Dossier>(
     `/investments/plots/${plotId}/dossiers`,
@@ -61,101 +62,107 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
 
   const schema = useMemo(() => getCreateDossierSchema(t), [t]);
 
-  const form = useForm<DossierFormData>({
-    resolver: zodResolver(schema),
-    defaultValues: {
-      dossier_number: '',
-      dossier_date: new Date().toISOString().split('T')[0],
-      status: 'pending_subscription_fee',
-    },
-  });
-
-  const addDossier = async (data : DossierFormData) => {
+  const runCreate = async (data: DossierFormData): Promise<unknown> => {
     try {
-      await create(data as any);
+      const res = await create(data as unknown as Parameters<typeof create>[0]);
       toast.success(t('dossier.created', 'investments') || 'Dossier created successfully');
-      setShowAdd(false);
-      form.reset();
-      if(confirmAllocateNewDossier){
-        setConfirmAllocatedNewDossier(null)
-      }
-      window.location.reload();
-    } catch (err: any) {
-      handleApiError(err, { module: "investments" });
+      return res;
+    } catch (err) {
+      handleApiError(err, { module: 'investments' });
+      throw err;
     }
-  }
-  const handleAdd = async (data: DossierFormData) => {
-    const allocatedDossier = dossiers.find(d => d.status == "active")
-    if ((plotStatus == "allocated" || data.status == "active") && allocatedDossier) {
-      setConfirmAllocatedNewDossier(data)
-      return
-    }
-    await addDossier(data)
-    
   };
 
-  const handleEdit = async (data: DossierFormData) => {
+  const runUpdate = async (
+    dossierId: number,
+    data: DossierFormData,
+    successKey: 'updated' | 'allocated' = 'updated'
+  ): Promise<unknown> => {
+    try {
+      const res = await update(dossierId, data as unknown as Parameters<typeof update>[1]);
+      toast.success(t(`dossier.${successKey}`, 'investments') || 'Dossier updated successfully');
+      return res;
+    } catch (err) {
+      handleApiError(err, { module: 'investments' });
+      throw err;
+    }
+  };
+
+  const onSubmitCreate = async (data: DossierFormData): Promise<unknown> => {
+    const allocatedDossier = dossiers.find((d) => d.status === 'active');
+    if ((plotStatus === 'allocated' || data.status === 'active') && allocatedDossier) {
+      setConfirmAllocatedNewDossier(data);
+      return new Promise<unknown>((resolve, reject) => {
+        pendingSubmitRef.current = { resolve, reject };
+      });
+    }
+    return runCreate(data);
+  };
+
+  const onSubmitEdit = async (data: DossierFormData): Promise<unknown> => {
     if (!editDossier) return;
     if (data.status === 'active' && editDossier.status !== 'active') {
       setConfirmEditAllocate(data);
-      return;
+      return new Promise<unknown>((resolve, reject) => {
+        pendingSubmitRef.current = { resolve, reject };
+      });
     }
+    return runUpdate(editDossier.id, data);
+  };
+
+  const handleConfirmCreate = async () => {
+    const data = confirmAllocateNewDossier;
+    const pending = pendingSubmitRef.current;
+    setConfirmAllocatedNewDossier(null);
+    pendingSubmitRef.current = null;
+    if (!data || !pending) return;
     try {
-      await update(editDossier.id, data as any);
-      toast.success(t('dossier.updated', 'investments') || 'Dossier updated successfully');
-      setEditDossier(null);
-      form.reset();
-      window.location.reload();
-    } catch (err: any) {
-      handleApiError(err, { module: "investments" });
+      pending.resolve(await runCreate(data));
+    } catch (err) {
+      pending.reject(err);
     }
   };
 
-  const handleEditAllocateConfirm = async () => {
-    if (!editDossier || !confirmEditAllocate) return;
+  const handleCancelCreateConfirm = () => {
+    setConfirmAllocatedNewDossier(null);
+    const pending = pendingSubmitRef.current;
+    pendingSubmitRef.current = null;
+    if (pending) pending.reject(new Error('cancelled'));
+  };
+
+  const handleConfirmEditAllocate = async () => {
+    const data = confirmEditAllocate;
+    const pending = pendingSubmitRef.current;
+    setConfirmEditAllocate(null);
+    pendingSubmitRef.current = null;
+    if (!editDossier || !data || !pending) return;
     try {
-      await update(editDossier.id, confirmEditAllocate as any);
-      toast.success(t('dossier.allocated', 'investments') || 'Dossier allocated successfully');
-      setEditDossier(null);
-      setConfirmEditAllocate(null);
-      form.reset();
-      window.location.reload();
-    } catch (err: any) {
-      handleApiError(err, { module: "investments" });
+      pending.resolve(await runUpdate(editDossier.id, data, 'allocated'));
+    } catch (err) {
+      pending.reject(err);
     }
   };
 
-  const handleFormSubmit = async (data: DossierFormData) => {
-    if (editDossier) {
-      await handleEdit(data);
-    } else {
-      await handleAdd(data);
-    }
+  const handleCancelEditAllocateConfirm = () => {
+    setConfirmEditAllocate(null);
+    const pending = pendingSubmitRef.current;
+    pendingSubmitRef.current = null;
+    if (pending) pending.reject(new Error('cancelled'));
   };
 
-  const openEdit = (dossier: Dossier) => {
-    const normalizeDate = (dateStr: string) => {
-      if (!dateStr) return new Date().toISOString().split('T')[0];
-      const isoMatch = dateStr.match(/^(\d{4}-\d{2}-\d{2})/);
-      if (isoMatch) return isoMatch[1];
-      const parts = dateStr.split('-');
-      if (parts.length === 3 && parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
-        return `${parts[2]}-${parts[1]}-${parts[0]}`;
-      }
-      return dateStr;
-    };
-    form.reset({
-      dossier_number: dossier.dossier_number,
-      dossier_date: normalizeDate(dossier.dossier_date),
-      status: dossier.status,
-    });
-    setEditDossier(dossier);
+  const handleCreateSuccess = () => {
+    setShowAdd(false);
+    window.location.reload();
+  };
+
+  const handleEditSuccess = () => {
+    setEditDossier(null);
+    window.location.reload();
   };
 
   const closeFormDialog = () => {
     setShowAdd(false);
     setEditDossier(null);
-    form.reset();
   };
 
   const isEditing = !!editDossier;
@@ -163,26 +170,24 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
   const handleDelete = async () => {
     if (!confirmDelete) return;
     try {
-      await remove((confirmDelete as any).id);
+      await remove((confirmDelete as unknown as { id: number }).id);
       toast.success(t('dossier.deleted', 'investments') || 'Dossier deleted successfully');
       setConfirmDelete(null);
       window.location.reload();
-    } catch (err: any) {
-      handleApiError(err, { module: "investments" });
+    } catch (err: unknown) {
+      handleApiError(err, { module: 'investments' });
     }
   };
 
-  const handleAllocate = async (dossier: Dossier) => {
+  const handleAllocate = useCallback(async (dossier: Dossier) => {
     try {
-      await update(dossier.id, { status: "active" });
+      await update(dossier.id, { status: 'active' } as unknown as Parameters<typeof update>[1]);
       toast.success(t('dossier.allocated', 'investments') || 'Dossier allocated successfully');
       window.location.reload();
-    } catch (err: any) {
-      handleApiError(err, { module: "investments" });
+    } catch (err: unknown) {
+      handleApiError(err, { module: 'investments' });
     }
-  };
-
-  
+  }, [update, t]);
 
   const columns = useMemo(() => [
     {
@@ -230,7 +235,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
             requiredPermission="investments.plot-dossier.view">
             <Eye size={16} />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => openEdit(row)}
+          <Button variant="ghost" size="sm" onClick={() => setEditDossier(row)}
             title={t('common.edit', 'shared') || 'Edit'}
             requiredPermission="investments.plot-dossier.update">
             <Pencil size={16} />
@@ -248,7 +253,12 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
         </div>
       ),
     }] : []),
-  ], [t, canManage, handleAllocate]);
+  ], [t, canManage, navigate, plotId]);
+
+  const fields = useMemo(() => buildDossierFormFields(t, { plotStatus }), [t, plotStatus]);
+
+  const createDefaultValues = useMemo(() => buildDossierDefaultValues(), []);
+  const editDefaultValues = editDossier ? buildDossierDefaultValues(editDossier) : undefined;
 
   return (
     <div className="space-y-4">
@@ -256,7 +266,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
         <h2 className="text-lg font-semibold">{t('dossier.title', 'investments') || 'Dossiers'}</h2>
         <div className="flex items-center gap-2">
           {canManage && (
-            <Button size="sm" onClick={() => { form.reset({ dossier_number: '', dossier_date: new Date().toISOString().split('T')[0], status: 'pending_subscription_fee' }); setShowAdd(true); }}
+            <Button size="sm" onClick={() => setShowAdd(true)}
               requiredPermission="investments.plot-dossier.create">
               <Plus size={16} className="mr-1" />
               {t('dossier.add', 'investments') || 'Add Dossier'}
@@ -271,7 +281,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
         <DataTable
           columns={columns}
           data={dossiers}
-          rowKey={'id' as any}
+          rowKey="id"
           loading={loadingMap['getAll']}
           emptyMessage={t('dossier.no_records', 'investments') || 'No dossiers found'}
           pagination={{
@@ -289,52 +299,29 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       {loadingMap['getAll'] && dossiers.length === 0 && !errorMap['getAll'] && <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />}
 
       <Dialog isOpen={showAdd || !!editDossier} onClose={closeFormDialog} title={isEditing ? (t('dossier.edit', 'investments') || 'Edit Dossier') : (t('dossier.add', 'investments') || 'Add Dossier')}>
-        <FormProvider {...form}>
-          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
-            <FormInput
-              name="dossier_number"
-              type="numeric"
-              label={t('dossier.number', 'investments') || 'Dossier Number'}
-              placeholder={t('dossier.number_placeholder', 'investments') || 'Enter dossier number'}
-            />
-            <FormInput
-              name="dossier_date"
-              label={t('dossier.date', 'investments') || 'Dossier Date'}
-              type="date"
-            />
-            <FormInput
-              name="status"
-              disabled={plotStatus == "allocated" && form.getValues().status=='active' }
-              label={t('dossier.status', 'investments') || 'Status'}
-              type="select"
-              options={isEditing ? [
-                { value: 'draft', label: t('dossier.status_draft', 'investments') || 'Draft' },
-                { value: 'pending_subscription_fee', label: t('dossier.status_pending_subscription_fee', 'investments') || 'Pending Subscription Fee' },
-                { value: 'subscription_fee_paid', label: t('dossier.status_subscription_fee_paid', 'investments') || 'Subscription Fee Paid' },
-                { value: 'allocatable', label: t('dossier.status_allocatable', 'investments') || 'Allocatable' },
-                { value: 'active', label: t('dossier.status_active', 'investments') || 'Allocated' },
-                { value: 'subscription_approved', label: t('dossier.status_subscription_approved', 'investments') || 'Subscription Approved' },
-                { value: 'cancelled', label: t('dossier.status_cancelled', 'investments') || 'Cancelled' },
-              ] : [
-                { value: 'draft', label: t('dossier.status_draft', 'investments') || 'Draft' },
-                { value: 'pending_subscription_fee', label: t('dossier.status_pending_subscription_fee', 'investments') || 'Pending Subscription Fee' },
-                { value: 'subscription_fee_paid', label: t('dossier.status_subscription_fee_paid', 'investments') || 'Subscription Fee Paid' },
-                { value: 'allocatable', label: t('dossier.status_allocatable', 'investments') || 'Allocatable' },
-                { value: 'active', label: t('dossier.status_active', 'investments') || 'Allocated' },
-                { value: 'subscription_approved', label: t('dossier.status_subscription_approved', 'investments') || 'Subscription Approved' },
-                { value: 'cancelled', label: t('dossier.status_cancelled', 'investments') || 'Cancelled' },
-              ]}
-            />
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" type="button" onClick={closeFormDialog}>
-                {t('common.cancel', 'shared') || 'Cancel'}
-              </Button>
-              <Button type="submit" isLoading={loadingMap[isEditing ? 'update' : 'create']}>
-                {t('common.save', 'shared') || 'Save'}
-              </Button>
-            </div>
-          </form>
-        </FormProvider>
+        {editDossier ? (
+          <GenericCreateForm
+            key={`edit-dossier-${editDossier.id}`}
+            schema={schema}
+            fields={fields}
+            defaultValues={editDefaultValues}
+            onSubmit={onSubmitEdit}
+            onSuccess={handleEditSuccess}
+            onCancel={closeFormDialog}
+            submitLabel={t('common.save', 'shared') || 'Save'}
+          />
+        ) : (
+          <GenericCreateForm
+            key="create-dossier"
+            schema={schema}
+            fields={fields}
+            defaultValues={createDefaultValues}
+            onSubmit={onSubmitCreate}
+            onSuccess={handleCreateSuccess}
+            onCancel={closeFormDialog}
+            submitLabel={t('common.save', 'shared') || 'Save'}
+          />
+        )}
       </Dialog>
 
       <ConfirmDialog
@@ -356,8 +343,8 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
         message={(t('dossier.allocate_new_message', 'investments') || 'Are you sure you want to unallocate the previous allocated dossier?') + ' ' + (t('dossier.allocate_unallocate_warning', 'investments') || '(if there is another allocated dossier it will be unallocated)')}
         confirmLabel={t('dossier.allocate', 'investments') || 'Allocate'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        onConfirm={() => {if(confirmAllocateNewDossier) addDossier(confirmAllocateNewDossier)}}
-        onCancel={() => setConfirmAllocatedNewDossier(null)}
+        onConfirm={handleConfirmCreate}
+        onCancel={handleCancelCreateConfirm}
         confirmLoading={loadingMap['create']}
       />
 
@@ -380,8 +367,8 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
         message={(t('dossier.allocate_message', 'investments') || 'Are you sure you want to allocate this dossier?') + ' ' + (t('dossier.allocate_unallocate_warning', 'investments') || '(if there is another allocated dossier it will be unallocated)')}
         confirmLabel={t('dossier.allocate', 'investments') || 'Allocate'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        onConfirm={handleEditAllocateConfirm}
-        onCancel={() => setConfirmEditAllocate(null)}
+        onConfirm={handleConfirmEditAllocate}
+        onCancel={handleCancelEditAllocateConfirm}
         confirmLoading={loadingMap['update']}
       />
     </div>

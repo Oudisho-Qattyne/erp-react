@@ -1,10 +1,11 @@
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, useMemo } from "react"
 import { useApiClient } from "../../../../core/presentation/context/api/ApiClinetProvider"
 import { createPersonRepository } from "../../infrastructure/repositories/PersonRepository"
 import { createManagePersonsUseCase } from "../../application/usecases/managePersonsUseCase"
 import { handleApiError } from "../../../../core/presentation/utils/handleApiError"
 import type { PersonFilters } from "../../application/dtos/personDtos"
 import type { Person } from "../../domain/entities/Person"
+import type { PersonSearchResult } from "../../../../core/registry/person/personRegistry"
 
 const MODULE = "crm"
 
@@ -27,6 +28,7 @@ export interface UsePersonsReturn {
   resetFilter: () => void
   setPage: (page: number) => void
   findAllPersons: () => Promise<void>
+  searchPersons: (query: string, perPage?: number) => Promise<PersonSearchResult[]>
 }
 
 export const usePersons = (): UsePersonsReturn => {
@@ -38,18 +40,15 @@ export const usePersons = (): UsePersonsReturn => {
   const [filter, setFilterState] = useState<PersonFilters>({})
   const [pagination, setPagination] = useState({ currentPage: 1, lastPage: 1, total: 0, hasMore: false })
 
-  const repository = createPersonRepository(apiClient)
-  const useCase = createManagePersonsUseCase(repository)
+  const useCase = useMemo(
+    () => createManagePersonsUseCase(createPersonRepository(apiClient)),
+    [apiClient]
+  )
 
   const setFnLoading = (fn: string, v: boolean) => setLoading((p) => ({ ...p, [fn]: v }))
   const setFnError = (fn: string, e: string | null) => setError((p) => ({ ...p, [fn]: e }))
 
   const clearError = useCallback(() => setError(initRecord(null)), [])
-
-  useEffect(() => {
-    findAllPersons()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter])
 
   const setFilter = useCallback((patch: Partial<PersonFilters>) => {
     setFilterState((prev) => ({ ...prev, ...patch, page: 1 }))
@@ -80,6 +79,27 @@ export const usePersons = (): UsePersonsReturn => {
     }
   }, [useCase, filter])
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    findAllPersons()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter])
+
+  const searchPersons = useCallback(
+    async (query: string, perPage = 10): Promise<PersonSearchResult[]> => {
+      const res = await useCase.findAllPersons({ search: query, per_page: perPage })
+      return (res.data ?? []).map((p) => ({
+        id: p.id,
+        name: p.name,
+        email: p.email,
+        primary_phone_number: p.primary_phone_number,
+        whatsapp: p.whatsapp,
+        facebook: p.facebook,
+      }))
+    },
+    [useCase]
+  )
+
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])
 
@@ -96,5 +116,6 @@ export const usePersons = (): UsePersonsReturn => {
     resetFilter,
     setPage,
     findAllPersons,
+    searchPersons,
   }
 }
