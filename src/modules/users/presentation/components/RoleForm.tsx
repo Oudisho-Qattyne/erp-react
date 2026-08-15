@@ -5,6 +5,8 @@ import { FormInput } from '../../../../core/presentation/layouts/ui/inputs/FormI
 import Input from '../../../../core/presentation/layouts/ui/inputs/Input';
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
 import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicForm221';
+import { useDialogClose } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
+import { useConfirmOnClose } from '../../../../core/presentation/layouts/ui/dialog/useConfirmOnClose';
 import { getCreateRoleSchema, type RoleFormValues } from '../schemas/roleForm';
 import { useManageRoles } from '../hooks/useManageRoles';
 import type { Permissions, Permission } from '../../domain/entities/permissions';
@@ -48,6 +50,17 @@ export function RoleForm({
   const { formState, watch, setValue } = methods;
   const { isValid, isSubmitting } = formState;
   const selectedPermissions = watch('permissions') || [];
+
+  const { requestClose } = useDialogClose();
+  useConfirmOnClose(() => methods.formState.isDirty);
+
+  const handleCancel = () => {
+    if (requestClose) {
+      requestClose();
+    } else {
+      onCancel?.();
+    }
+  };
 
   useEffect(() => {
     getPermissions()
@@ -160,7 +173,7 @@ export function RoleForm({
 
         <div className="flex justify-end gap-3">
           {onCancel && (
-            <Button type="button" variant="outline" onClick={onCancel}>
+            <Button type="button" variant="outline" onClick={handleCancel}>
               {actualCancelLabel}
             </Button>
           )}

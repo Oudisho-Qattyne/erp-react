@@ -8,6 +8,7 @@ import { useDynamicForm } from '../../../hooks/useDynamicForm221';
 import { useLanguage } from '../../../context/i18n/I18nProvider';
 import { applyServerValidationErrors } from '../../../utils/handleApiError';
 import { useDialogClose } from '../dialog/Dialog';
+import { useConfirmOnClose } from '../dialog/useConfirmOnClose';
 import type { InputType } from '../inputs/Input';
 import type { UseFormReturn } from 'react-hook-form';
 
@@ -157,8 +158,19 @@ export function GenericCreateForm({
   const { form: methods , errors , getValues} = useDynamicForm({ schema, defaultValues });
   const { handleSubmit, formState } = methods;
   const { isValid, isSubmitting } = formState;
-  const { setDisableClose } = useDialogClose();
+  const { setDisableClose, requestClose } = useDialogClose();
   const formRef = useRef<HTMLDivElement>(null);
+
+  useConfirmOnClose(() => methods.formState.isDirty && !methods.formState.isSubmitting);
+  console.log(errors , getValues());
+
+  const handleCancel = () => {
+    if (requestClose) {
+      requestClose();
+    } else {
+      onCancel();
+    }
+  };
 
   useEffect(() => {
     setDisableClose(isSubmitting);
@@ -253,7 +265,7 @@ export function GenericCreateForm({
             ))}
           </div>
           <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="outline" disabled={isSubmitting} onClick={onCancel}>
+            <Button type="button" variant="outline" disabled={isSubmitting} onClick={handleCancel}>
               {t('common.cancel', 'shared') || 'إلغاء'}
             </Button>
             <Button

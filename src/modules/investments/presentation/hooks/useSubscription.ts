@@ -50,7 +50,7 @@ export const useSubscription = (): UseSubscriptionReturn => {
       await idem.run('createSubscription', data, (key) => usecase.createSubscription(plotId, data, key));
       toast.success(t('transactions.created', MODULE) || 'Subscription created successfully');
     } catch (err: unknown) {
-      setFnError('createSubscription', handleApiError(err, { module: MODULE }));
+      setFnError('createSubscription', handleApiError(err, { module: MODULE, passThrough: true }));
       throw err;
     } finally {
       setFnLoading('createSubscription', false);

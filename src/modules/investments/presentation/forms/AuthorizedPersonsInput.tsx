@@ -61,25 +61,28 @@ export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps)
     [searchPersons]
   );
 
-  const hints = useMemo<MatrixFieldConfig['hints']>(() => {
-    if (!isRegistered) return undefined;
-    return {
-      searchApi: searchPersonsApi,
-      minChars: 2,
-      debounceMs: 300,
-      displayValue: (item: Record<string, unknown>) => String(item.name ?? ''),
-      fill: (item: Record<string, unknown>) => ({
-        id: (item.id as number) ?? null,
-        name: String(item.name ?? ''),
-        email: String(item.email ?? ''),
-        primary_phone_number: String(item.primary_phone_number ?? ''),
-        whatsapp: String(item.whatsapp ?? ''),
-        facebook: String(item.facebook ?? ''),
-        __original_name: String(item.name ?? ''),
-        __original_email: String(item.email ?? ''),
-      }),
-    };
-  }, [isRegistered, searchPersonsApi]);
+  const makeHints = useCallback(
+    (fieldName: string): MatrixFieldConfig['hints'] | undefined => {
+      if (!isRegistered) return undefined;
+      return {
+        searchApi: searchPersonsApi,
+        minChars: 2,
+        debounceMs: 300,
+        displayValue: (item: Record<string, unknown>) => String(item[fieldName] ?? ''),
+        fill: (item: Record<string, unknown>) => ({
+          id: (item.id as number | null | undefined) ?? null,
+          name: String(item.name ?? ''),
+          email: String(item.email ?? ''),
+          primary_phone_number: String(item.primary_phone_number ?? ''),
+          whatsapp: String(item.whatsapp ?? ''),
+          facebook: String(item.facebook ?? ''),
+          __original_name: String(item.name ?? ''),
+          __original_email: String(item.email ?? ''),
+        }),
+      };
+    },
+    [isRegistered, searchPersonsApi]
+  );
 
   const matrixFields = useMemo<MatrixFieldConfig[]>(() => [
     { name: 'id', label: 'ID', type: 'numeric', disabled: true, defaultValue: null },
@@ -88,23 +91,26 @@ export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps)
       type: 'alpha',
       label: t('facilities.authorized_persons_person', 'investments') || 'Person (name / email / phone)',
       required: true,
-      hints,
+      hints: makeHints('name'),
     },
-    { name: 'email', label: t('facilities.email', 'investments') || 'Email', type: 'text' },
+    { name: 'email', label: t('facilities.email', 'investments') || 'Email', type: 'text', hints: makeHints('email') },
     {
       name: 'primary_phone_number',
       label: t('facilities.authorized_persons_primary_phone', 'investments') || 'Primary Phone',
       type: 'numeric',
+      hints: makeHints('primary_phone_number'),
     },
     {
       name: 'whatsapp',
       label: t('facilities.authorized_persons_whatsapp', 'investments') || 'WhatsApp',
       type: 'numeric',
+      hints: makeHints('whatsapp'),
     },
     {
       name: 'facebook',
       label: t('facilities.authorized_persons_facebook', 'investments') || 'Facebook',
       type: 'text',
+      hints: makeHints('facebook'),
     },
     {
       name: 'role_in_facility',
@@ -118,7 +124,7 @@ export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps)
       type: 'checkbox',
       defaultValue: true,
     },
-  ], [t, hints]);
+  ], [t, makeHints]);
 
   const rowSchema = z
     .object({
@@ -180,5 +186,5 @@ export function AuthorizedPersonsField({ methods }: AuthorizedPersonsFieldProps)
     return errs;
   }, [errors]);
 
-  return <DataMatrixInput value={rows} onChange={setRows} matrixFields={matrixFields} rowSchema={rowSchema} errors={matrixErrors} />;
+  return <DataMatrixInput value={rows} onChange={setRows} matrixFields={matrixFields} rowSchema={rowSchema} errors={matrixErrors} defaultRowFactory={emptyAuthorizedPersonRow} />;
 }

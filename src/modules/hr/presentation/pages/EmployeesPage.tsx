@@ -18,7 +18,8 @@ import { useEntityCrud, useFaculties, useSpecializations } from '../hooks';
 import type { University } from '../../../../core/domain/entities/education/University';
 import type { OrganizationalLevels } from '../../../../core/domain/entities/organizationalLevels/organizationalLevels';
 import type { MultiLanguage } from '../../../../core/domain/entities/EntityWithNameOnly';
-import { Filter, Search } from 'lucide-react';
+import { AuditLog } from '../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
+import { Filter, Search, History } from 'lucide-react';
 
 export function EmployeesPage() {
   const { t } = useLanguage();
@@ -26,6 +27,7 @@ export function EmployeesPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState('');
+  const [auditItem, setAuditItem] = useState<EmployeeListItem | null>(null);
 
   const { getAll: loadUniversities } = useEntityCrud<University>('/shared-kernal/universities', '/shared-kernal/universities');
   const { getAllByUniversity } = useFaculties();
@@ -128,6 +130,19 @@ export function EmployeesPage() {
       render: (row) => row.created_at,
       sortable: true,
     },
+    {
+      key: 'actions',
+      label: t('common.actions', 'shared') || 'Actions',
+      width: 80,
+      render: (row) => (
+        <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
+          <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)}
+            title={t('employees.edit_log', 'hr') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
+            <History size={16} />
+          </Button>
+        </div>
+      ),
+    },
   ];
 
   const handleSort = (columnKey: string) => {
@@ -145,6 +160,16 @@ export function EmployeesPage() {
     await create(data);
     setIsAddDialogOpen(false);
     refetch(); // refresh list
+  };
+
+  const handleTranslateValues = (field: string, value: string) => {
+    if (field === 'gender') {
+      if (value === 'male') return t('employees.gender_male', 'hr') || 'Male';
+      if (value === 'female') return t('employees.gender_female', 'hr') || 'Female';
+    }
+    if (value === 'true') return t('common.yes', 'shared') || 'Yes';
+    if (value === 'false') return t('common.no', 'shared') || 'No';
+    return value;
   };
 
   const filterFields: FilterField[] = [
@@ -273,6 +298,28 @@ export function EmployeesPage() {
         onFilter={handleApplyFilter}
         onCancel={() => setIsFilterOpen(false)}
         onReset={() => { setExtraFilters({}); setPage(1); setIsFilterOpen(false) }}
+      />
+
+      <AuditLog
+        isOpen={!!auditItem}
+        onClose={() => setAuditItem(null)}
+        model="employee"
+        modelId={auditItem?.id}
+        module="hr"
+        labels={{
+          title: t('employees.edit_log', 'hr') || 'Edit Log',
+          event: t('employees.event', 'hr') || 'Event',
+          created_at: t('employees.created_at', 'hr') || 'Created At',
+          changed_by: t('employees.changed_by', 'hr') || 'Changed By',
+          changes: t('employees.changes', 'hr') || 'Changes',
+          field: t('employees.field', 'hr') || 'Field',
+          old_value: t('employees.old_value', 'hr') || 'Old Value',
+          new_value: t('employees.new_value', 'hr') || 'New Value',
+          no_records: t('employees.no_edit_log', 'hr') || 'No edit logs found',
+          subject_id: t('employees.subject_id', 'hr') || 'Employee ID',
+        }}
+        translateField={(key) => t(`employees.${key}`, 'hr') || key}
+        translateValues={handleTranslateValues}
       />
     </div>
   );

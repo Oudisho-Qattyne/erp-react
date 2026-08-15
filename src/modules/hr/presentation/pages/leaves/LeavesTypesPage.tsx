@@ -12,7 +12,8 @@ import { LoadingState } from "../../../../../core/presentation/layouts/ui/state/
 import { ErrorState } from "../../../../../core/presentation/layouts/ui/state/ErrorState"
 import { useLeaveTypes } from "../../hooks/leave/useLeaveTypes"
 import LeaveForm from "./LeaveForm"
-import { Eye, Edit, Archive, Trash2, Filter } from "lucide-react"
+import { AuditLog } from "../../../../../core/presentation/layouts/ui/auditLogs/AuditLog"
+import { Eye, Edit, Archive, Trash2, Filter, History } from "lucide-react"
 import type { EntityWithNameOnly } from "../../../../../core/domain/entities/EntityWithNameOnly"
 
 type ConfirmAction = "archive" | "delete" | null
@@ -45,6 +46,14 @@ export default function LeavesTypesPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null)
   const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [auditItem, setAuditItem] = useState<EntityWithNameOnly | null>(null)
+
+  const handleTranslateValues = (field: string, value: string) => {
+    if (["is_paid", "is_active", "requires_approval", "allow_half_day", "allow_hourly", "allow_split"].includes(field)) {
+      return value === "true" ? (t("common.yes", "shared") || "Yes") : value === "false" ? (t("common.no", "shared") || "No") : value
+    }
+    return value
+  }
 
   const filterFields: FilterField[] = [
     { name: "unit", label: t("leave.unit", "hr"), type: "select", options: [{ value: "day", label: t("leave.unit_day", "hr") }, { value: "hour", label: t("leave.unit_hour", "hr") }] },
@@ -91,7 +100,7 @@ export default function LeavesTypesPage() {
     {
       key: "actions",
       label: t("common.actions", "shared") || "الإجراءات",
-      width: 200,
+      width: 250,
       align: "center",
       render: (row) => (
         <div className="flex items-center justify-center gap-1">
@@ -103,6 +112,9 @@ export default function LeavesTypesPage() {
           </Button>
           <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedId(row.id); setConfirmAction("delete") }} title={t("common.delete", "shared") || "حذف"} requiredPermission="hr.leave-types.delete">
             <Trash2 size={16} className="text-danger" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setAuditItem(row) }} title={t("leave_types.edit_log", "hr") || "Edit Log"} requiredPermission="shared.audit-logs.view">
+            <History size={16} />
           </Button>
         </div>
       ),
@@ -222,6 +234,28 @@ export default function LeavesTypesPage() {
         confirmLoading={loading.delete}
         onConfirm={handleConfirm}
         onCancel={() => { setConfirmAction(null); setSelectedId(null) }}
+      />
+
+      <AuditLog
+        isOpen={!!auditItem}
+        onClose={() => setAuditItem(null)}
+        model="leave_type"
+        modelId={auditItem?.id}
+        module="hr"
+        labels={{
+          title: t("leave_types.edit_log", "hr") || "Edit Log",
+          event: t("leave_types.event", "hr") || "Event",
+          created_at: t("leave_types.created_at", "hr") || "Created At",
+          changed_by: t("leave_types.changed_by", "hr") || "Changed By",
+          changes: t("leave_types.changes", "hr") || "Changes",
+          field: t("leave_types.field", "hr") || "Field",
+          old_value: t("leave_types.old_value", "hr") || "Old Value",
+          new_value: t("leave_types.new_value", "hr") || "New Value",
+          no_records: t("leave_types.no_edit_log", "hr") || "No edit logs found",
+          subject_id: t("leave_types.subject_id", "hr") || "ID",
+        }}
+        translateField={(key) => t(`leave_types.${key}`, "hr") || key}
+        translateValues={handleTranslateValues}
       />
     </div>
   )

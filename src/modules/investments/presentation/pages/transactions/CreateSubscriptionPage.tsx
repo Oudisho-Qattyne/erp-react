@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Coins, ArrowLeft } from 'lucide-react';
 import { z } from 'zod';
-import { toast } from 'sonner';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
@@ -13,15 +12,16 @@ import type { FilterField } from '../../../../../core/presentation/layouts/ui/fi
 import type { EntityWithNameOnly } from '../../../../../core/domain/entities/EntityWithNameOnly';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
+import { isApiError } from '../../../../../core/domain/common/errors/ApiError';
 import type { Plot } from '../../../domain/entities/plot';
 import { getCreateFacilityFormSchema } from '../../schemas/facilityForm.schema';
+import { getInvestorRowSchema } from '../../schemas/investorForm.schema';
 import { buildFacilityFormFields, buildFacilityFormGroups } from '../../forms/facilityFormConfig';
-import { getCreateInvestorFormSchema } from '../../schemas/investorForm.schema';
-import { buildInvestorFormFields, buildInvestorFormGroups } from '../../forms/investorFormConfig';
-import type { Investor } from '../../../domain/entities/investor';
+import { InvestorsField } from '../../forms/InvestorsInput';
 import type { PartnershipType } from '../../../domain/entities/partnershipType';
 import { useSubscription } from '../../hooks/useSubscription';
-import type { CreateSubscriptionDTO, SubscriptionAuthorizedPersonPayload } from '../../../domain/repositories/ISubscriptionRepository';
+import { mapSubscriptionServerValidationErrors } from '../../forms/subscriptionServerErrors';
+import type { CreateSubscriptionDTO, SubscriptionAuthorizedPersonPayload, SubscriptionInvestorPayload } from '../../../domain/repositories/ISubscriptionRepository';
 
 type FetchParams = Record<string, string | number | boolean | undefined>;
 
@@ -30,7 +30,6 @@ export function CreateSubscriptionPage() {
   const navigate = useNavigate();
 
   const plotsCrud = useEntityCrud<Plot>('/investments/plots', '/investments/plots');
-  const investorsCrud = useEntityCrud<Investor>('/investments/investors', '/investments/investors');
   const partnershipTypesCrud = useEntityCrud<PartnershipType>('/investments/partnership-types', '/investments/partnership-types');
   const plotAreasCrud = useEntityCrud<EntityWithNameOnly>('/investments/plot-areas', '/investments/plot-areas');
   const plotClassificationsCrud = useEntityCrud<EntityWithNameOnly>('/investments/plot-classifications', '/investments/plot-classifications');
@@ -42,11 +41,6 @@ export function CreateSubscriptionPage() {
   const [plotFilters, setPlotFilters] = useState<Record<string, any>>({});
   const [plotSortBy, setPlotSortBy] = useState<string | undefined>(undefined);
   const [plotSortOrder, setPlotSortOrder] = useState<'asc' | 'desc'>('asc');
-
-  const [investorSearchQuery, setInvestorSearchQuery] = useState('');
-  const [investorPage, setInvestorPage] = useState(1);
-  const [investorPerPage, setInvestorPerPage] = useState(25);
-  const [investorFilters, setInvestorFilters] = useState<Record<string, any>>({});
 
   const fetchPlots = (params: FetchParams = {}) => {
     const sp = new URLSearchParams();
@@ -64,7 +58,6 @@ export function CreateSubscriptionPage() {
 
   useEffect(() => {
     fetchPlots({ page: 1, per_page: perPage });
-    investorsCrud.getAll('/investments/investors?page=1&per_page=25');
     partnershipTypesCrud.getAll('/investments/partnership-types?is_active=true');
     plotAreasCrud.getAll();
     plotClassificationsCrud.getAll();
@@ -114,55 +107,6 @@ export function CreateSubscriptionPage() {
     fetchPlots({ search: searchQuery, sortColumn: plotSortBy, sortOrder: plotSortOrder, page: 1, per_page: perPage });
   };
 
-  const fetchInvestors = (params: FetchParams = {}) => {
-    const sp = new URLSearchParams();
-    if (params.search) sp.append('search', String(params.search));
-    if (params.page) sp.append('page', String(params.page));
-    if (params.per_page) sp.append('per_page', String(params.per_page));
-    Object.entries(params).forEach(([k, v]) => {
-      if (!['search', 'page', 'per_page'].includes(k) && v !== '' && v !== undefined) {
-        sp.append(k, String(v));
-      }
-    });
-    investorsCrud.getAll(`/investments/investors?${sp.toString()}`);
-  };
-
-  const handleInvestorSearch = (query: string) => {
-    setInvestorSearchQuery(query);
-    setInvestorPage(1);
-    fetchInvestors({ ...investorFilters, search: query, page: 1, per_page: investorPerPage });
-  };
-
-  const handleInvestorPageChange = (newPage: number) => {
-    setInvestorPage(newPage);
-    fetchInvestors({ ...investorFilters, search: investorSearchQuery, page: newPage, per_page: investorPerPage });
-  };
-
-  const handleInvestorPerPageChange = (size: number) => {
-    setInvestorPerPage(size);
-    setInvestorPage(1);
-    fetchInvestors({ ...investorFilters, search: investorSearchQuery, page: 1, per_page: size });
-  };
-
-  const handleInvestorApplyFilter = (values: Record<string, any>) => {
-    const parsed: Record<string, any> = {};
-    for (const [key, val] of Object.entries(values)) {
-      if (val === '' || val === undefined) continue;
-      if (val === 'true') parsed[key] = true;
-      else if (val === 'false') parsed[key] = false;
-      else parsed[key] = val;
-    }
-    setInvestorFilters(parsed);
-    setInvestorPage(1);
-    fetchInvestors({ ...parsed, search: investorSearchQuery, page: 1, per_page: investorPerPage });
-  };
-
-  const handleInvestorResetFilter = () => {
-    setInvestorFilters({});
-    setInvestorPage(1);
-    fetchInvestors({ search: investorSearchQuery, page: 1, per_page: investorPerPage });
-  };
-
   const plotFilterFields: FilterField[] = [
     { name: 'status', label: t('plots.status', 'investments') || 'Status', type: 'select', options: [
       { value: 'unsold', label: t('plot_status.unsold', 'investments') || 'Unsold' },
@@ -180,28 +124,26 @@ export function CreateSubscriptionPage() {
     { name: 'to_date', label: t('plots.to_date', 'investments') || 'To Date', type: 'date' },
   ];
 
-  const investorFilterFields: FilterField[] = [
-    { name: 'has_social_account', label: t('investors.filter_has_social_account', 'investments') || 'Has Social Account', type: 'checkbox' },
-    { name: 'has_facebook_account', label: t('investors.filter_has_facebook_account', 'investments') || 'Has Facebook', type: 'checkbox' },
-    { name: 'has_instagram_account', label: t('investors.filter_has_instagram_account', 'investments') || 'Has Instagram', type: 'checkbox' },
-    { name: 'has_x_account', label: t('investors.filter_has_x_account', 'investments') || 'Has X (Twitter)', type: 'checkbox' },
-    { name: 'has_linkedin_account', label: t('investors.filter_has_linkedin_account', 'investments') || 'Has LinkedIn', type: 'checkbox' },
-    { name: 'is_possible_investor_in_future', label: t('investors.filter_is_possible_investor_in_future', 'investments') || 'Future Possible Investor', type: 'checkbox' },
-    { name: 'has_phone_number', label: t('investors.filter_has_phone_number', 'investments') || 'Has Phone', type: 'checkbox' },
-    { name: 'has_whatsapp_number', label: t('investors.filter_has_whatsapp_number', 'investments') || 'Has WhatsApp', type: 'checkbox' },
-    { name: 'nationality', label: t('investors.nationality', 'investments') || 'Nationality', type: 'text' },
-    { name: 'gender', label: t('investors.gender', 'investments') || 'Gender', type: 'select', options: [
-      { value: 'male', label: t('investors.gender_male', 'investments') || 'Male' },
-      { value: 'female', label: t('investors.gender_female', 'investments') || 'Female' },
-    ] },
-    { name: 'email', label: t('investors.email', 'investments') || 'Email', type: 'text' },
-  ];
-
   const plotColumns: ColumnDef<Plot>[] = [
     { key: 'code', label: t('plots.code', 'investments') || 'Code', width: 120, sortable: true },
     { key: 'identifier', label: t('plots.identifier', 'investments') || 'Identifier', width: 120, sortable: true },
     { key: 'plot_area_name', label: t('plots.plot_area_id', 'investments') || 'Plot Area', width: 120 },
     { key: 'plot_classification_name', label: t('plots.plot_classification_id', 'investments') || 'Classification', width: 120 },
+    {
+      key: 'status',
+      label: t('plots.status', 'investments') || 'Status',
+      width: 140,
+      render: (row: Plot) => (
+        <div className="flex flex-col gap-1 items-start">
+          <span className="inline-flex items-center gap-1 text-xs font-medium text-primary-dark bg-primary-light/20 px-2 py-0.5 rounded-full">
+            {t(`plot_status.${row.status}`, 'investments') || row.status}
+          </span>
+          {row.status_date && (
+            <span className="text-[10px] text-text-muted">{row.status_date}</span>
+          )}
+        </div>
+      ),
+    },
   ];
 
   const plotPickerConfig: PickerConfig<Plot> = {    dialogTitle: t('plots.picker_title', 'investments') || 'Select Plot',
@@ -233,61 +175,6 @@ export function CreateSubscriptionPage() {
     requiredPermission: 'investments.plots.list',
   };
 
-  const investorColumns: ColumnDef<Investor>[] = [
-    {
-      key: 'first_name',
-      label: t('investors.full_name', 'investments') || 'Full Name',
-      width: 200,
-      render: (row: Investor) => <span className="font-medium">{[row.first_name, row.father_name, row.last_name].filter(Boolean).join(' ')}</span>,
-    },
-    { key: 'national_id', label: t('investors.national_id', 'investments') || 'National ID', width: 150 },
-    { key: 'nationality', label: t('investors.nationality', 'investments') || 'Nationality', width: 130 },
-    { key: 'phone', label: t('investors.phone', 'investments') || 'Phone', width: 140 },
-  ];
-
-  const investorPickerConfig: PickerConfig<Investor> = {
-    dialogTitle: t('transactions.select_investors', 'investments') || 'Select Investors',
-    dialogSize: '2xl',
-    multiple: true,
-    valueProp: 'id',
-    labelProp: 'first_name',
-    data: investorsCrud.entities,
-    columns: investorColumns,
-    rowKey: 'id',
-    isLoading: investorsCrud.loadingMap['getAll'],
-    error: investorsCrud.errorMap['getAll'],
-    onRetry: () => fetchInvestors({ ...investorFilters, search: investorSearchQuery, page: investorPage, per_page: investorPerPage }),
-    onSearch: handleInvestorSearch,
-    searchPlaceholder: t('common.search', 'shared') || 'Search...',
-    filterFields: investorFilterFields,
-    filterValues: investorFilters,
-    onApplyFilter: handleInvestorApplyFilter,
-    onResetFilter: handleInvestorResetFilter,
-    page: investorPage,
-    perPage: investorPerPage,
-    totalPages: investorsCrud.pagination?.lastPage || 1,
-    totalItems: investorsCrud.pagination?.total || 0,
-    onPageChange: handleInvestorPageChange,
-    onPerPageChange: handleInvestorPerPageChange,
-    emptyMessage: t('investors.no_records', 'investments') || 'No investors found',
-    requiredPermission: 'investments.investors.list',
-    createConfig: {
-      schema: getCreateInvestorFormSchema(t),
-      fields: buildInvestorFormFields(t, false),
-      groups: buildInvestorFormGroups(t),
-      dialogTitle: t('investors.add', 'investments') || 'Add Investor',
-      dialogSize: '2xl',
-      buttonLabel: t('investors.add', 'investments') || 'Add Investor',
-      submitLabel: t('common.create', 'shared') || 'Create',
-      createButtonPermission: 'investments.investors.create',
-      onSubmit: async (data: Record<string, unknown>) => {
-        const res = await investorsCrud.create({ ...data, is_possible_investor_in_future: false } as Parameters<typeof investorsCrud.create>[0]);
-        fetchInvestors({ search: investorSearchQuery, page: 1, per_page: investorPerPage });
-        return res;
-      },
-    },
-  };
-
   const facilityDeps = {
     partnershipTypes: partnershipTypesCrud.entities,
     createPartnershipType: partnershipTypesCrud.create,
@@ -303,12 +190,10 @@ export function CreateSubscriptionPage() {
       pickerConfig: plotPickerConfig,
     },
     {
-      name: 'investor_ids',
+      name: 'investors',
       label: t('transactions.partners', 'investments') || 'Partners',
-      type: 'table-picker',
-      required: true,
       group: 'partners',
-      pickerConfig: investorPickerConfig,
+      render: (methods) => <InvestorsField methods={methods} />,
     },
     ...buildFacilityFormFields(t, facilityDeps),
   ];
@@ -324,7 +209,7 @@ export function CreateSubscriptionPage() {
       group: 'partners',
       title: t('transactions.group_partners', 'investments') || 'Partners',
       columns: 1,
-      rows: [['investor_ids']],
+      rows: [['investors']],
     },
     {
       group: 'facility',
@@ -335,7 +220,7 @@ export function CreateSubscriptionPage() {
 
   const schema = z.object({
     plot_id: z.number( t('transactions.validation.plot_required', 'investments') || 'Plot is required' ),
-    investor_ids: z.array(z.number()).min(1, t('transactions.validation.investors_required', 'investments') || 'At least one investor is required'),
+    investors: z.array(getInvestorRowSchema(t)).min(1, t('transactions.validation.investors_required', 'investments') || 'At least one investor is required'),
     ...getCreateFacilityFormSchema(t).shape,
   });
 
@@ -364,15 +249,16 @@ export function CreateSubscriptionPage() {
           require_all_persons_for_legal_matters: Boolean(data.require_all_persons_for_legal_matters),
         },
         authorized_persons: ((data.authorized_persons as SubscriptionAuthorizedPersonPayload[] | undefined) ?? []),
-        partners: {
-          investors_ids: (data.investor_ids as number[] | undefined) ?? [],
-        },
+        partners: ((data.investors as SubscriptionInvestorPayload[] | undefined) ?? []).map((investor) => ({ investor })),
       };
       await createSubscription(plotId, payload);
       navigate('/investments/plots');
       return { data: { id: plotId } };
     } catch (err: unknown) {
-      handleApiError(err, { module: 'investments' });
+      handleApiError(err, { module: 'investments' , passThrough:true });
+      if (isApiError(err) && err.validationErrors) {
+        err.validationErrors = mapSubscriptionServerValidationErrors(err.validationErrors);
+      }
       throw err;
     }
   };

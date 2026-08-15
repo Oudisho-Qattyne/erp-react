@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Button } from "../../../../core/presentation/layouts/ui/buttons/Button";
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider";
 import { AuthContext } from "../../../../core/infrastructure/auth/AuthProvider";
+import { useDialogClose } from "../../../../core/presentation/layouts/ui/dialog/Dialog";
+import { useConfirmOnClose } from "../../../../core/presentation/layouts/ui/dialog/useConfirmOnClose";
 
 export function FolderCreateForm({
     parentId,
@@ -17,6 +19,17 @@ export function FolderCreateForm({
     const [name, setName] = useState("");
     const [loading, setLoading] = useState(false);
     const auth = useContext(AuthContext);
+
+    const { requestClose } = useDialogClose();
+    useConfirmOnClose(() => name.trim() !== "");
+
+    const handleCancel = () => {
+      if (requestClose) {
+        requestClose();
+      } else {
+        onCancel();
+      }
+    };
 
     const handleSubmit = async () => {
       if (!name.trim()) return;
@@ -42,7 +55,7 @@ export function FolderCreateForm({
           autoFocus
         />
         <div className="flex justify-end gap-2">
-          <Button variant="outline" onClick={onCancel}>{t('file_upload.cancel', 'storage')}</Button>
+          <Button variant="outline" onClick={handleCancel}>{t('file_upload.cancel', 'storage')}</Button>
           <Button variant="primary" onClick={handleSubmit} disabled={loading || !name.trim()}>
             {loading ? t('folder_create.creating', 'storage') : t('folder_create.confirm', 'storage')}
           </Button>

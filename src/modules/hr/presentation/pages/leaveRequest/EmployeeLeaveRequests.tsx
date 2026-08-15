@@ -17,7 +17,8 @@ import type { EntityWithNameOnly } from "../../../../../core/domain/entities/Ent
 import Input from "../../../../../core/presentation/layouts/ui/inputs/Input"
 import { inputBaseClasses } from "../../../../../core/presentation/layouts/ui/inputs/styles"
 import type { UseFormReturn } from "react-hook-form"
-import { User, X, FileText, Filter, Search, Eye, Check, X as XIcon } from "lucide-react"
+import { AuditLog } from "../../../../../core/presentation/layouts/ui/auditLogs/AuditLog"
+import { User, X, FileText, Filter, Search, Eye, Check, X as XIcon, History } from "lucide-react"
 
 const PENDING_STATUS = "pending"
 
@@ -45,6 +46,7 @@ export const EmployeeLeaveRequests = () => {
     const [selectedEmployeeName, setSelectedEmployeeName] = useState<string>("")
     const [leaveTypePickerOpen, setLeaveTypePickerOpen] = useState(false)
     const [selectedLeaveTypeName, setSelectedLeaveTypeName] = useState<string | undefined>("")
+    const [auditItem, setAuditItem] = useState<LeaveRequest | null>(null)
     const formRef = useRef<UseFormReturn | null>(null)
     const handleSearch = () => setSearch(localSearch)
 
@@ -67,6 +69,15 @@ export const EmployeeLeaveRequests = () => {
 
     const getLocalizedTypeName = (lt: EntityWithNameOnly) =>
         typeof lt.name === "string" ? lt.name : language === "ar" ? lt.name.ar : lt.name.en
+
+    const handleTranslateValues = (field: string, value: string) => {
+        if (field === "status") {
+            return t(`leave_request.status_${value}`, "hr") || value
+        }
+        if (value === "true") return t("common.yes", "shared") || "Yes"
+        if (value === "false") return t("common.no", "shared") || "No"
+        return value
+    }
 
     const handleLeaveTypePicked = (types: EntityWithNameOnly[]) => {
         const lt = types[0]
@@ -206,7 +217,7 @@ export const EmployeeLeaveRequests = () => {
         {
             key: "actions",
             label: t("common.actions", "shared") || "Actions",
-            width: 160,
+            width: 200,
             align: "center",
             render: (row) => (
                 <div className="flex items-center justify-center gap-1">
@@ -217,6 +228,14 @@ export const EmployeeLeaveRequests = () => {
                             title={t("common.view", "shared") || "View"}
                     >
                         <Eye size={16} />
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => { e.stopPropagation(); setAuditItem(row) }}
+                        title={t("leave_request.edit_log", "hr") || "Edit Log"}
+                    >
+                        <History size={16} />
                     </Button>
                     {row.status === PENDING_STATUS && hasPermission('hr.leave-requests.manage') && (
                         <>
@@ -360,6 +379,28 @@ export const EmployeeLeaveRequests = () => {
                 onClose={() => setLeaveTypePickerOpen(false)}
                 onConfirm={handleLeaveTypePicked}
                 multiple={false}
+            />
+
+            <AuditLog
+                isOpen={!!auditItem}
+                onClose={() => setAuditItem(null)}
+                model="leave_request"
+                modelId={auditItem?.id}
+                module="hr"
+                labels={{
+                    title: t("leave_request.edit_log", "hr") || "Edit Log",
+                    event: t("leave_request.event", "hr") || "Event",
+                    created_at: t("leave_request.created_at", "hr") || "Created At",
+                    changed_by: t("leave_request.changed_by", "hr") || "Changed By",
+                    changes: t("leave_request.changes", "hr") || "Changes",
+                    field: t("leave_request.field", "hr") || "Field",
+                    old_value: t("leave_request.old_value", "hr") || "Old Value",
+                    new_value: t("leave_request.new_value", "hr") || "New Value",
+                    no_records: t("leave_request.no_edit_log", "hr") || "No edit logs found",
+                    subject_id: t("leave_request.subject_id", "hr") || "ID",
+                }}
+                translateField={(key) => t(`leave_request.${key}`, "hr") || key}
+                translateValues={handleTranslateValues}
             />
         </div>
     )

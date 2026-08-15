@@ -13,9 +13,10 @@ import { FormInput } from '../../../../core/presentation/layouts/ui/inputs/FormI
 import { getCreateEmployeeSchema, type EmployeeFormValues } from '../schemas/employeeForm';
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
 import { GenericCreateForm, type FieldConfig } from '../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
+import { useDialogClose } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
+import { useConfirmOnClose } from '../../../../core/presentation/layouts/ui/dialog/useConfirmOnClose';
 import { FormProvider } from 'react-hook-form';
 import { buildEmployeePersonalFields, buildEmployeeEmploymentFields } from '../forms/employeeFormConfig';
-
 import type { Country } from '../../../../core/domain/entities/regions/Country';
 import { CountryFormSchema } from '../../../../core/presentation/schemas/regions/countryForm.schema';
 import { OrganizationalUnitTreeSelect } from '../components/OrganizationalUnitTreeSelect';
@@ -243,6 +244,17 @@ export function EmployeeForm({
   const [jobStatusLogsOpen, setJobStatusLogsOpen] = useState<boolean>(false)
   const { handleSubmit, formState, watch, setValue } = methods;
   const { isValid, isSubmitting, errors } = formState;
+
+  const { requestClose } = useDialogClose();
+  useConfirmOnClose(() => methods.formState.isDirty);
+
+  const handleCancel = () => {
+    if (requestClose) {
+      requestClose();
+    } else {
+      onCancel?.();
+    }
+  };
 
   const prevErrorCount = useRef(0)
   useEffect(() => {
@@ -642,7 +654,7 @@ const EMPLOYMENT_FIELDS: FieldConfig[] = buildEmployeeEmploymentFields(t, {
         {/* Form Actions */}
         <div className="flex justify-end gap-3">
           {onCancel && (
-            <Button type="button" variant="outline" onClick={() => onCancel?.()}>
+            <Button type="button" variant="outline" onClick={handleCancel}>
               {actualCancelLabel}
             </Button>
           )}

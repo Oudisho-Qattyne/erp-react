@@ -67,7 +67,7 @@ function showToast(message: string): void {
  *
  * - 401:          no toast (client already redirects to login)
  * - 403:          forbidden
- * - 422           generic invalid-input toast (never the backend message)
+ * - 422           generic invalid-input toast (backend message only when `passThrough` is set)
  * - 404           resource not found
  * - 409           backend message (whitelisted business errors)
  * - 429           too many requests
@@ -111,7 +111,7 @@ export function handleApiError(error: unknown, options?: HandleApiErrorOptions):
   } else if (status === 403) {
     finalMessage = translate("common.forbidden", language, options);
   } else if (status === 422) {
-    finalMessage = translate("common.invalid_input", language, options);
+    finalMessage = passThrough ? showBackend() : translate("common.invalid_input", language, options);
   } else if (status === 404) {
     finalMessage = translate("common.resource_not_found", language, options);
   } else if (status === 429) {

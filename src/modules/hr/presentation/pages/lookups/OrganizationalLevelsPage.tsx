@@ -11,7 +11,8 @@ import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
-import { Pencil, Trash2, ChevronRight, ChevronDown } from 'lucide-react';
+import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
+import { Pencil, Trash2, ChevronRight, ChevronDown, History } from 'lucide-react';
 import type { OrganizationalLevels } from '../../../../../core/domain/entities/organizationalLevels/organizationalLevels';
 
 type OrgLevelNode = OrganizationalLevels & { children: OrgLevelNode[] };
@@ -49,6 +50,7 @@ export function OrganizationalLevelsPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
+  const [auditItem, setAuditItem] = useState<any>(null);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   useEffect(() => { getAll(); }, []);
@@ -110,7 +112,7 @@ export function OrganizationalLevelsPage() {
         return parent ? (typeof parent.name === 'string' ? parent.name : (parent.name?.ar || parent.name?.en || '')) : `#${row.parent_id}`;
       },
     },
-    { key: 'actions', label: t('common.actions', 'shared') || 'Actions', width: 150,
+    { key: 'actions', label: t('common.actions', 'shared') || 'Actions', width: 200,
       render: (row: any) => (
         <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
           <Button variant="ghost" size="sm" onClick={() => setEditItem(row)}
@@ -120,6 +122,10 @@ export function OrganizationalLevelsPage() {
           <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)}
             title={t('common.delete', 'shared') || 'Delete'} requiredPermission="hr.organizational-levels.delete">
             <Trash2 size={16} className="text-danger" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)}
+            title={t('lookups.edit_log', 'hr') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
+            <History size={16} />
           </Button>
         </div>
       ) },
@@ -178,6 +184,27 @@ export function OrganizationalLevelsPage() {
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
         confirmLoading={loadingMap['remove']}
         onConfirm={handleDeleteConfirm} onCancel={() => setConfirmDelete(null)} />
+
+      <AuditLog
+        isOpen={!!auditItem}
+        onClose={() => setAuditItem(null)}
+        model="organizational_level"
+        modelId={auditItem?.id}
+        module="hr"
+        labels={{
+          title: t('lookups.edit_log', 'hr') || 'Edit Log',
+          event: t('lookups.event', 'hr') || 'Event',
+          created_at: t('lookups.created_at', 'hr') || 'Created At',
+          changed_by: t('lookups.changed_by', 'hr') || 'Changed By',
+          changes: t('lookups.changes', 'hr') || 'Changes',
+          field: t('lookups.field', 'hr') || 'Field',
+          old_value: t('lookups.old_value', 'hr') || 'Old Value',
+          new_value: t('lookups.new_value', 'hr') || 'New Value',
+          no_records: t('lookups.no_edit_log', 'hr') || 'No edit logs found',
+          subject_id: t('lookups.subject_id', 'hr') || 'ID',
+        }}
+        translateField={(key) => t(`lookups.${key}`, 'hr') || key}
+      />
     </div>
   );
 }

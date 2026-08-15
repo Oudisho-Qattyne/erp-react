@@ -1,13 +1,19 @@
-import React, { useEffect, useState, createContext, useContext, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useMemo, createContext, useContext, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
+import { ConfirmDialog } from './ConfirmDialog';
+import { useLanguage } from '../../../context/i18n/I18nProvider';
 
 interface DialogCloseHandle {
   setDisableClose: (v: boolean) => void;
+  setCloseGuard: (guard: (() => boolean) | null) => void;
+  requestClose?: () => void;
 }
 
 const DialogCloseContext = createContext<DialogCloseHandle>({
   setDisableClose: () => {},
+  setCloseGuard: () => {},
+  requestClose: undefined,
 });
 
 export function useDialogClose() {
@@ -34,14 +40,18 @@ const sizeClasses = {
 };
 
 export function Dialog({ isOpen, onClose, title, children, actions, size = 'md', headerClassName }: DialogProps) {
+  const { t } = useLanguage();
   const [shouldRender, setShouldRender] = useState(isOpen);
   const [isClosing, setIsClosing] = useState(false);
   const [disableClose, setDisableClose] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const closeGuardRef = useRef<(() => boolean) | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       setShouldRender(true);
       setIsClosing(false);
+      setConfirmOpen(false);
     } else if (shouldRender) {
       // Start closing animation
       setIsClosing(true);
@@ -53,18 +63,34 @@ export function Dialog({ isOpen, onClose, title, children, actions, size = 'md',
     }
   }, [isOpen, shouldRender]);
 
-  const handleClose = useCallback(() => {
-    if (!disableClose) onClose();
-  }, [disableClose, onClose]);
+  const setCloseGuard = useCallback((guard: (() => boolean) | null) => {
+    closeGuardRef.current = guard;
+  }, []);
+
+  const requestClose = useCallback(() => {
+    if (disableClose || confirmOpen) return;
+    if (closeGuardRef.current?.()) {
+      setConfirmOpen(true);
+      return;
+    }
+    onClose();
+  }, [disableClose, confirmOpen, onClose]);
+
+  const handleClose = requestClose;
 
   // Close on Escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen && !disableClose) onClose();
+      if (e.key === 'Escape' && isOpen) requestClose();
     };
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onClose, disableClose]);
+  }, [isOpen, requestClose]);
+
+  const contextValue = useMemo(
+    () => ({ setDisableClose, setCloseGuard, requestClose }),
+    [setDisableClose, setCloseGuard, requestClose]
+  );
 
   if (!shouldRender) return null;
 
@@ -91,12 +117,26 @@ export function Dialog({ isOpen, onClose, title, children, actions, size = 'md',
         </div>
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4">
-          <DialogCloseContext.Provider value={{ setDisableClose }}>
+          <DialogCloseContext.Provider value={contextValue}>
             {children}
           </DialogCloseContext.Provider>
         </div>
         {/* Footer actions (optional) */}
         {actions && <div className="p-4 border-t border-border flex justify-end gap-2">{actions}</div>}
-    </div>
-  </div>, document.body)
+      </div>
+      {/* Unsaved changes confirm */}
+      <ConfirmDialog
+        isOpen={confirmOpen}
+        title={t('common.unsaved_changes_title', 'shared') || 'Discard changes?'}
+        message={t('common.unsaved_changes_message', 'shared') || 'You have unsaved changes. Are you sure you want to close without saving?'}
+        type="alert"
+        confirmLabel={t('common.discard', 'shared') || 'Discard'}
+        cancelLabel={t('common.keep_editing', 'shared') || 'Keep editing'}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          onClose();
+        }}
+        onCancel={() => setConfirmOpen(false)}
+      />
+    </div>, document.body)
 }

@@ -34,12 +34,34 @@ export interface SubscriptionAuthorizedPersonPayload {
   is_required_for_legal_matters?: boolean;
 }
 
+export interface SubscriptionInvestorPayload {
+  id?: number;
+  first_name?: string;
+  father_name?: string;
+  grandfather_name?: string;
+  last_name?: string;
+  mother_name?: string;
+  national_id?: string;
+  passport_number?: string;
+  nationality?: string;
+  gender?: 'male' | 'female';
+  phone?: string;
+  whatsapp_number?: string;
+  email?: string | null;
+  address?: string | null;
+  facebook?: string;
+  instagram?: string;
+  x?: string;
+  linkedin?: string;
+  is_possible_investor_in_future?: boolean;
+}
+
 export interface CreateSubscriptionDTO {
   facility: SubscriptionFacilityPayload;
   authorized_persons: SubscriptionAuthorizedPersonPayload[];
   partners: {
-    investors_ids: number[];
-  };
+    investor: SubscriptionInvestorPayload;
+  }[];
 }
 
 export interface ISubscriptionRepository {

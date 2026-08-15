@@ -1,9 +1,11 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Button } from "../../../../core/presentation/layouts/ui/buttons/Button";
 import Input from "../../../../core/presentation/layouts/ui/inputs/Input";
 import { inputBaseClasses } from "../../../../core/presentation/layouts/ui/inputs/styles";
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider";
 import { AuthContext } from "../../../../core/infrastructure/auth/AuthProvider";
+import { useDialogClose } from "../../../../core/presentation/layouts/ui/dialog/Dialog";
+import { useConfirmOnClose } from "../../../../core/presentation/layouts/ui/dialog/useConfirmOnClose";
 
 export function FileUploadForm({
   parentId,
@@ -22,6 +24,18 @@ export function FileUploadForm({
   const [baseName, setBaseName] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const auth = useContext(AuthContext);
+  const initialBaseNameRef = useRef<string | null>(null);
+
+  const { requestClose } = useDialogClose();
+  useConfirmOnClose(() => isSecure || (initialBaseNameRef.current !== null && baseName !== initialBaseNameRef.current));
+
+  const handleCancel = () => {
+    if (requestClose) {
+      requestClose();
+    } else {
+      onCancel();
+    }
+  };
 
   useEffect(() => {
     if (file?.name) {
@@ -29,11 +43,13 @@ export function FileUploadForm({
       if (lastDotIndex === -1) {
         setBaseName(file.name);
         setExtension("");
+        initialBaseNameRef.current = file.name;
       } else {
         const ext = file.name.slice(lastDotIndex);
         const nameWithoutExt = file.name.slice(0, lastDotIndex);
         setBaseName(nameWithoutExt);
         setExtension(ext);
+        initialBaseNameRef.current = nameWithoutExt;
       }
     }
   }, [file]);
@@ -81,7 +97,7 @@ export function FileUploadForm({
         <span className="text-sm">{t('file_upload.secure_storage', 'storage')}</span>
       </label>
       <div className="flex justify-end gap-2 pt-2">
-        <Button variant="outline" onClick={onCancel} disabled={loading}>
+        <Button variant="outline" onClick={handleCancel} disabled={loading}>
           {t('file_upload.cancel', 'storage')}
         </Button>
         <Button variant="primary" onClick={handleSubmit} disabled={loading}>

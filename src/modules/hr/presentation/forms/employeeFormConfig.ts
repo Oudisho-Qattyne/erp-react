@@ -201,7 +201,7 @@ export const buildEmployeePersonalFields = (t: Translate, deps: EmployeePersonal
     name: 'residential_area_details',
     label: t('employees.residential_area_details', 'hr') || 'تفاصيل المنطقة السكنية',
   },
-  { name: 'civil_registry_record', type: 'numeric', label: t('employees.civil_registry_record', 'hr') || 'رقم القيد المدني' },
+  { name: 'civil_registry_record', type: 'alphanumeric', label: t('employees.civil_registry_record', 'hr') || 'رقم القيد المدني' },
   { name: 'health_status', type: 'alpha', label: t('employees.health_status', 'hr') || 'الحالة الصحية' },
   { name: 'injury_details', label: t('employees.injury_details', 'hr') || 'تفاصيل الإصابات' },
   { name: 'injury_date', type: 'date', label: t('employees.injury_date', 'hr') || 'تاريخ الإصابة' },

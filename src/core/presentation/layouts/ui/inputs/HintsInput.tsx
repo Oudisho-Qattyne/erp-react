@@ -55,6 +55,10 @@ export function HintsInput({
   const trimmedQuery = debouncedQuery.trim();
 
   useEffect(() => {
+    setText(String(value ?? ''));
+  }, [value]);
+
+  useEffect(() => {
     if (trimmedQuery.length < minChars) return;
     let cancelled = false;
     searchApi(trimmedQuery, dependentData)
@@ -174,8 +178,6 @@ export function HintsInput({
       </div>
     );
   };
-console.log("rendered");
-
   return (
     <div ref={containerRef} className="relative w-full">
       <input

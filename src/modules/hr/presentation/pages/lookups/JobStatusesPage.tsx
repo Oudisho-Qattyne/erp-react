@@ -13,7 +13,8 @@ import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
-import { Pencil, Trash2, Star } from 'lucide-react';
+import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
+import { Pencil, Trash2, Star, History } from 'lucide-react';
 import type { JobStatus } from '../../../domain/entities/jobStatus/jobStatus';
 
 export function JobStatusesPage() {
@@ -24,6 +25,14 @@ export function JobStatusesPage() {
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<any>(null);
+  const [auditItem, setAuditItem] = useState<any>(null);
+
+  const handleTranslateValues = (field: string, value: string) => {
+    if (field === 'is_default') {
+      return value === 'true' ? (t('common.yes', 'shared') || 'Yes') : value === 'false' ? (t('common.no', 'shared') || 'No') : value;
+    }
+    return value;
+  };
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
@@ -71,6 +80,10 @@ export function JobStatusesPage() {
           <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)}
             title={t('common.delete', 'shared') || 'Delete'} requiredPermission="hr.job-statuses.delete">
             <Trash2 size={16} className="text-danger" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)}
+            title={t('lookups.edit_log', 'hr') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
+            <History size={16} />
           </Button>
         </div>
       ) },
@@ -135,6 +148,28 @@ export function JobStatusesPage() {
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
         confirmLoading={loadingMap['remove']}
         onConfirm={handleSetDefaultConfirm} onCancel={() => setConfirmSetDefault(null)} />
+
+      <AuditLog
+        isOpen={!!auditItem}
+        onClose={() => setAuditItem(null)}
+        model="job_status"
+        modelId={auditItem?.id}
+        module="hr"
+        labels={{
+          title: t('lookups.edit_log', 'hr') || 'Edit Log',
+          event: t('lookups.event', 'hr') || 'Event',
+          created_at: t('lookups.created_at', 'hr') || 'Created At',
+          changed_by: t('lookups.changed_by', 'hr') || 'Changed By',
+          changes: t('lookups.changes', 'hr') || 'Changes',
+          field: t('lookups.field', 'hr') || 'Field',
+          old_value: t('lookups.old_value', 'hr') || 'Old Value',
+          new_value: t('lookups.new_value', 'hr') || 'New Value',
+          no_records: t('lookups.no_edit_log', 'hr') || 'No edit logs found',
+          subject_id: t('lookups.subject_id', 'hr') || 'ID',
+        }}
+        translateField={(key) => t(`lookups.${key}`, 'hr') || key}
+        translateValues={handleTranslateValues}
+      />
     </div>
   );
 }

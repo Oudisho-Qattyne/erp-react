@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from "react"
 import { FormProvider, useFieldArray, useWatch, useFormContext } from "react-hook-form"
 import { useDynamicForm } from "../../../../../core/presentation/hooks/useDynamicForm221"
 import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nProvider"
+import { useDialogClose } from "../../../../../core/presentation/layouts/ui/dialog/Dialog"
+import { useConfirmOnClose } from "../../../../../core/presentation/layouts/ui/dialog/useConfirmOnClose"
 import { FormInput } from "../../../../../core/presentation/layouts/ui/inputs/FormInput"
 import { Button } from "../../../../../core/presentation/layouts/ui/buttons/Button"
 import { RuleGroupComponent } from "../../components/leaveRules/RuleGroupComponent"
@@ -65,6 +67,16 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
   })
 
   const errorCount = Object.keys(errors).length
+  const { requestClose } = useDialogClose()
+  useConfirmOnClose(() => form.formState.isDirty)
+
+  const handleCancel = () => {
+    if (requestClose) {
+      requestClose()
+    } else {
+      onCancel?.()
+    }
+  }
   useEffect(() => {
     const keys = Object.keys(errors)
     if (keys.length > 0) {
@@ -207,7 +219,7 @@ export default function LeaveForm({ defaultValues = LEAVE_EMPTY_DEFAULTS, onSubm
 
         <div className="flex items-center justify-end gap-3 pt-2">
           {onCancel && (
-            <Button variant="secondary" onClick={() => onCancel?.()} type="button">
+            <Button variant="secondary" onClick={handleCancel} type="button">
               {t("common.cancel", "shared")}
             </Button>
           )}

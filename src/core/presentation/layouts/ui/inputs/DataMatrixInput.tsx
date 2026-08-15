@@ -44,6 +44,7 @@ interface DataMatrixInputProps {
   errors?: Record<number, Record<string, string>>;
   rowSchema?: { safeParse: (data: any) => { success: boolean; error?: { flatten: () => { fieldErrors: Record<string, string[]> } } } };
   dependentData?: Record<string, unknown>;
+  defaultRowFactory?: () => Record<string, any>;
 }
 
 const getDefaultRow = (fields: MatrixFieldConfig[]) => {
@@ -114,10 +115,14 @@ export function DataMatrixInput({
   errors: externalErrors = {},
   rowSchema,
   dependentData,
+  defaultRowFactory,
 }: DataMatrixInputProps) {
   const { t } = useLanguage();
   const tableRef = useRef<HTMLTableElement>(null);
-  const defaultRow = useMemo(() => getDefaultRow(matrixFields), [matrixFields]);
+  const defaultRow = useMemo(
+    () => (defaultRowFactory ? defaultRowFactory() : getDefaultRow(matrixFields)),
+    [matrixFields, defaultRowFactory]
+  );
   const [colWidths, setColWidths] = useState<Record<string, number>>({});
   const dragRef = useRef<{ field: string; startX: number; startWidth: number } | null>(null);
   const rows = numberOfRows !== undefined
