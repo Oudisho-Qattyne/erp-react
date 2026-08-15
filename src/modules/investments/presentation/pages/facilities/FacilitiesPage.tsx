@@ -76,6 +76,11 @@ export function FacilitiesPage() {
 
   const filterFields: FilterField[] = [
     {
+      name: 'email',
+      label: t('facilities.email', 'investments') || 'Email',
+      type: 'text',
+    },
+    {
       name: 'plot_id',
       render: (form) => {
         formRef.current = form;
@@ -132,6 +137,7 @@ export function FacilitiesPage() {
   ];
 
   const filterInitialValues = useMemo(() => ({
+    email: (list.filter.email as string | undefined) || '',
     plot_id: (list.filter.plot_id as number | undefined) || '',
     plot_dossier_id: (list.filter.plot_dossier_id as number | undefined) || '',
   }), [list.filter]);
@@ -183,7 +189,7 @@ export function FacilitiesPage() {
       width: 150,
       render: (row: Facility) => row.partnership_type ? getLocalizedName(row.partnership_type.name) : '—',
     },
-    { key: "city", label: t("facilities.city", "investments") || "City", width: 120, sortable: true },
+    { key: "city", label: t("facilities.city", "investments") || "City", width: 120 },
     { key: "first_phone_number", label: t("facilities.first_phone_number", "investments") || "Phone", width: 140 },
     { key: "email", label: t("facilities.email", "investments") || "Email", width: 180 },
     {

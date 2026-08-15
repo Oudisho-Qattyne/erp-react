@@ -18,14 +18,12 @@ export interface QueryParams {
   page?: number;
   perPage?: number;
   search?: string;
-  sort?: string;
   /** Emits `sort_by[<name>]=<order>` per the lookups API (e.g. sort_by[name]) */
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
   /** Emits flat boolean params (e.g. is_active=true) for lookups that support them */
   isActive?: boolean;
   isDefault?: boolean;
-  filter?: Record<string, string | boolean | number>;
 }
 
 function buildFlatParams(params: QueryParams): Record<string, string | boolean | number> {
@@ -33,15 +31,9 @@ function buildFlatParams(params: QueryParams): Record<string, string | boolean |
   if (params.page != null) flat.page = params.page;
   if (params.perPage != null) flat.perPage = params.perPage;
   if (params.search != null) flat.search = params.search;
-  if (params.sort != null) flat.sort = params.sort;
   if (params.sortBy != null) flat[`sort_by[${params.sortBy}]`] = params.sortOrder ?? 'asc';
   if (params.isActive != null) flat.is_active = params.isActive;
   if (params.isDefault != null) flat.is_default = params.isDefault;
-  if (params.filter) {
-    for (const [key, value] of Object.entries(params.filter)) {
-      flat[`filter[${key}]`] = value;
-    }
-  }
   return flat;
 }
 
@@ -58,6 +50,7 @@ export interface EntityListState {
   setSearch: (query: string) => void;
   setSort: (column: string) => void;
   resetFilter: () => void;
+  refresh: () => void;
   page: number;
   perPage: number;
   setPage: (page: number) => void;
@@ -68,6 +61,13 @@ export interface UseEntityCrudOptions {
   listState?: boolean;
   defaultPerPage?: number;
   searchParamName?: string;
+  /** Column used as the initial sort (e.g. 'name' for lookups). Omit for no initial sort. */
+  defaultSortColumn?: string;
+  defaultSortOrder?: 'asc' | 'desc';
+  /** Send page/per_page query params. Default true. Set false for lookup-style lists. */
+  paginate?: boolean;
+  /** Debounce list refetches (ms). Default 0 (immediate). */
+  debounceMs?: number;
 }
 
 interface PaginationInfo {
@@ -158,10 +158,15 @@ export function useEntityCrud<T extends { id: number }>(
   const listStateEnabled = options?.listState ?? false;
   const searchParamName = options?.searchParamName ?? 'search';
   const defaultPerPage = options?.defaultPerPage ?? 25;
+  const defaultSortColumn = options?.defaultSortColumn;
+  const defaultSortOrder = options?.defaultSortOrder ?? 'asc';
+  const paginate = options?.paginate ?? true;
+  const debounceMs = options?.debounceMs ?? 0;
 
-  const [filter, setFilterState] = useState<ListStateFilter>({ sortOrder: 'asc' });
+  const [filter, setFilterState] = useState<ListStateFilter>({ sortColumn: defaultSortColumn, sortOrder: defaultSortOrder });
   const [page, setPageState] = useState(1);
   const [perPage, setPerPageState] = useState(defaultPerPage);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const setFilter = useCallback(
     (patch: Partial<ListStateFilter> | ((prev: ListStateFilter) => ListStateFilter)) => {
@@ -188,8 +193,10 @@ export function useEntityCrud<T extends { id: number }>(
 
   const resetFilter = useCallback(() => {
     setPageState(1);
-    setFilterState({ sortOrder: 'asc' });
-  }, []);
+    setFilterState({ sortColumn: defaultSortColumn, sortOrder: defaultSortOrder });
+  }, [defaultSortColumn, defaultSortOrder]);
+
+  const refresh = useCallback(() => setRefreshKey((k) => k + 1), []);
 
   const setPage = useCallback((p: number) => setPageState(p), []);
 
@@ -244,26 +251,32 @@ export function useEntityCrud<T extends { id: number }>(
       if (val !== undefined && val !== '') params.append(key, String(val));
     }
     if (filter.sortColumn) {
-      params.append('sortColumn', filter.sortColumn);
-      params.append('sortOrder', filter.sortOrder ?? 'asc');
+      params.append(`sort_by[${filter.sortColumn}]`, filter.sortOrder ?? 'asc');
     }
-    params.append('page', String(page));
-    params.append('per_page', String(perPage));
+    if (paginate) {
+      params.append('page', String(page));
+      params.append('per_page', String(perPage));
+    }
     return params;
-  }, [filter, page, perPage, searchParamName]);
+  }, [filter, page, perPage, searchParamName, paginate]);
 
   useEffect(() => {
     if (!listStateEnabled || !getUrl) return;
     const sep = getUrl.includes('?') ? '&' : '?';
+    const url = `${getUrl}${sep}${buildListParams().toString()}`;
+    if (debounceMs > 0) {
+      const timer = setTimeout(() => getAll(url), debounceMs);
+      return () => clearTimeout(timer);
+    }
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    getAll(`${getUrl}${sep}${buildListParams().toString()}`);
+    getAll(url);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listStateEnabled, getUrl, buildListParams]);
+  }, [listStateEnabled, getUrl, buildListParams, refreshKey]);
 
   const list = useMemo<EntityListState | undefined>(() => {
     if (!listStateEnabled) return undefined;
-    return { filter, setFilter, setSearch, setSort, resetFilter, page, perPage, setPage, setPerPage };
-  }, [listStateEnabled, filter, setFilter, setSearch, setSort, resetFilter, page, perPage, setPage, setPerPage]);
+    return { filter, setFilter, setSearch, setSort, resetFilter, refresh, page, perPage, setPage, setPerPage };
+  }, [listStateEnabled, filter, setFilter, setSearch, setSort, resetFilter, refresh, page, perPage, setPage, setPerPage]);
 
   const getById = useCallback(async (id: number) => {
     setFnLoading('getById', true);
@@ -303,6 +316,10 @@ export function useEntityCrud<T extends { id: number }>(
       const updated = await idem.run('update', { id, data }, (key) => usecase.update(id, data, key));
       if (updated && updated.data) {
         setEntities(prev => prev.map(u => u.id === id ? updated.data : u));
+      } else if (getUrl && listStateEnabled) {
+        // Idempotency replay returned no body (server already processed) — refresh the list with active filters
+        const sep = getUrl.includes('?') ? '&' : '?';
+        getAll(`${getUrl}${sep}${buildListParams().toString()}`).catch(() => undefined);
       } else if (getUrl) {
         // Idempotency replay returned no body (server already processed) — refresh the list
         getAll().catch(() => undefined);
@@ -314,7 +331,7 @@ export function useEntityCrud<T extends { id: number }>(
     } finally {
       setFnLoading('update', false);
     }
-  }, [usecase, idem, getAll, getUrl]);
+  }, [usecase, idem, getAll, getUrl, listStateEnabled, buildListParams]);
 
   const remove = useCallback(async (id: number) => {
     setFnLoading('remove', true);

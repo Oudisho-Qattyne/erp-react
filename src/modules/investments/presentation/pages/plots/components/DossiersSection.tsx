@@ -194,26 +194,22 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       key: 'dossier_number',
       label: t('dossier.number', 'investments') || 'Dossier Number',
       width: 180,
-      sortable: true,
     },
     {
       key: 'dossier_date',
       label: t('dossier.date', 'investments') || 'Dossier Date',
       width: 140,
-      sortable: true,
     },
     {
       key: 'allocated_date',
       label: t('dossier.allocated_date', 'investments') || 'Allocated Date',
       width: 140,
-      sortable: true,
       render: (row: Dossier) => row.allocated_date || '—',
     },
     {
       key: 'status',
       label: t('dossier.status', 'investments') || 'Status',
       width: 120,
-      sortable: true,
       render: (row: Dossier) => (
         <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
           style={{

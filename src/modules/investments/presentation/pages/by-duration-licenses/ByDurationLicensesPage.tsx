@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import { getCreateByDurationLicenseFormSchema } from '../../schemas/byDurationLicenseForm.schema';
@@ -20,45 +20,23 @@ import type { ByDurationLicense } from '../../../domain/entities/byDurationLicen
 
 export function ByDurationLicensesPage() {
   const { t } = useLanguage();
-  const { entities: items, getAll, create, update, remove, loadingMap, errorMap } = useEntityCrud<ByDurationLicense>('/investments/by-duration-licenses', '/investments/by-duration-licenses');
+  const { entities: items, create, update, remove, loadingMap, errorMap, list } = useEntityCrud<ByDurationLicense>(
+    '/investments/by-duration-licenses',
+    '/investments/by-duration-licenses',
+    { listState: true, defaultSortColumn: 'name', paginate: false, debounceMs: 300 }
+  );
   const entityName = t('by_duration_licenses.title', 'investments') || 'By Duration License';
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortColumn, setSortColumn] = useState('name');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [extraFilters, setExtraFilters] = useState<Record<string, string>>({});
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<ByDurationLicense | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<ByDurationLicense | null>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<ByDurationLicense | null>(null);
   const [auditItem, setAuditItem] = useState<ByDurationLicense | null>(null);
 
-  const listParams = useCallback(
-    () => ({
-      search: searchQuery || undefined,
-      sortBy: sortColumn,
-      sortOrder,
-      isActive: extraFilters.is_active === 'true' ? true : extraFilters.is_active === 'false' ? false : undefined,
-      isDefault: extraFilters.is_default === 'true' ? true : extraFilters.is_default === 'false' ? false : undefined,
-    }),
-    [searchQuery, sortColumn, sortOrder, extraFilters]
+  const filterInitialValues = useMemo(
+    () => Object.fromEntries(Object.entries(list.filter).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k))),
+    [list.filter]
   );
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      getAll(undefined, listParams());
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [getAll, listParams]);
-
-  const handleSort = (column: string) => {
-    if (sortColumn === column) {
-      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortColumn(column);
-      setSortOrder('asc');
-    }
-  };
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
@@ -76,7 +54,7 @@ export function ByDurationLicensesPage() {
     try {
       await update(confirmSetDefault.id, { ...confirmSetDefault, is_default: true });
       toast.success(t('common.set_default_success', 'shared')?.replace('{name}', entityName) || `${entityName} set as default successfully`);
-      getAll(undefined, listParams());
+      list.refresh();
     } catch (err: any) {
       handleApiError(err, { module: "investments" });
     }
@@ -157,16 +135,19 @@ export function ByDurationLicensesPage() {
   ];
 
   const handleApplyFilter = (values: Record<string, unknown>) => {
-    const parsed: Record<string, string> = {};
+    const parsed: Record<string, any> = {};
     for (const [key, val] of Object.entries(values)) {
-      if (val !== "" && val !== undefined) parsed[key] = String(val);
+      if (val === '' || val === undefined) continue;
+      if (val === 'true') parsed[key] = true;
+      else if (val === 'false') parsed[key] = false;
+      else parsed[key] = val;
     }
-    setExtraFilters(parsed);
+    list.setFilter(parsed);
     setIsFilterOpen(false);
   };
 
   const handleResetFilter = () => {
-    setExtraFilters({});
+    list.resetFilter();
     setIsFilterOpen(false);
   };
 
@@ -175,7 +156,7 @@ export function ByDurationLicensesPage() {
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-bold">{t('by_duration_licenses.title', 'investments')}</h1>
         <div className="w-full flex gap-2">
-          <Input type="text" value={searchQuery} onChange={setSearchQuery}
+          <Input type="text" value={list.filter.search ?? ''} onChange={list.setSearch}
             placeholder={t('common.search', 'shared') || 'Search...'}
             baseClasses={inputBaseClasses} className="w-60" />
             <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
@@ -200,7 +181,7 @@ export function ByDurationLicensesPage() {
       handleApiError(err, { module: "investments" }); throw err;
     }
           }}
-          onSuccess={() => { toast.success(t('by_duration_licenses.created', 'investments').replace('{name}', entityName)); getAll(undefined, listParams()); setIsCreateOpen(false); }}
+          onSuccess={() => { toast.success(t('by_duration_licenses.created', 'investments').replace('{name}', entityName)); list.refresh(); setIsCreateOpen(false); }}
           onCancel={() => setIsCreateOpen(false)}
           submitLabel={t('by_duration_licenses.add', 'investments')}
         />
@@ -222,16 +203,16 @@ export function ByDurationLicensesPage() {
       handleApiError(err, { module: "investments" }); throw err;
     }
           }}
-          onSuccess={() => { toast.success(t('common.updated', 'shared')?.replace('{name}', entityName) || `${entityName} updated successfully`); getAll(undefined, listParams()); setEditItem(null); }}
+          onSuccess={() => { toast.success(t('common.updated', 'shared')?.replace('{name}', entityName) || `${entityName} updated successfully`); list.refresh(); setEditItem(null); }}
           onCancel={() => setEditItem(null)}
           submitLabel={t('common.save', 'shared') || 'Save'}
         />
       </Dialog>
 
-      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll(undefined, listParams())} />}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => list.refresh()} />}
       {!errorMap['getAll'] && (
         <DataTable columns={columns} data={items} rowKey="id" loading={loadingMap['getAll']}
-          sortColumn={sortColumn} sortOrder={sortOrder} onSort={handleSort}
+          sortColumn={list.filter.sortColumn} sortOrder={list.filter.sortOrder} onSort={list.setSort}
           emptyMessage={t('by_duration_licenses.no_records', 'investments')} />
       )}
 
@@ -283,7 +264,7 @@ export function ByDurationLicensesPage() {
       <FilterDialog
         isOpen={isFilterOpen}
         fields={filterFields}
-        initialValues={extraFilters}
+        initialValues={filterInitialValues}
         onFilter={handleApplyFilter}
         onCancel={() => setIsFilterOpen(false)}
         onReset={handleResetFilter}

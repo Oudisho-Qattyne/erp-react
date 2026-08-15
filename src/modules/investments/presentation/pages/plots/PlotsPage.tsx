@@ -21,10 +21,10 @@ import { getLocalizedName } from '../../../../../core/presentation/utils/helpes'
 export function PlotsPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { entities: plots, getAll, remove, loadingMap, errorMap, pagination, list } = useEntityCrud<Plot>(
+  const { entities: plots, remove, loadingMap, errorMap, pagination, list } = useEntityCrud<Plot>(
     '/investments/plots',
     '/investments/plots',
-    { listState: true, searchParamName: 'code' }
+    { listState: true }
   );
   const { entities: areas, getAll: getAreas } = useEntityCrud<EntityWithNameOnly>('/investments/plot-areas', '/investments/plot-areas');
   const { entities: classifications, getAll: getClassifications } = useEntityCrud<EntityWithNameOnly>('/investments/plot-classifications', '/investments/plot-classifications');
@@ -44,10 +44,13 @@ export function PlotsPage() {
     getClassifications();
   }, []);
 
-  const handleApplyFilter = (values: Record<string, any>) => {
-    const parsed: Record<string, string> = {};
+  const handleApplyFilter = (values: Record<string, unknown>) => {
+    const parsed: Record<string, any> = {};
     for (const [key, val] of Object.entries(values)) {
-      if (val !== '' && val !== undefined) parsed[key] = val;
+      if (val === '' || val === undefined) continue;
+      if (val === 'true') parsed[key] = true;
+      else if (val === 'false') parsed[key] = false;
+      else parsed[key] = val;
     }
     list.setFilter(parsed);
     setIsFilterOpen(false);
@@ -89,6 +92,9 @@ export function PlotsPage() {
     { name: 'status', label: t('plots.status', 'investments') || 'Status', type: 'select', options: statusOptions },
     { name: 'plot_area_id', label: t('plots.plot_area_id', 'investments') || 'Region', type: 'select', options: areaOptions },
     { name: 'plot_classification_id', label: t('plots.plot_classification_id', 'investments') || 'Classification', type: 'select', options: classificationOptions },
+    { name: 'code', label: t('plots.code', 'investments') || 'Plot Code', type: 'text' },
+    { name: 'identifier', label: t('plots.identifier', 'investments') || 'Plot Identifier', type: 'text' },
+    { name: 'has_allocated_dossier', label: t('plots.filter_has_allocated_dossier', 'investments') || 'Has Allocated Dossier', type: 'checkbox' },
     { name: 'from_date', label: t('plots.from_date', 'investments') || 'From Date', type: 'date' },
     { name: 'to_date', label: t('plots.to_date', 'investments') || 'To Date', type: 'date' },
   ], [t, areaOptions, classificationOptions, statusOptions]);
@@ -98,21 +104,18 @@ export function PlotsPage() {
       key: 'code',
       label: t('plots.code', 'investments') || 'Plot Code',
       width: 120,
-      sortable: true,
       render: (row: Plot) => <span className="font-medium">{row.code}</span>
     },
     {
       key: 'identifier',
       label: t('plots.identifier', 'investments') || 'Plot Identifier',
       width: 120,
-      sortable: true,
       render: (row: Plot) => <span className="font-medium">{row.identifier}</span>
     },
     {
       key: 'status',
       label: t('plots.status', 'investments') || 'Status',
       width: 140,
-      sortable: true,
       render: (row: Plot) => (
         <div className="flex flex-col gap-1 items-start">
           <span className="inline-flex items-center gap-1 text-xs font-medium text-primary-dark bg-primary-light/20 px-2 py-0.5 rounded-full">
@@ -128,21 +131,18 @@ export function PlotsPage() {
       key: 'area',
       label: t('plots.area', 'investments') || 'Area',
       width: 100,
-      sortable: true,
       render: (row: Plot) => `${row.area} ㎡`
     },
     {
       key: 'plot_area_id',
       label: t('plots.plot_area_id', 'investments') || 'Region',
       width: 150,
-      sortable: true,
       render: (row: Plot) => row.plot_area_name || '—'
     },
     {
       key: 'plot_classification_id',
       label: t('plots.plot_classification_id', 'investments') || 'Classification',
       width: 150,
-      sortable: true,
       render: (row: Plot) => row.plot_classification_name || '—'
     },
     {
@@ -209,7 +209,7 @@ export function PlotsPage() {
       </div>
         <div className="flex flex-wrap items-center gap-3">
           <Input type="text" value={localSearch} onChange={setLocalSearch}
-            placeholder={t('common.search', 'shared') || 'Search by code...'}
+            placeholder={t('common.search', 'shared') || 'Search by code or identifier...'}
             baseClasses={inputBaseClasses} className="w-64" />
           <Button variant="primary" onClick={() => list.setSearch(localSearch)} size="sm" leftIcon={<Search size={14} />}>
             {t('common.search', 'shared') || 'Search'}
@@ -231,7 +231,7 @@ export function PlotsPage() {
         onReset={handleResetFilter}
       />
 
-      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll(`/investments/plots?page=${list.page}&per_page=${list.perPage}`)} />}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => list.refresh()} />}
 
       {!errorMap['getAll'] && (
         <DataTable
@@ -240,9 +240,6 @@ export function PlotsPage() {
           rowKey="id"
           loading={loadingMap['getAll']}
           emptyMessage={t('plots.no_records', 'investments') || 'No plots found'}
-          sortColumn={list.filter.sortColumn}
-          sortOrder={list.filter.sortOrder}
-          onSort={list.setSort}
           pagination={tablePagination}
         />
       )}

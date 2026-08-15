@@ -9,6 +9,9 @@ import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Butt
 import { GenericCreateForm, type FieldConfig, type GroupConfig } from '../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import type { PickerConfig } from '../../../../../core/presentation/layouts/ui/picker/pickerTypes';
 import type { ColumnDef } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
+import type { FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import type { EntityWithNameOnly } from '../../../../../core/domain/entities/EntityWithNameOnly';
+import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import type { Plot } from '../../../domain/entities/plot';
 import { getCreateFacilityFormSchema } from '../../schemas/facilityForm.schema';
@@ -29,23 +32,30 @@ export function CreateSubscriptionPage() {
   const plotsCrud = useEntityCrud<Plot>('/investments/plots', '/investments/plots');
   const investorsCrud = useEntityCrud<Investor>('/investments/investors', '/investments/investors');
   const partnershipTypesCrud = useEntityCrud<PartnershipType>('/investments/partnership-types', '/investments/partnership-types');
+  const plotAreasCrud = useEntityCrud<EntityWithNameOnly>('/investments/plot-areas', '/investments/plot-areas');
+  const plotClassificationsCrud = useEntityCrud<EntityWithNameOnly>('/investments/plot-classifications', '/investments/plot-classifications');
   const { createSubscription } = useSubscription();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
+  const [plotFilters, setPlotFilters] = useState<Record<string, any>>({});
+  const [plotSortBy, setPlotSortBy] = useState<string | undefined>(undefined);
+  const [plotSortOrder, setPlotSortOrder] = useState<'asc' | 'desc'>('asc');
 
   const [investorSearchQuery, setInvestorSearchQuery] = useState('');
   const [investorPage, setInvestorPage] = useState(1);
   const [investorPerPage, setInvestorPerPage] = useState(25);
+  const [investorFilters, setInvestorFilters] = useState<Record<string, any>>({});
 
   const fetchPlots = (params: FetchParams = {}) => {
     const sp = new URLSearchParams();
     if (params.search) sp.append('search', String(params.search));
+    if (params.sortColumn) sp.append(`sort_by[${params.sortColumn}]`, String(params.sortOrder ?? 'asc'));
     if (params.page) sp.append('page', String(params.page));
     if (params.per_page) sp.append('per_page', String(params.per_page));
     Object.entries(params).forEach(([k, v]) => {
-      if (!['search', 'page', 'per_page'].includes(k) && v !== '' && v !== undefined) {
+      if (!['search', 'sortColumn', 'sortOrder', 'page', 'per_page'].includes(k) && v !== '' && v !== undefined) {
         sp.append(k, String(v));
       }
     });
@@ -53,26 +63,55 @@ export function CreateSubscriptionPage() {
   };
 
   useEffect(() => {
-fetchPlots({ page: 1, per_page: perPage });
+    fetchPlots({ page: 1, per_page: perPage });
     investorsCrud.getAll('/investments/investors?page=1&per_page=25');
     partnershipTypesCrud.getAll('/investments/partnership-types?is_active=true');
+    plotAreasCrud.getAll();
+    plotClassificationsCrud.getAll();
   }, []);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setPage(1);
-    fetchPlots({ search: query, page: 1, per_page: perPage });
+    fetchPlots({ ...plotFilters, search: query, sortColumn: plotSortBy, sortOrder: plotSortOrder, page: 1, per_page: perPage });
   };
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    fetchPlots({ search: searchQuery, page: newPage, per_page: perPage });
+    fetchPlots({ ...plotFilters, search: searchQuery, sortColumn: plotSortBy, sortOrder: plotSortOrder, page: newPage, per_page: perPage });
   };
 
   const handlePerPageChange = (size: number) => {
     setPerPage(size);
     setPage(1);
-    fetchPlots({ search: searchQuery, page: 1, per_page: size });
+    fetchPlots({ ...plotFilters, search: searchQuery, sortColumn: plotSortBy, sortOrder: plotSortOrder, page: 1, per_page: size });
+  };
+
+  const handlePlotSort = (columnKey: string) => {
+    const newOrder = plotSortBy === columnKey && plotSortOrder === 'asc' ? 'desc' : 'asc';
+    setPlotSortBy(columnKey);
+    setPlotSortOrder(newOrder);
+    setPage(1);
+    fetchPlots({ ...plotFilters, search: searchQuery, sortColumn: columnKey, sortOrder: newOrder, page: 1, per_page: perPage });
+  };
+
+  const handlePlotApplyFilter = (values: Record<string, any>) => {
+    const parsed: Record<string, any> = {};
+    for (const [key, val] of Object.entries(values)) {
+      if (val === '' || val === undefined) continue;
+      if (val === 'true') parsed[key] = true;
+      else if (val === 'false') parsed[key] = false;
+      else parsed[key] = val;
+    }
+    setPlotFilters(parsed);
+    setPage(1);
+    fetchPlots({ ...parsed, search: searchQuery, sortColumn: plotSortBy, sortOrder: plotSortOrder, page: 1, per_page: perPage });
+  };
+
+  const handlePlotResetFilter = () => {
+    setPlotFilters({});
+    setPage(1);
+    fetchPlots({ search: searchQuery, sortColumn: plotSortBy, sortOrder: plotSortOrder, page: 1, per_page: perPage });
   };
 
   const fetchInvestors = (params: FetchParams = {}) => {
@@ -91,19 +130,72 @@ fetchPlots({ page: 1, per_page: perPage });
   const handleInvestorSearch = (query: string) => {
     setInvestorSearchQuery(query);
     setInvestorPage(1);
-    fetchInvestors({ search: query, page: 1, per_page: investorPerPage });
+    fetchInvestors({ ...investorFilters, search: query, page: 1, per_page: investorPerPage });
   };
 
   const handleInvestorPageChange = (newPage: number) => {
     setInvestorPage(newPage);
-    fetchInvestors({ search: investorSearchQuery, page: newPage, per_page: investorPerPage });
+    fetchInvestors({ ...investorFilters, search: investorSearchQuery, page: newPage, per_page: investorPerPage });
   };
 
   const handleInvestorPerPageChange = (size: number) => {
     setInvestorPerPage(size);
     setInvestorPage(1);
-    fetchInvestors({ search: investorSearchQuery, page: 1, per_page: size });
+    fetchInvestors({ ...investorFilters, search: investorSearchQuery, page: 1, per_page: size });
   };
+
+  const handleInvestorApplyFilter = (values: Record<string, any>) => {
+    const parsed: Record<string, any> = {};
+    for (const [key, val] of Object.entries(values)) {
+      if (val === '' || val === undefined) continue;
+      if (val === 'true') parsed[key] = true;
+      else if (val === 'false') parsed[key] = false;
+      else parsed[key] = val;
+    }
+    setInvestorFilters(parsed);
+    setInvestorPage(1);
+    fetchInvestors({ ...parsed, search: investorSearchQuery, page: 1, per_page: investorPerPage });
+  };
+
+  const handleInvestorResetFilter = () => {
+    setInvestorFilters({});
+    setInvestorPage(1);
+    fetchInvestors({ search: investorSearchQuery, page: 1, per_page: investorPerPage });
+  };
+
+  const plotFilterFields: FilterField[] = [
+    { name: 'status', label: t('plots.status', 'investments') || 'Status', type: 'select', options: [
+      { value: 'unsold', label: t('plot_status.unsold', 'investments') || 'Unsold' },
+      { value: 'announced', label: t('plot_status.announced', 'investments') || 'Announced' },
+      { value: 'subscribed', label: t('plot_status.subscribed', 'investments') || 'Subscribed' },
+      { value: 'allocated', label: t('plot_status.allocated', 'investments') || 'Allocated' },
+      { value: 'separated', label: t('plot_status.separated', 'investments') || 'Separated' },
+    ] },
+    { name: 'plot_area_id', label: t('plots.plot_area_id', 'investments') || 'Region', type: 'select', options: plotAreasCrud.entities.map(a => ({ value: String(a.id), label: getLocalizedName(a.name) })) },
+    { name: 'plot_classification_id', label: t('plots.plot_classification_id', 'investments') || 'Classification', type: 'select', options: plotClassificationsCrud.entities.map(c => ({ value: String(c.id), label: getLocalizedName(c.name) })) },
+    { name: 'code', label: t('plots.code', 'investments') || 'Plot Code', type: 'text' },
+    { name: 'identifier', label: t('plots.identifier', 'investments') || 'Plot Identifier', type: 'text' },
+    { name: 'has_allocated_dossier', label: t('plots.filter_has_allocated_dossier', 'investments') || 'Has Allocated Dossier', type: 'checkbox' },
+    { name: 'from_date', label: t('plots.from_date', 'investments') || 'From Date', type: 'date' },
+    { name: 'to_date', label: t('plots.to_date', 'investments') || 'To Date', type: 'date' },
+  ];
+
+  const investorFilterFields: FilterField[] = [
+    { name: 'has_social_account', label: t('investors.filter_has_social_account', 'investments') || 'Has Social Account', type: 'checkbox' },
+    { name: 'has_facebook_account', label: t('investors.filter_has_facebook_account', 'investments') || 'Has Facebook', type: 'checkbox' },
+    { name: 'has_instagram_account', label: t('investors.filter_has_instagram_account', 'investments') || 'Has Instagram', type: 'checkbox' },
+    { name: 'has_x_account', label: t('investors.filter_has_x_account', 'investments') || 'Has X (Twitter)', type: 'checkbox' },
+    { name: 'has_linkedin_account', label: t('investors.filter_has_linkedin_account', 'investments') || 'Has LinkedIn', type: 'checkbox' },
+    { name: 'is_possible_investor_in_future', label: t('investors.filter_is_possible_investor_in_future', 'investments') || 'Future Possible Investor', type: 'checkbox' },
+    { name: 'has_phone_number', label: t('investors.filter_has_phone_number', 'investments') || 'Has Phone', type: 'checkbox' },
+    { name: 'has_whatsapp_number', label: t('investors.filter_has_whatsapp_number', 'investments') || 'Has WhatsApp', type: 'checkbox' },
+    { name: 'nationality', label: t('investors.nationality', 'investments') || 'Nationality', type: 'text' },
+    { name: 'gender', label: t('investors.gender', 'investments') || 'Gender', type: 'select', options: [
+      { value: 'male', label: t('investors.gender_male', 'investments') || 'Male' },
+      { value: 'female', label: t('investors.gender_female', 'investments') || 'Female' },
+    ] },
+    { name: 'email', label: t('investors.email', 'investments') || 'Email', type: 'text' },
+  ];
 
   const plotColumns: ColumnDef<Plot>[] = [
     { key: 'code', label: t('plots.code', 'investments') || 'Code', width: 120, sortable: true },
@@ -121,13 +213,16 @@ fetchPlots({ page: 1, per_page: perPage });
     rowKey: 'id',
     isLoading: plotsCrud.loadingMap['getAll'],
     error: plotsCrud.errorMap['getAll'],
-    onRetry: () => fetchPlots({ search: searchQuery, page, per_page: perPage }),
+    onRetry: () => fetchPlots({ ...plotFilters, search: searchQuery, sortColumn: plotSortBy, sortOrder: plotSortOrder, page, per_page: perPage }),
     onSearch: handleSearch,
     searchPlaceholder: t('common.search', 'shared') || 'Search...',
-    filterFields: [],
-    filterValues: {},
-    onApplyFilter: () => {},
-    onResetFilter: () => {},
+    filterFields: plotFilterFields,
+    filterValues: plotFilters,
+    onApplyFilter: handlePlotApplyFilter,
+    onResetFilter: handlePlotResetFilter,
+    sortColumn: plotSortBy,
+    sortOrder: plotSortOrder,
+    onSort: handlePlotSort,
     page,
     perPage,
     totalPages: plotsCrud.pagination?.lastPage || 1,
@@ -143,12 +238,11 @@ fetchPlots({ page: 1, per_page: perPage });
       key: 'first_name',
       label: t('investors.full_name', 'investments') || 'Full Name',
       width: 200,
-      sortable: true,
       render: (row: Investor) => <span className="font-medium">{[row.first_name, row.father_name, row.last_name].filter(Boolean).join(' ')}</span>,
     },
-    { key: 'national_id', label: t('investors.national_id', 'investments') || 'National ID', width: 150, sortable: true },
-    { key: 'nationality', label: t('investors.nationality', 'investments') || 'Nationality', width: 130, sortable: true },
-    { key: 'phone', label: t('investors.phone', 'investments') || 'Phone', width: 140, sortable: true },
+    { key: 'national_id', label: t('investors.national_id', 'investments') || 'National ID', width: 150 },
+    { key: 'nationality', label: t('investors.nationality', 'investments') || 'Nationality', width: 130 },
+    { key: 'phone', label: t('investors.phone', 'investments') || 'Phone', width: 140 },
   ];
 
   const investorPickerConfig: PickerConfig<Investor> = {
@@ -162,13 +256,13 @@ fetchPlots({ page: 1, per_page: perPage });
     rowKey: 'id',
     isLoading: investorsCrud.loadingMap['getAll'],
     error: investorsCrud.errorMap['getAll'],
-    onRetry: () => fetchInvestors({ search: investorSearchQuery, page: investorPage, per_page: investorPerPage }),
+    onRetry: () => fetchInvestors({ ...investorFilters, search: investorSearchQuery, page: investorPage, per_page: investorPerPage }),
     onSearch: handleInvestorSearch,
     searchPlaceholder: t('common.search', 'shared') || 'Search...',
-    filterFields: [],
-    filterValues: {},
-    onApplyFilter: () => {},
-    onResetFilter: () => {},
+    filterFields: investorFilterFields,
+    filterValues: investorFilters,
+    onApplyFilter: handleInvestorApplyFilter,
+    onResetFilter: handleInvestorResetFilter,
     page: investorPage,
     perPage: investorPerPage,
     totalPages: investorsCrud.pagination?.lastPage || 1,

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import { SelectFromTable } from "../../../../core/presentation/layouts/ui/picker/SelectFromTable"
 import type { ColumnDef } from "../../../../core/presentation/layouts/ui/tables/ResizableTable"
@@ -30,19 +30,10 @@ export function UserPickerDialog({
 }: UserPickerDialogProps) {
   const { t } = useLanguage()
   const { users, loading, error, pagination, filter, setPage, setFilter, resetFilter, getAllUsers } = useManageUsers()
-  const [sortBy, setSortBy] = useState<string | undefined>(undefined)
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
 
   useEffect(() => {
     if (isOpen) getAllUsers()
   }, [isOpen, filter])
-
-  const handleSort = (columnKey: string) => {
-    const newOrder = sortBy === columnKey && sortOrder === "asc" ? "desc" : "asc"
-    setSortBy(columnKey)
-    setSortOrder(newOrder)
-    setFilter({ [`sort_by[${columnKey}]`]: newOrder } as any)
-  }
 
   const columns: ColumnDef<User>[] = [
     { key: "id", label: "#", width: 60 },
@@ -102,9 +93,6 @@ export function UserPickerDialog({
       error={error.getAllUsers}
       onRetry={getAllUsers}
       searchPlaceholder={t("users.search_placeholder", "users") || "Search..."}
-      sortColumn={sortBy}
-      sortOrder={sortOrder}
-      onSort={handleSort}
       filterFields={filterFields}
       filterValues={filter}
       onApplyFilter={handleApplyFilter}

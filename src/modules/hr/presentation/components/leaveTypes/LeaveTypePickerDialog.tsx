@@ -25,7 +25,7 @@ export function LeaveTypePickerDialog({
     defaultFilter,
 }: LeaveTypePickerDialogProps) {
     const { t, language } = useLanguage()
-    const { items: leaveTypes, userEligibleLeaveTypes, loading ,isLoading, error, pagination, filter, setSearch, setPage, setFilter, resetFilter , findUserEligibleLeaveTypes } = useLeaveTypes()
+    const { items: leaveTypes, userEligibleLeaveTypes, loading ,isLoading, error, pagination, filter, setSearch, setPage, setFilter, setSort, resetFilter , findUserEligibleLeaveTypes } = useLeaveTypes()
 
     useEffect(() => {
         if(eligible){
@@ -33,11 +33,22 @@ export function LeaveTypePickerDialog({
         }
     } ,[])
 
+    const handleSort = (columnKey: string) => {
+        if (columnKey === "name") {
+            const dir = filter["sort_by[name]"] === "asc" ? "desc" : "asc"
+            setSort("name", dir)
+        }
+    }
+
+    const sortColumn = filter["sort_by[name]"] ? "name" : undefined
+    const sortOrder = sortColumn === "name" ? filter["sort_by[name]"] : undefined
+
     const columns: ColumnDef<EntityWithNameOnly>[] = [
         {
             key: "name",
             label: t("leave_types.type_name", "hr") || "Leave Type",
             width: 300,
+            sortable: true,
             render: (row) => (typeof row.name === "string" ? row.name : language === "ar" ? row.name.ar : row.name.en),
         },
     ]
@@ -96,6 +107,9 @@ export function LeaveTypePickerDialog({
             filterValues={filter}
             onApplyFilter={handleApplyFilter}
             onResetFilter={resetFilter}
+            sortColumn={sortColumn}
+            sortOrder={sortOrder as any}
+            onSort={handleSort}
             page={pagination.currentPage}
             perPage={filter.per_page}
             totalPages={pagination.lastPage}

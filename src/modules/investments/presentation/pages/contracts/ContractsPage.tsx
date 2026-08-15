@@ -19,10 +19,10 @@ import { DossierPickerDialog } from '../plots/components/DossierPickerDialog';
 export function ContractsPage() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { entities: contracts, getAll, remove, loadingMap, errorMap, pagination, list } = useEntityCrud<Contract>(
+  const { entities: contracts, remove, loadingMap, errorMap, list } = useEntityCrud<Contract>(
     '/investments/contracts',
     '/investments/contracts',
-    { listState: true }
+    { listState: true, paginate: false }
   );
 
   const [localSearch, setLocalSearch] = useState('');
@@ -54,7 +54,7 @@ export function ContractsPage() {
       await remove(confirmDelete.id);
       toast.success(t('contract.deleted', 'investments') || 'Contract deleted successfully');
       setConfirmDelete(null);
-      getAll(`/investments/contracts?page=${list.page}&per_page=${list.perPage}`);
+      list.refresh();
     } catch (err: any) {
       handleApiError(err, { module: "investments" });
     }
@@ -88,21 +88,43 @@ export function ContractsPage() {
         );
       },
     },
+    {
+      name: 'contract_number',
+      label: t('contract.contract_number', 'investments') || 'Contract Number',
+      type: 'text',
+    },
+    {
+      name: 'payment_method',
+      label: t('contract.payment_method', 'investments') || 'Payment Method',
+      type: 'select',
+      options: [
+        { value: '', label: t('common.all', 'shared') || 'All' },
+        { value: 'cash', label: t('contract.payment_method_cash', 'investments') || 'Cash' },
+        { value: 'installment', label: t('contract.payment_method_installment', 'investments') || 'Installment' },
+      ],
+    },
+    {
+      name: 'paid_full_amount',
+      label: t('contract.paid_full_amount', 'investments') || 'Paid Full Amount',
+      type: 'checkbox',
+    },
+    { name: 'from_date', label: t('contract.from_date', 'investments') || 'From Date', type: 'date' },
+    { name: 'to_date', label: t('contract.to_date', 'investments') || 'To Date', type: 'date' },
   ];
 
-  const filterInitialValues = useMemo(() => ({
-    dossier_id: (list.filter.dossier_id as number | undefined) || '',
-  }), [list.filter]);
+  const filterInitialValues = useMemo(
+    () => Object.fromEntries(Object.entries(list.filter).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k))),
+    [list.filter]
+  );
 
   const handleApplyFilter = (values: Record<string, any>) => {
     const parsed: Record<string, any> = {};
     for (const [key, val] of Object.entries(values)) {
       if (val === '' || val === undefined) continue;
-      if (key === 'plot_id' || key === 'dossier_id') {
-        parsed[key] = Number(val);
-      } else {
-        parsed[key] = val;
-      }
+      if (val === 'true') parsed[key] = true;
+      else if (val === 'false') parsed[key] = false;
+      else if (key === 'plot_id' || key === 'dossier_id') parsed[key] = Number(val);
+      else parsed[key] = val;
     }
     if (parsed.dossier_id) {
       confirmedFilterRef.current.dossierName = filterDossierName;
@@ -132,9 +154,9 @@ export function ContractsPage() {
   };
 
   const columns = [
-    { key: "contract_number", label: t("contract.contract_number", "investments") || "Contract Number", width: 160, sortable: true },
+    { key: "contract_number", label: t("contract.contract_number", "investments") || "Contract Number", width: 160 },
     { key: "contract_date", label: t("contract.contract_date", "investments") || "Date", width: 120, sortable: true },
-    { key: "total_price", label: t("contract.total_price", "investments") || "Total", width: 130, sortable: true },
+    { key: "total_price", label: t("contract.total_price", "investments") || "Total", width: 130 },
     {
       key: "payment_method",
       label: t("contract.payment_method", "investments") || "Payment",
@@ -234,7 +256,7 @@ export function ContractsPage() {
       </div>
 
       {errorMap["getAll"] ? (
-        <ErrorState message={errorMap["getAll"]} onRetry={() => getAll(`/investments/contracts?page=${list.page}&per_page=${list.perPage}`)} />
+        <ErrorState message={errorMap["getAll"]} onRetry={() => list.refresh()} />
       ) : (
         <DataTable
           columns={columns}
@@ -245,15 +267,6 @@ export function ContractsPage() {
           sortColumn={list.filter.sortColumn}
           sortOrder={list.filter.sortOrder}
           onSort={list.setSort}
-          pagination={{
-            page: pagination?.currentPage || 1,
-            totalPages: pagination?.lastPage || 1,
-            totalItems: pagination?.total || 0,
-            onPageChange: list.setPage,
-            itemsPerPage: list.perPage,
-            onItemsPerPageChange: (size: number) => list.setPerPage(size),
-            itemsPerPageOptions: [10, 25, 50, 100],
-          }}
         />
       )}
 

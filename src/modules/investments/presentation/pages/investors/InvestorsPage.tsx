@@ -67,6 +67,18 @@ export function InvestorsPage() {
   };
 
   const filterFields: FilterField[] = [
+    { name: 'nationality', label: t('investors.nationality', 'investments') || 'Nationality', type: 'text' },
+    {
+      name: 'gender',
+      label: t('investors.gender', 'investments') || 'Gender',
+      type: 'select',
+      options: [
+        { value: '', label: t('common.all', 'shared') || 'All' },
+        { value: 'male', label: t('investors.gender_male', 'investments') || 'Male' },
+        { value: 'female', label: t('investors.gender_female', 'investments') || 'Female' },
+      ],
+    },
+    { name: 'email', label: t('investors.email', 'investments') || 'Email', type: 'text' },
     { name: 'has_social_account', label: t('investors.filter_has_social_account', 'investments') || 'Has Social Account', type: 'checkbox' },
     { name: 'has_facebook_account', label: t('investors.filter_has_facebook_account', 'investments') || 'Has Facebook', type: 'checkbox' },
     { name: 'has_instagram_account', label: t('investors.filter_has_instagram_account', 'investments') || 'Has Instagram', type: 'checkbox' },
@@ -82,35 +94,30 @@ export function InvestorsPage() {
       key: 'full_name',
       label: t('investors.full_name', 'investments') || 'Full Name',
       width: 200,
-      sortable: true,
       render: (row: Investor) => <span className="font-medium">{[row.first_name, row.father_name, row.last_name].filter(Boolean).join(' ')}</span>
     },
     {
       key: 'national_id',
       label: t('investors.national_id', 'investments') || 'National ID',
       width: 150,
-      sortable: true,
       render: (row: Investor) => row.national_id || '—'
     },
     {
       key: 'nationality',
       label: t('investors.nationality', 'investments') || 'Nationality',
       width: 130,
-      sortable: true,
       render: (row: Investor) => row.nationality || '—'
     },
     {
       key: 'phone',
       label: t('investors.phone', 'investments') || 'Phone',
       width: 140,
-      sortable: true,
       render: (row: Investor) => row.phone || '—'
     },
     {
       key: 'is_possible_investor_in_future',
       label: t('investors.is_possible_investor_in_future', 'investments') || 'Future Possible',
       width: 130,
-      sortable: true,
       render: (row: Investor) => <YesNo value={row.is_possible_investor_in_future} />
     },
     {

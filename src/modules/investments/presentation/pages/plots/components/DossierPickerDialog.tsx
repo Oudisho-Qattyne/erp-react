@@ -3,6 +3,7 @@ import { useEntityCrud } from "../../../../../../core/presentation/hooks/data/us
 import { useLanguage } from "../../../../../../core/presentation/context/i18n/I18nProvider"
 import { SelectFromTable } from "../../../../../../core/presentation/layouts/ui/picker/SelectFromTable"
 import type { ColumnDef } from "../../../../../../core/presentation/layouts/ui/tables/ResizableTable"
+import type { FilterField } from "../../../../../../core/presentation/layouts/ui/filter/FilterDialog"
 import type { Dossier } from "../../../../domain/entities/dossier"
 
 interface DossierPickerDialogProps {
@@ -32,16 +33,10 @@ export function DossierPickerDialog({
   const [perPage, setPerPage] = useState(25)
   const [filterValues, setFilterValues] = useState<Record<string, any>>({})
 
-  useEffect(() => {
-    if (isOpen && !defaultFilter) {
-      fetchDossiers({ page: 1, per_page: perPage })
-    }
-  }, [isOpen, defaultFilter])
-
   const fetchDossiers = (params: Record<string, any> = {}) => {
     const sp = new URLSearchParams()
     if (params.search) sp.append("search", params.search)
-    if (params.sortColumn) { sp.append("sortColumn", params.sortColumn); sp.append("sortOrder", params.sortOrder) }
+    if (params.sortColumn) sp.append(`sort_by[${params.sortColumn}]`, params.sortOrder)
     if (params.page) sp.append("page", String(params.page))
     if (params.per_page) sp.append("per_page", String(params.per_page))
     Object.entries(params).forEach(([k, v]) => {
@@ -51,6 +46,12 @@ export function DossierPickerDialog({
     })
     getAll(`/investments/dossiers?${sp.toString()}`)
   }
+
+  useEffect(() => {
+    if (isOpen && !defaultFilter) {
+      fetchDossiers({ page: 1, per_page: perPage })
+    }
+  }, [isOpen, defaultFilter])
 
   const handleSearch = (query: string) => {
     setSearchQuery(query)
@@ -67,9 +68,12 @@ export function DossierPickerDialog({
   }
 
   const handleApplyFilter = (values: Record<string, any>) => {
-    const parsed: Record<string, any> = { page: 1, per_page: perPage }
-    Object.entries(values).forEach(([k, v]) => { if (v !== "" && v !== undefined) parsed[k] = v })
-    setFilterValues(parsed)
+    const parsed: Record<string, any> = {}
+    for (const [key, val] of Object.entries(values)) {
+      if (val === "" || val === undefined) continue
+      parsed[key] = val
+    }
+    setFilterValues({ page: 1, per_page: perPage, ...parsed })
     setPage(1)
     fetchDossiers({ ...parsed, search: searchQuery, sortColumn: sortBy, sortOrder, page: 1, per_page: perPage })
   }
@@ -81,7 +85,7 @@ export function DossierPickerDialog({
   }
 
   const handleApplyDefaultFilter = (parsed: Record<string, any>) => {
-    setFilterValues(parsed)
+    setFilterValues({ page: 1, per_page: perPage, ...parsed })
     fetchDossiers({ ...parsed, search: searchQuery, sortColumn: sortBy, sortOrder, page: 1, per_page: perPage })
   }
 
@@ -96,8 +100,27 @@ export function DossierPickerDialog({
     fetchDossiers({ ...filterValues, search: searchQuery, sortColumn: sortBy, sortOrder, page: 1, per_page: size })
   }
 
+  const statusOptions = [
+    { value: "draft", label: t("dossier.status_draft", "investments") || "Draft" },
+    { value: "pending_subscription_fee", label: t("dossier.status_pending_subscription_fee", "investments") || "Pending Subscription Fee" },
+    { value: "subscription_fee_paid", label: t("dossier.status_subscription_fee_paid", "investments") || "Subscription Fee Paid" },
+    { value: "allocatable", label: t("dossier.status_allocatable", "investments") || "Allocatable" },
+    { value: "active", label: t("dossier.status_active", "investments") || "Allocated" },
+    { value: "subscription_approved", label: t("dossier.status_subscription_approved", "investments") || "Subscription Approved" },
+    { value: "cancelled", label: t("dossier.status_cancelled", "investments") || "Cancelled" },
+  ]
+
+  const filterFields: FilterField[] = [
+    { name: "dossier_number", label: t("dossier.number", "investments") || "Dossier Number", type: "text" },
+    { name: "from_dossier_date", label: t("dossier.from_dossier_date", "investments") || "From Dossier Date", type: "date" },
+    { name: "to_dossier_date", label: t("dossier.to_dossier_date", "investments") || "To Dossier Date", type: "date" },
+    { name: "from_subscription_date", label: t("dossier.from_subscription_date", "investments") || "From Subscription Date", type: "date" },
+    { name: "to_subscription_date", label: t("dossier.to_subscription_date", "investments") || "To Subscription Date", type: "date" },
+    { name: "status", label: t("dossier.status", "investments") || "Status", type: "select", options: statusOptions },
+  ]
+
   const columns: ColumnDef<Dossier>[] = [
-    { key: "dossier_number", label: t("dossier.number", "investments") || "Dossier Number", width: 160, sortable: true },
+    { key: "dossier_number", label: t("dossier.number", "investments") || "Dossier Number", width: 160 },
     { key: "dossier_date", label: t("dossier.date", "investments") || "Date", width: 120, sortable: true },
     { key: "status", label: t("dossier.status", "investments") || "Status", width: 120 },
   ]
@@ -121,7 +144,7 @@ export function DossierPickerDialog({
       onSearch={handleSearch}
       searchPlaceholder={t("common.search", "shared") || "Search..."}
       searchInitialValue={searchQuery}
-      filterFields={[]}
+      filterFields={filterFields}
       filterValues={filterValues}
       onApplyFilter={handleApplyFilter}
       onResetFilter={handleResetFilter}

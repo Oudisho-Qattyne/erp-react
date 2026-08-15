@@ -31,8 +31,6 @@ export function InvestorPickerDialog({
     '/investments/investors'
   )
 
-  const [sortBy, setSortBy] = useState<string | undefined>(undefined)
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(25)
   const [extraFilters, setExtraFilters] = useState<Record<string, any>>({})
@@ -45,21 +43,10 @@ export function InvestorPickerDialog({
     for (const [key, val] of Object.entries(extraFilters)) {
       if (val !== undefined && val !== "") params.append(key, String(val))
     }
-    if (sortBy) {
-      params.append("sortColumn", sortBy)
-      params.append("sortOrder", sortOrder)
-    }
     params.append("page", String(page))
     params.append("per_page", String(perPage))
     getAll(`/investments/investors?${params.toString()}`)
-  }, [isOpen, searchQuery, sortBy, sortOrder, page, perPage, extraFilters])
-
-  const handleSort = (columnKey: string) => {
-    const newOrder = sortBy === columnKey && sortOrder === "asc" ? "desc" : "asc"
-    setSortBy(columnKey)
-    setSortOrder(newOrder)
-    setPage(1)
-  }
+  }, [isOpen, searchQuery, page, perPage, extraFilters])
 
   const handleApplyFilter = (values: Record<string, any>) => {
     const parsed: Record<string, any> = {}
@@ -95,6 +82,12 @@ export function InvestorPickerDialog({
     { name: "is_possible_investor_in_future", label: t("investors.filter_is_possible_investor_in_future", "investments") || "Future Possible Investor", type: "checkbox" as const },
     { name: "has_phone_number", label: t("investors.filter_has_phone_number", "investments") || "Has Phone", type: "checkbox" as const },
     { name: "has_whatsapp_number", label: t("investors.filter_has_whatsapp_number", "investments") || "Has WhatsApp", type: "checkbox" as const },
+    { name: "nationality", label: t("investors.nationality", "investments") || "Nationality", type: "text" as const },
+    { name: "gender", label: t("investors.gender", "investments") || "Gender", type: "select" as const, options: [
+      { value: "male", label: t("investors.gender_male", "investments") || "Male" },
+      { value: "female", label: t("investors.gender_female", "investments") || "Female" },
+    ] },
+    { name: "email", label: t("investors.email", "investments") || "Email", type: "text" as const },
   ]
 
   const handleSearch = (query: string) => {
@@ -165,9 +158,6 @@ export function InvestorPickerDialog({
       onRetry={() => getAll()}
       onSearch={handleSearch}
       searchPlaceholder={t("dossier.search_placeholder", "investments") || "Search investors..."}
-      sortColumn={sortBy}
-      sortOrder={sortOrder}
-      onSort={handleSort}
       filterFields={filterFields}
       filterValues={extraFilters}
       onApplyFilter={handleApplyFilter}

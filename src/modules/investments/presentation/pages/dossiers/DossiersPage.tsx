@@ -59,6 +59,31 @@ export function DossiersPage() {
 
   const filterFields: FilterField[] = [
     {
+      name: 'dossier_number',
+      label: t('dossier.number', 'investments') || 'Dossier Number',
+      type: 'text',
+    },
+    {
+      name: 'from_dossier_date',
+      label: t('dossier.from_dossier_date', 'investments') || 'From Dossier Date',
+      type: 'date',
+    },
+    {
+      name: 'to_dossier_date',
+      label: t('dossier.to_dossier_date', 'investments') || 'To Dossier Date',
+      type: 'date',
+    },
+    {
+      name: 'from_subscription_date',
+      label: t('dossier.from_subscription_date', 'investments') || 'From Subscription Date',
+      type: 'date',
+    },
+    {
+      name: 'to_subscription_date',
+      label: t('dossier.to_subscription_date', 'investments') || 'To Subscription Date',
+      type: 'date',
+    },
+    {
       name: 'plot_id',
       render: (form) => {
         formRef.current = form;
@@ -103,6 +128,11 @@ export function DossiersPage() {
   ];
 
   const filterInitialValues = useMemo(() => ({
+    dossier_number: (list.filter.dossier_number as string | undefined) || '',
+    from_dossier_date: (list.filter.from_dossier_date as string | undefined) || '',
+    to_dossier_date: (list.filter.to_dossier_date as string | undefined) || '',
+    from_subscription_date: (list.filter.from_subscription_date as string | undefined) || '',
+    to_subscription_date: (list.filter.to_subscription_date as string | undefined) || '',
     plot_id: (list.filter.plot_id as number | undefined) || '',
     status: (list.filter.status as string | undefined) || '',
   }), [list.filter]);
@@ -159,14 +189,13 @@ export function DossiersPage() {
   };
 
   const columns = [
-    { key: "dossier_number", label: t("dossier.number", "investments") || "Dossier Number", width: 160, sortable: true },
+    { key: "dossier_number", label: t("dossier.number", "investments") || "Dossier Number", width: 160 },
     { key: "dossier_date", label: t("dossier.date", "investments") || "Dossier Date", width: 120, sortable: true },
-    { key: "allocated_date", label: t("dossier.allocated_date", "investments") || "Allocated Date", width: 120, sortable: true },
+    { key: "allocated_date", label: t("dossier.allocated_date", "investments") || "Allocated Date", width: 120 },
     {
       key: "status",
       label: t("dossier.status", "investments") || "Status",
       width: 130,
-      sortable: true,
       render: (row: Dossier) => {
         const st = statusStyles[row.status] || statusStyles.draft;
         return (
