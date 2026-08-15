@@ -32,6 +32,7 @@ import { useStorage } from '../../../../core/registry/storage/StorageProvider';
 import { handleApiError } from '../../../../core/presentation/utils/handleApiError';
 import { EmployeeStatusLogsDialog } from '../components/employee/EmployeeStatuseLogsDialog';
 import { JobStatusLogsDialog } from '../components/employee/JobStatusLogsDialog';
+import { AuditLog } from '../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 
 export function ShowEmployeePage() {
   const { id } = useParams<{ id: string }>();
@@ -49,6 +50,10 @@ export function ShowEmployeePage() {
   const [loading, setLoading] = useState(true);
   const [photoUpdating, setPhotoUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [child, setChild] = useState<any>()
+  const [education, setEducation] = useState<any>()
+  const [spouse, setSpouse] = useState<any>()
+  const [employmenstDetails, setEmploymenstDetails] = useState<any>()
   const { getById, update } = useManageEmployee()
   const fetchEmployee = async () => {
     try {
@@ -78,7 +83,7 @@ export function ShowEmployeePage() {
     setPhotoUpdating(true);
     try {
       const { ...newData } = employee
-      await update(Number(id), {  photo_id: items[0]._id });
+      await update(Number(id), { photo_id: items[0]._id });
       await fetchEmployee();
       setEmployeePhotoPickerOpen(false);
     } catch (err: any) {
@@ -99,7 +104,7 @@ export function ShowEmployeePage() {
       />
     );
   }
-  
+
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10 p-4">
@@ -204,18 +209,27 @@ export function ShowEmployeePage() {
               <InfoRow label={t('employees.marital_status', 'hr') || 'الحالة الاجتماعية'} value={getMaritalStatus(employee.marital_status, t)} />
               {employee.marital_status === 'married' && (
                 <>
-                  <InfoRow label={employee.gender === 'female' ? (t('employees.spouses_female', 'hr') || 'Husband') : (t('employees.spouses_male', 'hr') || 'Wives')} value={
-                    employee.spouses && employee.spouses.length > 0 ? (
-                      <div className="space-y-1">
-                        {employee.spouses.map((spouse: any, idx: number) => (
-                          <div key={idx} className="flex flex-wrap items-center gap-x-2">
-                            <span className="font-medium">{spouse.name}</span>
-                            {spouse.workplace && <span className="text-muted-foreground">- {spouse.workplace}</span>}
+                  <div className='relative w-full flex justify-between items-center'>
+                    <div className='relative flex justify-between items-center'>
+
+
+                      <InfoRow label={employee.gender === 'female' ? (t('employees.spouses_female', 'hr') || 'Husband') : (t('employees.spouses_male', 'hr') || 'Wives')} value={
+                        employee.spouses && employee.spouses.length > 0 ? (
+                          <div className="space-y-1">
+
+                            {employee.spouses.map((spouse: any, idx: number) => (
+                              <div key={idx} className="flex flex-wrap items-center gap-x-2">
+                                <span className="font-medium">{spouse.name}</span>
+                                {spouse.workplace && <span className="text-muted-foreground">- {spouse.workplace}</span>}
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    ) : '-'
-                  } />
+                        ) : '-'
+                      } />
+                    </div>
+                    <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setSpouse(id)} />
+
+                  </div>
                   {/* keep in mind */}
                   <InfoRow label={t('employees.number_of_children', 'hr') || 'عدد الأولاد'} value={employee.number_of_children} />
                 </>
@@ -285,8 +299,13 @@ export function ShowEmployeePage() {
           {/* Employment Details */}
           <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border shadow-sm">
             <h2 className="text-lg font-bold text-text flex items-center gap-2 mb-6 pb-4 border-b border-border/50">
-              <Briefcase size={20} className="text-primary" />
-              {t('show_employee.employment_details', 'hr') || 'التفاصيل الوظيفية'}
+              <div className='relative w-full flex justify-between items-center'>
+                <div className='relative flex justify-between items-center gap-2'>
+                  <Briefcase size={20} className="text-primary" />
+                  {t('show_employee.employment_details', 'hr') || 'التفاصيل الوظيفية'}
+                </div>
+                <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setEmploymenstDetails(id)} />
+              </div>
             </h2>
             {employee.employment_details ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
@@ -309,8 +328,13 @@ export function ShowEmployeePage() {
           {/* Education Details */}
           <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border shadow-sm">
             <h2 className="text-lg font-bold text-text flex items-center gap-2 mb-6 pb-4 border-b border-border/50">
-              <GraduationCap size={20} className="text-primary" />
-              {t('show_employee.education_details', 'hr') || 'المؤهلات العلمية'}
+              <div className='relative w-full flex justify-between items-center'>
+                <div className='relative flex justify-between items-center gap-2'>
+                  <GraduationCap size={20} className="text-primary" />
+                  {t('show_employee.education_details', 'hr') || 'المؤهلات العلمية'}
+                </div>
+                <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setEducation(id)} />
+              </div>
             </h2>
             {employee.educations && employee.educations.length > 0 ? (
               <div className="space-y-4">
@@ -349,9 +373,16 @@ export function ShowEmployeePage() {
           {employee.children && employee.children.length > 0 && (
             <div className="bg-card/80 backdrop-blur-sm rounded-2xl p-6 border border-border shadow-sm">
               <h2 className="text-lg font-bold text-text flex items-center gap-2 mb-6 pb-4 border-b border-border/50">
-                <User size={20} className="text-primary" />
-                {t('employees.children', 'hr') || 'الأولاد'}
+                <div className='relative w-full flex justify-between items-center'>
+                  <div className='relative flex justify-between items-center gap-2'>
+                    <User size={20} className="text-primary" />
+                    {t('employees.children', 'hr') || 'الأولاد'}
+                  </div>
+                  <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setChild(id)} />
+                </div>
+
               </h2>
+
               <div className="space-y-4">
                 {employee.children.map((child, idx) => (
                   <div key={child.id || idx} className="bg-background/50 border border-border/60 rounded-xl p-4">
@@ -362,8 +393,10 @@ export function ShowEmployeePage() {
                   </div>
                 ))}
               </div>
+
             </div>
           )}
+
         </div>
       </div>
       {storage?.FileExplorerDialogComponent && employee?.folder &&
@@ -379,6 +412,92 @@ export function ShowEmployeePage() {
       {employee?.id && (
         <JobStatusLogsDialog isOpen={jobStatusLogsOpen} onClose={() => setJobStatusLogsOpen(false)} employeeId={employee.id} />
       )}
+      <AuditLog
+        isOpen={!!child}
+        onClose={() => setChild(null)}
+        model="employee_child"
+        modelId={Number(id)}
+        module="hr"
+        labels={{
+          title: t('employees.edit_log', 'hr') || 'Edit Log',
+          event: t('employees.event', 'hr') || 'Event',
+          created_at: t('employees.created_at', 'hr') || 'Created At',
+          changed_by: t('employees.changed_by', 'hr') || 'Changed By',
+          changes: t('employees.changes', 'hr') || 'Changes',
+          field: t('employees.field', 'hr') || 'Field',
+          old_value: t('employees.old_value', 'hr') || 'Old Value',
+          new_value: t('employees.new_value', 'hr') || 'New Value',
+          no_records: t('employees.no_edit_log', 'hr') || 'No edit logs found',
+          subject_id: t('employees.subject_id', 'hr') || 'Employee ID',
+        }}
+        translateField={(key) => t(`employees.${key}`, 'hr') || key}
+      // translateValues={handleTranslateValues}
+      />
+
+      <AuditLog
+        isOpen={!!education}
+        onClose={() => setEducation(null)}
+        model="employee_education"
+        modelId={Number(id)}
+        module="hr"
+        labels={{
+          title: t('employees.edit_log', 'hr') || 'Edit Log',
+          event: t('employees.event', 'hr') || 'Event',
+          created_at: t('employees.created_at', 'hr') || 'Created At',
+          changed_by: t('employees.changed_by', 'hr') || 'Changed By',
+          changes: t('employees.changes', 'hr') || 'Changes',
+          field: t('employees.field', 'hr') || 'Field',
+          old_value: t('employees.old_value', 'hr') || 'Old Value',
+          new_value: t('employees.new_value', 'hr') || 'New Value',
+          no_records: t('employees.no_edit_log', 'hr') || 'No edit logs found',
+          subject_id: t('employees.subject_id', 'hr') || 'Employee ID',
+        }}
+        translateField={(key) => t(`employees.${key}`, 'hr') || key}
+      // translateValues={handleTranslateValues}
+      />
+
+      <AuditLog
+        isOpen={!!spouse}
+        onClose={() => setSpouse(null)}
+        model="employee_spouse"
+        modelId={Number(id)}
+        module="hr"
+        labels={{
+          title: t('employees.edit_log', 'hr') || 'Edit Log',
+          event: t('employees.event', 'hr') || 'Event',
+          created_at: t('employees.created_at', 'hr') || 'Created At',
+          changed_by: t('employees.changed_by', 'hr') || 'Changed By',
+          changes: t('employees.changes', 'hr') || 'Changes',
+          field: t('employees.field', 'hr') || 'Field',
+          old_value: t('employees.old_value', 'hr') || 'Old Value',
+          new_value: t('employees.new_value', 'hr') || 'New Value',
+          no_records: t('employees.no_edit_log', 'hr') || 'No edit logs found',
+          subject_id: t('employees.subject_id', 'hr') || 'Employee ID',
+        }}
+        translateField={(key) => t(`employees.${key}`, 'hr') || key}
+      // translateValues={handleTranslateValues}
+      />
+      <AuditLog
+        isOpen={!!employmenstDetails}
+        onClose={() => setEmploymenstDetails(null)}
+        model="employee_employment_detail"
+        modelId={Number(id)}
+        module="hr"
+        labels={{
+          title: t('employees.edit_log', 'hr') || 'Edit Log',
+          event: t('employees.event', 'hr') || 'Event',
+          created_at: t('employees.created_at', 'hr') || 'Created At',
+          changed_by: t('employees.changed_by', 'hr') || 'Changed By',
+          changes: t('employees.changes', 'hr') || 'Changes',
+          field: t('employees.field', 'hr') || 'Field',
+          old_value: t('employees.old_value', 'hr') || 'Old Value',
+          new_value: t('employees.new_value', 'hr') || 'New Value',
+          no_records: t('employees.no_edit_log', 'hr') || 'No edit logs found',
+          subject_id: t('employees.subject_id', 'hr') || 'Employee ID',
+        }}
+        translateField={(key) => t(`employees.${key}`, 'hr') || key}
+      // translateValues={handleTranslateValues}
+      />
     </div>
   );
 }

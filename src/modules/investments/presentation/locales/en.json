@@ -380,7 +380,7 @@
     "group_utilities": "Utilities",
     "group_authorized_persons": "Authorized Persons",
     "authorized_persons": "Authorized Persons",
-    "authorized_persons_person": "Person (name / email / phone)",
+    "authorized_persons_person": "Name",
     "authorized_persons_role": "Role in Facility",
     "authorized_persons_role_placeholder": "Role based on facility",
     "authorized_persons_required_label": "Required for Legal Matters",

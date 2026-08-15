@@ -381,7 +381,7 @@
     "group_utilities": "المرافق",
     "group_authorized_persons": "الأشخاص المخولون",
     "authorized_persons": "الأشخاص المخولون",
-    "authorized_persons_person": "الشخص (الاسم / البريد الإلكتروني / الهاتف)",
+    "authorized_persons_person": "الاسم",
     "authorized_persons_role": "الدور في المنشأة",
     "authorized_persons_role_placeholder": "الدور بالنسبة للمنشأة",
     "authorized_persons_required_label": "مطلوب للمسائل القانونية",
