@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud, useFaculties, useSpecializations } from '../../hooks';
 import { SpecializationFormSchema } from '../../../../../core/presentation/schemas/education/specializationForm.schema';
@@ -24,6 +24,8 @@ export function SpecializationsPage() {
   const { entities: specializations, getAllByFaculty, create, update, remove, loadingMap, errorMap } = useSpecializations();
   const entity = t('lookups.tabs.specializations', 'hr') || 'Specialization';
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortColumn, setSortColumn] = useState('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedUniversity, setSelectedUniversity] = useState<number | null>(null);
   const [selectedFaculty, setSelectedFaculty] = useState<number | null>(null);
@@ -33,7 +35,29 @@ export function SpecializationsPage() {
 
   useEffect(() => { loadUniversities(); }, []);
   useEffect(() => { if (selectedUniversity) { getAllByUniversity(selectedUniversity); setSelectedFaculty(null); } }, [selectedUniversity]);
-  useEffect(() => { if (selectedFaculty) getAllByFaculty(selectedFaculty); }, [selectedFaculty]);
+
+  const listParams = useCallback(
+    () => ({ search: searchQuery || undefined, sortBy: sortColumn, sortOrder }),
+    [searchQuery, sortColumn, sortOrder]
+  );
+
+  useEffect(() => {
+    if (!selectedFaculty) return;
+    const timer = setTimeout(() => {
+      getAllByFaculty(selectedFaculty, listParams());
+    }, 300);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedFaculty, listParams]);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(column);
+      setSortOrder('asc');
+    }
+  };
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
@@ -51,19 +75,15 @@ export function SpecializationsPage() {
     try {
       await update(confirmSetDefault.id, { is_default: true });
       toast.success(t('lookups.set_default_success', 'hr').replace('{name}', entity));
-      selectedFaculty && getAllByFaculty(selectedFaculty);
+      selectedFaculty && getAllByFaculty(selectedFaculty, listParams());
       setConfirmSetDefault(null);
     } catch (err : any) {
       handleApiError(err, { module: "hr" });
     }
   };
 
-  const filtered = specializations.filter((s: any) =>
-    (typeof s.name === 'string' ? s.name : s.name?.ar || s.name?.en || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   const columns = [
-    { key: 'name', label: t('employees.specialization', 'hr') || 'Specialization', width: 300,
+    { key: 'name', label: t('employees.specialization', 'hr') || 'Specialization', width: 300, sortable: true,
       render: (row: any) => typeof row.name === 'string' ? row.name : (row.name?.ar || row.name?.en || '') },
     { key: 'is_default', label: t('common.is_default', 'shared') || 'Default', width: 120,
       render: (row: any) => row.is_default
@@ -126,7 +146,7 @@ export function SpecializationsPage() {
               fields={[{ name: 'name', type: 'alpha', label: t('employees.specialization', 'hr') || 'Specialization name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
               schema={SpecializationFormSchema.omit({ Faculty_id: true })}
               onSubmit={async (data) => { try { return await create({ ...data, name: data.name, faculty_id: selectedFaculty }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
-              onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAllByFaculty(selectedFaculty); setIsCreateOpen(false); }}
+              onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAllByFaculty(selectedFaculty, listParams()); setIsCreateOpen(false); }}
               onCancel={() => setIsCreateOpen(false)}
               submitLabel={t('employee_form.add_specialization', 'hr') || 'Add Specialization'}
             />
@@ -139,18 +159,19 @@ export function SpecializationsPage() {
               schema={SpecializationFormSchema.omit({ Faculty_id: true })}
               defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), is_default: Boolean(editItem.is_default) } : undefined}
               onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: data.name }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
-              onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); selectedFaculty && getAllByFaculty(selectedFaculty); setEditItem(null); }}
+              onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); selectedFaculty && getAllByFaculty(selectedFaculty, listParams()); setEditItem(null); }}
               onCancel={() => setEditItem(null)}
               submitLabel={t('common.save', 'shared') || 'Save'}
             />
           </Dialog>
 
-          {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => selectedFaculty && getAllByFaculty(selectedFaculty)} />}
-          {!errorMap['getAll'] && !loadingMap['getAll'] && filtered.length === 0 && (
+          {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => selectedFaculty && getAllByFaculty(selectedFaculty, listParams())} />}
+          {!errorMap['getAll'] && !loadingMap['getAll'] && specializations.length === 0 && (
             <EmptyState message={t('lookups.no_specializations', 'hr') || 'No specializations found'} />
           )}
-          {!errorMap['getAll'] && (filtered.length > 0 || loadingMap['getAll']) && (
-            <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
+          {!errorMap['getAll'] && (specializations.length > 0 || loadingMap['getAll']) && (
+            <DataTable columns={columns} data={specializations} rowKey="id" loading={loadingMap['getAll']}
+              sortColumn={sortColumn} sortOrder={sortOrder} onSort={handleSort}
               emptyMessage={t('lookups.no_specializations', 'hr') || 'No specializations found'} />
           )}
         </>

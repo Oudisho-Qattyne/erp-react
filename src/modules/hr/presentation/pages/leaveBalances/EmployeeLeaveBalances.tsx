@@ -33,7 +33,6 @@ export const EmployeeLeaveBalances = () => {
     const formRef = useRef<UseFormReturn | null>(null)
     const SORT_FIELD_MAP: Record<string, string> = {
         leave_type_name: "leave_type_name",
-        accrual_period: "accrual_period",
         entitled_units: "entitled_units",
         consumed_units: "consumed_units",
         available_units: "available_units",
@@ -158,7 +157,7 @@ export const EmployeeLeaveBalances = () => {
         { key: "leave_type_name", label: t("leave_balance.leave_type", "hr") || "Leave Type", width: 160, sortable: true },
         { key: "employee_name", label: t("leave_balance.employee_name", "hr") || "Leave Type", width: 130,  render: (row) => `${row.employee_first_name} ${row.employee_last_name}`},
         {
-            key: "accrual_period", label: t("leave_balance.accrual_period", "hr") || "Period", width: 90, sortable: true,
+            key: "accrual_period", label: t("leave_balance.accrual_period", "hr") || "Period", width: 90, sortable: false,
             render: (row) => row.accrual_period === "yearly"
                 ? (t("leave_balance.yearly", "hr") || "Yearly")
                 : (t("leave_balance.monthly", "hr") || "Monthly")

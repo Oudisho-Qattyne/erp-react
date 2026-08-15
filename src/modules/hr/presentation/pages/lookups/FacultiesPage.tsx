@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud, useFaculties } from '../../hooks';
 import { FacultyFormSchema } from '../../../../../core/presentation/schemas/education/facultyForm.schema';
@@ -23,6 +23,8 @@ export function FacultiesPage() {
   const { entities: faculties, getAllByUniversity, create, update, remove, loadingMap, errorMap } = useFaculties();
   const [selectedUniversity, setSelectedUniversity] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortColumn, setSortColumn] = useState('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
@@ -30,7 +32,29 @@ export function FacultiesPage() {
   const entity = t('lookups.tabs.faculties', 'hr') || 'Faculty';
 
   useEffect(() => { loadUniversities(); }, []);
-  useEffect(() => { if (selectedUniversity) getAllByUniversity(selectedUniversity); }, [selectedUniversity]);
+
+  const listParams = useCallback(
+    () => ({ search: searchQuery || undefined, sortBy: sortColumn, sortOrder }),
+    [searchQuery, sortColumn, sortOrder]
+  );
+
+  useEffect(() => {
+    if (!selectedUniversity) return;
+    const timer = setTimeout(() => {
+      getAllByUniversity(selectedUniversity, listParams());
+    }, 300);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedUniversity, listParams]);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(column);
+      setSortOrder('asc');
+    }
+  };
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
@@ -48,19 +72,15 @@ export function FacultiesPage() {
     try {
       await update(confirmSetDefault.id, { is_default: true });
       toast.success(t('lookups.set_default_success', 'hr').replace('{name}', entity));
-      selectedUniversity && getAllByUniversity(selectedUniversity);
+      selectedUniversity && getAllByUniversity(selectedUniversity, listParams());
       setConfirmSetDefault(null);
     } catch (err : any) {
       handleApiError(err, { module: "hr" });
     }
   };
 
-  const filtered = faculties.filter((f: any) =>
-    (typeof f.name === 'string' ? f.name : f.name?.ar || f.name?.en || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   const columns = [
-    { key: 'name', label: t('employees.faculty', 'hr') || 'Faculty', width: 300,
+    { key: 'name', label: t('employees.faculty', 'hr') || 'Faculty', width: 300, sortable: true,
       render: (row: any) => typeof row.name === 'string' ? row.name : (row.name?.ar || row.name?.en || '') },
     { key: 'is_default', label: t('common.is_default', 'shared') || 'Default', width: 120,
       render: (row: any) => row.is_default
@@ -115,7 +135,7 @@ export function FacultiesPage() {
               fields={[{ name: 'name', type: 'alpha', label: t('employees.faculty', 'hr') || 'Faculty name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
               schema={FacultyFormSchema.omit({ university_id: true })}
               onSubmit={async (data) => { try { return await create({ ...data, name: data.name, university_id: selectedUniversity }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
-              onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAllByUniversity(selectedUniversity); setIsCreateOpen(false); }}
+              onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAllByUniversity(selectedUniversity, listParams()); setIsCreateOpen(false); }}
               onCancel={() => setIsCreateOpen(false)}
               submitLabel={t('employee_form.add_faculty', 'hr') || 'Add Faculty'}
             />
@@ -128,18 +148,19 @@ export function FacultiesPage() {
               schema={FacultyFormSchema.omit({ university_id: true })}
               defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), is_default: Boolean(editItem.is_default) } : undefined}
               onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: data.name }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
-              onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); selectedUniversity && getAllByUniversity(selectedUniversity); setEditItem(null); }}
+              onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); selectedUniversity && getAllByUniversity(selectedUniversity, listParams()); setEditItem(null); }}
               onCancel={() => setEditItem(null)}
               submitLabel={t('common.save', 'shared') || 'Save'}
             />
           </Dialog>
 
-          {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => selectedUniversity && getAllByUniversity(selectedUniversity)} />}
-          {!errorMap['getAll'] && !loadingMap['getAll'] && filtered.length === 0 && (
+          {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => selectedUniversity && getAllByUniversity(selectedUniversity, listParams())} />}
+          {!errorMap['getAll'] && !loadingMap['getAll'] && faculties.length === 0 && (
             <EmptyState message={t('lookups.no_faculties', 'hr') || 'No faculties found'} />
           )}
-          {!errorMap['getAll'] && (filtered.length > 0 || loadingMap['getAll']) && (
-            <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
+          {!errorMap['getAll'] && (faculties.length > 0 || loadingMap['getAll']) && (
+            <DataTable columns={columns} data={faculties} rowKey="id" loading={loadingMap['getAll']}
+              sortColumn={sortColumn} sortOrder={sortOrder} onSort={handleSort}
               emptyMessage={t('lookups.no_faculties', 'hr') || 'No faculties found'} />
           )}
         </>

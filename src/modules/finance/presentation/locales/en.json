@@ -98,6 +98,10 @@
   },
   "notifications": {
     "subscription_request_transaction_created_title": "Subscription request transaction created",
-    "subscription_request_transaction_created_description": "A transaction was created for the subscription request"
+    "subscription_request_transaction_created_description": "A transaction was created for the subscription request",
+    "subscription_request_transaction_approved_title": "Subscription request transaction approved",
+    "subscription_request_transaction_approved_description": "A transaction for the subscription request was approved",
+    "subscription_request_transaction_canceled_title": "Subscription request transaction canceled",
+    "subscription_request_transaction_canceled_description": "A transaction for the subscription request was canceled"
   }
 }

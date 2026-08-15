@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../hooks';
 import { CountryFormSchema } from '../../../../../core/presentation/schemas/regions/countryForm.schema';
@@ -22,15 +22,33 @@ export function CountriesPage() {
   const { entities: countries, getAll, create, update, remove, loadingMap, errorMap } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
   const entity = t('lookups.tabs.countries', 'hr') || 'Country';
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortColumn, setSortColumn] = useState('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<any>(null);
-  const filtered = countries.filter((c: any) =>
-    (typeof c.name === 'string' ? c.name : c.name?.ar || c.name?.en || '').toLowerCase().includes(searchQuery.toLowerCase())
+
+  const listParams = useCallback(
+    () => ({ search: searchQuery || undefined, sortBy: sortColumn, sortOrder }),
+    [searchQuery, sortColumn, sortOrder]
   );
 
-  useEffect(() => { getAll(); }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      getAll(undefined, listParams());
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [getAll, listParams]);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(column);
+      setSortOrder('asc');
+    }
+  };
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
@@ -48,7 +66,7 @@ export function CountriesPage() {
     try {
       await update(confirmSetDefault.id, { is_default: true });
       toast.success(t('lookups.set_default_success', 'hr').replace('{name}', entity));
-      getAll();
+      getAll(undefined, listParams());
       setConfirmSetDefault(null);
     } catch (err : any) {
       handleApiError(err, { module: "hr" });
@@ -57,7 +75,7 @@ export function CountriesPage() {
 
   const columns = [
     {
-      key: 'name', label: t('employees.country', 'hr') || 'Country', width: 300,
+      key: 'name', label: t('employees.country', 'hr') || 'Country', width: 300, sortable: true,
       render: (row: any) => typeof row.name === 'string' ? row.name : (row.name?.ar || row.name?.en || '')
     },
     {
@@ -107,7 +125,7 @@ export function CountriesPage() {
           fields={[{ name: 'name', type: 'alpha', label: t('employees.country', 'hr') || 'Country name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
           schema={CountryFormSchema}
           onSubmit={async (data) => { try { return await create({ ...data, name: { ar: data.name } }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
-          onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAll(); setIsCreateOpen(false); }}
+          onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAll(undefined, listParams()); setIsCreateOpen(false); }}
           onCancel={() => setIsCreateOpen(false)}
           submitLabel={t('employee_form.add_country', 'hr') || 'Add Country'}
         />
@@ -119,15 +137,16 @@ export function CountriesPage() {
           schema={CountryFormSchema}
           defaultValues={editItem ? { name: getLocalizedName(editItem.name), is_default: Boolean(editItem.is_default) } : undefined}
           onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: { ar: data.name } }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
-          onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); getAll(); setEditItem(null); }}
+          onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); getAll(undefined, listParams()); setEditItem(null); }}
           onCancel={() => setEditItem(null)}
           submitLabel={t('common.save', 'shared') || 'Save'}
         />
       </Dialog>
 
-      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll()} />}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll(undefined, listParams())} />}
       {!errorMap['getAll'] && (
-        <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
+        <DataTable columns={columns} data={countries} rowKey="id" loading={loadingMap['getAll']}
+          sortColumn={sortColumn} sortOrder={sortOrder} onSort={handleSort}
           emptyMessage={t('lookups.no_countries', 'hr') || 'No countries found'} />
       )}
 

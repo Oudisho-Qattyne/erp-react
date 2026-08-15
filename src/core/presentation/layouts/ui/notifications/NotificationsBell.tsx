@@ -102,10 +102,10 @@ export function NotificationsBell() {
           setOpen((prev) => !prev);
           if (error) clearError();
         }}
-        className="relative p-1.5 rounded-md hover:bg-primary-light transition-colors cursor-pointer"
+        className="relative p-1.5 rounded-md hover:bg-primary transition-colors cursor-pointer group"
         aria-label={t('topbar.notifications', 'shared')}
       >
-        <Bell size={20} className="text-text" />
+        <Bell size={20} className="text-text group-hover:text-white transition-colors" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}

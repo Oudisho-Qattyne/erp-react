@@ -19,6 +19,12 @@ export interface QueryParams {
   perPage?: number;
   search?: string;
   sort?: string;
+  /** Emits `sort_by[<name>]=<order>` per the lookups API (e.g. sort_by[name]) */
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  /** Emits flat boolean params (e.g. is_active=true) for lookups that support them */
+  isActive?: boolean;
+  isDefault?: boolean;
   filter?: Record<string, string | boolean | number>;
 }
 
@@ -28,6 +34,9 @@ function buildFlatParams(params: QueryParams): Record<string, string | boolean |
   if (params.perPage != null) flat.perPage = params.perPage;
   if (params.search != null) flat.search = params.search;
   if (params.sort != null) flat.sort = params.sort;
+  if (params.sortBy != null) flat[`sort_by[${params.sortBy}]`] = params.sortOrder ?? 'asc';
+  if (params.isActive != null) flat.is_active = params.isActive;
+  if (params.isDefault != null) flat.is_default = params.isDefault;
   if (params.filter) {
     for (const [key, value] of Object.entries(params.filter)) {
       flat[`filter[${key}]`] = value;

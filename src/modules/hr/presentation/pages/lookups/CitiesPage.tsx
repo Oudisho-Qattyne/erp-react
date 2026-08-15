@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud, useCities } from '../../hooks';
 import { CityFormSchema } from '../../../../../core/presentation/schemas/regions/cityForm.schema';
@@ -24,17 +24,38 @@ export function CitiesPage() {
   const { entities: cities, getAllByCountry, create, update, remove, loadingMap, errorMap } = useCities();
   const [selectedCountry, setSelectedCountry] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortColumn, setSortColumn] = useState('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<any>(null);
   const entity = t('lookups.tabs.cities', 'hr') || 'City';
-  const filtered = cities.filter((c: any) =>
-    (typeof c.name === 'string' ? c.name : c.name?.ar || c.name?.en || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   useEffect(() => { loadCountries(); }, []);
-  useEffect(() => { if (selectedCountry) getAllByCountry(selectedCountry); }, [selectedCountry]);
+
+  const listParams = useCallback(
+    () => ({ search: searchQuery || undefined, sortBy: sortColumn, sortOrder }),
+    [searchQuery, sortColumn, sortOrder]
+  );
+
+  useEffect(() => {
+    if (!selectedCountry) return;
+    const timer = setTimeout(() => {
+      getAllByCountry(selectedCountry, listParams());
+    }, 300);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCountry, listParams]);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(column);
+      setSortOrder('asc');
+    }
+  };
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
@@ -52,7 +73,7 @@ export function CitiesPage() {
     try {
       await update(confirmSetDefault.id, { is_default: true });
       toast.success(t('lookups.set_default_success', 'hr').replace('{name}', entity));
-      selectedCountry && getAllByCountry(selectedCountry);
+      selectedCountry && getAllByCountry(selectedCountry, listParams());
       setConfirmSetDefault(null);
     } catch (err : any) {
       handleApiError(err, { module: "hr" });
@@ -61,7 +82,7 @@ export function CitiesPage() {
 
   const columns = [
     {
-      key: 'name', label: t('employees.city', 'hr') || 'City', width: 300,
+      key: 'name', label: t('employees.city', 'hr') || 'City', width: 300, sortable: true,
       render: (row: any) => typeof row.name === 'string' ? row.name : (row.name?.ar || row.name?.en || '')
     },
     {
@@ -124,7 +145,7 @@ export function CitiesPage() {
               fields={[{ name: 'name', type: 'alpha', label: t('employees.city', 'hr') || 'City name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
               schema={CityFormSchema.omit({ country_id: true })}
               onSubmit={async (data) => { try { return await create({ ...data, name: { ar: data.name }, country_id: selectedCountry }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
-              onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAllByCountry(selectedCountry); setIsCreateOpen(false); }}
+              onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAllByCountry(selectedCountry, listParams()); setIsCreateOpen(false); }}
               onCancel={() => setIsCreateOpen(false)}
               submitLabel={t('employee_form.add_city', 'hr') || 'Add City'}
             />
@@ -137,18 +158,19 @@ export function CitiesPage() {
               schema={CityFormSchema.omit({ country_id: true })}
               defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), is_default: Boolean(editItem.is_default) } : undefined}
               onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: { ar: data.name } }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
-              onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); selectedCountry && getAllByCountry(selectedCountry); setEditItem(null); }}
+              onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); selectedCountry && getAllByCountry(selectedCountry, listParams()); setEditItem(null); }}
               onCancel={() => setEditItem(null)}
               submitLabel={t('common.save', 'shared') || 'Save'}
             />
           </Dialog>
 
-          {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => selectedCountry && getAllByCountry(selectedCountry)} />}
-          {!errorMap['getAll'] && !loadingMap['getAll'] && filtered.length === 0 && (
+          {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => selectedCountry && getAllByCountry(selectedCountry, listParams())} />}
+          {!errorMap['getAll'] && !loadingMap['getAll'] && cities.length === 0 && (
             <EmptyState message={t('lookups.no_cities', 'hr') || 'No cities found'} />
           )}
-          {!errorMap['getAll'] && (filtered.length > 0 || loadingMap['getAll']) && (
-            <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
+          {!errorMap['getAll'] && (cities.length > 0 || loadingMap['getAll']) && (
+            <DataTable columns={columns} data={cities} rowKey="id" loading={loadingMap['getAll']}
+              sortColumn={sortColumn} sortOrder={sortOrder} onSort={handleSort}
               emptyMessage={t('lookups.no_cities', 'hr') || 'No cities found'} />
           )}
         </>

@@ -122,10 +122,10 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
       const res = await useCase.findAllLeaveTypes(filter)
       setItems(res.data)
       setPagination({
-        currentPage: res.currentPage || 1,
-        lastPage: res.lastPage || 1,
-        total: (res.total as any) || 0,
-        hasMore: res.hasMore || false,
+        currentPage: res.pagination?.currentPage || 1,
+        lastPage: res.pagination?.lastPage || 1,
+        total: res.pagination?.total || 0,
+        hasMore: res.pagination?.hasMore || false,
       })
     } catch (err: any) {
       setFnError("findAll", handleApiError(err, { module: "hr" , passThrough:true } ))

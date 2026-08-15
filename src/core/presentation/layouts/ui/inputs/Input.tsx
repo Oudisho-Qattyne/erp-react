@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { CustomSelect } from './CustomSelect';
 import { SelectOrCreate } from './SelectOrCreate';
 import { MultiSelectOrCreate } from './MultiSelectOrCreate';
@@ -9,7 +9,7 @@ import { DataMatrixInput, type MatrixFieldConfig } from './DataMatrixInput';
 import { TablePickerInput } from './TablePickerInput';
 import type { PickerConfig } from '../picker/pickerTypes';
 import { Toggle, type ToggleSize, type ToggleVariant } from './Toggle';
-import { Info } from 'lucide-react';
+import { Info, Eye, EyeOff } from 'lucide-react';
 import { AuthContext } from '../../../../infrastructure/auth/AuthProvider';
 export type InputType = 'text' | 'number' | 'numeric' | 'alpha' | 'alphanumeric' | 'decimal' | 'email' | 'password' | 'textarea' | 'date' | 'time' | 'datetime' | 'select' | 'select-or-create' | 'multi-select-or-create' | 'data-matrix' | 'table-picker' | 'checkbox' | 'toggle';
 
@@ -128,6 +128,7 @@ const InputTypes: React.FC<InputProps> = ({
   const finalRequired = required ?? false;
   const finalOptions = options;
   const localClass = `${baseClasses} ${className}`
+  const [showPassword, setShowPassword] = useState(false);
   switch (type) {
     case 'textarea':
       return (
@@ -405,6 +406,46 @@ const InputTypes: React.FC<InputProps> = ({
 
     default:
       // text, number, or any other HTML input type
+      if (type === 'password') {
+        return (
+          <div className="relative w-full">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={finalValue}
+              onChange={(e) => {
+                const raw = e.target.value;
+                const filtered = regex ? sanitizeRegex(raw, regex) : raw;
+                onChange(filtered);
+              }}
+              onKeyDown={(e) => {
+                if (!regex) return;
+                const allowed = [
+                  'Backspace', 'Delete', 'Tab', 'Escape', 'Enter',
+                  'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+                  'Home', 'End',
+                ];
+                if (allowed.includes(e.key)) return;
+                if (e.ctrlKey && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase())) return;
+                regex.lastIndex = 0;
+                if (regex.test(e.key)) return;
+                e.preventDefault();
+              }}
+              placeholder={finalPlaceholder}
+              disabled={finalDisabled}
+              className={`${localClass} pe-9`}
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute inset-y-0 end-2 flex items-center text-text-muted hover:text-text transition-colors cursor-pointer"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+        );
+      }
       return (
         <input
           type={type}

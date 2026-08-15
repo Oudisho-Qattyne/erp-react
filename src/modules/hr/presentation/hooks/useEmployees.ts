@@ -100,7 +100,7 @@ export function useManageEmployee(params: UseManageEmployeeParams = {}): UseMana
       if (search.trim()) params.search = search.trim();
       if (gender) params.gender = gender;
       if (sortBy) {
-        params.sort_by = { [sortBy]: sortOrder };
+        params[`sort_by[${sortBy}]`] = sortOrder;
       }
       for (const [key, val] of Object.entries(extraFilters)) {
         if (val !== undefined && val !== null && val !== '') params[key] = val;

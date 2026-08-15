@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud, useCities, useRegions } from '../../hooks';
 import { RegionFormSchema } from '../../../../../core/presentation/schemas/regions/regionForm.schema';
@@ -24,6 +24,8 @@ export function RegionsPage() {
   const { entities: regions, getAllByCity, create, update, remove, loadingMap, errorMap } = useRegions();
   const entity = t('lookups.tabs.regions', 'hr') || 'Region';
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortColumn, setSortColumn] = useState('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState<number | null>(null);
   const [selectedCity, setSelectedCity] = useState<number | null>(null);
@@ -33,7 +35,29 @@ export function RegionsPage() {
 
   useEffect(() => { loadCountries(); }, []);
   useEffect(() => { if (selectedCountry) { getAllByCountry(selectedCountry); setSelectedCity(null); } }, [selectedCountry]);
-  useEffect(() => { if (selectedCity) getAllByCity(selectedCity); }, [selectedCity]);
+
+  const listParams = useCallback(
+    () => ({ search: searchQuery || undefined, sortBy: sortColumn, sortOrder }),
+    [searchQuery, sortColumn, sortOrder]
+  );
+
+  useEffect(() => {
+    if (!selectedCity) return;
+    const timer = setTimeout(() => {
+      getAllByCity(selectedCity, listParams());
+    }, 300);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCity, listParams]);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(column);
+      setSortOrder('asc');
+    }
+  };
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
@@ -51,19 +75,15 @@ export function RegionsPage() {
     try {
       await update(confirmSetDefault.id, { is_default: true });
       toast.success(t('lookups.set_default_success', 'hr').replace('{name}', entity));
-      selectedCity && getAllByCity(selectedCity);
+      selectedCity && getAllByCity(selectedCity, listParams());
       setConfirmSetDefault(null);
     } catch (err : any) {
       handleApiError(err, { module: "hr" });
     }
   };
 
-  const filtered = regions.filter((r: any) =>
-    (typeof r.name === 'string' ? r.name : r.name?.ar || r.name?.en || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   const columns = [
-    { key: 'name', label: t('employees.region', 'hr') || 'Region', width: 300,
+    { key: 'name', label: t('employees.region', 'hr') || 'Region', width: 300, sortable: true,
       render: (row: any) => typeof row.name === 'string' ? row.name : (row.name?.ar || row.name?.en || '') },
     { key: 'is_default', label: t('common.is_default', 'shared') || 'Default', width: 120,
       render: (row: any) => row.is_default
@@ -127,7 +147,7 @@ export function RegionsPage() {
               fields={[{ name: 'name', type: 'alpha', label: t('employees.region', 'hr') || 'Region name', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
               schema={RegionFormSchema.omit({ residence_city_id: true })}
               onSubmit={async (data) => { try { return await create({ ...data, name: { ar: data.name }, residence_city_id: selectedCity }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
-              onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAllByCity(selectedCity); setIsCreateOpen(false); }}
+              onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAllByCity(selectedCity, listParams()); setIsCreateOpen(false); }}
               onCancel={() => setIsCreateOpen(false)}
               submitLabel={t('employee_form.add_region', 'hr') || 'Add Region'}
             />
@@ -140,18 +160,19 @@ export function RegionsPage() {
               schema={RegionFormSchema.omit({ residence_city_id: true })}
               defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), is_default: Boolean(editItem.is_default) } : undefined}
               onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: { ar: data.name } }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
-              onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); selectedCity && getAllByCity(selectedCity); setEditItem(null); }}
+              onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); selectedCity && getAllByCity(selectedCity, listParams()); setEditItem(null); }}
               onCancel={() => setEditItem(null)}
               submitLabel={t('common.save', 'shared') || 'Save'}
             />
           </Dialog>
 
-          {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => selectedCity && getAllByCity(selectedCity)} />}
-          {!errorMap['getAll'] && !loadingMap['getAll'] && filtered.length === 0 && (
+          {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => selectedCity && getAllByCity(selectedCity, listParams())} />}
+          {!errorMap['getAll'] && !loadingMap['getAll'] && regions.length === 0 && (
             <EmptyState message={t('lookups.no_regions', 'hr') || 'No regions found'} />
           )}
-          {!errorMap['getAll'] && (filtered.length > 0 || loadingMap['getAll']) && (
-            <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
+          {!errorMap['getAll'] && (regions.length > 0 || loadingMap['getAll']) && (
+            <DataTable columns={columns} data={regions} rowKey="id" loading={loadingMap['getAll']}
+              sortColumn={sortColumn} sortOrder={sortOrder} onSort={handleSort}
               emptyMessage={t('lookups.no_regions', 'hr') || 'No regions found'} />
           )}
         </>

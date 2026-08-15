@@ -14,6 +14,10 @@ import { inputBaseClasses } from '../../../../core/presentation/layouts/ui/input
 import { LoadingState } from '../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../core/presentation/layouts/ui/state/ErrorState';
 import { useManageEmployee } from '../hooks/useEmployees';
+import { useEntityCrud, useFaculties, useSpecializations } from '../hooks';
+import type { University } from '../../../../core/domain/entities/education/University';
+import type { OrganizationalLevels } from '../../../../core/domain/entities/organizationalLevels/organizationalLevels';
+import type { MultiLanguage } from '../../../../core/domain/entities/EntityWithNameOnly';
 import { Filter, Search } from 'lucide-react';
 
 export function EmployeesPage() {
@@ -22,6 +26,11 @@ export function EmployeesPage() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState('');
+
+  const { getAll: loadUniversities } = useEntityCrud<University>('/shared-kernal/universities', '/shared-kernal/universities');
+  const { getAllByUniversity } = useFaculties();
+  const { getAllByFaculty } = useSpecializations();
+  const { getAll: loadOrgUnits } = useEntityCrud<OrganizationalLevels>('/hr/organizational-levels', '/hr/organizational-levels');
 
   const genderOptions = [
     { value: '', label: t('employees.gender_all', 'hr') || 'الكل' },
@@ -53,18 +62,52 @@ export function EmployeesPage() {
     create, // from useManageEmployee
   } = useManageEmployee({ initialPerPage: 10 });
 
+  const SORT_FIELD_MAP: Record<string, string> = {
+    full_name: 'first_name',
+    created_at: 'created_at',
+  };
+
+  const getLocalizedName = (name: string | MultiLanguage) =>
+    typeof name === 'string' ? name : (name.ar || name.en || '');
+
+  const computeUniversities = async () => {
+    const response = await loadUniversities();
+    console.log(response);
+    
+    return { options: [{ value: '', label: t("common.all", "shared") || "All" }, ...response.data.map((u) => ({ value: u.id, label: getLocalizedName(u.name) }))] };
+  };
+
+  const computeFaculties = async (values: Record<string, unknown>) => {
+    const univId = values.university_id;
+    if (!univId) return { options: [{ value: '', label: t("common.all", "shared") || "All" }], disabled: true };
+    const response = await getAllByUniversity(Number(univId));
+    return { options: [{ value: '', label: t("common.all", "shared") || "All" }, ...response.data.map((f) => ({ value: f.id, label: getLocalizedName(f.name) }))] };
+  };
+
+  const computeSpecializations = async (values: Record<string, unknown>) => {
+    const facId = values.faculty_id;
+    if (!facId) return { options: [{ value: '', label: t("common.all", "shared") || "All" }], disabled: true };
+    const response = await getAllByFaculty(Number(facId));
+    return { options: [{ value: '', label: t("common.all", "shared") || "All" }, ...response.data.map((s) => ({ value: s.id, label: getLocalizedName(s.name) }))] };
+  };
+
+  const computeOrgUnits = async () => {
+    const response = await loadOrgUnits();
+    return { options: [{ value: '', label: t("common.all", "shared") || "All" }, ...response.data.map((o) => ({ value: o.id, label: getLocalizedName(o.name) }))] };
+  };
+
   const columns: ColumnDef<EmployeeListItem>[] = [
     {
       key: 'personal_id_number',
       label: t('employees.personal_id_number', 'hr') || 'الرقم الذاتي',
       width: 120,
-      sortable: true,
+      sortable: false,
     },
     {
       key: 'national_id',
       label: t('employees.national_id', 'hr') || 'الرقم الوطني',
       width: 140,
-      sortable: true,
+      sortable: false,
     },
     {
       key: 'full_name',
@@ -88,10 +131,12 @@ export function EmployeesPage() {
   ];
 
   const handleSort = (columnKey: string) => {
-    if (sortBy === columnKey) {
+    const field = SORT_FIELD_MAP[columnKey];
+    if (!field) return;
+    if (sortBy === field) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
-      setSortBy(columnKey);
+      setSortBy(field);
       setSortOrder('asc');
     }
   };
@@ -133,12 +178,22 @@ export function EmployeesPage() {
       { value: "true", label: t("common.yes", "shared") },
       { value: "false", label: t("common.no", "shared") },
     ]},
+    { name: "university_id", type: "select", searchable: true, label: t("employees.university", "hr"), compute: computeUniversities },
+    { name: "faculty_id", type: "select", searchable: true, label: t("employees.faculty", "hr"), dependsOn: ["university_id"], compute: computeFaculties },
+    { name: "specialization_id", type: "select", searchable: true, label: t("employees.specialization", "hr"), dependsOn: ["faculty_id"], compute: computeSpecializations },
+    { name: "organizational_unit", type: "select", searchable: true, label: t("employees.org_unit_id", "hr") || "Organizational Unit", compute: computeOrgUnits },
   ]
 
   const handleApplyFilter = (values: Record<string, any>) => {
     const parsed: Record<string, any> = {}
     for (const [key, val] of Object.entries(values)) {
-      if (val !== "" && val !== undefined) parsed[key] = val
+      if (val !== "" && val !== undefined) {
+        if (["university_id", "faculty_id", "specialization_id", "organizational_unit"].includes(key)) {
+          parsed[key] = Number(val)
+        } else {
+          parsed[key] = val
+        }
+      }
     }
     setExtraFilters(parsed)
     setPage(1)
@@ -187,7 +242,7 @@ export function EmployeesPage() {
           data={employees}
           onRowClick={(row) => navigate(`/hr/employees/${row.id}`)}
           rowKey="id"
-          sortColumn={sortBy}
+          sortColumn={Object.entries(SORT_FIELD_MAP).find(([, field]) => field === sortBy)?.[0] ?? undefined}
           sortOrder={sortOrder}
           onSort={handleSort}
           loading={loading}
@@ -197,9 +252,9 @@ export function EmployeesPage() {
             totalItems: pagination.total,
             onPageChange: setPage,
             itemsPerPage: perPage,
-            onItemsPerPageChange: setPerPage,
-            itemsPerPageOptions: [5, 10, 20, 50],
-          }}
+            onItemsPerPageChange: (size) => { setPerPage(size); setPage(1) },
+             itemsPerPageOptions: [10, 25, 50, 100],
+          }} 
           emptyMessage={t('employees.no_data', 'hr') || 'لا يوجد موظفون'}
         />
       )}

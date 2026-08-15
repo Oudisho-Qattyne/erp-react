@@ -180,8 +180,8 @@ export default function LeavesTypesPage() {
             totalItems: pagination.total,
             onPageChange: setPage,
             itemsPerPage: filter.per_page,
-            onItemsPerPageChange: (size) => setPage(1),
-            itemsPerPageOptions: [5, 10, 20, 50],
+            onItemsPerPageChange: (size) => setFilter({ per_page: size, page: 1 }),
+             itemsPerPageOptions: [10, 25, 50, 100],
           }}
           emptyMessage={t("common.no_data", "shared") || "لا توجد إجازات"}
         />

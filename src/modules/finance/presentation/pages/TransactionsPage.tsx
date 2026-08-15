@@ -102,12 +102,13 @@ export function TransactionsPage() {
   const sortOrder = sortColumn ? filter.sort_by?.[sortColumn as keyof TransactionFilters["sort_by"]] : undefined
 
   const handleSort = (key: string) => {
-    const order = sortColumn === key && sortOrder === "asc" ? "desc" : "asc"
-    setFilter({ sort_by: { [key]: order } as TransactionFilters["sort_by"], page: 1 })
+    const field = key === "id" ? "created_at" : key
+    const order = sortColumn === field && sortOrder === "asc" ? "desc" : "asc"
+    setFilter({ sort_by: { [field]: order } as TransactionFilters["sort_by"], page: 1 })
   }
 
   const columns: ColumnDef<Transaction>[] = [
-    { key: "id", label: "#", width: 60 },
+    { key: "id", label: "#", width: 60, sortable: true, render: (row) => row.id },
     {
       key: "transaction_type",
       label: t("transaction.type", MODULE) || "Type",

@@ -160,7 +160,12 @@ export function SelectFromTable<T extends { id: number | string }>({
     if (!multiple) {
       onConfirm([row])
       onClose()
+      return
     }
+    const key = row[rowKey] as string | number;
+    setSelectedKeys((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    )
   }
 
   const s = (key: string, fallback: string) => t(key, "shared") || fallback
@@ -231,7 +236,7 @@ export function SelectFromTable<T extends { id: number | string }>({
             selectable={multiple || undefined}
             selectedRows={multiple ? selectedKeys : undefined}
             onSelectionChange={multiple ? setSelectedKeys : undefined}
-            onRowClick={multiple ? undefined : handleRowClick}
+            onRowClick={handleRowClick}
             sortColumn={sortColumn}
             sortOrder={sortOrder}
             onSort={onSort}

@@ -23,6 +23,28 @@ interface SubscriptionRequestPayload {
   };
 }
 
+interface SubscriptionTransactionPayload {
+  dossier?: {
+    id?: number | string;
+    plot_id?: number | string;
+    dossier_number?: string | null;
+    status?: string;
+  };
+  transaction?: {
+    id?: string;
+    transaction_type?: string;
+    transaction_status?: string;
+    transaction_value?: number | string;
+    reason?: string;
+  };
+  payment_fee?: {
+    id?: number | string;
+    name?: string;
+    code?: string;
+    fee_value?: number | string;
+  };
+}
+
 registerNotificationHandler('subscription_request.transaction_created', {
   title: ({ t }) =>
     t('notifications.subscription_request_transaction_created_title', 'finance') ||
@@ -52,6 +74,76 @@ registerNotificationHandler('subscription_request.transaction_created', {
   },
   data: (notification: Notification): SubscriptionRequestPayload | null =>
     (notification.data?.payload as SubscriptionRequestPayload | null) ?? null,
+});
+
+registerNotificationHandler('transaction_approved.subscription_reqeust', {
+  title: ({ t }) =>
+    t('notifications.subscription_request_transaction_approved_title', 'finance') ||
+    'Subscription request transaction approved',
+  description: ({ notification, t, data }) => {
+    const payload = (data ?? notification.data?.payload) as SubscriptionTransactionPayload | null;
+    const transaction = payload?.transaction;
+    const dossier = payload?.dossier;
+    const paymentFee = payload?.payment_fee;
+    const base =
+      t('notifications.subscription_request_transaction_approved_description', 'finance') ||
+      'A transaction for the subscription request was approved';
+    const extras = [
+      transaction?.id ? `#${String(transaction.id).slice(0, 8)}` : '',
+      transaction?.transaction_value != null ? `$${String(transaction.transaction_value)}` : '',
+      dossier?.dossier_number ?? (dossier?.id ? `Dossier #${dossier.id}` : ''),
+      paymentFee?.name ?? '',
+    ]
+      .filter(Boolean)
+      .join(' - ');
+    return extras ? `${base} (${extras})` : base;
+  },
+  action: ({ navigate, data }): void => {
+    const payload = data as SubscriptionTransactionPayload | null;
+    const dossier = payload?.dossier;
+    if (dossier?.id && dossier?.plot_id) {
+      navigate(`/investments/plots/${dossier.plot_id}/dossiers/${dossier.id}`);
+      return;
+    }
+    navigate('/finance/transactions');
+  },
+  data: (notification: Notification): SubscriptionTransactionPayload | null =>
+    (notification.data?.payload as SubscriptionTransactionPayload | null) ?? null,
+});
+
+registerNotificationHandler('transaction_canceled.subscription_reqeust', {
+  title: ({ t }) =>
+    t('notifications.subscription_request_transaction_canceled_title', 'finance') ||
+    'Subscription request transaction canceled',
+  description: ({ notification, t, data }) => {
+    const payload = (data ?? notification.data?.payload) as SubscriptionTransactionPayload | null;
+    const transaction = payload?.transaction;
+    const dossier = payload?.dossier;
+    const paymentFee = payload?.payment_fee;
+    const base =
+      t('notifications.subscription_request_transaction_canceled_description', 'finance') ||
+      'A transaction for the subscription request was canceled';
+    const extras = [
+      transaction?.id ? `#${String(transaction.id).slice(0, 8)}` : '',
+      transaction?.transaction_value != null ? `$${String(transaction.transaction_value)}` : '',
+      dossier?.dossier_number ?? (dossier?.id ? `Dossier #${dossier.id}` : ''),
+      paymentFee?.name ?? '',
+    ]
+      .filter(Boolean)
+      .join(' - ');
+    return extras ? `${base} (${extras})` : base;
+  },
+  action: ({ navigate, data }): void => {
+    const payload = data as SubscriptionTransactionPayload | null;
+    const dossier = payload?.dossier;
+    if (dossier?.id && dossier?.plot_id) {
+      navigate(`/investments/plots/${dossier.plot_id}/dossiers/${dossier.id}`);
+      return;
+    }
+    navigate('/finance/transactions');
+  },
+  data: (notification: Notification): SubscriptionTransactionPayload | null =>
+    (notification.data?.payload as SubscriptionTransactionPayload | null) ?? null,
 });
 
 const financeModule: Module = {

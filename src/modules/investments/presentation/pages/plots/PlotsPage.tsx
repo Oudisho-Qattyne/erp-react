@@ -178,7 +178,10 @@ export function PlotsPage() {
     page: pagination?.currentPage || 1,
     totalPages: pagination?.lastPage || 1,
     totalItems: pagination?.total || 0,
+    itemsPerPage: list.perPage,
     onPageChange: list.setPage,
+    onItemsPerPageChange: list.setPerPage,
+    itemsPerPageOptions: [10, 25, 50, 100],
   };
 
   const handleTranslateValues = (field: string, value: string) => {

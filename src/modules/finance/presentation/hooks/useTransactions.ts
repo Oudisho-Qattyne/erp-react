@@ -11,6 +11,8 @@ import { useIdempotency } from "../../../../core/presentation/hooks/useIdempoten
 
 const MODULE = "finance"
 
+const DEFAULT_FILTER: Partial<TransactionFilters> = { sort_by: { created_at: "desc" } }
+
 const OP_KEYS = ["findAllTransactions", "createTransaction", "updateTransactionStatus"] as const
 
 function initRecord<T>(value: T): Record<string, T> {
@@ -44,7 +46,7 @@ export const useTransactions = (initialFilter?: Partial<TransactionFilters>): Us
   const [transaction, setTransaction] = useState<Transaction | null>(null)
   const [loading, setLoading] = useState<Record<string, boolean>>(() => initRecord(false))
   const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null))
-  const [filter, setFilterState] = useState<TransactionFilters>(() => ({ ...initialFilter }))
+  const [filter, setFilterState] = useState<TransactionFilters>(() => ({ ...DEFAULT_FILTER, ...initialFilter }))
   const [pagination, setPagination] = useState({ currentPage: 1, lastPage: 1, total: 0, hasMore: false })
 
   const repository = createTransactionRepository(apiClient)
@@ -60,7 +62,7 @@ const setFilter = useCallback((patch: Partial<TransactionFilters>) => {
   setFilterState((prev) => ({ ...prev, ...patch, page: 1 }))
 }, [])
 
-const resetFilter = useCallback(() => setFilterState({}), [])
+const resetFilter = useCallback(() => setFilterState({ ...DEFAULT_FILTER }), [])
 
 const setPage = useCallback((page: number) => {
   setFilterState((prev) => ({ ...prev, page }))

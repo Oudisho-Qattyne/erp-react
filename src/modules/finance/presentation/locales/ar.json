@@ -98,6 +98,10 @@
   },
   "notifications": {
     "subscription_request_transaction_created_title": "تم إنشاء معاملة طلب الاكتتاب",
-    "subscription_request_transaction_created_description": "تم إنشاء معاملة لطلب الاكتتاب"
+    "subscription_request_transaction_created_description": "تم إنشاء معاملة لطلب الاكتتاب",
+    "subscription_request_transaction_approved_title": "تمت الموافقة على معاملة طلب الاكتتاب",
+    "subscription_request_transaction_approved_description": "تمت الموافقة على معاملة طلب الاكتتاب",
+    "subscription_request_transaction_canceled_title": "تم إلغاء معاملة طلب الاكتتاب",
+    "subscription_request_transaction_canceled_description": "تم إلغاء معاملة طلب الاكتتاب"
   }
 }

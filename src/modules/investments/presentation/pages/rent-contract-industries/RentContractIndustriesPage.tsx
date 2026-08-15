@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import { getCreateRentContractIndustryFormSchema } from '../../schemas/rentContractIndustryForm.schema';
@@ -13,7 +13,8 @@ import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialo
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
-import { Pencil, Trash2, Star, Check, X, History } from 'lucide-react';
+import { Pencil, Trash2, Star, Check, X, History, Filter } from 'lucide-react';
+import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 import type { RentContractIndustry } from '../../../domain/entities/rentContractIndustry';
 
@@ -22,15 +23,42 @@ export function RentContractIndustriesPage() {
   const { entities: items, getAll, create, update, remove, loadingMap, errorMap } = useEntityCrud<RentContractIndustry>('/investments/rent-contract-industries', '/investments/rent-contract-industries');
   const entityName = t('rent_contract_industries.title', 'investments') || 'Rent Contract Industry';
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortColumn, setSortColumn] = useState('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [extraFilters, setExtraFilters] = useState<Record<string, string>>({});
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<RentContractIndustry | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<RentContractIndustry | null>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<RentContractIndustry | null>(null);
   const [auditItem, setAuditItem] = useState<RentContractIndustry | null>(null);
 
-  const filtered = items.filter((c: any) => c.name?.toLowerCase().includes(searchQuery.toLowerCase()));
+  const listParams = useCallback(
+    () => ({
+      search: searchQuery || undefined,
+      sortBy: sortColumn,
+      sortOrder,
+      isActive: extraFilters.is_active === 'true' ? true : extraFilters.is_active === 'false' ? false : undefined,
+      isDefault: extraFilters.is_default === 'true' ? true : extraFilters.is_default === 'false' ? false : undefined,
+    }),
+    [searchQuery, sortColumn, sortOrder, extraFilters]
+  );
 
-  useEffect(() => { getAll(); }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      getAll(undefined, listParams());
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [getAll, listParams]);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(column);
+      setSortOrder('asc');
+    }
+  };
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
@@ -48,7 +76,7 @@ export function RentContractIndustriesPage() {
     try {
       await update(confirmSetDefault.id, { ...confirmSetDefault, is_default: true });
       toast.success(t('common.set_default_success', 'shared')?.replace('{name}', entityName) || `${entityName} set as default successfully`);
-      getAll();
+      getAll(undefined, listParams());
     } catch (err: any) {
       handleApiError(err, { module: "investments" });
     }
@@ -67,6 +95,7 @@ export function RentContractIndustriesPage() {
       key: 'name',
       label: t('rent_contract_industries.name', 'investments') || 'Name',
       width: 250,
+      sortable: true,
       render: (row: RentContractIndustry) => getLocalizedName(row.name)
     },
     {
@@ -114,6 +143,33 @@ export function RentContractIndustriesPage() {
     },
   ];
 
+  const filterFields: FilterField[] = [
+    { name: "is_active", label: t("common.is_active", "shared") || "Is Active?", type: "select", options: [
+      { value: "", label: t("common.all", "shared") || "All" },
+      { value: "true", label: t("common.yes", "shared") || "Yes" },
+      { value: "false", label: t("common.no", "shared") || "No" },
+    ]},
+    { name: "is_default", label: t("common.is_default", "shared") || "Default", type: "select", options: [
+      { value: "", label: t("common.all", "shared") || "All" },
+      { value: "true", label: t("common.yes", "shared") || "Yes" },
+      { value: "false", label: t("common.no", "shared") || "No" },
+    ]},
+  ];
+
+  const handleApplyFilter = (values: Record<string, unknown>) => {
+    const parsed: Record<string, string> = {};
+    for (const [key, val] of Object.entries(values)) {
+      if (val !== "" && val !== undefined) parsed[key] = String(val);
+    }
+    setExtraFilters(parsed);
+    setIsFilterOpen(false);
+  };
+
+  const handleResetFilter = () => {
+    setExtraFilters({});
+    setIsFilterOpen(false);
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col gap-2">
@@ -122,6 +178,9 @@ export function RentContractIndustriesPage() {
           <Input type="text" value={searchQuery} onChange={setSearchQuery}
             placeholder={t('common.search', 'shared') || 'Search...'}
             baseClasses={inputBaseClasses} className="w-60" />
+            <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
+              {t('common.filter', 'shared') || 'تصفية'}
+            </Button>
             <Button onClick={() => setIsCreateOpen(true)} requiredPermission="investments.rent-contract-industries.create">{t('rent_contract_industries.add', 'investments')}</Button>
         </div>
       </div>
@@ -139,7 +198,7 @@ export function RentContractIndustriesPage() {
       handleApiError(err, { module: "investments" }); throw err;
     }
           }}
-          onSuccess={() => { toast.success(t('rent_contract_industries.created', 'investments').replace('{name}', entityName)); getAll(); setIsCreateOpen(false); }}
+          onSuccess={() => { toast.success(t('rent_contract_industries.created', 'investments').replace('{name}', entityName)); getAll(undefined, listParams()); setIsCreateOpen(false); }}
           onCancel={() => setIsCreateOpen(false)}
           submitLabel={t('rent_contract_industries.add', 'investments')}
         />
@@ -161,15 +220,16 @@ export function RentContractIndustriesPage() {
       handleApiError(err, { module: "investments" }); throw err;
     }
           }}
-          onSuccess={() => { toast.success(t('common.updated', 'shared')?.replace('{name}', entityName) || `${entityName} updated successfully`); getAll(); setEditItem(null); }}
+          onSuccess={() => { toast.success(t('common.updated', 'shared')?.replace('{name}', entityName) || `${entityName} updated successfully`); getAll(undefined, listParams()); setEditItem(null); }}
           onCancel={() => setEditItem(null)}
           submitLabel={t('common.save', 'shared') || 'Save'}
         />
       </Dialog>
 
-      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll()} />}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll(undefined, listParams())} />}
       {!errorMap['getAll'] && (
-        <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
+        <DataTable columns={columns} data={items} rowKey="id" loading={loadingMap['getAll']}
+          sortColumn={sortColumn} sortOrder={sortOrder} onSort={handleSort}
           emptyMessage={t('rent_contract_industries.no_records', 'investments')} />
       )}
 
@@ -216,6 +276,15 @@ export function RentContractIndustriesPage() {
         confirmLoading={loadingMap['remove']}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setConfirmDelete(null)}
+      />
+
+      <FilterDialog
+        isOpen={isFilterOpen}
+        fields={filterFields}
+        initialValues={extraFilters}
+        onFilter={handleApplyFilter}
+        onCancel={() => setIsFilterOpen(false)}
+        onReset={handleResetFilter}
       />
     </div>
   );

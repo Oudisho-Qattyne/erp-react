@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../hooks';
 import { JobStatusFormSchema } from '../../schemas/jobStatus/jobStatus.schema';
@@ -21,15 +21,33 @@ export function JobStatusesPage() {
   const { entities: items, getAll, create, update, remove, loadingMap, errorMap } = useEntityCrud<JobStatus>('/hr/job-statuses', '/hr/job-statuses');
   const entity = t('lookups.tabs.job_statuses', 'hr') || 'Job Status';
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortColumn, setSortColumn] = useState('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<any>(null);
-  const filtered = items.filter((item: any) =>
-    (typeof item.name === 'string' ? item.name : item.name?.ar || item.name?.en || '').toLowerCase().includes(searchQuery.toLowerCase())
+
+  const listParams = useCallback(
+    () => ({ search: searchQuery || undefined, sortBy: sortColumn, sortOrder }),
+    [searchQuery, sortColumn, sortOrder]
   );
 
-  useEffect(() => { getAll(); }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      getAll(undefined, listParams());
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [getAll, listParams]);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(column);
+      setSortOrder('asc');
+    }
+  };
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
@@ -47,7 +65,7 @@ export function JobStatusesPage() {
     try {
       await update(confirmSetDefault.id, { is_default: true });
       toast.success(t('lookups.set_default_success', 'hr').replace('{name}', entity));
-      getAll();
+      getAll(undefined, listParams());
       setConfirmSetDefault(null);
     } catch (err : any) {
       handleApiError(err, { module: "hr" });
@@ -55,7 +73,7 @@ export function JobStatusesPage() {
   };
 
   const columns = [
-    { key: 'name', label: t('employee_form.job_status', 'hr') || 'Job Status', width: 300,
+    { key: 'name', label: t('employee_form.job_status', 'hr') || 'Job Status', width: 300, sortable: true,
       render: (row: any) => typeof row.name === 'string' ? row.name : (row.name?.ar || row.name?.en || '') },
     { key: 'is_default', label: t('common.is_default', 'shared') || 'Default', width: 120,
       render: (row: any) => row.is_default
@@ -100,7 +118,7 @@ export function JobStatusesPage() {
           fields={[{ name: 'name', type: 'alpha', label: t('employee_form.job_status', 'hr') || 'Job Status', required: true }, { name: 'is_default', label: t('common.is_default', 'shared') || 'Default', required: false, type: 'checkbox' }]}
           schema={JobStatusFormSchema}
           onSubmit={async (data) => { try { return await create({ ...data, name: data.name }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
-          onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAll(); setIsCreateOpen(false); }}
+          onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAll(undefined, listParams()); setIsCreateOpen(false); }}
           onCancel={() => setIsCreateOpen(false)}
           submitLabel={t('employee_form.add_job_status', 'hr') || 'Add Job Status'}
         />
@@ -113,15 +131,16 @@ export function JobStatusesPage() {
           schema={JobStatusFormSchema}
           defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), is_default: Boolean(editItem.is_default) } : undefined}
           onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: data.name }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
-          onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); getAll(); setEditItem(null); }}
+          onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); getAll(undefined, listParams()); setEditItem(null); }}
           onCancel={() => setEditItem(null)}
           submitLabel={t('common.save', 'shared') || 'Save'}
         />
       </Dialog>
 
-      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll()} />}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll(undefined, listParams())} />}
       {!errorMap['getAll'] && (
-        <DataTable columns={columns} data={filtered} rowKey="id" loading={loadingMap['getAll']}
+        <DataTable columns={columns} data={items} rowKey="id" loading={loadingMap['getAll']}
+          sortColumn={sortColumn} sortOrder={sortOrder} onSort={handleSort}
           emptyMessage={t('lookups.no_job_statuses', 'hr') || 'No job statuses found'} />
       )}
 

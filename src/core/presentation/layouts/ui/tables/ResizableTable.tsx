@@ -161,7 +161,7 @@ export function DataTable<T extends Record<string, any>>({
             <select
               value={itemsPerPage}
               onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-              className="px-2 py-1 rounded border border-border text-sm"
+              className="px-2 py-1 rounded border border-border text-sm bg-card text-text"
             >
               {itemsPerPageOptions.map((size) => (
                 <option key={size} value={size}>
@@ -264,7 +264,7 @@ export function DataTable<T extends Record<string, any>>({
                           <select
                             value={filters[col.key] || ''}
                             onChange={(e) => onFilterChange(col.key, e.target.value)}
-                            className="w-full px-2 py-1 text-xs rounded border border-border bg-background"
+                            className="w-full px-2 py-1 text-xs rounded border border-border bg-background text-text"
                           >
                             <option value="">{col.filter.placeholder || t('common.all', 'shared') || 'الكل'}</option>
                             {col.filter.options?.map(opt => (

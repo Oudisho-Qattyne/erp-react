@@ -4,8 +4,8 @@ import type { Fee } from '../../domain/entities/Fee';
 type Translate = (key: string, module?: string) => string;
 
 export const buildCreateFeeFormFields = (t: Translate): FieldConfig[] => [
-  { name: 'name', label: t('fee.name', 'finance') || 'Name', type: 'alpha', required: true },
-  { name: 'code', label: t('fee.code', 'finance') || 'Code', type: 'alphanumeric', required: true },
+  { name: 'name', label: t('fee.name', 'finance') || 'Name', type: 'text', required: true },
+  { name: 'code', label: t('fee.code', 'finance') || 'Code', type: 'text',  regex: /\S/, required: true },
   {
     name: 'fee_value',
     label: t('fee.fee_value', 'finance') || 'Fee Value',

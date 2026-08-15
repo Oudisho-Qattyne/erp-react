@@ -1,10 +1,13 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import type { Notification } from '../../../../domain/entities/notification/notification';
 import { useApiClient } from '../../../context/api/ApiClinetProvider';
 import { createNotificationsRepository } from '../../../../infrastructure/repositories/NotificationsRepository';
 import { createNotificationsUseCase } from '../../../../application/usecases/manageNotificationsUseCase';
+import { subscribeNotificationChannel, type NotificationEchoCallbacks, type BroadcastNotificationData } from '../../../../application/usecases/notificationEchoUseCase';
 import { handleApiError } from '../../../utils/handleApiError';
 import { useIdempotency } from '../../useIdempotency';
+import { useAuth } from '../../../../infrastructure/auth/AuthProvider';
+import { createEcho } from '../../../../infrastructure/echo/echo';
 
 export interface UseNotificationsReturn {
   notifications: Notification[];
@@ -18,6 +21,8 @@ export interface UseNotificationsReturn {
 
 export const useNotifications = (): UseNotificationsReturn => {
   const apiClient = useApiClient();
+  const { user } = useAuth();
+  const currentUserId = user?.id as number | undefined;
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(false);
@@ -28,6 +33,38 @@ export const useNotifications = (): UseNotificationsReturn => {
   const idem = useIdempotency();
 
   const clearError = useCallback(() => setError(null), []);
+
+  const cbRef = useRef<NotificationEchoCallbacks>(null as any);
+
+  const pushNotification = useCallback((type: string, data: BroadcastNotificationData) => {
+    const notification: Notification = {
+      id: String(data.id ?? crypto.randomUUID()),
+      type,
+      data: data.payload ? { payload: data.payload } : null,
+      read_at: null,
+      created_at: new Date().toISOString(),
+    };
+    setNotifications((prev) => [notification, ...prev.filter((n) => n.id !== notification.id)]);
+  }, []);
+
+  // Keep cbRef.current always up to date
+  cbRef.current = {
+    onBroadcastNotification: (data) => {
+      if (data.type === 'transaction.created') {
+        pushNotification('subscription_request.transaction_created', data);
+      } else if (data.type === 'subscription_request.transaction_updated') {
+        pushNotification('transaction_approved.subscription_reqeust', data);
+      }
+    },
+  };
+
+  // Subscribe to the notifications channel — runs once per user
+  useEffect(() => {
+    if (!currentUserId) return;
+
+    const echo = createEcho();
+    subscribeNotificationChannel(echo, currentUserId, cbRef);
+  }, [currentUserId]);
 
   const getNotifications = useCallback(async () => {
     setLoading(true);
