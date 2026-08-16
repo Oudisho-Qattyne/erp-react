@@ -8,6 +8,7 @@ import { handleApiError } from '../../../utils/handleApiError';
 import { useIdempotency } from '../../useIdempotency';
 import { useAuth } from '../../../../infrastructure/auth/AuthProvider';
 import { createEcho } from '../../../../infrastructure/echo/echo';
+import { playNotificationSound } from '../../../../infrastructure/audio/notificationSounds';
 
 export interface UseNotificationsReturn {
   notifications: Notification[];
@@ -50,6 +51,7 @@ export const useNotifications = (): UseNotificationsReturn => {
   // Keep cbRef.current always up to date
   cbRef.current = {
     onBroadcastNotification: (data) => {
+      playNotificationSound()
       if (data.type === 'transaction.created') {
         pushNotification('subscription_request.transaction_created', data);
       } else if (data.type === 'subscription_request.transaction_updated') {

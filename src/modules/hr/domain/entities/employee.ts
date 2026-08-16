@@ -41,6 +41,7 @@ export interface EmployeeChildren {
 }
 
 export interface EmployeeSpouse {
+  id:number;
   name?: string;
   workplace?:string;
 }

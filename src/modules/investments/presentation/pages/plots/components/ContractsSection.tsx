@@ -98,7 +98,7 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
       width: 130,
       render: (row: Contract) => (
         <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
-          <Button variant="ghost" size="sm" onClick={() => navigate(`/investments/plots/${plotId}/dossiers/${dossierId}/contract/${row.id}`)} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.contracts.view">
+          <Button variant="ghost" size="sm" onClick={() => window.open(`/investments/plots/${plotId}/dossiers/${dossierId}/contract/${row.id}` , '_blank')} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.contracts.view">
             <Eye size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setEditingContract(row)} title={t('common.edit', 'shared') || 'Edit'} requiredPermission="investments.contracts.update">

@@ -140,7 +140,7 @@ export function InvestorsPage() {
       width: 100,
       render: (row: Investor) => (
         <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
-          <Button variant="ghost" size="sm" onClick={() => navigate(`/investments/investors/${row.id}/edit`)}
+          <Button variant="ghost" size="sm" onClick={() => window.open(`/investments/investors/${row.id}/edit` , '_blank')}
             title={t('common.view', 'shared') || 'View'} requiredPermission="investments.investors.view">
             <Eye size={16} />
           </Button>
@@ -178,8 +178,8 @@ export function InvestorsPage() {
           <h1 className="text-2xl font-bold text-text">{t('investors.title', 'investments') || 'Investors'}</h1>
         </div>
         <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={() => navigate('/investments/investors/create-future-possible')} requiredPermission="investments.investors.create">{t('investors.add_future_possible', 'investments') || 'Add Future Possible Investor'}</Button>
-          <Button onClick={() => navigate('/investments/investors/create')} requiredPermission="investments.investors.create">{t('investors.add', 'investments') || 'Add Investor'}</Button>
+          <Button variant="outline" onClick={() => window.open('/investments/investors/create-future-possible' , '_blank')} requiredPermission="investments.investors.create">{t('investors.add_future_possible', 'investments') || 'Add Future Possible Investor'}</Button>
+          <Button onClick={() => window.open('/investments/investors/create' , '_blank')} requiredPermission="investments.investors.create">{t('investors.add', 'investments') || 'Add Investor'}</Button>
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-3">

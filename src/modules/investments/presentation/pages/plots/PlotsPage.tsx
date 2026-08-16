@@ -157,7 +157,7 @@ export function PlotsPage() {
               <MapPin size={16} className="text-success" />
             </Button>
           )}
-          <Button variant="ghost" size="sm" onClick={() => navigate(`/investments/plots/${row.id}/edit`)}
+          <Button variant="ghost" size="sm" onClick={() => window.open(`/investments/plots/${row.id}/edit` , '_blank')}
             title={t('common.view', 'shared') || 'View'} requiredPermission="investments.plots.view">
             <Eye size={16} />
           </Button>
@@ -204,7 +204,7 @@ export function PlotsPage() {
             <History size={16} />
             {t('plots.edit_log', 'investments') || 'سجل التعديلات'}
           </Button> */}
-          <Button onClick={() => navigate('/investments/plots/create')} requiredPermission="investments.plots.create">{t('plots.add', 'investments') || 'Add Plot'}</Button>
+          <Button onClick={() => window.open('/investments/plots/create' , '_blank')} requiredPermission="investments.plots.create">{t('plots.add', 'investments') || 'Add Plot'}</Button>
         </div>
       </div>
         <div className="flex flex-wrap items-center gap-3">

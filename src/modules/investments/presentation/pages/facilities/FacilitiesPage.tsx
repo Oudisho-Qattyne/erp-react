@@ -200,7 +200,7 @@ export function FacilitiesPage() {
         const pid = row.plot?.id || row.plot_id;
         const label = row.plot?.code || row.plot?.identifier || '—';
         return pid ? (
-          <button type="button" onClick={() => navigate(`/investments/plots/${pid}/edit`)} className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
+          <button type="button" onClick={() => window.open(`/investments/plots/${pid}/edit` , '_blank')} className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
             <Eye size={14} />
             <span>{label}</span>
           </button>
@@ -216,7 +216,7 @@ export function FacilitiesPage() {
         const did = row.plot_dossier?.id || row.plot_dossier_id;
         const label = row.plot_dossier?.dossier_number || '—';
         return pid && did ? (
-          <button type="button" onClick={() => navigate(`/investments/plots/${pid}/dossiers/${did}`)} className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
+          <button type="button" onClick={() => window.open(`/investments/plots/${pid}/dossiers/${did}` , '_blank')} className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
             <Eye size={14} />
             <span>{label}</span>
           </button>
@@ -235,7 +235,7 @@ export function FacilitiesPage() {
             const pid = row.plot?.id || row.plot_id;
             const did = row.plot_dossier?.id || row.plot_dossier_id;
             if (pid && did) {
-              navigate(`/investments/plots/${pid}/dossiers/${did}/facilities/${row.id}`);
+              window.open(`/investments/plots/${pid}/dossiers/${did}/facilities/${row.id}` , '_blank');
             }
           }} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.facilities.view">
             <Eye size={16} />

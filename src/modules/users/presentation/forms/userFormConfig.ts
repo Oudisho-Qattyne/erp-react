@@ -21,6 +21,11 @@ export const buildEditUserFormFields = (t: Translate, roles: Role[]): FieldConfi
   { name: 'role', label: t('users.role', 'users') || 'Role', type: 'select', required: true, options: buildRoleOptions(roles) },
 ];
 
+export const buildChangePasswordFormFields = (t: Translate, roles:Role[]) : FieldConfig[] => [
+  { name: 'password', label: t('users.password', 'users') || 'Password', type: 'password', required: true },
+  { name: 'password_confirmation', label: t('users.confirm_password', 'users') || 'Confirm Password', type: 'password', required: true},
+]
+
 export const buildUserFormGroups = (t: Translate): GroupConfig[] => [
   {
     group: 'account',

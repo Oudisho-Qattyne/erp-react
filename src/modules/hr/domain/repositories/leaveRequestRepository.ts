@@ -5,7 +5,8 @@ import type { LeaveRequestProcessOperations } from "../valueObjects/leaveRequest
 
 export interface ILeaveRequestRepository{
     createLeaveRequest:(leaveRequest : any, idempotencyKey?: string) => Promise<DomainResponse<any>>,
-
+    createEmployeeLeaveRequest:(leaveRequest : any, idempotencyKey?: string) => Promise<DomainResponse<any>>,
+    
     getAllMyLeaveRequests:(filter : any) => Promise<DpomainResponsePaginated<LeaveRequest[]>>,
     getAllLeaveRequests:(filter : any) => Promise<DpomainResponsePaginated<LeaveRequest[]>>,
     getLeaveRequestById:(id:number) => Promise<DomainResponse<LeaveRequest>>,

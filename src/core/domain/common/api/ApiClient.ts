@@ -1,5 +1,5 @@
 export interface RequestConfig extends RequestInit {
-  params?: Record<string, string | boolean | number>;
+  params?: Record<string, string | boolean | number | Array<string | number>>;
   responseType?: 'json' | 'blob' | 'text' | 'arrayBuffer';
   /** Timeout in ms before the request is aborted (default 60s) */
   timeout?: number;

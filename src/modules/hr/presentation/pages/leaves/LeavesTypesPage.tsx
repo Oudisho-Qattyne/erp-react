@@ -104,7 +104,7 @@ export default function LeavesTypesPage() {
       align: "center",
       render: (row) => (
         <div className="flex items-center justify-center gap-1">
-          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/hr/leaves/${row.id}`) }} title={t("common.view", "shared") || "عرض"} requiredPermission="hr.leave-types.view">
+          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); window.open(`/hr/leaves/${row.id}` , '_blank') }} title={t("common.view", "shared") || "عرض"} requiredPermission="hr.leave-types.view">
             <Eye size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); setSelectedId(row.id); setConfirmAction("archive") }} title={t("common.archive", "shared") || "أرشفة"} requiredPermission="hr.leave-types.update">
@@ -181,7 +181,7 @@ export default function LeavesTypesPage() {
         <DataTable loading={loading.findAll}
           columns={columns}
           data={items}
-          onRowClick={(row) => navigate(`/hr/leaves/${row.id}`)}
+          onRowClick={(row) => window.open(`/hr/leaves/${row.id}` , '_blank')}
           rowKey="id"
           sortColumn={sortColumn}
           sortOrder={sortOrder as any}

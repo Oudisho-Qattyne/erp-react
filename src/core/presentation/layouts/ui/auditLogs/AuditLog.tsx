@@ -26,7 +26,7 @@ interface AuditLogProps {
   isOpen: boolean;
   onClose: () => void;
   model: string;
-  modelId?: number;
+  modelId?: number | number[];
   module?: string;
   labels?: AuditLogLabels;
   translateField?: (key: string) => string;

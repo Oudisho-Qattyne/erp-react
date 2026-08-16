@@ -265,7 +265,7 @@ export function EmployeesPage() {
         <DataTable
           columns={columns}
           data={employees}
-          onRowClick={(row) => navigate(`/hr/employees/${row.id}`)}
+          onRowClick={(row) => window.open(`/hr/employees/${row.id}` , '_blank')}
           rowKey="id"
           sortColumn={Object.entries(SORT_FIELD_MAP).find(([, field]) => field === sortBy)?.[0] ?? undefined}
           sortOrder={sortOrder}

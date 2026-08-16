@@ -12,7 +12,8 @@ import { useManageUsers } from "../../hooks/user/userManageUsers"
 import { CreateUserForm } from "../../components/CreateUserForm"
 import { ShowUserDialog } from "../../components/ShowUserDialog"
 import type { User } from "../../../domain/entities/user/user"
-import { Search, Download, FileText, Plus, Filter, Eye, Pencil } from "lucide-react"
+import { Search, Download, FileText, Plus, Filter, Eye, Pencil, Lock } from "lucide-react"
+import { ChangePassword } from "../../components/ChangePassword"
 
 const statusStyles: Record<string, string> = {
   active: "bg-success/10 text-success border-success/20",
@@ -27,8 +28,8 @@ export function AllUsers() {
   const [localSearch, setLocalSearch] = useState("")
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [editUser, setEditUser] = useState<User | null>(null)
+  const [changePassword, setChangePassword] = useState<User | null>(null)
 
-  
   const {
     users,
     loading,
@@ -49,16 +50,17 @@ export function AllUsers() {
 
   useEffect(() => {
     getAllUsers()
-  } , [filter])
+  }, [filter])
+
   const columns: ColumnDef<User>[] = [
     { key: "id", label: "#", width: 60 },
     { key: "name", label: t("users.name", "users") || "Name", width: 180 },
     { key: "email", label: t("users.email", "users") || "Email", width: 200 },
-    { key: "mobile", label: t("users.mobile", "users") || "Mobile", width: 140 },
+    { key: "mobile", label: t("users.mobile", "users") || "Mobile", width: 120 },
     {
       key: "status",
       label: t("users.status", "users") || "Status",
-      width: 110,
+      width: 100,
       render: (row) => (
         <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold border ${statusStyles[row.status] || ""}`}>
           {t(`users.status_${row.status}`, "users") || row.status}
@@ -68,10 +70,10 @@ export function AllUsers() {
     {
       key: "role",
       label: t("users.role", "users") || "Role",
-      width: 120,
+      width: 100,
       render: (row) => (language === "ar" ? row.role?.display_name : row.role?.name) || "-",
     },
-    { key: "", label: t("users.employee_name", "users") || "Name", width: 180 , render:row => row.employee_first_name ?`${row.employee_first_name} ${row.employee_last_name}` : '-' },
+    { key: "", label: t("users.employee_name", "users") || "Name", width: 180, render: row => row.employee_first_name ? `${row.employee_first_name} ${row.employee_last_name}` : '-' },
     { key: "created_at", label: t("users.created_at", "users") || "Created At", width: 160, render: (row) => row.created_at },
     {
       key: "actions",
@@ -98,32 +100,45 @@ export function AllUsers() {
           >
             <Pencil size={16} />
           </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setChangePassword(row)}
+            title={t("common.change_password", "shared") || "Change Password"}
+            requiredPermission="users.users.edit"
+          >
+            <Lock size={16} />
+          </Button>
         </div>
       ),
     },
   ]
   const filterFields: FilterField[] = [
-    { name: "status", label: t("users.status", "users") || "Status", type: "select", options: [
-      { value: "", label: t("common.all", "shared") || "All" },
-      { value: "active", label: t("users.status_active", "users") || "Active" },
-      { value: "inactive", label: t("users.status_inactive", "users") || "Inactive" },
-      { value: "suspended", label: t("users.status_suspended", "users") || "Suspended" },
-    ]},
-    { name: "linked_to_user", label: t("users.linked_to_employee", "users") || "Linked to Employee", type: "select", options: [
-      { value: "", label: t("common.all", "shared") || "All" },
-      { value: "true", label: t("common.yes", "shared") || "Yes" },
-      { value: "false", label: t("common.no", "shared") || "No" },
-    ]},
+    {
+      name: "status", label: t("users.status", "users") || "Status", type: "select", options: [
+        { value: "", label: t("common.all", "shared") || "All" },
+        { value: "active", label: t("users.status_active", "users") || "Active" },
+        { value: "inactive", label: t("users.status_inactive", "users") || "Inactive" },
+        { value: "suspended", label: t("users.status_suspended", "users") || "Suspended" },
+      ]
+    },
+    {
+      name: "linked_to_user", label: t("users.linked_to_employee", "users") || "Linked to Employee", type: "select", options: [
+        { value: "", label: t("common.all", "shared") || "All" },
+        { value: "true", label: t("common.yes", "shared") || "Yes" },
+        { value: "false", label: t("common.no", "shared") || "No" },
+      ]
+    },
   ]
 
-    const handleApplyFilter = (values: Record<string, any>) => {
-        const parsed: Record<string, any> = { page: 1, per_page: filter.per_page }
-        for (const [key, val] of Object.entries(values)) {
-            if (val !== "" && val !== undefined) parsed[key] = val
-        }
-        setFilter(() => parsed as any)
-        setIsFilterOpen(false)
+  const handleApplyFilter = (values: Record<string, any>) => {
+    const parsed: Record<string, any> = { page: 1, per_page: filter.per_page }
+    for (const [key, val] of Object.entries(values)) {
+      if (val !== "" && val !== undefined) parsed[key] = val
     }
+    setFilter(() => parsed as any)
+    setIsFilterOpen(false)
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -201,7 +216,7 @@ export function AllUsers() {
             columns={columns}
             data={users}
             rowKey="id"
-            onRowClick={() => {}}
+            onRowClick={() => { }}
             loading={loading.getAllUsers}
             emptyMessage={t("users.no_data", "users") || "No users found"}
             pagination={{
@@ -244,7 +259,24 @@ export function AllUsers() {
           startEditing
           onClose={() => { setEditUser(null); getAllUsers() }}
         />
+
       )}
+
+      <Dialog isOpen={!!changePassword} onClose={() => setChangePassword(null)} title={t("common.change_password", "shared") || "تغير كلمة المرور"}>
+
+        {
+          changePassword &&
+
+
+          <ChangePassword
+            user={changePassword}
+            onSuccess={() => { setChangePassword(null); }}
+            onCancel={() => setChangePassword(null)}
+          />
+        }
+
+      </Dialog>
+
     </div>
   )
 }

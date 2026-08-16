@@ -7,3 +7,8 @@ export type CreateUserDto = Omit<User, 'id' | 'signature' | 'photo'| 'status' | 
 
 export type UpdateuserDto = Omit<CreateUserDto ,'password'>
 
+
+export type ChangePasswordDto = {
+    password:string
+    password_confirmation:string
+}

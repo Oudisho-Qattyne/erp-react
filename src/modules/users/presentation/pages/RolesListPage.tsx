@@ -76,7 +76,7 @@ export function RolesListPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate(`/users/roles/${row.id}`)}
+            onClick={() => window.open(`/users/roles/${row.id}` , '_blank')}
             title={t('common.view', 'shared') || 'View'}
             requiredPermission="users.roles.view"
           >

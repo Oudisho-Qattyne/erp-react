@@ -7,10 +7,10 @@ import { handleApiError } from "../../../../../core/presentation/utils/handleApi
 import { useIdempotency } from "../../../../../core/presentation/hooks/useIdempotency"
 import type { User } from "../../../domain/entities/user/user"
 import type { FilterUserDto } from "../../../application/dtos/user/filterUserDto"
-import type { CreateUserDto, UpdateuserDto } from "../../../application/dtos/user/userDto"
+import type { ChangePasswordDto, CreateUserDto, UpdateuserDto } from "../../../application/dtos/user/userDto"
 import { toast } from "sonner"
 
-const OP_KEYS = ["getAllUsers", "getCurrentUser", "createUser", "updateUser", "updateSignature", "exportUsersExcel", "exportUsersPdf", "linkUserToEmployee"] as const
+const OP_KEYS = ["getAllUsers", "getCurrentUser", "createUser", "updateUser", "changePassword", "updateSignature", "exportUsersExcel", "exportUsersPdf", "linkUserToEmployee"] as const
 
 function initRecord<T>(value: T): Record<string, T> {
   return Object.fromEntries(OP_KEYS.map((k) => [k, value]))
@@ -37,6 +37,7 @@ export interface UseManageUsersReturn {
   getCurrentUser: () => Promise<void>
   createUser: (data: CreateUserDto) => Promise<void>
   updateUser: (id: number, data: UpdateuserDto) => Promise<void>
+  changePassword: (id: number, data:ChangePasswordDto) => Promise<void>
   updateSignature: (file: File) => Promise<void>
   exportUsersExcel: () => Promise<void>
   exportUsersPdf: () => Promise<void>
@@ -113,7 +114,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
     setFnError("createUser", null)
     try {
       await idem.run('createUser', data, (key) => useCase.createUser(data, key))
-      toast.success(t('created', 'users'))
+      toast.success(t('users.created', 'users'))
       await getAllUsers()
     } catch (err: any) {
       setFnError("createUser", handleApiError(err, { module: "users" }))
@@ -128,7 +129,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
     setFnError("updateUser", null)
     try {
       await idem.run('updateUser', { id, data }, (key) => useCase.updateUser(id, data, key))
-      toast.success(t('updated', 'users'))
+      toast.success(t('users.updated', 'users'))
       await getAllUsers()
     } catch (err: any) {
       setFnError("updateUser", handleApiError(err, { module: "users" }))
@@ -138,12 +139,28 @@ export const useManageUsers = (): UseManageUsersReturn => {
     }
   }, [useCase, t, getAllUsers, idem])
 
+  const changePassword = useCallback(async (id: number, data: ChangePasswordDto) => {
+    setFnLoading("changePassword", true)
+    setFnError("changePassword", null)
+    try {
+      await idem.run('changePassword', { id, data }, (key) => useCase.changePassword(id, data, key))
+      toast.success(t('users.password_changed', 'users'))
+      await getAllUsers()
+    } catch (err: any) {
+      setFnError("changePassword", handleApiError(err, { module: "users" }))
+      throw err
+    } finally {
+      setFnLoading("changePassword", false)
+    }
+  }, [useCase, t, getAllUsers, idem])
+
+
   const updateSignature = useCallback(async (file: File) => {
     setFnLoading("updateSignature", true)
     setFnError("updateSignature", null)
     try {
       await idem.run('uploadSignature', { signature: file }, (key) => useCase.updateSignature(file, key))
-      toast.success(t('signature_updated', 'users'))
+      toast.success(t('users.signature_updated', 'users'))
     } catch (err: any) {
       setFnError("updateSignature", handleApiError(err, { module: "users" }))
       throw err
@@ -166,7 +183,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
-      toast.success(t('exported', 'users'))
+      toast.success(t('users.exported', 'users'))
     } catch (err: any) {
       setFnError("exportUsersExcel", handleApiError(err, { module: "users" }))
       throw err
@@ -189,7 +206,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
       a.click()
       document.body.removeChild(a)
       URL.revokeObjectURL(url)
-      toast.success(t('exported', 'users'))
+      toast.success(t('users.exported', 'users'))
     } catch (err: any) {
       setFnError("exportUsersPdf", handleApiError(err, { module: "users" }))
       throw err
@@ -203,7 +220,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
     setFnError("linkUserToEmployee", null)
     try {
       await idem.run('linkUserToEmployee', { userId, employeeId }, (key) => useCase.linkUserToEmployee(userId, employeeId, key))
-      toast.success(t('linked', 'users'))
+      toast.success(t('users.linked', 'users'))
     } catch (err: any) {
       setFnError("linkUserToEmployee", handleApiError(err, { module: "users" }))
       throw err
@@ -232,6 +249,7 @@ export const useManageUsers = (): UseManageUsersReturn => {
     getCurrentUser,
     createUser,
     updateUser,
+    changePassword,
     updateSignature,
     exportUsersExcel,
     exportUsersPdf,

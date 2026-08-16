@@ -7,9 +7,15 @@ import type { IAuditLogsRepository } from "../../domain/repositories/IAuditLogsR
 export function createAuditLogsRepository(apiClieint: ApiClient): IAuditLogsRepository {
     const baseUrl = "/shared-kernal/audit-logs"
     return {
-        getAuditLogs: (model: string, modelId?: number, page?: number, perPage?: number) => {
-            const params: Record<string, string | boolean | number> = { model };
-            if (modelId != null) params.model_id = modelId;
+        getAuditLogs: (model: string, modelId?: number | number[], page?: number, perPage?: number) => {
+            const params: Record<string, string | boolean | number | Array<string | number>> = { model };
+            if (modelId != null) {
+                if (Array.isArray(modelId)) {
+                    params['model_id[]'] = modelId;
+                } else {
+                    params.model_id = modelId;
+                }
+            }
             if (page != null) params.page = page;
             if (perPage != null) params.perPage = perPage;
             return apiClieint.get<DpomainResponsePaginated<AuditLog[]>>(baseUrl, { params });

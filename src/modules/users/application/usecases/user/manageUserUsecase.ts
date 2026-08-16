@@ -3,7 +3,7 @@ import type { DpomainResponsePaginated } from "../../../../hr/domain/entities/co
 import type { User } from "../../../domain/entities/user/user";
 import type { IUserRepository } from "../../../domain/repositories/user/IUserRepository";
 import type { FilterUserDto } from "../../dtos/user/filterUserDto";
-import type { CreateUserDto, UpdateuserDto } from "../../dtos/user/userDto";
+import type { ChangePasswordDto, CreateUserDto, UpdateuserDto } from "../../dtos/user/userDto";
 
 
 export const createManageUserUseCase = (
@@ -25,6 +25,11 @@ export const createManageUserUseCase = (
     updateUser(id: number, data: UpdateuserDto, idempotencyKey?: string): Promise<DomainResponse<User>> {
       return repository.updateUser(id, data, idempotencyKey);
     },
+
+    changePassword(id: number, data: ChangePasswordDto, idempotencyKey?: string): Promise<DomainResponse<User>> {
+      return repository.changePassword(id, data, idempotencyKey);
+    },
+
     updateSignature( file: File, idempotencyKey?: string): Promise<DomainResponse<User>> {
         return repository.updateSignature(file, idempotencyKey);
       },

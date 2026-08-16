@@ -14,7 +14,8 @@ export const createUserRepository = (apiClient: ApiClient): IUserRepository => {
 
            createUser : (user : any, idempotencyKey?: string) => apiClient.post<DomainResponse<User>>(baseUrl , user, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined),
            updateUser : (id :number , user:any, idempotencyKey?: string) => apiClient.post<DomainResponse<User>>(`${baseUrl}/${id}` , user, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined),
-
+           changePassword : (id :number , newPassword:any, idempotencyKey?: string) => apiClient.post<DomainResponse<User>>(`${baseUrl}/${id}/password` , newPassword, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined),
+           
            updateSignature : (signature : File, idempotencyKey?: string) => {
             const formData = new FormData();
             formData.append('signature', signature);

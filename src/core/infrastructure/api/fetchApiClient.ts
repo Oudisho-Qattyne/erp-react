@@ -20,11 +20,15 @@ export function createFetchApiClient(
 ): ApiClient {
   const DEFAULT_TIMEOUT = 60_000;
 
-  const buildUrl = (url: string, params?: Record<string, string | boolean | number>): string => {
+  const buildUrl = (url: string, params?: Record<string, string | boolean | number | Array<string | number>>): string => {
     const fullUrl = new URL(baseURL + url);
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
-        fullUrl.searchParams.append(key, String(value));
+        if (Array.isArray(value)) {
+          value.forEach((item) => fullUrl.searchParams.append(key, String(item)));
+        } else {
+          fullUrl.searchParams.append(key, String(value));
+        }
       });
     }
     return fullUrl.toString();

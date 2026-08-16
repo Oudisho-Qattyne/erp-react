@@ -91,6 +91,8 @@
     "process_error": "فشلت معالجة طلب الإجازة",
     "create_title": "إنشاء طلب إجازة",
     "edit_title": "تعديل طلب الإجازة",
+    "create_for_employee_title": "إنشاء طلب إجازة لموظف",
+    "select_employee": "اختيار موظف",
     "select_leave_type": "اختيار نوع الإجازة",
     "request_details": "تفاصيل الطلب",
     "start_date": "تاريخ ووقت البداية",
@@ -141,6 +143,7 @@
       "end_date_required": "تاريخ النهاية مطلوب",
       "requested_units_min": "الوحدات المطلوبة يجب أن تكون 1 على الأقل",
       "reason_required": "السبب مطلوب",
+      "employee_required": "الموظف مطلوب",
       "end_date_after_start": "تاريخ النهاية يجب أن يكون بعد أو يساوي تاريخ البداية"
     }
   },

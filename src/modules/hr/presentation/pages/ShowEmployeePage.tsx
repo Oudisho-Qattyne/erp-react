@@ -44,6 +44,8 @@ export function ShowEmployeePage() {
   const [employeePhotoPickerOpen, setEmployeePhotoPickerOpen] = useState<boolean>(false)
   const [statusLogsOpen, setStatusLogsOpen] = useState<boolean>(false)
   const [jobStatusLogsOpen, setJobStatusLogsOpen] = useState<boolean>(false)
+  const [auditOpen, setAuditOpen] = useState<boolean>(false)
+
   const storage = useStorage();
 
   const [employee, setEmployee] = useState<EmployeeData | null>(null);
@@ -78,6 +80,11 @@ export function ShowEmployeePage() {
     }
   }, [id]);
 
+console.log(
+  employee &&
+  employee.spouses.map(s => s.id)
+
+);
   const handlePhotoSelect = async (items: any[]) => {
     if (items.length === 0) return;
     setPhotoUpdating(true);
@@ -124,6 +131,10 @@ export function ShowEmployeePage() {
               {t('show_employee.folder', 'hr') || 'مجلد الموظف'}
             </Button>
           )}
+          <Button variant="outline" onClick={() => setAuditOpen(true)} requiredPermission="shared.audit-logs.view">
+            <History size={18} />
+            {t('employees.edit_log', 'hr') || 'سجل التعديل'}
+          </Button>
           <Button variant="primary" onClick={() => navigate(`/hr/employees/${id}/edit`)} requiredPermission="hr.employees.update">
             {t('show_employee.edit', 'hr') || 'تعديل الموظف'}
           </Button>
@@ -227,7 +238,7 @@ export function ShowEmployeePage() {
                         ) : '-'
                       } />
                     </div>
-                    <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setSpouse(id)} />
+                    <History className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setSpouse(employee.spouses.map(s => s.id))} />
 
                   </div>
                   {/* keep in mind */}
@@ -304,7 +315,7 @@ export function ShowEmployeePage() {
                   <Briefcase size={20} className="text-primary" />
                   {t('show_employee.employment_details', 'hr') || 'التفاصيل الوظيفية'}
                 </div>
-                <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setEmploymenstDetails(id)} />
+                <History className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setEmploymenstDetails(id)} />
               </div>
             </h2>
             {employee.employment_details ? (
@@ -333,7 +344,7 @@ export function ShowEmployeePage() {
                   <GraduationCap size={20} className="text-primary" />
                   {t('show_employee.education_details', 'hr') || 'المؤهلات العلمية'}
                 </div>
-                <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setEducation(id)} />
+                <History className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setEducation(employee.educations.map(e => e.id))} />
               </div>
             </h2>
             {employee.educations && employee.educations.length > 0 ? (
@@ -378,7 +389,7 @@ export function ShowEmployeePage() {
                     <User size={20} className="text-primary" />
                     {t('employees.children', 'hr') || 'الأولاد'}
                   </div>
-                  <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setChild(id)} />
+                  <History className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setChild(employee.children.map(c => c.id))} />
                 </div>
 
               </h2>
@@ -413,10 +424,31 @@ export function ShowEmployeePage() {
         <JobStatusLogsDialog isOpen={jobStatusLogsOpen} onClose={() => setJobStatusLogsOpen(false)} employeeId={employee.id} />
       )}
       <AuditLog
+        isOpen={auditOpen}
+        onClose={() => setAuditOpen(false)}
+        model="employee"
+        modelId={Number(id)}
+        module="hr"
+        labels={{
+          title: t('employees.edit_log', 'hr') || 'Edit Log',
+          event: t('employees.event', 'hr') || 'Event',
+          created_at: t('employees.created_at', 'hr') || 'Created At',
+          changed_by: t('employees.changed_by', 'hr') || 'Changed By',
+          changes: t('employees.changes', 'hr') || 'Changes',
+          field: t('employees.field', 'hr') || 'Field',
+          old_value: t('employees.old_value', 'hr') || 'Old Value',
+          new_value: t('employees.new_value', 'hr') || 'New Value',
+          no_records: t('employees.no_edit_log', 'hr') || 'No edit logs found',
+          subject_id: t('employees.subject_id', 'hr') || 'Employee ID',
+        }}
+        translateField={(key) => t(`employees.${key}`, 'hr') || key}
+      // translateValues={handleTranslateValues}
+      />
+      <AuditLog
         isOpen={!!child}
         onClose={() => setChild(null)}
         model="employee_child"
-        modelId={Number(id)}
+        modelId={child}
         module="hr"
         labels={{
           title: t('employees.edit_log', 'hr') || 'Edit Log',
@@ -438,7 +470,7 @@ export function ShowEmployeePage() {
         isOpen={!!education}
         onClose={() => setEducation(null)}
         model="employee_education"
-        modelId={Number(id)}
+        modelId={education}
         module="hr"
         labels={{
           title: t('employees.edit_log', 'hr') || 'Edit Log',
@@ -460,7 +492,7 @@ export function ShowEmployeePage() {
         isOpen={!!spouse}
         onClose={() => setSpouse(null)}
         model="employee_spouse"
-        modelId={Number(id)}
+        modelId={spouse}
         module="hr"
         labels={{
           title: t('employees.edit_log', 'hr') || 'Edit Log',
@@ -481,7 +513,7 @@ export function ShowEmployeePage() {
         isOpen={!!employmenstDetails}
         onClose={() => setEmploymenstDetails(null)}
         model="employee_employment_detail"
-        modelId={Number(id)}
+        modelId={employmenstDetails}
         module="hr"
         labels={{
           title: t('employees.edit_log', 'hr') || 'Edit Log',

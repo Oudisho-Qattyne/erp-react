@@ -172,7 +172,7 @@ export function UserLeaveRequests() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={(e) => { e.stopPropagation(); navigate(`/hr/leave-requests/${row.id}`) }}
+            onClick={(e) => { e.stopPropagation(); window.open(`/hr/leave-requests/${row.id}` , '_blank') }}
             title={t("common.view", "shared") || "View"}
           >
             <Eye size={16} />
@@ -189,7 +189,7 @@ export function UserLeaveRequests() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={(e) => { e.stopPropagation(); navigate(`/hr/leave-requests/${row.id}/edit`) }}
+              onClick={(e) => { e.stopPropagation(); window.open(`/hr/leave-requests/${row.id}/edit` , '_blank') }}
               title={t("common.edit", "shared") || "Edit"}
             >
               <Pencil size={16} />
@@ -249,7 +249,7 @@ export function UserLeaveRequests() {
                 data={myLeaveRequests}
                 rowKey="id"
                 loading={loading.findAllMyLeaveRequests}
-                onRowClick={(row) => navigate(`/hr/leave-requests/${row.id}`)}
+                onRowClick={(row) => window.open(`/hr/leave-requests/${row.id}` , '_blank')}
                 emptyMessage={t("leave_request.no_data", "hr") || "No leave requests found"}
             pagination={{
               page: pagination.currentPage,

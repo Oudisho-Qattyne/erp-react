@@ -106,6 +106,7 @@
     "group_security": "الأمان",
     "password": "كلمة المرور",
     "confirm_password": "تأكيد كلمة المرور",
+    "password_changed": "تم تغيير كلمة المرور بنجاح",
     "linked_to_employee": "مرتبط بموظف",
     "permissions": "الصلاحيات",
     "no_permissions": "لا توجد صلاحيات مخصصة",

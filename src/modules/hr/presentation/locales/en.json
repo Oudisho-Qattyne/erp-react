@@ -91,6 +91,8 @@
     "process_error": "Failed to process leave request",
     "create_title": "Create Leave Request",
     "edit_title": "Edit Leave Request",
+    "create_for_employee_title": "Create Leave Request for Employee",
+    "select_employee": "Select Employee",
     "select_leave_type": "Select Leave Type",
     "request_details": "Request Details",
     "start_date": "Start Date & Time",
@@ -141,6 +143,7 @@
       "end_date_required": "End date is required",
       "requested_units_min": "Requested units must be at least 1",
       "reason_required": "Reason is required",
+      "employee_required": "Employee is required",
       "end_date_after_start": "End date must be on or after start date"
     }
   },

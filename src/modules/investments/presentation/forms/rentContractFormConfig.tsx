@@ -8,6 +8,17 @@ import { getLocalizedName } from '../../../../core/presentation/utils/helpes';
 
 type Translate = (key: string, module?: string) => string;
 
+const normalizeDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  const isoMatch = dateStr.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (isoMatch) return isoMatch[1];
+  const parts = dateStr.split('-');
+  if (parts.length === 3 && parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+  return dateStr;
+};
+
 interface RentContractFormDeps {
   industries: RentContractIndustry[];
   createIndustry: UseEntityCrudReturn<RentContractIndustry>['create'];
@@ -59,8 +70,8 @@ export const buildRentContractDefaultValues = (contract: RentContract): Record<s
   renter_name: contract.renter_name,
   renter_phone: contract.renter_phone,
   rent_contract_number: contract.rent_contract_number,
-  rent_contract_date: contract.rent_contract_date,
+  rent_contract_date: normalizeDate(contract.rent_contract_date),
   rent_area: contract.rent_area,
-  rent_contract_duration: contract.rent_contract_duration,
+  rent_contract_duration: normalizeDate(contract.rent_contract_duration),
   rent_contract_industry_id: contract.rent_contract_industry_id ?? null,
 });

@@ -106,6 +106,7 @@
     "group_security": "Security",
     "password": "Password",
     "confirm_password": "Confirm Password",
+    "password_changed": "Password changed successfully",
     "linked_to_employee": "Linked to Employee",
     "permissions": "Permissions",
     "no_permissions": "No permissions assigned",

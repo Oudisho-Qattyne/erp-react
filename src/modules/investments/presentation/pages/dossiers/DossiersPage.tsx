@@ -237,7 +237,7 @@ export function DossiersPage() {
         <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
           <Button variant="ghost" size="sm" onClick={() => {
             const pid = row.plot?.id || row.plot_id;
-              navigate(`/investments/plots/${pid}/dossiers/${row.id}`);
+            window.open(`/investments/plots/${pid}/dossiers/${row.id}` ,'_blank');
           }} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.plot-dossier.view"
             disabled={!row.plot?.id}>
             <Eye size={16} />

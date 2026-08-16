@@ -1,12 +1,13 @@
 import type { ILeaveRequestRepository } from "../../../domain/repositories/leaveRequestRepository"
 import type { LeaveRequestProcessOperations } from "../../../domain/valueObjects/leaveRequest/leaveRequestProcessOperations"
 import type { FilterLeaveRequestDto } from "../../dtos/leaveRequest/FilterLeaveRequestDto"
-import type { CreateLeaveRequestDto, UpdateLeaveRequestDto } from "../../dtos/leaveRequest/leaveRequest"
+import type { CreateEmployeeLeaveRequestDto, CreateLeaveRequestDto, UpdateLeaveRequestDto } from "../../dtos/leaveRequest/leaveRequest"
 
 export const createManageLeaveRequestUseCase = (repository: ILeaveRequestRepository) => {
   return {
         createLeaveRequset : (leaveRequest : CreateLeaveRequestDto, idempotencyKey?: string) => repository.createLeaveRequest(leaveRequest, idempotencyKey),
-
+        createEmployeeLeaveRequest : (leaveRequest : CreateEmployeeLeaveRequestDto, idempotencyKey?: string) => repository.createLeaveRequest(leaveRequest, idempotencyKey),
+        
         findAllEmployeeLeaveRequests : (filter : FilterLeaveRequestDto) => repository.getAllLeaveRequests(filter),
         findAllMyLeaveRequests : (filter : FilterLeaveRequestDto) => repository.getAllMyLeaveRequests(filter),
         findLeaveRequestById : (id:number) => repository.getLeaveRequestById(id),

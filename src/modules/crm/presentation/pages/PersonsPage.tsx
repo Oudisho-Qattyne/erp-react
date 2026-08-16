@@ -74,7 +74,7 @@ export function PersonsPage() {
             requiredPermission={config.permission}
             onClick={(e) => {
               e.stopPropagation()
-              navigate(config.resolve(row.id))
+              window.open(config.resolve(row.id) , '_blank')
             }}
           >
             <Eye size={14} />
@@ -105,7 +105,7 @@ export function PersonsPage() {
   const handleApplyFilter = (values: Record<string, any>) => {
     const parsed: Partial<PersonFilters> = { page: 1, per_page: filter.per_page }
     for (const [key, val] of Object.entries(values)) {
-      if (val !== "" && val !== undefined) parsed[key as keyof PersonFilters] = val as any
+      if (val !== "" && val !== undefined) (parsed as Record<string, unknown>)[key] = val
     }
     setFilter(parsed)
     setIsFilterOpen(false)

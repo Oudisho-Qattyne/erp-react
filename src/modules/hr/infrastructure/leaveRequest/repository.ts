@@ -10,6 +10,7 @@ export const createLeaveRequesteRepository = (apiClient: ApiClient): ILeaveReque
 
 return{
     createLeaveRequest : (leaveRequest : any, idempotencyKey?: string) => apiClient.post<DomainResponse<LeaveRequest>>(baseUrl , leaveRequest, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined),
+    createEmployeeLeaveRequest : (leaveRequest : any, idempotencyKey?: string) => apiClient.post<DomainResponse<LeaveRequest>>(baseUrl , leaveRequest, idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined),
 
     getAllLeaveRequests:(filter : any) => apiClient.get<DpomainResponsePaginated<LeaveRequest[]>>(baseUrl , {params:filter}),
     getAllMyLeaveRequests:(filter : any) => apiClient.get<DpomainResponsePaginated<LeaveRequest[]>>(`${baseUrl}/my` , {params:filter}),

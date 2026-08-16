@@ -226,7 +226,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       width: 140,
       render: (row: Dossier) => (
         <div className="flex items-center justify-center gap-1">
-          <Button variant="ghost" size="sm" onClick={() => navigate(`/investments/plots/${plotId}/dossiers/${row.id}`)}
+          <Button variant="ghost" size="sm" onClick={() => window.open(`/investments/plots/${plotId}/dossiers/${row.id}` , '_blank')}
             title={t('common.view', 'shared') || 'View'}
             requiredPermission="investments.plot-dossier.view">
             <Eye size={16} />

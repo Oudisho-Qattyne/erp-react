@@ -6,12 +6,12 @@ import { createManageLeaveRequestUseCase } from "../../../application/usecases/l
 import { handleApiError } from "../../../../../core/presentation/utils/handleApiError"
 import type { LeaveRequest } from "../../../domain/entities/leaveRequest/leaveRequest"
 import type { FilterLeaveRequestDto } from "../../../application/dtos/leaveRequest/FilterLeaveRequestDto"
-import type { CreateLeaveRequestDto, UpdateLeaveRequestDto } from "../../../application/dtos/leaveRequest/leaveRequest"
+import type { CreateEmployeeLeaveRequestDto, CreateLeaveRequestDto, UpdateLeaveRequestDto } from "../../../application/dtos/leaveRequest/leaveRequest"
 import type { LeaveRequestProcessOperations } from "../../../domain/valueObjects/leaveRequest/leaveRequestProcessOperations"
 import { toast } from "sonner"
 import { useIdempotency } from "../../../../../core/presentation/hooks/useIdempotency"
 
-const OP_KEYS = ["findAllMyLeaveRequests", "findAllEmployeeLeaveRequests", "findLeaveRequestById", "createLeaveRequest", "updateLeaveRequest", "processLeaveRequest"] as const
+const OP_KEYS = ["findAllMyLeaveRequests", "findAllEmployeeLeaveRequests", "findLeaveRequestById", "createLeaveRequest", "createEmployeeLeaveRequest" , "updateLeaveRequest", "processLeaveRequest"] as const
 
 function initRecord<T>(value: T): Record<string, T> {
   return Object.fromEntries(OP_KEYS.map((k) => [k, value]))
@@ -39,6 +39,7 @@ export interface UseLeaveRequestReturn {
   findAllEmployeeLeaveRequests: (employeeId?: number) => Promise<void>
   findLeaveRequestById: (id: number) => Promise<void>
   createLeaveRequest: (data: CreateLeaveRequestDto) => Promise<void>
+  createEmployeeLeaveRequest:(data: CreateEmployeeLeaveRequestDto) => Promise<void>
   updateLeaveRequest: (id: number, data: UpdateLeaveRequestDto) => Promise<void>
   processLeaveRequest: (id: number, operation: LeaveRequestProcessOperations, reviewNotes: string) => Promise<void>
   setSearch: (search: string) => void
@@ -146,10 +147,24 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
       await idem.run('create', data, (key) => useCase.createLeaveRequset(data, key))
       toast.success(t("leave_request.create_success", "hr"))
     } catch (err: any) {
-      setFnError("createLeaveRequest", handleApiError(err, { module: "hr" }))
+      setFnError("createLeaveRequest", handleApiError(err, { module: "hr" , passThrough:true}))
       throw err
     } finally {
       setFnLoading("createLeaveRequest", false)
+    }
+  }, [useCase, t, idem])
+
+  const createEmployeeLeaveRequest = useCallback(async (data: CreateEmployeeLeaveRequestDto) => {
+    setFnLoading("createEmployeeLeaveRequest", true)
+    setFnError("createEmployeeLeaveRequest", null)
+    try {
+      await idem.run('create', data, (key) => useCase.createEmployeeLeaveRequest(data, key))
+      toast.success(t("leave_request.create_success", "hr"))
+    } catch (err: any) {
+      setFnError("createEmployeeLeaveRequest", handleApiError(err, { module: "hr" , passThrough:true }))
+      throw err
+    } finally {
+      setFnLoading("createEmployeeLeaveRequest", false)
     }
   }, [useCase, t, idem])
 
@@ -203,6 +218,7 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
     findAllEmployeeLeaveRequests,
     findLeaveRequestById,
     createLeaveRequest,
+    createEmployeeLeaveRequest,
     updateLeaveRequest,
     processLeaveRequest,
     setSearch,

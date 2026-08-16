@@ -104,7 +104,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
       width: 130,
       render: (row: Facility) => (
         <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
-          <Button variant="ghost" size="sm" onClick={() => navigate(`/investments/plots/${plotId}/dossiers/${dossierId}/facilities/${row.id}`)} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.facilities.view">
+          <Button variant="ghost" size="sm" onClick={() => window.open(`/investments/plots/${plotId}/dossiers/${dossierId}/facilities/${row.id}` , '_blank')} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.facilities.view">
             <Eye size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setEditingFacility(row)} title={t('common.edit', 'shared') || 'Edit'} requiredPermission="investments.facilities.update">

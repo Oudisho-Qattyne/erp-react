@@ -18,7 +18,8 @@ import Input from "../../../../../core/presentation/layouts/ui/inputs/Input"
 import { inputBaseClasses } from "../../../../../core/presentation/layouts/ui/inputs/styles"
 import type { UseFormReturn } from "react-hook-form"
 import { AuditLog } from "../../../../../core/presentation/layouts/ui/auditLogs/AuditLog"
-import { User, X, FileText, Filter, Search, Eye, Check, X as XIcon, History } from "lucide-react"
+import { CreateEmployeeLeaveRequestDialog } from "./CreateEmployeeLeaveRequestDialog"
+import { User, X, FileText, Filter, Search, Eye, Check, X as XIcon, History, Plus } from "lucide-react"
 
 const PENDING_STATUS = "pending"
 
@@ -33,7 +34,6 @@ const LEAVE_REQUEST_STATUSES = ["draft", "pending", "approved", "rejected", "can
 
 export const EmployeeLeaveRequests = () => {
     const { t, language } = useLanguage()
-    const navigate = useNavigate()
     const { hasPermission } = useAuth()
     const { employeeLeaveRequests, findAllEmployeeLeaveRequests, loading, error, pagination, filter, setPage, setFilter, resetFilter, setSearch, processLeaveRequest } = useLeaveRequest()
 
@@ -47,6 +47,7 @@ export const EmployeeLeaveRequests = () => {
     const [leaveTypePickerOpen, setLeaveTypePickerOpen] = useState(false)
     const [selectedLeaveTypeName, setSelectedLeaveTypeName] = useState<string | undefined>("")
     const [auditItem, setAuditItem] = useState<LeaveRequest | null>(null)
+    const [createDialogOpen, setCreateDialogOpen] = useState(false)
     const formRef = useRef<UseFormReturn | null>(null)
     const handleSearch = () => setSearch(localSearch)
 
@@ -224,7 +225,7 @@ export const EmployeeLeaveRequests = () => {
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={(e) => { e.stopPropagation(); navigate(`/hr/employee-leave-requests/${row.id}`) }}
+                        onClick={(e) => { e.stopPropagation(); window.open(`/hr/employee-leave-requests/${row.id}` , "_blank") }}
                             title={t("common.view", "shared") || "View"}
                     >
                         <Eye size={16} />
@@ -266,7 +267,12 @@ export const EmployeeLeaveRequests = () => {
 
     return (
         <div className="p-6 space-y-6">
-            <h1 className="text-2xl font-bold">{t("employee_leave_requests.title", "hr") || "Employee Leave Requests"}</h1>
+            <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold">{t("employee_leave_requests.title", "hr") || "Employee Leave Requests"}</h1>
+                <Button variant="primary" onClick={() => setCreateDialogOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="hr.leave-requests.manage">
+                    {t("leave_request.new_request", "hr") || "New Request"}
+                </Button>
+            </div>
 
             {error.findAllEmployeeLeaveRequests ? (
                 <ErrorState message={error.findAllEmployeeLeaveRequests} onRetry={() => findAllEmployeeLeaveRequests()} />
@@ -297,7 +303,7 @@ export const EmployeeLeaveRequests = () => {
                         data={employeeLeaveRequests}
                         rowKey="id"
                         loading={loading.findAllEmployeeLeaveRequests}
-                        onRowClick={(row) => navigate(`/hr/employee-leave-requests/${row.id}`)}
+                        onRowClick={(row) => window.open(`/hr/employee-leave-requests/${row.id}` , '_blank')}
                         emptyMessage={t("leave_request.no_data", "hr") || "No leave requests found"}
                         pagination={{
                             page: pagination.currentPage,
@@ -401,6 +407,12 @@ export const EmployeeLeaveRequests = () => {
                 }}
                 translateField={(key) => t(`leave_request.${key}`, "hr") || key}
                 translateValues={handleTranslateValues}
+            />
+
+            <CreateEmployeeLeaveRequestDialog
+                isOpen={createDialogOpen}
+                onClose={() => setCreateDialogOpen(false)}
+                onSuccess={() => { findAllEmployeeLeaveRequests(); setFilter({ page: 1 }) }}
             />
         </div>
     )

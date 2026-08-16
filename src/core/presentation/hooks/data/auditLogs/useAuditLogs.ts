@@ -28,7 +28,7 @@ export interface UseAuditLogsReturn {
   loading: boolean;
   error: string | null;
   pagination?: PaginationInfo;
-  getAuditLogs: (model: string, modelId?: number, page?: number, perPage?: number) => Promise<void>;
+  getAuditLogs: (model: string, modelId?: number | number[], page?: number, perPage?: number) => Promise<void>;
   clearError: () => void;
 }
 
@@ -45,7 +45,7 @@ export const useAuditLogs = (): UseAuditLogsReturn => {
 
   const clearError = useCallback(() => setError(null), []);
 
-  const getAuditLogs = useCallback(async (model: string, modelId?: number, page?: number, perPage?: number) => {
+  const getAuditLogs = useCallback(async (model: string, modelId?: number | number[], page?: number, perPage?: number) => {
     setLoading(true);
     setError(null);
     try {

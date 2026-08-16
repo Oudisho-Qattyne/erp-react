@@ -8,9 +8,9 @@ export interface IUserRepository {
 
     createUser: (user: any, idempotencyKey?: string) => Promise<DomainResponse<User>>;
     updateUser: (id: number, user: any, idempotencyKey?: string) => Promise<DomainResponse<User>>;
+    changePassword: (id: number, newPassword: any, idempotencyKey?: string) => Promise<DomainResponse<User>>;
 
     updateSignature: (signature: File, idempotencyKey?: string) => Promise<DomainResponse<User>>;
-
     exportUsersExcel: (idempotencyKey?: string) => Promise<DomainResponse<Blob>>;
     exportUsersPdf: (idempotencyKey?: string) => Promise<DomainResponse<Blob>>;
 

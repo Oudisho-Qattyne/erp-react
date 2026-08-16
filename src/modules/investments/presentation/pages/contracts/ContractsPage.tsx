@@ -172,7 +172,7 @@ export function ContractsPage() {
         const pid = row.plot_id || row.dossier?.plot_id;
         const label = p?.code || p?.identifier || pid?.toString() || '—';
         return pid ? (
-          <button type="button" onClick={() => navigate(`/investments/plots/${pid}/edit`)} className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
+          <button type="button" onClick={() => window.open(`/investments/plots/${pid}/edit` , '_blank')} className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
             <Eye size={14} />
             <span>{label}</span>
           </button>
@@ -188,7 +188,7 @@ export function ContractsPage() {
         const pid = row.plot_id || row.dossier?.plot_id;
         const label = row.dossier?.dossier_number || did?.toString() || '—';
         return pid && did ? (
-          <button type="button" onClick={() => navigate(`/investments/plots/${pid}/dossiers/${did}`)} className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
+          <button type="button" onClick={() => window.open(`/investments/plots/${pid}/dossiers/${did}` ,'_blank')} className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
             <Eye size={14} />
             <span>{label}</span>
           </button>
@@ -206,7 +206,7 @@ export function ContractsPage() {
           <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
             <Button variant="ghost" size="sm" onClick={() => {
               if (pid && did) {
-                navigate(`/investments/plots/${pid}/dossiers/${did}/contract/${row.id}`);
+                window.open(`/investments/plots/${pid}/dossiers/${did}/contract/${row.id}` , '_blank');
               }
             }} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.contracts.view">
               <Eye size={16} />
