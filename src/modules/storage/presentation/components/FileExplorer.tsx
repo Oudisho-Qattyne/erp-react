@@ -342,7 +342,7 @@ export function FileExplorer({ folderId, onSelectionChange, hideToolbar, fileTyp
 
     return (
         <div className="h-full relative">
-            <div className="wx-willow-theme">
+            <div className="wx-willow-theme h-full">
                 <Willow>
                     <Locale words={language === 'ar' ? ar : en} optional={true}>
                         <div className="relative h-full flex flex-col">

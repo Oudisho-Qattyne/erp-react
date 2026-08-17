@@ -1,4 +1,7 @@
 /* storage-explorer.css */
+.wx-willow-theme {
+    height: 100%;
+}
 .svar-filemanager__toolbar {
     display: none !important;
   }

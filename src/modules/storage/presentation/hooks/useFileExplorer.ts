@@ -191,6 +191,8 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         setFunctionError("createFolder", null);
         try {
             let parentId: string | undefined | null = null;
+            console.log(rootFolder);
+            
             if (rootFolder) {
                 if (parent == "/") {
                     parentId = rootFolder._id;
@@ -204,13 +206,14 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             }
             else {
                 const storageItem = api.getFile(parent);
-                if (storageItem) {
+                console.log(storageItem , parent);
+               if (storageItem) {
                     parentId = storageItem?._id;
                 }
             }
-            if (parentId !== null && parentId !== undefined) {
-                await idem.run('createFolder', { parentId, name }, (key) => useCase.createFolder(parentId, name, key));
-            }
+
+                await idem.run('createFolder', { parentId, name }, (key) => useCase.createFolder(parentId ?? null, name, key));
+            
             await loadFolderByPath(parent, api);
             toast.success(t('toasts.folder_created', 'storage').replace('{name}', name));
         } catch (err: any) {
@@ -284,9 +287,9 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
                     parentId = storageItem?._id;
                 }
             }
-            if (parentId !== null && parentId !== undefined) {
-                await idem.run('uploadFile', { parentId, file, name, isSecure }, (key) => useCase.uploadFile(parentId, file, name, isSecure, key));
-            }
+           
+                await idem.run('uploadFile', { parentId, file, name, isSecure }, (key) => useCase.uploadFile(parentId ?? null, file, name, isSecure, key));
+            
 
             await loadFolderByPath(parent, api);
             toast.success(t('toasts.file_uploaded', 'storage').replace('{name}', name));

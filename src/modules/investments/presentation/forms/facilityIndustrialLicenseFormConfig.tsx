@@ -14,6 +14,17 @@ import { getLocalizedName } from '../../../../core/presentation/utils/helpes';
 
 type Translate = (key: string, module?: string) => string;
 
+const normalizeDate = (dateStr: string) => {
+  if (!dateStr) return '';
+  const isoMatch = dateStr.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (isoMatch) return isoMatch[1];
+  const parts = dateStr.split('-');
+  if (parts.length === 3 && parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
+    return `${parts[2]}-${parts[1]}-${parts[0]}`;
+  }
+  return dateStr;
+};
+
 interface FacilityIndustrialLicenseFormDeps {
   categories: IndustryCategory[];
   createCategory: UseEntityCrudReturn<IndustryCategory>['create'];
@@ -148,7 +159,7 @@ export const buildFacilityIndustrialLicenseDefaultValues = (license: FacilityInd
   industry_category_id: license.industry_category?.id ?? null,
   industry_type_id: license.industry_type?.id ?? null,
   industrial_decision_number: license.industrial_decision_number,
-  industrial_decision_date: license.industrial_decision_date,
+  industrial_decision_date: normalizeDate(license.industrial_decision_date),
   industrial_decision_type_id: license.industrial_decision_type?.id ?? null,
   industrial_license_source_id: license.industrial_license_source?.id ?? null,
 });

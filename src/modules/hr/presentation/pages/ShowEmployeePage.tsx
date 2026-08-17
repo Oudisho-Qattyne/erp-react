@@ -135,7 +135,7 @@ console.log(
             <History size={18} />
             {t('employees.edit_log', 'hr') || 'سجل التعديل'}
           </Button>
-          <Button variant="primary" onClick={() => navigate(`/hr/employees/${id}/edit`)} requiredPermission="hr.employees.update">
+          <Button variant="primary" onClick={() => window.open(`/hr/employees/${id}/edit` , '_blank')} requiredPermission="hr.employees.update">
             {t('show_employee.edit', 'hr') || 'تعديل الموظف'}
           </Button>
         </div>

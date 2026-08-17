@@ -20,7 +20,7 @@ import { ro } from "zod/locales"
 
 export const EmployeeLeaveBalances = () => {
     const { t, language } = useLanguage()
-    const { employeeLeaveBalances, findAllEmployeeLeaveBalances, loading, error, pagination, filter, setPage, setFilter, resetFilter, setSearch } = useLeaveBalance()
+    const { employeeLeaveBalances, findAllEmployeeLeaveBalances, loading, error, filter, setFilter, resetFilter, setSearch } = useLeaveBalance()
 
     const [sortColumn, setSortColumn] = useState<string>("leave_type_name")
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
@@ -136,7 +136,7 @@ export const EmployeeLeaveBalances = () => {
     ]
 
     const handleApplyFilter = (values: Record<string, any>) => {
-        const parsed: Record<string, any> = { page: 1, per_page: filter.per_page }
+        const parsed: Record<string, any> = {}
         for (const [key, val] of Object.entries(values)) {
             if (val === "" || val === undefined) continue
             if (key === "leave_type_id" || key === "employee_id") {
@@ -212,15 +212,6 @@ export const EmployeeLeaveBalances = () => {
                         sortColumn={sortColumn}
                         sortOrder={sortOrder}
                         onSort={handleSort}
-                        pagination={{
-                            page: pagination.currentPage,
-                            totalPages: pagination.lastPage,
-                            totalItems: pagination.total,
-                            itemsPerPage: filter.per_page,
-                            onPageChange: setPage,
-                            onItemsPerPageChange: (size) => setFilter({ per_page: size, page: 1 }),
-                            itemsPerPageOptions: [10, 25, 50, 100],
-                        }}
                     />
                 </div>
             )}

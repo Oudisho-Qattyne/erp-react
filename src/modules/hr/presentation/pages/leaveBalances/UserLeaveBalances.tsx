@@ -16,7 +16,7 @@ import { Filter, FileText, X } from "lucide-react"
 
 export const UserLeaveBalances = () => {
   const { t, language } = useLanguage()
-  const { myLeaveBalances, findAllMyLeaveBalances, loading, error, pagination, filter, setPage, setFilter, resetFilter } = useLeaveBalance()
+  const { myLeaveBalances, findAllMyLeaveBalances, loading, error, filter, setFilter, resetFilter } = useLeaveBalance()
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [leaveTypePickerOpen, setLeaveTypePickerOpen] = useState(false)
   const [selectedLeaveTypeName, setSelectedLeaveTypeName] = useState<string | undefined>("")
@@ -67,7 +67,7 @@ export const UserLeaveBalances = () => {
   ]
 
   const handleApplyFilter = (values: Record<string, any>) => {
-    const parsed: Record<string, any> = { page: 1, per_page: filter.per_page }
+    const parsed: Record<string, any> = {}
     for (const [key, val] of Object.entries(values)) {
       if (val === "" || val === undefined) continue
       if (key === "leave_type_id") {
@@ -125,15 +125,6 @@ export const UserLeaveBalances = () => {
             rowKey="leave_type_id"
             loading={loading.findAllMyLeaveBalances}
             emptyMessage={t("leave_balance.no_data", "hr") || "No leave balances found"}
-            pagination={{
-              page: pagination.currentPage,
-              totalPages: pagination.lastPage,
-              totalItems: pagination.total,
-              itemsPerPage: filter.per_page,
-              onPageChange: setPage,
-              onItemsPerPageChange: (size) => setFilter({ per_page: size, page: 1 }),
-              itemsPerPageOptions: [10, 25, 50, 100],
-            }}
           />
         </>
       )}

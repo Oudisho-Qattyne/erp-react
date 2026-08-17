@@ -7,8 +7,8 @@ export interface ILeaveRequestRepository{
     createLeaveRequest:(leaveRequest : any, idempotencyKey?: string) => Promise<DomainResponse<any>>,
     createEmployeeLeaveRequest:(leaveRequest : any, idempotencyKey?: string) => Promise<DomainResponse<any>>,
     
-    getAllMyLeaveRequests:(filter : any) => Promise<DpomainResponsePaginated<LeaveRequest[]>>,
-    getAllLeaveRequests:(filter : any) => Promise<DpomainResponsePaginated<LeaveRequest[]>>,
+    getAllMyLeaveRequests:(filter : any) => Promise<DomainResponse<LeaveRequest[]>>,
+    getAllLeaveRequests:(filter : any) => Promise<DomainResponse<LeaveRequest[]>>,
     getLeaveRequestById:(id:number) => Promise<DomainResponse<LeaveRequest>>,
 
     updateLeaveRequest:(id:number , leaveRequest : any, idempotencyKey?: string) => Promise<DomainResponse<LeaveRequest>>,

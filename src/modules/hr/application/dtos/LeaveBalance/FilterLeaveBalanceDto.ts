@@ -1,8 +1,8 @@
 import type { SortType } from "../../../../../core/domain/valueObjects/common/SortType";
 
 export interface FilterLeaveBalancesDto {
-    page: number;
-    per_page: number;
+    page?: number;
+    per_page?: number;
     search?: string;
     employee_id?: number;
     leave_type_id?: number;

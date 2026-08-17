@@ -43,7 +43,7 @@ export function PersonsPage() {
 
   const columns: ColumnDef<Person>[] = [
     { key: "id", label: "#", width: 60, align: "center", render: (row) => row.id },
-    { key: "name", label: t("persons.person_name", MODULE) || "Name", width: 180, sortable: true, align: "center", render: (row) => row.name || "—" },
+    { key: "name", label: t("persons.person_name", MODULE) || "Name", width: 180, align: "center", render: (row) => row.name || "—" },
     {
       key: "type",
       label: t("persons.type", MODULE) || "Type",

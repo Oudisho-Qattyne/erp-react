@@ -19,13 +19,27 @@ export const mapId2Path = (storageItem: StorageItem): string => {
     path += `/${storageItem.name}`
     return path
 }
+
+const parseCreatedAt = (dateStr: string): Date => {
+    if (!dateStr) return new Date();
+    const parts = dateStr.split('-');
+    if (parts.length === 3 && parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
+        return new Date(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0]));
+    }
+    if (parts.length === 3 && parts[0].length === 4) {
+        return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    }
+    return new Date(dateStr);
+}
+
 export const storageItem2StorageItemDto = (storageItem: StorageItem): StorageItemDto => {
+console.log(storageItem);
 
     const storageItemDto: StorageItemDto = {
         ...storageItem,
         id: mapId2Path(storageItem),
         type: storageItem.type,
-        date: new Date(2023, 11, 1, 14, 45),
+        date: parseCreatedAt(storageItem.created_at),
         lazy: storageItem.type == "folder",
         size: storageItem.type == "file" ? storageItem.size : 0,
         _id:storageItem.id

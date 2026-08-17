@@ -16,10 +16,7 @@ function initRecord<T>(value: T): Record<string, T> {
   return Object.fromEntries(OP_KEYS.map((k) => [k, value]))
 }
 
-const DEFAULT_FILTER: FilterLeaveBalancesDto = {
-  page: 1,
-  per_page: 25,
-}
+const DEFAULT_FILTER: FilterLeaveBalancesDto = {}
 
 export interface UseLeaveBalanceReturn {
   myLeaveBalances: LeaveBalance[]
@@ -28,7 +25,6 @@ export interface UseLeaveBalanceReturn {
   isLoading: () => boolean
   error: Record<string, string | null>
   hasErrors: () => boolean
-  pagination: { currentPage: number; lastPage: number; total: number; hasMore: boolean }
   filter: FilterLeaveBalancesDto
   setFilter: (patch: Partial<FilterLeaveBalancesDto> | ((prev: FilterLeaveBalancesDto) => FilterLeaveBalancesDto)) => void
   resetFilter: () => void
@@ -37,7 +33,6 @@ export interface UseLeaveBalanceReturn {
   findAllEmployeeLeaveBalances: (employeeId?: number) => Promise<void>
   adjustLeaveBalance: (adjust: AdjustLeaveBalanceDto) => Promise<void>
   setSearch: (search: string) => void
-  setPage: (page: number) => void
 }
 
 export const useLeaveBalance = (): UseLeaveBalanceReturn => {
@@ -49,7 +44,6 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
   const [loading, setLoading] = useState<Record<string, boolean>>(() => initRecord(false))
   const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null))
   const [filter, setFilterState] = useState<FilterLeaveBalancesDto>(DEFAULT_FILTER)
-  const [pagination, setPagination] = useState({ currentPage: 1, lastPage: 1, total: 0, hasMore: false })
 
   const repository = createLeaveBalanceRepository(apiClient)
   const useCase = createManageLeaveBalanceUseCase(repository)
@@ -68,7 +62,7 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
 
   const setSearch = useCallback((search: string) => {
     setFilterState((prev) => {
-      const next = { ...prev, page: 1 }
+      const next = { ...prev }
       if (search.trim()) {
         next.search = search
       } else {
@@ -78,22 +72,12 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
     })
   }, [])
 
-  const setPage = useCallback((page: number) => {
-    setFilterState((prev) => ({ ...prev, page }))
-  }, [])
-
   const findAllMyLeaveBalances = useCallback(async () => {
     setFnLoading("findAllMyLeaveBalances", true)
     setFnError("findAllMyLeaveBalances", null)
     try {
       const res = await useCase.findAllMyLeaveBalances(filter)
       setMyLeaveBalances(res.data)
-      setPagination({
-        currentPage: res.currentPage || 1,
-        lastPage: res.lastPage || 1,
-        total: (res.total as any) || 0,
-        hasMore: res.hasMore || false,
-      })
     } catch (err: any) {
       setFnError("findAllMyLeaveBalances", handleApiError(err, { module: "hr" , passThrough:true }))
     } finally {
@@ -107,12 +91,6 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
     try {
       const res = await useCase.findAllEmployeeLeaveBalances(employeeId, filter)
       setEmployeeLeaveBalances(res.data)
-      setPagination({
-        currentPage: res.currentPage || 1,
-        lastPage: res.lastPage || 1,
-        total: (res.total as any) || 0,
-        hasMore: res.hasMore || false,
-      })
     } catch (err: any) {
       setFnError("findAllEmployeeLeaveBalances", handleApiError(err, { module: "hr" }))
     } finally {
@@ -145,7 +123,6 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
     isLoading,
     error,
     hasErrors,
-    pagination,
     filter,
     setFilter,
     resetFilter,
@@ -154,6 +131,5 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
     findAllEmployeeLeaveBalances,
     adjustLeaveBalance,
     setSearch,
-    setPage,
   }
 }

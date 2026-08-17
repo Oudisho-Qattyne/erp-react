@@ -43,7 +43,7 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
     },
 
 
-    createFolder: async (parentId: string, name: string, idempotencyKey?: string): Promise<DomainResponse<StorageItemDto>> => {
+    createFolder: async (parentId: string | null, name: string, idempotencyKey?: string): Promise<DomainResponse<StorageItemDto>> => {
       const res = await repository.createFolder(parentId, name, idempotencyKey)
       let storageItemsDto: StorageItemDto
       if (res.data) {
@@ -61,7 +61,7 @@ export const createManageStorageUseCase = (repository: IManageStorageRepository)
     },
 
     // File operations
-    uploadFile: async (parentId: string, file: File, name: string, isSecure: boolean, idempotencyKey?: string): Promise<DomainResponse<StorageFile>> => {
+    uploadFile: async (parentId: string | null, file: File, name: string, isSecure: boolean, idempotencyKey?: string): Promise<DomainResponse<StorageFile>> => {
       return (repository.uploadFile(parentId, file, name ? name : file.name, isSecure, idempotencyKey));
     },
 

@@ -96,10 +96,10 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
       const res = await useCase.findAllMyLeaveRequests(filter)
       setMyLeaveRequests(res.data)
       setPagination({
-        currentPage: res.currentPage || 1,
-        lastPage: res.lastPage || 1,
-        total: (res.total as any) || 0,
-        hasMore: res.hasMore || false,
+        currentPage: res.pagination?.currentPage || 1,
+        lastPage: res.pagination?.lastPage || 1,
+        total: (res.pagination?.total as any) || 0,
+        hasMore: res.pagination?.hasMore || false,
       })
     } catch (err: any) {
       setFnError("findAllMyLeaveRequests", handleApiError(err, { module: "hr" , passThrough:true }))
@@ -115,10 +115,10 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
       const res = await useCase.findAllEmployeeLeaveRequests({ ...filter, ...(employeeId !== undefined ? { employee_id: employeeId } : {}) })
       setEmployeeLeaveRequests(res.data)
       setPagination({
-        currentPage: res.currentPage || 1,
-        lastPage: res.lastPage || 1,
-        total: (res.total as any) || 0,
-        hasMore: res.hasMore || false,
+        currentPage: res.pagination?.currentPage || 1,
+        lastPage: res.pagination?.lastPage || 1,
+        total: (res.pagination?.total as any) || 0,
+        hasMore: res.pagination?.hasMore || false,
       })
     } catch (err: any) {
       setFnError("findAllEmployeeLeaveRequests", handleApiError(err, { module: "hr" }))
