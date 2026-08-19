@@ -338,18 +338,35 @@
     "partnership_type_name": "اسم نوع الشراكة",
     "folder": "مجلد المنشأة",
     "address": "العنوان",
-    "city": "المدينة",
+    "company_status": "الشركة",
+    "company_status_established": "قائمة",
+    "company_status_in_incorporation": "قيد التأسيس",
+    "commercial_registry": "السجل التجاري",
+    "commercial_registry_date": "تاريخ السجل التجاري",
+    "company_nationality": "جنسية الشركة",
+    "add_country": "إضافة دولة",
     "first_phone_number": "رقم الهاتف",
     "second_phone_number": "رقم الهاتف 2",
     "email": "البريد الإلكتروني",
-    "capital_in_usd": "رأس المال ($)",
-    "capital_in_syp": "رأس المال (ل.س)",
+    "capital_in_usd": "رأس المال الكلي ($)",
+    "capital_in_syp": "رأس المال الكلي (ل.س)",
     "value_of_machines_in_usd": "قيمة الآلات ($)",
     "value_of_machines_in_syp": "قيمة الآلات (ل.س)",
     "number_of_workers": "عدد العمال",
+    "number_of_patrols": "عدد الدوريات",
+    "number_of_phone_lines": "عدد خطوط الهاتف",
+    "internet_need_monthly_gb": "الحاجة الى الإنترنت شهرياً (GB)",
+    "imported_raw_materials_annually": "المواد الأولية المستوردة سنوياً",
     "daily_production_capacity": "الطاقة الإنتاجية اليومية",
     "monthly_production_capacity": "الطاقة الإنتاجية الشهرية",
     "yearly_production_capacity": "الطاقة الإنتاجية السنوية",
+    "production_material": "المادة",
+    "production_output": "الإنتاج",
+    "daily_consumption_volume": "حجم الاستهلاك اليومي",
+    "consumption_material": "المادة",
+    "consumption_value": "الاستهلاك",
+    "consumption_unit": "الواحدة",
+    "export_percentage": "نسبة التصدير من الإنتاج (%) ",
     "electrical_power_capacity": "سعة الطاقة الكهربائية",
     "yearly_estimated_water_consumption": "الاستهلاك السنوي المقدر للمياه",
     "created": "تم إنشاء المنشأة بنجاح",
@@ -396,7 +413,10 @@
       "name_required": "الاسم مطلوب",
       "partnership_type_required": "نوع الشراكة مطلوب",
       "address_required": "العنوان مطلوب",
-      "city_required": "المدينة مطلوبة",
+      "company_status_required": "حالة الشركة مطلوبة",
+      "company_nationality_required": "جنسية الشركة مطلوبة",
+      "commercial_registry_required": "السجل التجاري مطلوب",
+      "commercial_registry_date_required": "تاريخ السجل التجاري مطلوب",
       "first_phone_number_required": "رقم الهاتف مطلوب",
       "email_invalid": "البريد الإلكتروني غير صالح",
       "capital_in_usd_positive": "يجب أن يكون رقماً موجباً",
@@ -404,9 +424,16 @@
       "value_of_machines_in_usd_positive": "يجب أن يكون رقماً موجباً",
       "value_of_machines_in_syp_positive": "يجب أن يكون رقماً موجباً",
       "number_of_workers_positive": "يجب أن يكون رقماً موجباً",
-      "daily_production_capacity_positive": "يجب أن يكون رقماً موجباً",
-      "monthly_production_capacity_positive": "يجب أن يكون رقماً موجباً",
-      "yearly_production_capacity_positive": "يجب أن يكون رقماً موجباً",
+      "number_of_patrols_integer": "يجب أن يكون رقماً صحيحاً",
+      "number_of_patrols_positive": "يجب أن يكون رقماً موجباً",
+      "number_of_phone_lines_positive": "يجب أن يكون رقماً موجباً",
+      "internet_need_monthly_gb_positive": "يجب أن يكون رقماً موجباً",
+      "export_percentage_range": "يجب أن تكون القيمة بين 0 و 100",
+      "material_required": "المادة مطلوبة",
+      "production_required": "الإنتاج مطلوب",
+      "consumption_material_required": "المادة مطلوبة",
+      "consumption_value_required": "الاستهلاك مطلوب",
+      "yearly_production_capacity_required": "يجب إضافة صف واحد على الأقل",
       "electrical_power_capacity_required": "هذا الحقل مطلوب",
       "yearly_estimated_water_consumption_positive": "يجب أن يكون رقماً موجباً",
       "authorized_person_name_required": "اسم الشخص مطلوب",
@@ -1116,6 +1143,9 @@
     "industry_types": {
       "title": "أنواع الصناعة"
     },
+    "consumption_materials": {
+      "title": "مواد الاستهلاك"
+    },
     "licensing_statuses": {
       "title": "حالات الترخيص"
     },
@@ -1137,11 +1167,39 @@
     "contract": {
       "title": "العقود"
     },
-    "transactions": {
+"transactions": {
       "title": "المعاملات"
     },
     "partnership_types": {
       "title": "أنواع الشراكة"
+    }
+  },
+  "consumption_materials": {
+    "title": "مواد الاستهلاك",
+    "add": "إضافة مادة استهلاك",
+    "create": "إنشاء مادة استهلاك",
+    "name": "اسم المادة",
+    "unit": "الواحدة",
+    "is_active": "نشط",
+    "created": "تم إنشاء {name} بنجاح",
+    "create_error": "فشل في إنشاء {name}",
+    "deleted": "تم حذف {name} بنجاح",
+    "delete_error": "فشل في حذف {name}",
+    "no_records": "لا يوجد مواد استهلاك",
+    "edit_log": "سجل التعديل",
+    "no_edit_log": "لا يوجد سجل تعديلات",
+    "event": "الحدث",
+    "created_at": "تاريخ الإنشاء",
+    "changed_by": "تم التغيير بواسطة",
+    "changes": "التغييرات",
+    "field": "الحقل",
+    "old_value": "القيمة القديمة",
+    "new_value": "القيمة الجديدة",
+    "subject_id": "رقم مادة الاستهلاك",
+    "id": "ID",
+    "validation": {
+      "name_required": "الاسم مطلوب",
+      "unit_required": "الواحدة مطلوبة"
     }
   }
 }

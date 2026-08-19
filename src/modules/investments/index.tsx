@@ -1,6 +1,6 @@
 import enLocales from './presentation/locales/en.json';
 import arLocales from './presentation/locales/ar.json';
-import { Map, List, FileCheck, BadgeCheck, Tags, Layers, Flag, SlidersHorizontal, Coins, Handshake } from 'lucide-react';
+import { Map, List, FileCheck, BadgeCheck, Tags, Layers, Flag, SlidersHorizontal, Coins, Handshake, Package } from 'lucide-react';
 import type { Module } from '../../core/moduleRegistry';
 import { registerPersonDetailRoute } from '../../core/registry/person/personRegistry';
 import { PlotAreasPage } from './presentation/pages/plot-areas/PlotAreasPage';
@@ -24,6 +24,7 @@ import { IndustrialDecisionTypesPage } from './presentation/pages/industrial-dec
 import { IndustrialLicenseSourcesPage } from './presentation/pages/industrial-license-sources/IndustrialLicenseSourcesPage';
 import { IndustryCategoriesPage } from './presentation/pages/industry-categories/IndustryCategoriesPage';
 import { IndustryTypesPage } from './presentation/pages/industry-types/IndustryTypesPage';
+import { ConsumptionMaterialsPage } from './presentation/pages/consumption-materials/ConsumptionMaterialsPage';
 import { LicensingStatusesPage } from './presentation/pages/licensing-statuses/LicensingStatusesPage';
 import { ByDurationLicensesPage } from './presentation/pages/by-duration-licenses/ByDurationLicensesPage';
 import { ByIndustryLicensesPage } from './presentation/pages/by-industry-licenses/ByIndustryLicensesPage';
@@ -263,7 +264,7 @@ const investmentsModule: Module = {
       moduleName: 'investments',
       icon: <SlidersHorizontal size={18} />,
       group: 'investments',
-      requiredPermission: ['investments.industry-categories.list', 'investments.industry-types.list', 'investments.licensing-statuses.list', 'investments.industrial-decision-types.list', 'investments.industrial-license-sources.list', 'investments.by-duration-licenses.list', 'investments.by-industry-licenses.list', 'investments.rent-contract-industries.list'],
+      requiredPermission: ['investments.industry-categories.list', 'investments.industry-types.list', 'investments.consumption-materials.list', 'investments.licensing-statuses.list', 'investments.industrial-decision-types.list', 'investments.industrial-license-sources.list', 'investments.by-duration-licenses.list', 'investments.by-industry-licenses.list', 'investments.rent-contract-industries.list'],
     },
     {
       path: '/investments/industry-categories',
@@ -288,6 +289,19 @@ const investmentsModule: Module = {
       moduleName: 'investments',
       requiredPermission: 'investments.industry-types.list',
       icon: <Layers size={18} />,
+      group: 'investments',
+      parentNav: '/investments/industrial-management',
+    },
+    {
+path: '/investments/consumption-materials',
+      element: <ConsumptionMaterialsPage />,
+      layout: 'dashboard',
+      label: 'consumption_materials.title',
+      nav: true,
+      order: 3,
+      moduleName: 'investments',
+      // requiredPermission: 'investments.consumption-materials.list',
+      icon: <Package size={18} />,
       group: 'investments',
       parentNav: '/investments/industrial-management',
     },

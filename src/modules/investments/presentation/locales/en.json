@@ -337,7 +337,13 @@
     "partnership_type_name": "Partnership Type Name",
     "folder": "Facility Folder",
     "address": "Address",
-    "city": "City",
+    "company_status": "Company Status",
+    "company_status_established": "Established",
+    "company_status_in_incorporation": "Under Incorporation",
+    "commercial_registry": "Commercial Registry",
+    "commercial_registry_date": "Commercial Registry Date",
+    "company_nationality": "Company Nationality",
+    "add_country": "Add Country",
     "first_phone_number": "Phone",
     "second_phone_number": "Phone 2",
     "email": "Email",
@@ -346,9 +352,20 @@
     "value_of_machines_in_usd": "Machinery Value (USD)",
     "value_of_machines_in_syp": "Machinery Value (SYP)",
     "number_of_workers": "Workers",
+    "number_of_patrols": "Number of Patrols",
+    "number_of_phone_lines": "Number of Phone Lines",
+    "internet_need_monthly_gb": "Monthly Internet Need (GB)",
+    "imported_raw_materials_annually": "Imported Raw Materials Annually",
     "daily_production_capacity": "Daily Capacity",
     "monthly_production_capacity": "Monthly Capacity",
     "yearly_production_capacity": "Annual Capacity",
+    "production_material": "Material",
+    "production_output": "Production",
+    "daily_consumption_volume": "Daily Consumption Volume",
+    "consumption_material": "Material",
+    "consumption_value": "Consumption",
+    "consumption_unit": "Unit",
+    "export_percentage": "Export Percentage of Production",
     "electrical_power_capacity": "Power Capacity",
     "yearly_estimated_water_consumption": "Water Consumption",
     "created": "Facility created successfully",
@@ -395,7 +412,10 @@
       "name_required": "Name is required",
       "partnership_type_required": "Partnership type is required",
       "address_required": "Address is required",
-      "city_required": "City is required",
+      "company_status_required": "Company status is required",
+      "company_nationality_required": "Company nationality is required",
+      "commercial_registry_required": "Commercial Registry is required",
+      "commercial_registry_date_required": "Commercial Registry Date is required",
       "first_phone_number_required": "Phone is required",
       "email_invalid": "Invalid email address",
       "capital_in_usd_positive": "Must be a positive number",
@@ -403,9 +423,16 @@
       "value_of_machines_in_usd_positive": "Must be a positive number",
       "value_of_machines_in_syp_positive": "Must be a positive number",
       "number_of_workers_positive": "Must be a positive number",
-      "daily_production_capacity_positive": "Must be a positive number",
-      "monthly_production_capacity_positive": "Must be a positive number",
-      "yearly_production_capacity_positive": "Must be a positive number",
+      "number_of_patrols_integer": "Must be an integer",
+      "number_of_patrols_positive": "Must be a positive number",
+      "number_of_phone_lines_positive": "Must be a positive number",
+      "internet_need_monthly_gb_positive": "Must be a positive number",
+      "export_percentage_range": "Must be between 0 and 100",
+      "material_required": "Material is required",
+      "production_required": "Production is required",
+      "consumption_material_required": "Consumption material is required",
+      "consumption_value_required": "Consumption is required",
+      "yearly_production_capacity_required": "At least one row is required",
       "electrical_power_capacity_required": "This field is required",
       "yearly_estimated_water_consumption_positive": "Must be a positive number",
       "authorized_person_name_required": "Person name is required",
@@ -1115,6 +1142,9 @@
     "industry_types": {
       "title": "Industry Types"
     },
+    "consumption_materials": {
+      "title": "Consumption Materials"
+    },
     "licensing_statuses": {
       "title": "Licensing Statuses"
     },
@@ -1136,11 +1166,39 @@
     "contract": {
       "title": "Contracts"
     },
-    "transactions": {
+"transactions": {
       "title": "Transactions"
     },
     "partnership_types": {
       "title": "Partnership Types"
+    }
+  },
+  "consumption_materials": {
+    "title": "Consumption Materials",
+    "add": "Add Consumption Material",
+    "create": "Create Consumption Material",
+    "name": "Material Name",
+    "unit": "Unit",
+    "is_active": "Is Active",
+    "created": "{name} created successfully",
+    "create_error": "Failed to create {name}",
+    "deleted": "{name} deleted successfully",
+    "delete_error": "Failed to delete {name}",
+    "no_records": "No Consumption Materials found",
+    "edit_log": "Edit Log",
+    "no_edit_log": "No edit logs found",
+    "event": "Event",
+    "created_at": "Created At",
+    "changed_by": "Changed By",
+    "changes": "Changes",
+    "field": "Field",
+    "old_value": "Old Value",
+    "new_value": "New Value",
+    "subject_id": "Consumption Material ID",
+    "id": "ID",
+    "validation": {
+      "name_required": "Name is required",
+      "unit_required": "Unit is required"
     }
   }
 }

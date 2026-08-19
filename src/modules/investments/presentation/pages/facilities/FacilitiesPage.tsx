@@ -189,7 +189,6 @@ export function FacilitiesPage() {
       width: 150,
       render: (row: Facility) => row.partnership_type ? getLocalizedName(row.partnership_type.name) : '—',
     },
-    { key: "city", label: t("facilities.city", "investments") || "City", width: 120 },
     { key: "first_phone_number", label: t("facilities.first_phone_number", "investments") || "Phone", width: 140 },
     { key: "email", label: t("facilities.email", "investments") || "Email", width: 180 },
     {

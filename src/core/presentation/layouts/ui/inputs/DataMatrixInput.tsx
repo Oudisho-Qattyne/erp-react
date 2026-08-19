@@ -23,6 +23,7 @@ export interface MatrixFieldConfig {
   renderCreateForm?: (onSuccess: (value: number | string, item?: unknown) => void, onCancel: () => void, dependentData?: Record<string, unknown>) => React.ReactNode;
   labelPath?: string;
   createButtonPermission?: string;
+  compute?: (row: Record<string, any>, value: any) => Record<string, any> | void;
   hints?: {
     searchApi: (query: string, dependentData?: Record<string, unknown>) => Promise<Record<string, unknown>[]>;
     minChars?: number;
@@ -163,18 +164,31 @@ export function DataMatrixInput({
   }, [internalErrors, externalErrors]);
 
   const handleCellChange = (rowIndex: number, fieldName: string, fieldValue: any) => {
-    const updated = rows.map((row, i) =>
-      i === rowIndex ? { ...row, [fieldName]: fieldValue } : row
-    );
+    const updated = rows.map((row, i) => {
+      if (i !== rowIndex) return row;
+      const nextRow = { ...row, [fieldName]: fieldValue };
+      const field = matrixFields.find((f) => f.name === fieldName);
+      if (field?.compute) {
+        const patch = field.compute(nextRow, fieldValue);
+        if (patch) return { ...nextRow, ...patch };
+      }
+      return nextRow;
+    });
     onChange(updated);
   };
 
   const handleRowFill = (rowIndex: number, item: Record<string, unknown>, triggerField: string) => {
     const field = matrixFields.find((f) => f.name === triggerField);
     const fillData = field?.hints?.fill ? field.hints.fill(item) : { ...item };
-    onChange(rows.map((row, i) =>
-      i === rowIndex ? { ...row, ...fillData } : row
-    ));
+    onChange(rows.map((row, i) => {
+      if (i !== rowIndex) return row;
+      const nextRow = { ...row, ...fillData };
+      if (field?.compute) {
+        const patch = field.compute(nextRow, nextRow[triggerField]);
+        if (patch) return { ...nextRow, ...patch };
+      }
+      return nextRow;
+    }));
   };
 
   const addRow = () => {

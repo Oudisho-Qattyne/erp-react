@@ -13,6 +13,8 @@ import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card
 import { getCreateFacilityFormSchema } from '../../../schemas/facilityForm.schema';
 import { buildFacilityFormFields, buildFacilityFormGroups, buildFacilityDefaultValues } from '../../../forms/facilityFormConfig';
 import type { PartnershipType } from '../../../../domain/entities/partnershipType';
+import type { Country } from '../../../../../../core/domain/entities/regions/Country';
+import type { ConsumptionMaterial } from '../../../../domain/entities/consumptionMaterial';
 import { getLocalizedName } from '../../../../../../core/presentation/utils/helpes';
 import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { Factory, Plus, Eye, Pencil, Trash2, History } from 'lucide-react';
@@ -31,6 +33,8 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
   const baseUrl = `/investments/facilities`;
   const { entities: facilities, getAll: getFacilities, create: createFacility, update: updateFacility, remove: deleteFacility, loadingMap: facLoading, errorMap: facError } = useEntityCrud<Facility>(baseUrl, baseUrl);
   const { entities: partnershipTypes, getAll: getPartnershipTypes, create: createPartnershipType } = useEntityCrud<PartnershipType>('/investments/partnership-types', '/investments/partnership-types');
+  const { entities: countries, getAll: loadCountries, create: createCountry } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
+  const { entities: consumptionMaterials, getAll: loadConsumptionMaterials, create: createConsumptionMaterial } = useEntityCrud<ConsumptionMaterial>('/investments/consumption-materials', '/investments/consumption-materials');
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingFacility, setEditingFacility] = useState<Facility | null>(null);
@@ -83,7 +87,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
     setDeletingFacility(null);
   };
 
-  const fields = buildFacilityFormFields(t, { partnershipTypes, createPartnershipType });
+  const fields = buildFacilityFormFields(t, { partnershipTypes, createPartnershipType, countries, loadCountries, createCountry, consumptionMaterials, loadConsumptionMaterials, createConsumptionMaterial });
   const formGroups = buildFacilityFormGroups(t);
 
   const columns = [
@@ -94,7 +98,6 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
       width: 150,
       render: (row: Facility) => row.partnership_type ? getLocalizedName(row.partnership_type.name) : '—',
     },
-    { key: "city", label: t("facilities.city", "investments") || "City", width: 120 },
     { key: "first_phone_number", label: t("facilities.first_phone_number", "investments") || "Phone", width: 130 },
     { key: "email", label: t("facilities.email", "investments") || "Email", width: 180 },
     { key: "number_of_workers", label: t("facilities.number_of_workers", "investments") || "Workers", width: 100 },

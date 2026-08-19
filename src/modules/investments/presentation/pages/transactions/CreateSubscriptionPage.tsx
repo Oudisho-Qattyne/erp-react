@@ -19,9 +19,12 @@ import { getInvestorRowSchema } from '../../schemas/investorForm.schema';
 import { buildFacilityFormFields, buildFacilityFormGroups } from '../../forms/facilityFormConfig';
 import { InvestorsField } from '../../forms/InvestorsInput';
 import type { PartnershipType } from '../../../domain/entities/partnershipType';
+import type { Country } from '../../../../../core/domain/entities/regions/Country';
 import { useSubscription } from '../../hooks/useSubscription';
 import { mapSubscriptionServerValidationErrors } from '../../forms/subscriptionServerErrors';
 import type { CreateSubscriptionDTO, SubscriptionAuthorizedPersonPayload, SubscriptionInvestorPayload } from '../../../domain/repositories/ISubscriptionRepository';
+import type { ProductionCapacityRow, DailyConsumptionRow } from '../../../domain/entities/facility';
+import type { ConsumptionMaterial } from '../../../domain/entities/consumptionMaterial';
 
 type FetchParams = Record<string, string | number | boolean | undefined>;
 
@@ -31,6 +34,8 @@ export function CreateSubscriptionPage() {
 
   const plotsCrud = useEntityCrud<Plot>('/investments/plots', '/investments/plots');
   const partnershipTypesCrud = useEntityCrud<PartnershipType>('/investments/partnership-types', '/investments/partnership-types');
+  const countriesCrud = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
+  const consumptionMaterialsCrud = useEntityCrud<ConsumptionMaterial>('/investments/consumption-materials', '/investments/consumption-materials');
   const plotAreasCrud = useEntityCrud<EntityWithNameOnly>('/investments/plot-areas', '/investments/plot-areas');
   const plotClassificationsCrud = useEntityCrud<EntityWithNameOnly>('/investments/plot-classifications', '/investments/plot-classifications');
   const { createSubscription } = useSubscription();
@@ -178,6 +183,12 @@ export function CreateSubscriptionPage() {
   const facilityDeps = {
     partnershipTypes: partnershipTypesCrud.entities,
     createPartnershipType: partnershipTypesCrud.create,
+    countries: countriesCrud.entities,
+    loadCountries: countriesCrud.getAll,
+    createCountry: countriesCrud.create,
+    consumptionMaterials: consumptionMaterialsCrud.entities,
+    loadConsumptionMaterials: consumptionMaterialsCrud.getAll,
+    createConsumptionMaterial: consumptionMaterialsCrud.create,
   };
 
   const fields: FieldConfig[] = [
@@ -232,7 +243,10 @@ export function CreateSubscriptionPage() {
           name: String(data.name ?? ''),
           partnership_type_id: (data.partnership_type_id as number | null) ?? null,
           address: String(data.address ?? ''),
-          city: String(data.city ?? ''),
+          company_status: String(data.company_status ?? ''),
+          commercial_registry: (data.commercial_registry as string | null | undefined) ?? null,
+          commercial_registry_date: (data.commercial_registry_date as string | null | undefined) ?? null,
+          company_nationality_id: (data.company_nationality_id as number | null) ?? null,
           first_phone_number: String(data.first_phone_number ?? ''),
           second_phone_number: (data.second_phone_number as string) || null,
           email: (data.email as string) || null,
@@ -241,9 +255,15 @@ export function CreateSubscriptionPage() {
           value_of_machines_in_usd: Number(data.value_of_machines_in_usd),
           value_of_machines_in_syp: Number(data.value_of_machines_in_syp),
           number_of_workers: Number(data.number_of_workers),
-          daily_production_capacity: Number(data.daily_production_capacity),
-          monthly_production_capacity: Number(data.monthly_production_capacity),
-          yearly_production_capacity: Number(data.yearly_production_capacity),
+          number_of_patrols: (data.number_of_patrols as number | null) ?? null,
+          number_of_phone_lines: (data.number_of_phone_lines as number | null) ?? null,
+          internet_need_monthly_gb: (data.internet_need_monthly_gb as number | null) ?? null,
+          imported_raw_materials_annually: (data.imported_raw_materials_annually as string | null | undefined) ?? null,
+          export_percentage: (data.export_percentage as number | null) ?? null,
+          daily_production_capacity: (data.daily_production_capacity as ProductionCapacityRow[] | undefined) ?? [],
+          monthly_production_capacity: (data.monthly_production_capacity as ProductionCapacityRow[] | undefined) ?? [],
+          yearly_production_capacity: (data.yearly_production_capacity as ProductionCapacityRow[] | undefined) ?? [],
+          daily_consumption_volume: (data.daily_consumption_volume as DailyConsumptionRow[] | undefined) ?? [],
           electrical_power_capacity: String(data.electrical_power_capacity ?? ''),
           yearly_estimated_water_consumption: Number(data.yearly_estimated_water_consumption),
           require_all_persons_for_legal_matters: Boolean(data.require_all_persons_for_legal_matters),

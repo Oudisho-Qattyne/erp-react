@@ -1,10 +1,14 @@
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
+import type { ProductionCapacityRow, DailyConsumptionRow } from "../entities/facility";
 
 export interface SubscriptionFacilityPayload {
   name: string;
   partnership_type_id?: number | null;
   address: string;
-  city: string;
+  company_status?: string;
+  commercial_registry?: string | null;
+  commercial_registry_date?: string | null;
+  company_nationality_id?: number | null;
   first_phone_number: string;
   second_phone_number?: string | null;
   email?: string | null;
@@ -13,9 +17,15 @@ export interface SubscriptionFacilityPayload {
   value_of_machines_in_usd: number;
   value_of_machines_in_syp: number;
   number_of_workers: number;
-  daily_production_capacity: number;
-  monthly_production_capacity: number;
-  yearly_production_capacity: number;
+  number_of_patrols?: number | null;
+  number_of_phone_lines?: number | null;
+  internet_need_monthly_gb?: number | null;
+  imported_raw_materials_annually?: string | null;
+  export_percentage?: number | null;
+  daily_production_capacity?: ProductionCapacityRow[];
+  monthly_production_capacity?: ProductionCapacityRow[];
+  yearly_production_capacity?: ProductionCapacityRow[];
+  daily_consumption_volume?: DailyConsumptionRow[];
   electrical_power_capacity: string;
   yearly_estimated_water_consumption: number;
   require_all_persons_for_legal_matters: boolean;
