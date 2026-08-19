@@ -34,7 +34,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
   const { entities: facilities, getAll: getFacilities, create: createFacility, update: updateFacility, remove: deleteFacility, loadingMap: facLoading, errorMap: facError } = useEntityCrud<Facility>(baseUrl, baseUrl);
   const { entities: partnershipTypes, getAll: getPartnershipTypes, create: createPartnershipType } = useEntityCrud<PartnershipType>('/investments/partnership-types', '/investments/partnership-types');
   const { entities: countries, getAll: loadCountries, create: createCountry } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
-  const { entities: consumptionMaterials, getAll: loadConsumptionMaterials, create: createConsumptionMaterial } = useEntityCrud<ConsumptionMaterial>('/investments/consumption-materials', '/investments/consumption-materials');
+  const { entities: consumptionMaterials, getAll: loadConsumptionMaterials, create: createConsumptionMaterial } = useEntityCrud<ConsumptionMaterial>('/investments/consumable-materials', '/investments/consumable-materials');
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingFacility, setEditingFacility] = useState<Facility | null>(null);
@@ -46,6 +46,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
   useEffect(() => {
     if (dossierId && plotId) getFacilities(listUrl);
     getPartnershipTypes('/investments/partnership-types?is_active=true');
+    loadConsumptionMaterials('/investments/consumable-materials?is_active=true');
   }, [dossierId, plotId]);
 
   const handleCreate = async (data: any) => {

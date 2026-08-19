@@ -14,15 +14,15 @@ import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialo
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
-import { Pencil, Trash2, Check, X, History, Filter, Star } from 'lucide-react';
+import { Pencil, Trash2, Check, X, History, Filter } from 'lucide-react';
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 
 export function ConsumptionMaterialsPage() {
   const { t } = useLanguage();
   const { entities: items, create, update, remove, loadingMap, errorMap, list } = useEntityCrud<ConsumptionMaterial>(
-    '/investments/consumption-materials',
-    '/investments/consumption-materials',
+    '/investments/consumable-materials',
+    '/investments/consumable-materials',
     { listState: true, defaultSortColumn: 'name', paginate: false, debounceMs: 300 }
   );
   const entityName = t('consumption_materials.title', 'investments') || 'Consumption Material';
@@ -30,11 +30,13 @@ export function ConsumptionMaterialsPage() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<ConsumptionMaterial | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<ConsumptionMaterial | null>(null);
-  const [confirmSetDefault, setConfirmSetDefault] = useState<ConsumptionMaterial | null>(null);
   const [auditItem, setAuditItem] = useState<ConsumptionMaterial | null>(null);
 
   const filterInitialValues = useMemo(
-    () => Object.fromEntries(Object.entries(list.filter).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k))),
+    () => {
+      const entries = Object.entries(list.filter).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k));
+      return Object.fromEntries(entries.map(([k, v]) => [k, typeof v === 'boolean' ? String(v) : v]));
+    },
     [list.filter]
   );
 
@@ -47,18 +49,6 @@ export function ConsumptionMaterialsPage() {
       handleApiError(err, { module: "investments" });
     }
     setConfirmDelete(null);
-  };
-
-  const handleSetDefaultConfirm = async () => {
-    if (!confirmSetDefault) return;
-    try {
-      await update(confirmSetDefault.id, { ...confirmSetDefault, is_default: true });
-      toast.success(t('common.set_default_success', 'shared')?.replace('{name}', entityName) || `${entityName} set as default successfully`);
-      list.refresh();
-    } catch (err: any) {
-      handleApiError(err, { module: "investments" });
-    }
-    setConfirmSetDefault(null);
   };
 
   const columns = [
@@ -84,31 +74,17 @@ export function ConsumptionMaterialsPage() {
         : <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full"><X size={12} /> {t('common.no', 'shared') || 'No'}</span>
     },
     {
-      key: 'is_default',
-      label: t('common.is_default', 'shared') || 'Default',
-      width: 120,
-      render: (row: ConsumptionMaterial) => row.is_default
-        ? <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full"><Star size={12} /> {t('common.yes', 'shared') || 'Yes'}</span>
-        : <span className="text-xs text-text-muted">—</span>
-    },
-    {
       key: 'actions',
       label: t('common.actions', 'shared') || 'Actions',
       width: 200,
       render: (row: ConsumptionMaterial) => (
         <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
-          {!row.is_default && (
-            <Button variant="ghost" size="sm" onClick={() => setConfirmSetDefault(row)}
-              title={t('common.set_default', 'shared') || 'Set as default'} requiredPermission="investments.consumption-materials.update">
-              <Star size={16} />
-            </Button>
-          )}
           <Button variant="ghost" size="sm" onClick={() => setEditItem(row)}
-            title={t('common.edit', 'shared') || 'Edit'} requiredPermission="investments.consumption-materials.update">
+            title={t('common.edit', 'shared') || 'Edit'} requiredPermission="investments.consumable-materials.update">
             <Pencil size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)}
-            title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.consumption-materials.delete">
+            title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.consumable-materials.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)}
@@ -129,11 +105,6 @@ export function ConsumptionMaterialsPage() {
 
   const filterFields: FilterField[] = [
     { name: "is_active", label: t("common.is_active", "shared") || "Is Active?", type: "select", options: [
-      { value: "", label: t("common.all", "shared") || "All" },
-      { value: "true", label: t("common.yes", "shared") || "Yes" },
-      { value: "false", label: t("common.no", "shared") || "No" },
-    ]},
-    { name: "is_default", label: t("common.is_default", "shared") || "Default", type: "select", options: [
       { value: "", label: t("common.all", "shared") || "All" },
       { value: "true", label: t("common.yes", "shared") || "Yes" },
       { value: "false", label: t("common.no", "shared") || "No" },
@@ -160,8 +131,7 @@ export function ConsumptionMaterialsPage() {
   const formFields = [
     { name: 'name', type: 'alpha' as const, label: t('consumption_materials.name', 'investments') || 'Material Name', required: true },
     { name: 'unit', type: 'text' as const, label: t('consumption_materials.unit', 'investments') || 'Unit', required: true },
-    { name: 'is_active', type: 'checkbox' as const, label: t('common.is_active', 'shared') },
-    { name: 'is_default', type: 'checkbox' as const, label: t('common.is_default', 'shared') }
+    { name: 'is_active', type: 'checkbox' as const, label: t('common.is_active', 'shared') }
   ];
 
   return (
@@ -176,7 +146,7 @@ export function ConsumptionMaterialsPage() {
               {t('common.filter', 'shared') || 'Filter'}
             </Button>
             <Button onClick={() => setIsCreateOpen(true)} 
-            // requiredPermission="investments.consumption-materials.create"
+            // requiredPermission="investments.consumable-materials.create"
               >{t('consumption_materials.add', 'investments')}</Button>
         </div>
       </div>
@@ -202,7 +172,7 @@ export function ConsumptionMaterialsPage() {
         <GenericCreateForm
           fields={formFields}
           schema={getCreateConsumptionMaterialFormSchema(t)}
-          defaultValues={editItem ? { name: editItem.name, unit: editItem.unit, is_active: Boolean(editItem.is_active), is_default: Boolean(editItem.is_default) } : undefined}
+          defaultValues={editItem ? { name: editItem.name, unit: editItem.unit, is_active: Boolean(editItem.is_active) } : undefined}
           onSubmit={async (data) => {
             try {
               await update(editItem!.id, data);
@@ -255,18 +225,6 @@ export function ConsumptionMaterialsPage() {
         confirmLoading={loadingMap['remove']}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setConfirmDelete(null)}
-      />
-
-      <ConfirmDialog
-        isOpen={!!confirmSetDefault}
-        type="alert"
-        title={t('common.set_default_title', 'shared')?.replace('{entity}', entityName) || 'Set as default'}
-        message={t('common.set_default_message', 'shared')?.replace('{entity}', entityName) || `Are you sure you want to set this ${entityName} as default?`}
-        confirmLabel={t('common.set_default', 'shared') || 'Set as default'}
-        cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
-        confirmLoading={loadingMap['update']}
-        onConfirm={handleSetDefaultConfirm}
-        onCancel={() => setConfirmSetDefault(null)}
       />
 
       <FilterDialog

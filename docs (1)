@@ -8,6 +8,78 @@ servers:
     url: /api/v1/
     description: 'Base URL'
 paths:
+  /shared-kernal/notifications:
+    get:
+      summary: 'List all notifications for the authenticated user'
+      description: 'Returns all database notifications for the authenticated user (read and unread).'
+      tags:
+        - Notifications
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'List of notifications'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/Notification' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  '/shared-kernal/notifications/{notificationId}/read':
+    post:
+      summary: 'Mark a notification as read'
+      description: "Marks a single unread notification as read for the authenticated user.\nIf the notification is not found (or already read), the call still succeeds\nwith an empty `data` array.\n"
+      tags:
+        - Notifications
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: notificationId
+          in: path
+          required: true
+          description: 'UUID of the notification to mark as read.'
+          schema:
+            type: string
+            format: uuid
+            example: 4b1f1e7a-9f6b-4a1c-8a2e-3f5d7c9b2e41
+      responses:
+        200:
+          description: 'Notification marked as read'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponseEmptyData'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /shared-kernal/notifications/read-all:
+    post:
+      summary: 'Mark all notifications as read'
+      description: 'Marks all unread notifications as read for the authenticated user.'
+      tags:
+        - Notifications
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'All notifications marked as read'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponseEmptyData'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /shared-kernal/countries:
     get:
       summary: 'List all countries'
@@ -986,6 +1058,112 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
+  /crm/people:
+    get:
+      tags:
+        - People
+      summary: 'Get all People'
+      description: "Returns a paginated list of people (auto-created from Employee/Investor resources).\n\nRequires the `crm.people.list` permission.\n\nFilters are applied through the `scopeFilter` on the `Person` entity. See the module description for the full list of supported filters.\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+          description: 'Page number'
+        -
+          name: per_page
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: 'Number of items per page'
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+          description: 'Partial (LIKE) match on `name`, `email`, `primary_phone_number`, `secondary_phone_number`, `whatsapp`'
+        -
+          name: type
+          in: query
+          schema:
+            type: string
+            enum:
+              - employee
+              - investor
+          description: 'Filter by person type. `employee` → Employee resources, `investor` → Investor resources.'
+        -
+          name: name
+          in: query
+          schema:
+            type: string
+          description: 'Partial (LIKE) match on `name`'
+        -
+          name: email
+          in: query
+          schema:
+            type: string
+          description: 'Exact match on `email`'
+        -
+          name: primary_phone_number
+          in: query
+          schema:
+            type: string
+          description: 'Partial (LIKE) match on `primary_phone_number`'
+        -
+          name: secondary_phone_number
+          in: query
+          schema:
+            type: string
+          description: 'Partial (LIKE) match on `secondary_phone_number`'
+        -
+          name: whatsapp
+          in: query
+          schema:
+            type: string
+          description: 'Partial (LIKE) match on `whatsapp`'
+        -
+          name: telegram
+          in: query
+          schema:
+            type: string
+          description: 'Partial (LIKE) match on `telegram`'
+        -
+          name: x
+          in: query
+          schema:
+            type: string
+          description: 'Partial (LIKE) match on `x`'
+        -
+          name: linkedin
+          in: query
+          schema:
+            type: string
+          description: 'Partial (LIKE) match on `linkedin`'
+        -
+          name: facebook
+          in: query
+          schema:
+            type: string
+          description: 'Partial (LIKE) match on `facebook`'
+      responses:
+        200:
+          description: 'List of people'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { pagination: { type: object, properties: { lastPage: { type: integer, example: 1 }, currentPage: { type: integer, example: 1 }, hasMore: { type: boolean, example: false }, total: { type: integer, example: 3 } } }, data: { type: array, items: { $ref: '#/components/schemas/PersonInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
   /chat/users/:
     get:
       summary: 'List all users'
@@ -3531,6 +3709,152 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
+  /investments/consumable-materials:
+    get:
+      tags:
+        - 'Consumable Materials'
+      summary: 'Get all Consumable Materials'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+          description: 'Search by name or unit'
+        -
+          name: is_active
+          in: query
+          schema:
+            type: boolean
+          description: 'Filter by active status'
+      responses:
+        200:
+          description: 'List of consumable materials'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/ConsumableMaterialInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Consumable Materials'
+      summary: 'Create a Consumable Material'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsumableMaterialDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ConsumableMaterialInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/consumable-materials/{id}':
+    get:
+      tags:
+        - 'Consumable Materials'
+      summary: 'Get a Consumable Material by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Consumable material details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ConsumableMaterialInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Consumable Materials'
+      summary: 'Update a Consumable Material'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsumableMaterialDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ConsumableMaterialInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Consumable Materials'
+      summary: 'Delete a Consumable Material'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
   /investments/contracts:
     get:
       tags:
@@ -5539,7 +5863,7 @@ paths:
           in: query
           schema:
             type: string
-          description: 'Search by name, city, or address'
+          description: 'Search by name or address'
         -
           name: plot_id
           in: query
@@ -5557,6 +5881,68 @@ paths:
           schema:
             type: string
           description: 'Filter by email (LIKE match)'
+        -
+          name: company_type
+          in: query
+          schema:
+            type: string
+            enum:
+              - existing
+              - under_incorporation
+          description: 'Filter by company type'
+        -
+          name: company_nationality_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by company nationality ID'
+        -
+          name: partnership_type_id
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by partnership type ID'
+        -
+          name: number_or_patrols
+          in: query
+          schema:
+            type: integer
+          description: 'Filter by number of patrols'
+        -
+          name: commercial_register_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 'Filter by exact commercial register date'
+        -
+          name: from_commercial_register_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 'Filter by commercial register date (from)'
+        -
+          name: to_commercial_register_date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 'Filter by commercial register date (to)'
+        -
+          name: from_created_at
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 'Filter by creation date (from)'
+        -
+          name: to_created_at
+          in: query
+          schema:
+            type: string
+            format: date
+          description: 'Filter by creation date (to)'
         -
           name: ids
           in: query
@@ -5690,6 +6076,43 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
+  '/investments/facilities/{id}/authorized-persons':
+    put:
+      tags:
+        - Facilities
+      summary: 'Update authorized persons for a Facility'
+      description: "Replaces the authorized persons of the facility with the provided list\n(full sync, existing assignments not present in the list are removed).\n\nFor each item, if the `person.id` is provided, the passed person fields update the existing\nperson with that id. Otherwise, a new person is created from the passed fields and used.\nWhen no `id` is provided, the `name` field is required.\n\nPassing an empty array `[]` clears all authorized persons for the facility.\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFacilityAuthorizedPersonsDTO'
+      responses:
+        200:
+          description: 'Authorized persons updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/FacilityInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
   /investments/facility-industrial-licenses:
     get:
       tags:
@@ -6168,6 +6591,196 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
+  /investments/partnership-types:
+    get:
+      tags:
+        - 'Partnership Types'
+      summary: 'Get all Partnership Types'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: search
+          in: query
+          schema:
+            type: string
+        -
+          name: is_active
+          in: query
+          schema:
+            type: boolean
+        -
+          name: is_default
+          in: query
+          schema:
+            type: boolean
+      responses:
+        200:
+          description: 'List of partnership types'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/PartnershipTypeInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+    post:
+      tags:
+        - 'Partnership Types'
+      summary: 'Create a Partnership Type'
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnershipTypeDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PartnershipTypeInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  '/investments/partnership-types/{id}':
+    get:
+      tags:
+        - 'Partnership Types'
+      summary: 'Get a Partnership Type by ID'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Partnership type details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PartnershipTypeInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      tags:
+        - 'Partnership Types'
+      summary: 'Update a Partnership Type'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartnershipTypeDTO'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PartnershipTypeInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+    delete:
+      tags:
+        - 'Partnership Types'
+      summary: 'Delete a Partnership Type'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+  '/investments/plots/{plotId}/requests/subscription':
+    post:
+      tags:
+        - 'Subscription Requests'
+      summary: 'Create a Subscription Request'
+      description: "Creates, inside one database transaction:\n  1. A new plot dossier with status `pending_subscription_fee`\n  2. Its partners — investors are created or updated from the passed `investor` objects,\n     then attached to the dossier\n  3. A new facility linked to the dossier\n  4. The facility authorized persons\n\nForeign keys (`plot_id`, `plot_dossier_id`, `facility_id`) are derived server-side from the\nroute parameter and the created records, and must NOT be sent by the client.\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddSubscriptionRequestRequest'
+      responses:
+        200:
+          description: "Subscription request created successfully. Returns the created plot dossier\n(with its plot, partners and facilities including their authorized persons).\nThe created dossier has status `pending_subscription_fee`.\n"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierInfoResource' } } }
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /investments/rent-contract-industries:
     get:
       tags:
@@ -6450,155 +7063,6 @@ paths:
       tags:
         - 'Rent Contracts'
       summary: 'Delete a Rent Contract'
-      security:
-        -
-          sanctumAuth: {  }
-      parameters:
-        -
-          name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: 'Deleted successfully'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SuccessResponse'
-        401:
-          $ref: '#/components/responses/Unauthenticated'
-        404:
-          $ref: '#/components/responses/NotFound'
-  /investments/service-conditions:
-    get:
-      tags:
-        - 'Service Conditions'
-      summary: 'Get all Service Conditions'
-      security:
-        -
-          sanctumAuth: {  }
-      parameters:
-        -
-          name: search
-          in: query
-          schema:
-            type: string
-        -
-          name: is_active
-          in: query
-          schema:
-            type: boolean
-        -
-          name: is_default
-          in: query
-          schema:
-            type: boolean
-      responses:
-        200:
-          description: 'List of service conditions'
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/ServiceConditionInfoResource' } } } }
-        401:
-          $ref: '#/components/responses/Unauthenticated'
-    post:
-      tags:
-        - 'Service Conditions'
-      summary: 'Create a Service Condition'
-      security:
-        -
-          sanctumAuth: {  }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ServiceConditionDTO'
-      responses:
-        200:
-          description: 'Created successfully'
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/ServiceConditionInfoResource' } } }
-        401:
-          $ref: '#/components/responses/Unauthenticated'
-        422:
-          $ref: '#/components/responses/ValidationError'
-  '/investments/service-conditions/{id}':
-    get:
-      tags:
-        - 'Service Conditions'
-      summary: 'Get a Service Condition by ID'
-      security:
-        -
-          sanctumAuth: {  }
-      parameters:
-        -
-          name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: 'Service condition details'
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/ServiceConditionInfoResource' } } }
-        401:
-          $ref: '#/components/responses/Unauthenticated'
-        404:
-          $ref: '#/components/responses/NotFound'
-    put:
-      tags:
-        - 'Service Conditions'
-      summary: 'Update a Service Condition'
-      security:
-        -
-          sanctumAuth: {  }
-      parameters:
-        -
-          name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ServiceConditionDTO'
-      responses:
-        200:
-          description: 'Updated successfully'
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/ServiceConditionInfoResource' } } }
-        401:
-          $ref: '#/components/responses/Unauthenticated'
-        404:
-          $ref: '#/components/responses/NotFound'
-        422:
-          $ref: '#/components/responses/ValidationError'
-    delete:
-      tags:
-        - 'Service Conditions'
-      summary: 'Delete a Service Condition'
       security:
         -
           sanctumAuth: {  }
@@ -7405,6 +7869,58 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ValidationErrorResponse'
+  '/users/{id}/password':
+    post:
+      summary: 'Update user password'
+      tags:
+        - 'Users Module'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - password
+                - password_confirmation
+              properties:
+                password:
+                  type: string
+                  format: password
+                  example: newpassword123
+                password_confirmation:
+                  type: string
+                  format: password
+                  example: newpassword123
+      responses:
+        200:
+          description: 'User password updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/User' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        422:
+          description: 'Validation error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
   /users/signature:
     post:
       summary: 'Update user signature'
@@ -7683,6 +8199,53 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    Notification:
+      type: object
+      description: 'A database notification stored in the `notifications` table.'
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 4b1f1e7a-9f6b-4a1c-8a2e-3f5d7c9b2e41
+        type:
+          type: string
+          description: 'Fully-qualified class name of the notification.'
+          example: App\Modules\Investments\Notifications\SubscriptionRequestCreated
+        notifiable_type:
+          type: string
+          example: App\Modules\UserManagement\Domain\Entities\User
+        notifiable_id:
+          type: integer
+          example: 1
+        data:
+          type: object
+          description: 'Notification payload built by `DatabaseNotificationPayloadBuilder`.'
+          properties:
+            title:
+              type: string
+              example: 'New subscription request'
+            content:
+              type: object
+              additionalProperties: true
+              example:
+                dossier_id: 15
+                message: 'A new subscription request was submitted'
+            notification_type:
+              type: string
+              example: App\Modules\Investments\Notifications\SubscriptionRequestCreated
+        read_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2026-08-12T10:00:00.000000Z'
+        created_at:
+          type: string
+          format: date-time
+          example: '2026-08-12T09:30:00.000000Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2026-08-12T09:30:00.000000Z'
     SuccessResponse:
       type: object
       properties:
@@ -7839,6 +8402,64 @@ components:
         created_at:
           type: string
           example: '2024-01-01 10:00:00'
+    PersonInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Ahmad Hassan'
+        email:
+          type: string
+          nullable: true
+          example: ahmad@example.com
+        primary_phone_number:
+          type: string
+          example: '+963999999999'
+        secondary_phone_number:
+          type: string
+          nullable: true
+          example: null
+        whatsapp:
+          type: string
+          nullable: true
+          example: '+963999999999'
+        telegram:
+          type: string
+          nullable: true
+          example: null
+        x:
+          type: string
+          nullable: true
+          example: 'https://x.com/ahmad'
+        linkedin:
+          type: string
+          nullable: true
+          example: 'https://linkedin.com/in/ahmad'
+        facebook:
+          type: string
+          nullable: true
+          example: 'https://facebook.com/ahmad'
+        personable_type:
+          type: string
+          nullable: true
+          example: App\Modules\HR\Domain\Entities\Employee
+          description: 'Morph class of the source resource (Employee or Investor)'
+        personable_id:
+          type: integer
+          nullable: true
+          example: 1
+          description: 'ID of the source resource'
+        created_at:
+          type: string
+          format: date
+          example: 06-07-2026
+        updated_at:
+          type: string
+          format: date
+          example: 06-07-2026
     ChatUser:
       type: object
       properties:
@@ -9726,6 +10347,45 @@ components:
           type: string
           format: date
           example: 12-07-2026
+    ConsumableMaterialDTO:
+      type: object
+      required:
+        - name
+        - is_active
+      properties:
+        name:
+          type: string
+          description: 'Required. The name of the consumable material. Must be unique among non-deleted records.'
+          example: 'Lubricant Oil'
+        unit:
+          type: string
+          nullable: true
+          description: 'Optional. The unit of measurement for the material.'
+          example: Liters
+        is_active:
+          type: boolean
+          description: 'Required. Whether this material is currently active.'
+          example: true
+    ConsumableMaterialInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Lubricant Oil'
+        unit:
+          type: string
+          nullable: true
+          example: Liters
+        is_active:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date
+          example: 19-08-2026
     ContractDTO:
       type: object
       required:
@@ -10020,28 +10680,6 @@ components:
                 type: string
                 nullable: true
                 example: pending
-    ServiceCondition_WithPivot:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        name:
-          type: string
-          example: Active
-        is_active:
-          type: boolean
-          example: true
-        is_default:
-          type: boolean
-          example: false
-        pivot:
-          type: object
-          properties:
-            note:
-              type: string
-              nullable: true
-              example: 'Some note'
     ServiceStatusCondition_WithPivot:
       type: object
       properties:
@@ -10145,11 +10783,6 @@ components:
           allOf:
             -
               $ref: '#/components/schemas/PlotDossierInfoResource'
-        service_conditions:
-          type: array
-          nullable: true
-          items:
-            $ref: '#/components/schemas/ServiceCondition_WithPivot'
         service_status_conditions:
           type: array
           nullable: true
@@ -10689,27 +11322,27 @@ components:
       type: object
       required:
         - plot_id
+        - plot_dossier_id
         - name
         - address
-        - city
+        - company_type
         - first_phone_number
-        - capital_in_usd
-        - capital_in_syp
+        - total_capital_in_usd
+        - total_capital_in_syp
         - value_of_machines_in_usd
         - value_of_machines_in_syp
         - number_of_workers
-        - daily_production_capacity
-        - monthly_production_capacity
-        - yearly_production_capacity
         - electrical_power_capacity
-        - yearly_estimated_water_consumption
+        - authorized_persons
+        - daily_production_capacities
+        - monthly_production_capacities
+        - yearly_production_capacities
       properties:
         plot_id:
           type: integer
           example: 1
         plot_dossier_id:
           type: integer
-          nullable: true
           example: 1
         name:
           type: string
@@ -10717,9 +11350,26 @@ components:
         address:
           type: string
           example: '123 Industrial Zone'
-        city:
+        company_type:
           type: string
-          example: Damascus
+          enum:
+            - existing
+            - under_incorporation
+          description: "Company type. When `existing`, `commercial_register` and `commercial_register_date` are required.\n"
+          example: existing
+        commercial_register:
+          type: string
+          description: 'Required when `company_type` is `existing`.'
+          example: CR-12345
+        commercial_register_date:
+          type: string
+          format: date
+          description: 'Required when `company_type` is `existing`.'
+          example: '2024-01-15'
+        company_nationality_id:
+          type: integer
+          nullable: true
+          example: 1
         first_phone_number:
           type: string
           example: '+963111111111'
@@ -10731,10 +11381,14 @@ components:
           type: string
           nullable: true
           example: factory@example.com
-        capital_in_usd:
+        partnership_type_id:
+          type: integer
+          nullable: true
+          example: 1
+        total_capital_in_usd:
           type: number
           example: 500000.0
-        capital_in_syp:
+        total_capital_in_syp:
           type: number
           example: 250000000.0
         value_of_machines_in_usd:
@@ -10746,21 +11400,103 @@ components:
         number_of_workers:
           type: integer
           example: 50
-        daily_production_capacity:
-          type: number
-          example: 1000.0
-        monthly_production_capacity:
-          type: number
-          example: 30000.0
-        yearly_production_capacity:
-          type: number
-          example: 365000.0
         electrical_power_capacity:
           type: number
           example: 500.0
-        yearly_estimated_water_consumption:
+        yearly_estimated_drinking_water_consumption:
           type: number
+          nullable: true
           example: 10000.0
+        yearly_estimated_industrial_water_consumption:
+          type: number
+          nullable: true
+          example: 5000.0
+        number_or_patrols:
+          type: integer
+          nullable: true
+          example: 10
+        telephone_lines_number:
+          type: integer
+          nullable: true
+          example: 5
+        monthly_internet_data_requirement:
+          type: number
+          nullable: true
+          example: 100.0
+        yearly_imported_raw_materials:
+          type: string
+          nullable: true
+          example: '5000 tons'
+        export_to_production_ratio:
+          type: number
+          nullable: true
+          description: 'Ratio between 0 and 100.'
+          example: 75.0
+        require_all_persons_for_legal_matters:
+          type: boolean
+          default: false
+          description: "Optional. When true, all authorized persons are required for legal matters.\nDefaults to false when omitted.\n"
+          example: false
+        authorized_persons:
+          type: array
+          description: "Required. List of authorized persons for the facility. Each item either creates a new person\n(when `person.id` is not provided) or updates an existing one (when `person.id` is provided).\nPass `[]` to clear all.\n"
+          items:
+            $ref: '#/components/schemas/AuthorizedPersonItem'
+        daily_consumption:
+          type: array
+          nullable: true
+          description: "Optional. List of consumable materials with their consumption for the facility.\nOmit to leave unchanged, pass `[]` to clear.\n"
+          items:
+            $ref: '#/components/schemas/DailyConsumptionItem'
+        daily_production_capacities:
+          type: array
+          description: "Required. List of daily production capacities. Each item must have `material` and `production`.\nPass `[]` to clear all.\n"
+          items:
+            $ref: '#/components/schemas/ProductionCapacityItem'
+        monthly_production_capacities:
+          type: array
+          description: "Required. List of monthly production capacities. Each item must have `material` and `production`.\nPass `[]` to clear all.\n"
+          items:
+            $ref: '#/components/schemas/ProductionCapacityItem'
+        yearly_production_capacities:
+          type: array
+          description: "Required. List of yearly production capacities. Each item must have `material` and `production`.\nPass `[]` to clear all.\n"
+          items:
+            $ref: '#/components/schemas/ProductionCapacityItem'
+    DailyConsumptionItem:
+      type: object
+      required:
+        - id
+        - consumption
+      properties:
+        id:
+          type: integer
+          description: 'ID of an existing consumable material.'
+          example: 1
+        consumption:
+          type: string
+          description: 'The consumption details for this consumable material.'
+          example: '100 liters per day'
+      example:
+        id: 1
+        consumption: '100 liters per day'
+    ProductionCapacityItem:
+      type: object
+      required:
+        - material
+        - production
+      properties:
+        material:
+          type: string
+          description: 'The material used in production.'
+          example: 'Raw Steel'
+        production:
+          type: string
+          description: 'The production output.'
+          example: '500 units per day'
+      example:
+        material: 'Raw Steel'
+        production: '500 units per day'
     FacilityInfoResource:
       type: object
       properties:
@@ -10787,15 +11523,47 @@ components:
           allOf:
             -
               $ref: '#/components/schemas/PlotDossierInfoResource'
+        partnership_type_id:
+          type: integer
+          nullable: true
+          example: null
+        partnership_type:
+          type: object
+          nullable: true
+          allOf:
+            -
+              $ref: '#/components/schemas/PartnershipTypeInfoResource'
         name:
           type: string
           example: 'Main Factory'
         address:
           type: string
           example: '123 Industrial Zone'
-        city:
+        company_type:
           type: string
-          example: Damascus
+          enum:
+            - existing
+            - under_incorporation
+          example: existing
+        commercial_register:
+          type: string
+          nullable: true
+          example: CR-12345
+        commercial_register_date:
+          type: string
+          format: date
+          nullable: true
+          example: '2024-01-15'
+        company_nationality_id:
+          type: integer
+          nullable: true
+          example: null
+        company_nationality:
+          type: object
+          nullable: true
+          allOf:
+            -
+              $ref: '#/components/schemas/CountryInfoResource'
         first_phone_number:
           type: string
           example: '+963111111111'
@@ -10807,10 +11575,10 @@ components:
           type: string
           nullable: true
           example: factory@example.com
-        capital_in_usd:
+        total_capital_in_usd:
           type: number
           example: 500000.0
-        capital_in_syp:
+        total_capital_in_syp:
           type: number
           example: 250000000.0
         value_of_machines_in_usd:
@@ -10822,21 +11590,40 @@ components:
         number_of_workers:
           type: integer
           example: 50
-        daily_production_capacity:
-          type: number
-          example: 1000.0
-        monthly_production_capacity:
-          type: number
-          example: 30000.0
-        yearly_production_capacity:
-          type: number
-          example: 365000.0
         electrical_power_capacity:
           type: number
           example: 500.0
-        yearly_estimated_water_consumption:
+        yearly_estimated_drinking_water_consumption:
           type: number
+          nullable: true
           example: 10000.0
+        yearly_estimated_industrial_water_consumption:
+          type: number
+          nullable: true
+          example: 5000.0
+        number_or_patrols:
+          type: integer
+          nullable: true
+          example: 10
+        telephone_lines_number:
+          type: integer
+          nullable: true
+          example: 5
+        monthly_internet_data_requirement:
+          type: number
+          nullable: true
+          example: 100.0
+        yearly_imported_raw_materials:
+          type: string
+          nullable: true
+          example: '5000 tons'
+        export_to_production_ratio:
+          type: number
+          nullable: true
+          example: 0.75
+        require_all_persons_for_legal_matters:
+          type: boolean
+          example: false
         created_at:
           type: string
           format: date
@@ -10845,6 +11632,198 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FacilityIndustrialLicenseInfoResource'
+        authorized_persons:
+          type: array
+          description: "List of persons authorized for the facility, each with their role in the facility\n(returned when the `authorizedPersons` relation is loaded).\n"
+          items:
+            $ref: '#/components/schemas/AuthorizedPersonResource'
+        daily_consumption:
+          type: array
+          description: "List of consumable materials with their consumption for the facility\n(returned when the `daily_consumption` relation is loaded).\n"
+          items:
+            $ref: '#/components/schemas/DailyConsumptionResource'
+        daily_production_capacities:
+          type: array
+          description: "List of daily production capacities for the facility\n(returned when the `dailyProductionCapacities` relation is loaded).\n"
+          items:
+            $ref: '#/components/schemas/ProductionCapacityResource'
+        monthly_production_capacities:
+          type: array
+          description: "List of monthly production capacities for the facility\n(returned when the `monthlyProductionCapacities` relation is loaded).\n"
+          items:
+            $ref: '#/components/schemas/ProductionCapacityResource'
+        yearly_production_capacities:
+          type: array
+          description: "List of yearly production capacities for the facility\n(returned when the `yearlyProductionCapacities` relation is loaded).\n"
+          items:
+            $ref: '#/components/schemas/ProductionCapacityResource'
+    ProductionCapacityResource:
+      type: object
+      required:
+        - id
+        - material
+        - production
+      properties:
+        id:
+          type: integer
+          example: 1
+        material:
+          type: string
+          description: 'The material used in production.'
+          example: 'Raw Steel'
+        production:
+          type: string
+          description: 'The production output.'
+          example: '500 units per day'
+    DailyConsumptionResource:
+      type: object
+      required:
+        - consumable_material
+        - consumption
+      properties:
+        consumable_material:
+          $ref: '#/components/schemas/ConsumableMaterialInfoResource'
+        consumption:
+          type: string
+          nullable: true
+          description: 'The consumption details for this consumable material.'
+          example: '100 liters per day'
+    PersonData:
+      type: object
+      description: "Data of a person to create or update.\n- If `id` is provided, the passed fields update the existing person with that id.\n- If `id` is NOT provided, a new person is created from the passed fields and used.\n- When `id` is not provided, the `name` field is required.\n"
+      properties:
+        id:
+          type: integer
+          nullable: true
+          example: 1
+          description: 'ID of an existing person (CRM `people` table, soft-deleted persons are excluded). When provided, the person is updated with the passed fields.'
+        name:
+          type: string
+          example: 'John Doe'
+          description: 'Person name. Required when no `id` is provided.'
+        role:
+          type: string
+          nullable: true
+          example: Manager
+          description: 'Person role (optional).'
+        email:
+          type: string
+          format: email
+          nullable: true
+          example: john@example.com
+          description: 'Person email (optional, must be unique).'
+        primary_phone_number:
+          type: string
+          nullable: true
+          example: '+963911111111'
+        secondary_phone_number:
+          type: string
+          nullable: true
+          example: '+963922222222'
+        whatsapp:
+          type: string
+          nullable: true
+        telegram:
+          type: string
+          nullable: true
+        x:
+          type: string
+          nullable: true
+        linkedin:
+          type: string
+          nullable: true
+        facebook:
+          type: string
+          nullable: true
+      example:
+        name: 'John Doe'
+        role: Manager
+        email: john.doe@example.com
+        primary_phone_number: '+963911111111'
+        secondary_phone_number: '+963922222222'
+        whatsapp: '+963933333333'
+        telegram: '@johndoe'
+        x: '@johndoe'
+        linkedin: 'https://linkedin.com/in/johndoe'
+        facebook: 'https://facebook.com/johndoe'
+    AuthorizedPersonItem:
+      type: object
+      required:
+        - person
+        - role_in_facility
+      properties:
+        person:
+          $ref: '#/components/schemas/PersonData'
+        role_in_facility:
+          type: string
+          example: 'Factory Manager'
+          description: 'The role of the person inside the facility (stored in the pivot table).'
+        is_required_for_legal_matters:
+          type: boolean
+          default: false
+          description: 'Optional. Whether this person is required for legal matters. Defaults to false when omitted.'
+          example: false
+      example:
+        person:
+          name: 'John Doe'
+          role: Manager
+          email: john.doe@example.com
+          primary_phone_number: '+963911111111'
+          secondary_phone_number: '+963922222222'
+          whatsapp: '+963933333333'
+          telegram: '@johndoe'
+          x: '@johndoe'
+          linkedin: 'https://linkedin.com/in/johndoe'
+          facebook: 'https://facebook.com/johndoe'
+        role_in_facility: 'Factory Manager'
+        is_required_for_legal_matters: true
+    AuthorizedPersonResource:
+      type: object
+      required:
+        - person
+        - role_in_facility
+      properties:
+        person:
+          $ref: '#/components/schemas/PersonInfoResource'
+        role_in_facility:
+          type: string
+          example: 'Factory Manager'
+          description: 'The role of the person inside the facility (stored in the pivot table).'
+        is_required_for_legal_matters:
+          type: boolean
+          example: false
+          description: 'Whether this person is required for legal matters.'
+    UpdateFacilityAuthorizedPersonsDTO:
+      type: object
+      required:
+        - authorized_persons
+      properties:
+        authorized_persons:
+          type: array
+          description: "List of persons to set as authorized for the facility, each with their role in the facility.\nPassing an empty array `[]` clears all authorized persons.\n\nFor each item, if the `person.id` is provided, the passed person fields update the existing\nperson with that id. Otherwise, a new person is created from the passed fields and used.\nWhen no `id` is provided, the `name` field is required.\n"
+          items:
+            $ref: '#/components/schemas/AuthorizedPersonItem'
+      example:
+        authorized_persons:
+          -
+            person:
+              name: 'John Doe'
+              role: Manager
+              email: john.doe@example.com
+              primary_phone_number: '+963911111111'
+              secondary_phone_number: '+963922222222'
+              whatsapp: '+963933333333'
+              telegram: '@johndoe'
+              x: '@johndoe'
+              linkedin: 'https://linkedin.com/in/johndoe'
+              facebook: 'https://facebook.com/johndoe'
+            role_in_facility: 'Factory Manager'
+            is_required_for_legal_matters: true
+          -
+            person:
+              id: 5
+              email: updated@example.com
+            role_in_facility: 'Production Supervisor'
     FacilityIndustrialLicenseDTO:
       type: object
       required:
@@ -11031,6 +12010,187 @@ components:
           type: string
           format: date
           example: 12-07-2026
+    PartnershipTypeDTO:
+      type: object
+      required:
+        - name
+        - is_default
+        - is_active
+      properties:
+        name:
+          type: string
+          example: 'Joint Stock Company'
+        is_default:
+          type: boolean
+          example: false
+        is_active:
+          type: boolean
+          example: true
+    PartnershipTypeInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: 'Joint Stock Company'
+        is_active:
+          type: boolean
+          example: true
+        is_default:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date
+          example: 12-07-2026
+    SubscriptionRequestPartners:
+      type: object
+      description: 'Existing investors to attach to the created dossier as partners.'
+      required:
+        - investor_ids
+      properties:
+        investor_ids:
+          type: array
+          description: 'IDs of existing investors (from the `investors` table) to attach to the dossier as partners.'
+          items:
+            type: integer
+          example:
+            - 1
+            - 2
+    SubscriptionRequestFacility:
+      type: object
+      description: "Facility data. `plot_id` and `plot_dossier_id` are derived server-side from the route\nparameter and the created dossier, and must NOT be sent by the client.\n"
+      required:
+        - name
+        - address
+        - city
+        - first_phone_number
+        - capital_in_usd
+        - capital_in_syp
+        - value_of_machines_in_usd
+        - value_of_machines_in_syp
+        - number_of_workers
+        - daily_production_capacity
+        - monthly_production_capacity
+        - yearly_production_capacity
+        - electrical_power_capacity
+        - yearly_estimated_water_consumption
+      properties:
+        name:
+          type: string
+          example: 'Main Factory'
+        address:
+          type: string
+          example: '123 Industrial Zone'
+        city:
+          type: string
+          example: Damascus
+        first_phone_number:
+          type: string
+          example: '+963111111111'
+        second_phone_number:
+          type: string
+          nullable: true
+          example: '+963222222222'
+        email:
+          type: string
+          nullable: true
+          example: factory@example.com
+        partnership_type_id:
+          type: integer
+          nullable: true
+          example: 1
+        capital_in_usd:
+          type: number
+          example: 500000.0
+        capital_in_syp:
+          type: number
+          example: 250000000.0
+        value_of_machines_in_usd:
+          type: number
+          example: 200000.0
+        value_of_machines_in_syp:
+          type: number
+          example: 100000000.0
+        number_of_workers:
+          type: integer
+          example: 50
+        daily_production_capacity:
+          type: number
+          example: 1000.0
+        monthly_production_capacity:
+          type: number
+          example: 30000.0
+        yearly_production_capacity:
+          type: number
+          example: 365000.0
+        electrical_power_capacity:
+          type: number
+          example: 500.0
+        yearly_estimated_water_consumption:
+          type: number
+          example: 10000.0
+        require_all_persons_for_legal_matters:
+          type: boolean
+          default: false
+          example: false
+          description: "Optional. When true, all authorized persons are required for legal matters.\nDefaults to false when omitted.\n"
+    AddPlotSubscriptionRequestRequest:
+      type: object
+      required:
+        - facility
+        - authorized_persons
+        - partners
+      properties:
+        facility:
+          $ref: '#/components/schemas/SubscriptionRequestFacility'
+        authorized_persons:
+          type: array
+          description: "Authorized persons for the facility. Each item either creates a new person\n(when `person.id` is not provided) or updates an existing one (when `person.id` is provided).\nWhen `person.id` is not provided, `person.name` is required.\n"
+          items:
+            $ref: '#/components/schemas/AuthorizedPersonItem'
+        partners:
+          $ref: '#/components/schemas/SubscriptionRequestPartners'
+      example:
+        facility:
+          name: 'Main Factory'
+          address: '123 Industrial Zone'
+          city: Damascus
+          first_phone_number: '+963111111111'
+          second_phone_number: '+963222222222'
+          email: factory@example.com
+          capital_in_usd: 500000.0
+          capital_in_syp: 250000000.0
+          value_of_machines_in_usd: 200000.0
+          value_of_machines_in_syp: 100000000.0
+          number_of_workers: 50
+          daily_production_capacity: 1000.0
+          monthly_production_capacity: 30000.0
+          yearly_production_capacity: 365000.0
+          electrical_power_capacity: 500.0
+          yearly_estimated_water_consumption: 10000.0
+          require_all_persons_for_legal_matters: false
+        authorized_persons:
+          -
+            person:
+              name: 'John Doe'
+              role: Manager
+              email: john.doe@example.com
+              primary_phone_number: '+963911111111'
+              secondary_phone_number: '+963922222222'
+              whatsapp: '+963933333333'
+              telegram: '@johndoe'
+              x: '@johndoe'
+              linkedin: 'https://linkedin.com/in/johndoe'
+              facebook: 'https://facebook.com/johndoe'
+            role_in_facility: 'Factory Manager'
+            is_required_for_legal_matters: true
+        partners:
+          investor_ids:
+            - 1
+            - 2
     RentContractIndustryDTO:
       type: object
       required:
@@ -11146,45 +12306,6 @@ components:
           type: string
           format: date
           example: 21-07-2026
-    ServiceConditionDTO:
-      type: object
-      required:
-        - name
-        - is_default
-        - is_active
-      properties:
-        name:
-          type: string
-          example: Active
-        is_default:
-          type: boolean
-          example: false
-        is_active:
-          type: boolean
-          example: true
-    ServiceConditionInfoResource:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        name:
-          type: string
-          example: Active
-        is_active:
-          type: boolean
-          example: true
-        is_default:
-          type: boolean
-          example: false
-        created_at:
-          type: string
-          format: date
-          example: 16-07-2026
-        updated_at:
-          type: string
-          format: date
-          example: 16-07-2026
     ServiceStatusConditionDTO:
       type: object
       required:
@@ -11220,6 +12341,232 @@ components:
           type: string
           format: date
           example: 16-07-2026
+    AddSubscriptionRequestRequest:
+      type: object
+      required:
+        - partners
+        - facility
+        - authorized_persons
+      properties:
+        partners:
+          type: array
+          description: "Investors to attach to the created dossier as partners.\nEach item either creates a new investor (when `investor.id` is not provided)\nor updates an existing investor (when `investor.id` is provided).\n"
+          items:
+            $ref: '#/components/schemas/SubscriptionPartnerItem'
+        facility:
+          $ref: '#/components/schemas/AddSubscriptionRequestFacility'
+        authorized_persons:
+          type: array
+          description: "Authorized persons for the created facility. Each item either creates a new person\n(when `person.id` is not provided) or updates an existing one (when `person.id` is provided).\nWhen `person.id` is not provided, `person.name` is required.\n"
+          items:
+            $ref: '#/components/schemas/AuthorizedPersonItem'
+      example:
+        partners:
+          -
+            investor:
+              first_name: John
+              last_name: Doe
+              father_name: Michael
+              mother_name: Sarah
+              nationality: Syrian
+              gender: male
+              is_possible_investor_in_future: false
+        facility:
+          name: 'Main Factory'
+          address: '123 Industrial Zone'
+          city: Damascus
+          first_phone_number: '+963111111111'
+          second_phone_number: '+963222222222'
+          email: factory@example.com
+          capital_in_usd: 500000.0
+          capital_in_syp: 250000000.0
+          value_of_machines_in_usd: 200000.0
+          value_of_machines_in_syp: 100000000.0
+          number_of_workers: 50
+          daily_production_capacity: 1000.0
+          monthly_production_capacity: 30000.0
+          yearly_production_capacity: 365000.0
+          electrical_power_capacity: 500.0
+          yearly_estimated_water_consumption: 10000.0
+          require_all_persons_for_legal_matters: false
+        authorized_persons:
+          -
+            person:
+              name: 'John Doe'
+              role: Manager
+              email: john.doe@example.com
+              primary_phone_number: '+963911111111'
+              secondary_phone_number: '+963922222222'
+              whatsapp: '+963933333333'
+              telegram: '@johndoe'
+              x: '@johndoe'
+              linkedin: 'https://linkedin.com/in/johndoe'
+              facebook: 'https://facebook.com/johndoe'
+            role_in_facility: 'Factory Manager'
+            is_required_for_legal_matters: true
+    SubscriptionPartnerItem:
+      type: object
+      required:
+        - investor
+      properties:
+        investor:
+          $ref: '#/components/schemas/InvestorPayload'
+    InvestorPayload:
+      type: object
+      description: "Investor data to create or update.\n- If `id` is provided, the passed fields update the existing investor with that id.\n- If `id` is NOT provided, a new investor is created from the passed fields.\n- When `id` is not provided, `first_name`, `last_name`, `father_name`, `mother_name`,\n  `nationality`, `gender` and `is_possible_investor_in_future` are required.\n"
+      properties:
+        id:
+          type: integer
+          nullable: true
+          example: 1
+          description: 'ID of an existing investor (soft-deleted investors are excluded). When provided, the investor is updated with the passed fields.'
+        first_name:
+          type: string
+          example: John
+        last_name:
+          type: string
+          example: Doe
+        father_name:
+          type: string
+          example: Michael
+        mother_name:
+          type: string
+          example: Sarah
+        grandfather_name:
+          type: string
+          nullable: true
+          example: Robert
+        national_id:
+          type: string
+          nullable: true
+          example: '1234567890'
+        passport_number:
+          type: string
+          nullable: true
+          example: A1234567
+        nationality:
+          type: string
+          example: Syrian
+        gender:
+          type: string
+          enum:
+            - male
+            - female
+          example: male
+        phone:
+          type: string
+          nullable: true
+          example: '+963999999999'
+        whatsapp_number:
+          type: string
+          nullable: true
+          example: '+963999999999'
+        email:
+          type: string
+          format: email
+          nullable: true
+          example: johndoe@example.com
+        address:
+          type: string
+          nullable: true
+          example: 'Damascus, Syria'
+        facebook:
+          type: string
+          nullable: true
+          example: 'https://facebook.com/johndoe'
+        instagram:
+          type: string
+          nullable: true
+          example: 'https://instagram.com/johndoe'
+        x:
+          type: string
+          nullable: true
+          example: 'https://x.com/johndoe'
+        linkedin:
+          type: string
+          nullable: true
+          example: 'https://linkedin.com/in/johndoe'
+        is_possible_investor_in_future:
+          type: boolean
+          example: false
+    AddSubscriptionRequestFacility:
+      type: object
+      description: "Facility data. `plot_id` and `plot_dossier_id` are derived server-side from the route\nparameter and the created dossier, and must NOT be sent by the client.\n"
+      required:
+        - name
+        - address
+        - city
+        - first_phone_number
+        - capital_in_usd
+        - capital_in_syp
+        - value_of_machines_in_usd
+        - value_of_machines_in_syp
+        - number_of_workers
+        - daily_production_capacity
+        - monthly_production_capacity
+        - yearly_production_capacity
+        - electrical_power_capacity
+        - yearly_estimated_water_consumption
+      properties:
+        name:
+          type: string
+          example: 'Main Factory'
+        address:
+          type: string
+          example: '123 Industrial Zone'
+        city:
+          type: string
+          example: Damascus
+        first_phone_number:
+          type: string
+          example: '+963111111111'
+        second_phone_number:
+          type: string
+          nullable: true
+          example: '+963222222222'
+        email:
+          type: string
+          nullable: true
+          example: factory@example.com
+        partnership_type_id:
+          type: integer
+          nullable: true
+          example: 1
+        capital_in_usd:
+          type: number
+          example: 500000.0
+        capital_in_syp:
+          type: number
+          example: 250000000.0
+        value_of_machines_in_usd:
+          type: number
+          example: 200000.0
+        value_of_machines_in_syp:
+          type: number
+          example: 100000000.0
+        number_of_workers:
+          type: integer
+          example: 50
+        daily_production_capacity:
+          type: number
+          example: 1000.0
+        monthly_production_capacity:
+          type: number
+          example: 30000.0
+        yearly_production_capacity:
+          type: number
+          example: 365000.0
+        electrical_power_capacity:
+          type: number
+          example: 500.0
+        yearly_estimated_water_consumption:
+          type: number
+          example: 10000.0
+        require_all_persons_for_legal_matters:
+          type: boolean
+          default: false
+          example: false
+          description: "Optional. When true, all authorized persons are required for legal matters.\nDefaults to false when omitted.\n"
     StorageItemBase:
       type: object
       properties:
@@ -12076,6 +13423,9 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
 tags:
   -
+    name: Notifications
+    description: "Manage the authenticated user's notifications"
+  -
     name: Countries
     description: 'Manage Countries'
   -
@@ -12093,6 +13443,9 @@ tags:
   -
     name: Specializations
     description: 'Manage Specializations'
+  -
+    name: People
+    description: 'Manage People'
   -
     name: 'Chat Module'
     description: 'Conversations and messages'
@@ -12132,6 +13485,9 @@ tags:
   -
     name: 'By Industry Licenses'
     description: 'Manage By Industry License definitions'
+  -
+    name: 'Consumable Materials'
+    description: 'Manage Consumable Material definitions'
   -
     name: Contracts
     description: 'Manage Contract definitions'
@@ -12184,17 +13540,23 @@ tags:
     name: 'License Statuses'
     description: 'Manage License Status definitions'
   -
+    name: 'Partnership Types'
+    description: 'Manage Partnership Type definitions'
+  -
+    name: 'Plot Requests'
+    description: 'Submit plot requests'
+  -
     name: 'Rent Contract Industries'
     description: 'Manage Rent Contract Industry definitions'
   -
     name: 'Rent Contracts'
     description: 'Manage Rent Contracts'
   -
-    name: 'Service Conditions'
-    description: 'Manage Service Condition definitions'
-  -
     name: 'Service Status Conditions'
     description: 'Manage Service Status Condition definitions'
+  -
+    name: 'Subscription Requests'
+    description: 'Create a complete subscription request for a plot'
   -
     name: Storage
     description: 'Resolve storage items by ID or list root-level items'

@@ -112,7 +112,7 @@ export function FormInput<T extends FieldValues>({
 }: FormInputProps<T>) {
   const { t, direction } = useLanguage();
   const auth = useContext(AuthContext);
-  const { setValue, watch, getValues, control } = useFormContext<T>();
+  const { setValue, watch, getValues, control, clearErrors } = useFormContext<T>();
   const { errors } = useFormState({ control, name });
 
   const getFieldError = (obj: any, path: string): string | undefined => {
@@ -193,6 +193,7 @@ export function FormInput<T extends FieldValues>({
 
   const handleChange = (val: any) => {
     setValue(name, val, { shouldValidate: true, shouldDirty: true });
+    if (type === 'data-matrix') clearErrors(name);
   };
 
   const baseClasses = `${inputBaseClasses} ${error ? 'border-danger ring-danger/10 animate-shake' : ''}`;

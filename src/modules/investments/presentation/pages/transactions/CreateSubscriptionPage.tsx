@@ -23,7 +23,7 @@ import type { Country } from '../../../../../core/domain/entities/regions/Countr
 import { useSubscription } from '../../hooks/useSubscription';
 import { mapSubscriptionServerValidationErrors } from '../../forms/subscriptionServerErrors';
 import type { CreateSubscriptionDTO, SubscriptionAuthorizedPersonPayload, SubscriptionInvestorPayload } from '../../../domain/repositories/ISubscriptionRepository';
-import type { ProductionCapacityRow, DailyConsumptionRow } from '../../../domain/entities/facility';
+import type { ProductionCapacityRow } from '../../../domain/entities/facility';
 import type { ConsumptionMaterial } from '../../../domain/entities/consumptionMaterial';
 
 type FetchParams = Record<string, string | number | boolean | undefined>;
@@ -35,7 +35,7 @@ export function CreateSubscriptionPage() {
   const plotsCrud = useEntityCrud<Plot>('/investments/plots', '/investments/plots');
   const partnershipTypesCrud = useEntityCrud<PartnershipType>('/investments/partnership-types', '/investments/partnership-types');
   const countriesCrud = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
-  const consumptionMaterialsCrud = useEntityCrud<ConsumptionMaterial>('/investments/consumption-materials', '/investments/consumption-materials');
+  const consumptionMaterialsCrud = useEntityCrud<ConsumptionMaterial>('/investments/consumable-materials', '/investments/consumable-materials');
   const plotAreasCrud = useEntityCrud<EntityWithNameOnly>('/investments/plot-areas', '/investments/plot-areas');
   const plotClassificationsCrud = useEntityCrud<EntityWithNameOnly>('/investments/plot-classifications', '/investments/plot-classifications');
   const { createSubscription } = useSubscription();
@@ -64,6 +64,7 @@ export function CreateSubscriptionPage() {
   useEffect(() => {
     fetchPlots({ page: 1, per_page: perPage });
     partnershipTypesCrud.getAll('/investments/partnership-types?is_active=true');
+    consumptionMaterialsCrud.getAll('/investments/consumable-materials?is_active=true');
     plotAreasCrud.getAll();
     plotClassificationsCrud.getAll();
   }, []);
@@ -243,29 +244,30 @@ export function CreateSubscriptionPage() {
           name: String(data.name ?? ''),
           partnership_type_id: (data.partnership_type_id as number | null) ?? null,
           address: String(data.address ?? ''),
-          company_status: String(data.company_status ?? ''),
-          commercial_registry: (data.commercial_registry as string | null | undefined) ?? null,
-          commercial_registry_date: (data.commercial_registry_date as string | null | undefined) ?? null,
+          company_type: String(data.company_type ?? ''),
+          commercial_register: (data.commercial_register as string | null | undefined) ?? null,
+          commercial_register_date: (data.commercial_register_date as string | null | undefined) ?? null,
           company_nationality_id: (data.company_nationality_id as number | null) ?? null,
           first_phone_number: String(data.first_phone_number ?? ''),
           second_phone_number: (data.second_phone_number as string) || null,
           email: (data.email as string) || null,
-          capital_in_usd: Number(data.capital_in_usd),
-          capital_in_syp: Number(data.capital_in_syp),
+          total_capital_in_usd: Number(data.total_capital_in_usd),
+          total_capital_in_syp: Number(data.total_capital_in_syp),
           value_of_machines_in_usd: Number(data.value_of_machines_in_usd),
           value_of_machines_in_syp: Number(data.value_of_machines_in_syp),
           number_of_workers: Number(data.number_of_workers),
-          number_of_patrols: (data.number_of_patrols as number | null) ?? null,
-          number_of_phone_lines: (data.number_of_phone_lines as number | null) ?? null,
-          internet_need_monthly_gb: (data.internet_need_monthly_gb as number | null) ?? null,
-          imported_raw_materials_annually: (data.imported_raw_materials_annually as string | null | undefined) ?? null,
-          export_percentage: (data.export_percentage as number | null) ?? null,
-          daily_production_capacity: (data.daily_production_capacity as ProductionCapacityRow[] | undefined) ?? [],
-          monthly_production_capacity: (data.monthly_production_capacity as ProductionCapacityRow[] | undefined) ?? [],
-          yearly_production_capacity: (data.yearly_production_capacity as ProductionCapacityRow[] | undefined) ?? [],
-          daily_consumption_volume: (data.daily_consumption_volume as DailyConsumptionRow[] | undefined) ?? [],
+          number_or_patrols: (data.number_or_patrols as number | null) ?? null,
+          telephone_lines_number: (data.telephone_lines_number as number | null) ?? null,
+          monthly_internet_data_requirement: (data.monthly_internet_data_requirement as number | null) ?? null,
+          yearly_imported_raw_materials: (data.yearly_imported_raw_materials as string | null | undefined) ?? null,
+          export_to_production_ratio: (data.export_to_production_ratio as number | null) ?? null,
+          daily_production_capacities: (data.daily_production_capacities as ProductionCapacityRow[] | undefined) ?? [],
+          monthly_production_capacities: (data.monthly_production_capacities as ProductionCapacityRow[] | undefined) ?? [],
+          yearly_production_capacities: (data.yearly_production_capacities as ProductionCapacityRow[] | undefined) ?? [],
+          daily_consumption: ((data.daily_consumption as { material: number; consumption: string }[] | undefined) ?? []).map(row => ({ id: row.material, consumption: row.consumption })),
           electrical_power_capacity: String(data.electrical_power_capacity ?? ''),
-          yearly_estimated_water_consumption: Number(data.yearly_estimated_water_consumption),
+          yearly_estimated_drinking_water_consumption: Number(data.yearly_estimated_drinking_water_consumption),
+          yearly_estimated_industrial_water_consumption: Number(data.yearly_estimated_industrial_water_consumption),
           require_all_persons_for_legal_matters: Boolean(data.require_all_persons_for_legal_matters),
         },
         authorized_persons: ((data.authorized_persons as SubscriptionAuthorizedPersonPayload[] | undefined) ?? []),

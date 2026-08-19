@@ -4,7 +4,6 @@ export const getCreateConsumptionMaterialFormSchema = (t: (key: string, module?:
   name: z.string().min(1, t('consumption_materials.validation.name_required', 'investments') || 'Name is required'),
   unit: z.string().min(1, t('consumption_materials.validation.unit_required', 'investments') || 'Unit is required'),
   is_active: z.boolean().optional().default(true),
-  is_default: z.boolean().optional().default(false),
 });
 
 const dummyT = (() => '') as (key: string, module?: string) => string;

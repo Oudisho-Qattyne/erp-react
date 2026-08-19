@@ -223,7 +223,7 @@ export function FacilitiesPage() {
       },
     },
     { key: "number_of_workers", label: t("facilities.number_of_workers", "investments") || "Workers", width: 100, sortable: true },
-    { key: "capital_in_usd", label: t("facilities.capital_in_usd", "investments") || "Capital (USD)", width: 140, sortable: true },
+    { key: "total_capital_in_usd", label: t("facilities.total_capital_in_usd", "investments") || "Capital (USD)", width: 140, sortable: true },
     {
       key: "actions",
       label: t("common.actions", "shared") || "Actions",

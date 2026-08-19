@@ -29,10 +29,10 @@ export function ShowFacilityPage() {
 
   const { getById } = useEntityCrud<Facility>(`/investments/facilities`, `/investments/facilities`);
 
-  const { entities: consumptionMaterials, getAll: loadConsumptionMaterials } = useEntityCrud<ConsumptionMaterial>('/investments/consumption-materials', '/investments/consumption-materials');
+  const { entities: consumptionMaterials, getAll: loadConsumptionMaterials } = useEntityCrud<ConsumptionMaterial>('/investments/consumable-materials', '/investments/consumable-materials');
 
   useEffect(() => {
-    loadConsumptionMaterials('/investments/consumption-materials?is_active=true');
+    loadConsumptionMaterials('/investments/consumable-materials?is_active=true');
   }, []);
 
   const { getById: getDossierById } = useEntityCrud<Dossier>(
@@ -98,9 +98,13 @@ export function ShowFacilityPage() {
       const found = consumptionMaterials.find(cm => String(cm.id) === String(id));
       return found ? getLocalizedName(found.name) : String(id);
     };
+    const materialUnit = (id: number | string) => {
+      const found = consumptionMaterials.find(cm => String(cm.id) === String(id));
+      return found?.unit || '—';
+    };
     return (
       <div className="mb-4 last:mb-0">
-        <h3 className="text-sm font-semibold text-text mb-2">{t('facilities.daily_consumption_volume', 'investments') || 'Daily Consumption Volume'}</h3>
+        <h3 className="text-sm font-semibold text-text mb-2">{t('facilities.daily_consumption', 'investments') || 'Daily Consumption Volume'}</h3>
         <table className="w-full text-sm border-collapse">
           <thead>
             <tr className="border-b border-border bg-primary-light/10">
@@ -112,9 +116,9 @@ export function ShowFacilityPage() {
           <tbody>
             {rows.map((row, i) => (
               <tr key={i} className="border-b border-border/50">
-                <td className="py-2 px-3">{materialLabel(row.material)}</td>
+                <td className="py-2 px-3">{materialLabel(row.id)}</td>
                 <td className="py-2 px-3">{row.consumption}</td>
-                <td className="py-2 px-3">{row.unit || '—'}</td>
+                <td className="py-2 px-3">{materialUnit(row.id)}</td>
               </tr>
             ))}
           </tbody>
@@ -123,6 +127,9 @@ export function ShowFacilityPage() {
     );
   };
 
+
+  console.log(facility);
+  
   const renderProductionMatrix = (title: string, rows?: ProductionCapacityRow[]) => {
     if (!rows || rows.length === 0) return null;
     return (
@@ -185,32 +192,33 @@ export function ShowFacilityPage() {
           <InfoRow label={t('facilities.partnership_type_name', 'investments') || 'Partnership Type Name'} value={facility.partnership_type ? getLocalizedName(facility.partnership_type.name) : '—'} />
           <InfoRow label={t('facilities.address', 'investments') || 'Address'} value={facility.address} />
           <InfoRow
-            label={t('facilities.company_status', 'investments') || 'Company Status'}
+            label={t('facilities.company_type', 'investments') || 'Company Type'}
             value={
-              facility.company_status === 'established'
-                ? t('facilities.company_status_established', 'investments') || 'Established'
-                : facility.company_status === 'in_incorporation'
-                  ? t('facilities.company_status_in_incorporation', 'investments') || 'Under Incorporation'
+              facility.company_type === 'existing'
+                ? t('facilities.company_type_existing', 'investments') || 'Existing'
+                : facility.company_type === 'under_incorporation'
+                  ? t('facilities.company_type_under_incorporation', 'investments') || 'Under Incorporation'
                   : '—'
             }
           />
-          <InfoRow label={t('facilities.commercial_registry', 'investments') || 'Commercial Registry'} value={facility.commercial_registry || '—'} />
-          <InfoRow label={t('facilities.commercial_registry_date', 'investments') || 'Commercial Registry Date'} value={facility.commercial_registry_date || '—'} />
+          <InfoRow label={t('facilities.commercial_register', 'investments') || 'Commercial Register'} value={facility.commercial_register || '—'} />
+          <InfoRow label={t('facilities.commercial_register_date', 'investments') || 'Commercial Register Date'} value={facility.commercial_register_date || '—'} />
           <InfoRow label={t('facilities.first_phone_number', 'investments') || 'Phone'} value={facility.first_phone_number} />
           <InfoRow label={t('facilities.second_phone_number', 'investments') || 'Phone 2'} value={facility.second_phone_number || '—'} />
           <InfoRow label={t('facilities.email', 'investments') || 'Email'} value={facility.email || '—'} />
           <InfoRow label={t('facilities.number_of_workers', 'investments') || 'Workers'} value={facility.number_of_workers ?? '—'} />
-          <InfoRow label={t('facilities.number_of_patrols', 'investments') || 'Number of Patrols'} value={facility.number_of_patrols ?? '—'} />
-          <InfoRow label={t('facilities.number_of_phone_lines', 'investments') || 'Number of Phone Lines'} value={facility.number_of_phone_lines ?? '—'} />
-          <InfoRow label={t('facilities.imported_raw_materials_annually', 'investments') || 'Imported Raw Materials Annually'} value={facility.imported_raw_materials_annually || '—'} />
-          <InfoRow label={t('facilities.capital_in_syp', 'investments') || 'Capital (SYP)'} value={facility.capital_in_syp ?? '—'} />
-          <InfoRow label={t('facilities.capital_in_usd', 'investments') || 'Capital (USD)'} value={facility.capital_in_usd ?? '—'} />
+          <InfoRow label={t('facilities.number_or_patrols', 'investments') || 'Number of Patrols'} value={facility.number_or_patrols ?? '—'} />
+          <InfoRow label={t('facilities.telephone_lines_number', 'investments') || 'Telephone Lines Number'} value={facility.telephone_lines_number ?? '—'} />
+          <InfoRow label={t('facilities.yearly_imported_raw_materials', 'investments') || 'Yearly Imported Raw Materials'} value={facility.yearly_imported_raw_materials || '—'} />
+          <InfoRow label={t('facilities.total_capital_in_syp', 'investments') || 'Capital (SYP)'} value={facility.total_capital_in_syp ?? '—'} />
+          <InfoRow label={t('facilities.total_capital_in_usd', 'investments') || 'Capital (USD)'} value={facility.total_capital_in_usd ?? '—'} />
           <InfoRow label={t('facilities.value_of_machines_in_syp', 'investments') || 'Machinery Value (SYP)'} value={facility.value_of_machines_in_syp ?? '—'} />
           <InfoRow label={t('facilities.value_of_machines_in_usd', 'investments') || 'Machinery Value (USD)'} value={facility.value_of_machines_in_usd ?? '—'} />
-          <InfoRow label={t('facilities.export_percentage', 'investments') || 'Export Percentage of Production'} value={facility.export_percentage ?? '—'} />
+          <InfoRow label={t('facilities.export_to_production_ratio', 'investments') || 'Export to Production Ratio'} value={facility.export_to_production_ratio ?? '—'} />
           <InfoRow label={t('facilities.electrical_power_capacity', 'investments') || 'Power Capacity'} value={facility.electrical_power_capacity || '—'} />
-          <InfoRow label={t('facilities.internet_need_monthly_gb', 'investments') || 'Monthly Internet Need (GB)'} value={facility.internet_need_monthly_gb ?? '—'} />
-          <InfoRow label={t('facilities.yearly_estimated_water_consumption', 'investments') || 'Water Consumption'} value={facility.yearly_estimated_water_consumption ?? '—'} />
+          <InfoRow label={t('facilities.monthly_internet_data_requirement', 'investments') || 'Monthly Internet Data Requirement'} value={facility.monthly_internet_data_requirement ?? '—'} />
+          <InfoRow label={t('facilities.yearly_estimated_drinking_water_consumption', 'investments') || 'Drinking Water Consumption'} value={facility.yearly_estimated_drinking_water_consumption ?? '—'} />
+          <InfoRow label={t('facilities.yearly_estimated_industrial_water_consumption', 'investments') || 'Industrial Water Consumption'} value={facility.yearly_estimated_industrial_water_consumption ?? '—'} />
         </div>
       </SectionCard>
 
@@ -222,10 +230,10 @@ export function ShowFacilityPage() {
           </h2>
         </div>
         <div className="space-y-6">
-          {renderProductionMatrix(t('facilities.daily_production_capacity', 'investments') || 'Daily Capacity', facility.daily_production_capacity)}
-          {renderProductionMatrix(t('facilities.monthly_production_capacity', 'investments') || 'Monthly Capacity', facility.monthly_production_capacity)}
-          {renderProductionMatrix(t('facilities.yearly_production_capacity', 'investments') || 'Annual Capacity', facility.yearly_production_capacity)}
-          {renderConsumptionMatrix(facility.daily_consumption_volume)}
+          {renderProductionMatrix(t('facilities.daily_production_capacities', 'investments') || 'Daily Capacity', facility.daily_production_capacities)}
+          {renderProductionMatrix(t('facilities.monthly_production_capacities', 'investments') || 'Monthly Capacity', facility.monthly_production_capacities)}
+          {renderProductionMatrix(t('facilities.yearly_production_capacities', 'investments') || 'Annual Capacity', facility.yearly_production_capacities)}
+          {renderConsumptionMatrix(facility.daily_consumption)}
         </div>
       </SectionCard>
 

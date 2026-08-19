@@ -54,8 +54,11 @@ export const getProductionMatrixRowSchema = (t: (key: string, module?: string) =
 
 export const getDailyConsumptionRowSchema = (t: (key: string, module?: string) => string) =>
   z.object({
-    material: z.number(t('facilities.validation.consumption_material_required', 'investments') || 'Consumption material is required'),
-    consumption: z.string().min(1, t('facilities.validation.consumption_value_required', 'investments') || 'Consumption is required'),
+    id: z.number(t('facilities.validation.consumption_material_required', 'investments') || 'Consumption material is required'),
+    consumption: z.preprocess(
+      (v) => (v === undefined || v === null ? '' : String(v)),
+      z.string().min(1, t('facilities.validation.consumption_value_required', 'investments') || 'Consumption is required')
+    ),
     unit: z.string().optional(),
   });
 
@@ -63,48 +66,49 @@ export const getCreateFacilityFormSchema = (t: (key: string, module?: string) =>
   name: z.string().min(1, t('facilities.validation.name_required', 'investments') || 'Name is required'),
   partnership_type_id: z.number( t('facilities.validation.partnership_type_required', 'investments') || 'Partnership type is required' ),
   address: z.string().min(1, t('facilities.validation.address_required', 'investments') || 'Address is required'),
-  company_status: z.string().min(1, t('facilities.validation.company_status_required', 'investments') || 'Company status is required'),
-  commercial_registry: z.string().optional().nullable(),
-  commercial_registry_date: z.string().optional().nullable(),
+  company_type: z.string().min(1, t('facilities.validation.company_type_required', 'investments') || 'Company type is required'),
+  commercial_register: z.string().optional().nullable(),
+  commercial_register_date: z.string().optional().nullable(),
   company_nationality_id: z.number(t('facilities.validation.company_nationality_required', 'investments') || 'Company nationality is required'),
-  first_phone_number: z.string().optional().nullable(),
+  first_phone_number: z.string().min(1, t('facilities.validation.first_phone_number_required', 'investments') || 'Phone is required'),
   second_phone_number: z.string().optional().nullable(),
   email: z.string().email(t('facilities.validation.email_invalid', 'investments') || 'Invalid email address').optional().nullable().or(z.literal('')),
-  capital_in_usd: z.number().positive(t('facilities.validation.capital_in_usd_positive', 'investments') || 'Must be positive'),
-  capital_in_syp: z.number().positive(t('facilities.validation.capital_in_syp_positive', 'investments') || 'Must be positive'),
+  total_capital_in_usd: z.number().positive(t('facilities.validation.total_capital_in_usd_positive', 'investments') || 'Must be positive'),
+  total_capital_in_syp: z.number().positive(t('facilities.validation.total_capital_in_syp_positive', 'investments') || 'Must be positive'),
   value_of_machines_in_usd: z.number().positive(t('facilities.validation.value_of_machines_in_usd_positive', 'investments') || 'Must be positive'),
   value_of_machines_in_syp: z.number().positive(t('facilities.validation.value_of_machines_in_syp_positive', 'investments') || 'Must be positive'),
   number_of_workers: z.number().min(0 , t('facilities.validation.number_of_workers_positive', 'investments') || 'Must be positive').int(),
-  number_of_patrols: z.number().min(0 , t('facilities.validation.number_of_patrols_integer', 'investments') || 'Must be an integer').optional().nullable(),
-  number_of_phone_lines: z.number().min(0 , t('facilities.validation.number_of_phone_lines_positive', 'investments') || 'Must be a positive number').optional().nullable(),
-  internet_need_monthly_gb: z.number().min(0 , t('facilities.validation.internet_need_monthly_gb_positive', 'investments') || 'Must be a positive number').optional().nullable(),
-  imported_raw_materials_annually: z.string().optional().nullable(),
-  export_percentage: z.number()
-    .min(0, t('facilities.validation.export_percentage_range', 'investments') || 'Must be between 0 and 100')
-    .max(100, t('facilities.validation.export_percentage_range', 'investments') || 'Must be between 0 and 100')
+  number_or_patrols: z.number().min(0 , t('facilities.validation.number_or_patrols_integer', 'investments') || 'Must be an integer').optional().nullable(),
+  telephone_lines_number: z.number().min(0 , t('facilities.validation.telephone_lines_number_positive', 'investments') || 'Must be a positive number').optional().nullable(),
+  monthly_internet_data_requirement: z.number().min(0 , t('facilities.validation.monthly_internet_data_requirement_positive', 'investments') || 'Must be a positive number').optional().nullable(),
+  yearly_imported_raw_materials: z.string().optional().nullable(),
+  export_to_production_ratio: z.number()
+    .min(0, t('facilities.validation.export_to_production_ratio_range', 'investments') || 'Must be between 0 and 100')
+    .max(100, t('facilities.validation.export_to_production_ratio_range', 'investments') || 'Must be between 0 and 100')
     .optional().nullable(),
-  daily_production_capacity: z.array(getProductionMatrixRowSchema(t)).optional(),
-  monthly_production_capacity: z.array(getProductionMatrixRowSchema(t)).optional(),
-  yearly_production_capacity: z.array(getProductionMatrixRowSchema(t)).min(1, t('facilities.validation.yearly_production_capacity_required', 'investments') || 'At least one row is required'),
-  daily_consumption_volume: z.array(getDailyConsumptionRowSchema(t)).optional(),
+  daily_production_capacities: z.array(getProductionMatrixRowSchema(t)).optional(),
+  monthly_production_capacities: z.array(getProductionMatrixRowSchema(t)).optional(),
+  yearly_production_capacities: z.array(getProductionMatrixRowSchema(t)).min(1, t('facilities.validation.yearly_production_capacities_required', 'investments') || 'At least one row is required'),
+  daily_consumption: z.array(getDailyConsumptionRowSchema(t)).optional(),
   electrical_power_capacity: z.string().min(1, t('facilities.validation.electrical_power_capacity_required', 'investments') || 'Required'),
-  yearly_estimated_water_consumption: z.number().positive(t('facilities.validation.yearly_estimated_water_consumption_positive', 'investments') || 'Must be positive'),
+  yearly_estimated_drinking_water_consumption: z.number().positive(t('facilities.validation.yearly_estimated_drinking_water_consumption_positive', 'investments') || 'Must be positive'),
+  yearly_estimated_industrial_water_consumption: z.number().positive(t('facilities.validation.yearly_estimated_industrial_water_consumption_positive', 'investments') || 'Must be positive'),
   authorized_persons: z.array(getAuthorizedPersonSchema(t)).optional(),
   require_all_persons_for_legal_matters: z.boolean().optional().default(true),
 }).superRefine((data, ctx) => {
-  if (data.company_status === 'established') {
-    if (!data.commercial_registry?.trim()) {
+  if (data.company_type === 'existing') {
+    if (!data.commercial_register?.trim()) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ['commercial_registry'],
-        message: t('facilities.validation.commercial_registry_required', 'investments') || 'Commercial Registry is required',
+        path: ['commercial_register'],
+        message: t('facilities.validation.commercial_register_required', 'investments') || 'Commercial Register is required',
       });
     }
-    if (!data.commercial_registry_date?.trim()) {
+    if (!data.commercial_register_date?.trim()) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        path: ['commercial_registry_date'],
-        message: t('facilities.validation.commercial_registry_date_required', 'investments') || 'Commercial Registry Date is required',
+        path: ['commercial_register_date'],
+        message: t('facilities.validation.commercial_register_date_required', 'investments') || 'Commercial Register Date is required',
       });
     }
   }
