@@ -186,9 +186,10 @@ export function InvestorPickerDialog({
             throw err
           }
         },
-        dialogTitle: t('investors.add', 'investments') || 'Add Investor',
+dialogTitle: t('investors.add', 'investments') || 'Add Investor',
         buttonLabel: t('investors.add', 'investments') || 'Add Investor',
         submitLabel: t('investors.add', 'investments') || 'Add Investor',
+        createButtonPermission: 'investments.investors.create',
       }}
     />
   )

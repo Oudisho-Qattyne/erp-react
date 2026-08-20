@@ -288,6 +288,7 @@ export function CreateEmployeeLeaveRequestDialog({ isOpen, onClose, onSuccess }:
                         onClick={handleSubmit}
                         disabled={!canSubmit || isSubmitting}
                         isLoading={isSubmitting}
+                        requiredPermission="hr.leave-requests.manage"
                     >
                         {t("leave_request.submit", "hr") || "Submit Request"}
                     </Button>

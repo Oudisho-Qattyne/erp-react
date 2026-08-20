@@ -145,9 +145,8 @@ export function ConsumptionMaterialsPage() {
             <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
               {t('common.filter', 'shared') || 'Filter'}
             </Button>
-            <Button onClick={() => setIsCreateOpen(true)} 
-            // requiredPermission="investments.consumable-materials.create"
-              >{t('consumption_materials.add', 'investments')}</Button>
+            <Button onClick={() => setIsCreateOpen(true)} requiredPermission="investments.consumable-materials.create">
+              {t('consumption_materials.add', 'investments')}</Button>
         </div>
       </div>
 

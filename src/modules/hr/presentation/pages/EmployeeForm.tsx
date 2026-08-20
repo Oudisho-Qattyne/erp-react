@@ -22,6 +22,7 @@ import { CountryFormSchema } from '../../../../core/presentation/schemas/regions
 import { OrganizationalUnitTreeSelect } from '../components/OrganizationalUnitTreeSelect';
 import { useDynamicForm } from '../../../../core/presentation/hooks/useDynamicForm221';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
+import { useAuth } from '../../../../core/infrastructure/auth/AuthProvider';
 import type { ChronicDiseases } from '../../../../core/domain/entities/chronicDiseases/chronicDiseases';
 import { EntityFormSchema } from '../../../../core/presentation/schemas/entityForm.schema';
 import type { JobStatus } from '../../domain/entities/jobStatus/jobStatus';
@@ -232,6 +233,7 @@ export function EmployeeForm({
   employee_id
 }: EmployeeFormProps) {
   const { t } = useLanguage();
+  const { hasPermission } = useAuth();
   const actualSubmitLabel = submitLabel || t('employee_form.save', 'hr') || 'حفظ الموظف';
   const actualCancelLabel = cancelLabel || t('employee_form.cancel', 'hr') || 'إلغاء';
   const schema = getCreateEmployeeSchema(t)
@@ -507,13 +509,13 @@ const PERSONAL_FIELDS: FieldConfig[] = buildEmployeePersonalFields(t, {
     computeChronicDiseases,
     computeEmployeeStatuses,
     computeResidenceCities,
-    infoButtonEmployeeStatus: employee_id ? () => { setStatusLogsOpen(true) } : undefined,
+    infoButtonEmployeeStatus: employee_id && hasPermission('shared.audit-logs.view') ? () => { setStatusLogsOpen(true) } : undefined,
   });
 
 const EMPLOYMENT_FIELDS: FieldConfig[] = buildEmployeeEmploymentFields(t, {
     renderJobStatusCreateForm: (onSuccess, onCancel) => <JobStatusCreateForm onSuccess={onSuccess} onCancel={onCancel} />,
     computeJobStatuses,
-    infoButtonJobStatus: employee_id ? () => { setJobStatusLogsOpen(true) } : undefined,
+    infoButtonJobStatus: employee_id && hasPermission('shared.audit-logs.view') ? () => { setJobStatusLogsOpen(true) } : undefined,
   });
   const gridColsClass = {
     1: 'grid-cols-1',

@@ -53,7 +53,7 @@ export function ShowLeaveRequestPage() {
       <div className="flex items-center justify-between">
         <Button
           variant="outline"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/hr/my-leave-requests')}
           leftIcon={<ArrowRight size={18} className={direction === "rtl" ? "rotate-180" : ""} />}
           className="text-text-muted hover:text-text"
         >

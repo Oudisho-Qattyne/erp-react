@@ -227,6 +227,7 @@ export const EmployeeLeaveRequests = () => {
                         size="sm"
                         onClick={(e) => { e.stopPropagation(); window.open(`/hr/employee-leave-requests/${row.id}` , "_blank") }}
                             title={t("common.view", "shared") || "View"}
+                            requiredPermission="hr.leave-requests.list"
                     >
                         <Eye size={16} />
                     </Button>
@@ -235,6 +236,7 @@ export const EmployeeLeaveRequests = () => {
                         size="sm"
                         onClick={(e) => { e.stopPropagation(); setAuditItem(row) }}
                         title={t("leave_request.edit_log", "hr") || "Edit Log"}
+                        requiredPermission="shared.audit-logs.view"
                     >
                         <History size={16} />
                     </Button>

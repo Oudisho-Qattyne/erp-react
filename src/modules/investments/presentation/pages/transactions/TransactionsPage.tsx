@@ -36,7 +36,6 @@ export function TransactionsPage() {
   const [activeCard, setActiveCard] = useState('subscription');
 
   const visibleCards = transactionCards.filter(({ permission }) => !permission || hasPermission(permission));
-console.log(hasPermission("investments.plot-reqeusts.subscription_request"));
 
   const openCreate = (key: string) => {
     if (key === 'subscription') {

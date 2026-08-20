@@ -121,6 +121,7 @@ export function InstallmentsSection({
             size="sm"
             onClick={() => openEditDialog(row)}
             title={t('installments.edit_payment_date', 'investments') || 'Edit Payment Date'}
+            requiredPermission="investments.contract-payment-installments.update"
           >
             <Pencil size={16} />
           </Button>
@@ -143,6 +144,7 @@ export function InstallmentsSection({
           onClick={openPayDialog}
           leftIcon={<Calendar size={16} />}
           disabled={installments.every((i) => i.payment_date)}
+          requiredPermission="investments.contract-payment-installments.pay"
         >
           {t('installments.pay_next', 'investments') || 'Pay Next Unpaid'}
         </Button>

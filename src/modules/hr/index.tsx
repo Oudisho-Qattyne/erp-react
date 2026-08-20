@@ -187,6 +187,7 @@ const usersModule: Module = {
       nav: true,
       moduleName: 'hr',
       requiresAuth: true,
+      requiredPermission: 'hr.leave-requests.manage',
     },
     {
       path: '/hr/leave-requests/:id',
@@ -196,6 +197,7 @@ const usersModule: Module = {
       nav: false,
       moduleName: 'hr',
       requiresAuth: true,
+      requiredPermission: 'hr.leave-requests.list',
     },
     {
       path: '/hr/leave-requests/:id/edit',
@@ -205,6 +207,7 @@ const usersModule: Module = {
       nav: false,
       moduleName: 'hr',
       requiresAuth: true,
+      requiredPermission: 'hr.leave-requests.manage',
     },
     {
       path: '/hr/adjust-leave-balance',

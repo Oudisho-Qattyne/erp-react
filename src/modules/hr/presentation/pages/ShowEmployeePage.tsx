@@ -22,6 +22,7 @@ import {
   Info
 } from 'lucide-react';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
+import { useAuth } from '../../../../core/infrastructure/auth/AuthProvider';
 import { useManageEmployee } from '../hooks/useEmployees';
 import { getLocalizedName } from '../../../../core/presentation/utils/helpes';
 import { LoadingState } from '../../../../core/presentation/layouts/ui/state/LoadingState';
@@ -39,6 +40,7 @@ export function ShowEmployeePage() {
   const navigate = useNavigate();
   const apiClient = useApiClient();
   const { language, t } = useLanguage();
+  const { hasPermission } = useAuth();
 
   const [FileExplorerOpen, setFileExplorerOpen] = useState<boolean>(false)
   const [employeePhotoPickerOpen, setEmployeePhotoPickerOpen] = useState<boolean>(false)
@@ -158,7 +160,7 @@ console.log(
               </div>
 
           }
-          <div onClick={() => { if (!photoUpdating) setEmployeePhotoPickerOpen(true) }} className='absolute w-full h-full flex cursor-pointer opacity-0 justify-center items-center hover:opacity-50 transform duration-300'>
+          <div onClick={() => { if (!photoUpdating && hasPermission('hr.employees.update')) setEmployeePhotoPickerOpen(true) }} className='absolute w-full h-full flex cursor-pointer opacity-0 justify-center items-center hover:opacity-50 transform duration-300'>
             {photoUpdating ? (
               <Spinner size="lg" />
             ) : (
@@ -238,7 +240,7 @@ console.log(
                         ) : '-'
                       } />
                     </div>
-                    <History className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setSpouse(employee.spouses.map(s => s.id))} />
+                    <History className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => { if (hasPermission('shared.audit-logs.view')) setSpouse(employee.spouses.map(s => s.id)) }} />
 
                   </div>
                   {/* keep in mind */}
@@ -249,7 +251,7 @@ console.log(
               <InfoRow label={t('employees.civil_registry_record', 'hr') || 'رقم القيد المدني'} value={employee.civil_registry_record} />
               <div className="flex items-center justify-between gap-2">
                 <InfoRow label={t('employees.employee_status_id', 'hr') || 'حالة الموظف'} value={employee.employee_status ? (getLocalizedName(employee.employee_status.name) || employee.employee_status_id) : employee.employee_status_id} />
-                <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setStatusLogsOpen(true)} />
+                <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => { if (hasPermission('shared.audit-logs.view')) setStatusLogsOpen(true) }} />
               </div>
               <InfoRow label={t('employees.employee_status_note', 'hr') || 'ملاحظات حالة الموظف'} value={employee.employee_status_note} />
             </div>
@@ -315,7 +317,7 @@ console.log(
                   <Briefcase size={20} className="text-primary" />
                   {t('show_employee.employment_details', 'hr') || 'التفاصيل الوظيفية'}
                 </div>
-                <History className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setEmploymenstDetails(id)} />
+                <History className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => { if (hasPermission('shared.audit-logs.view')) setEmploymenstDetails(id) }} />
               </div>
             </h2>
             {employee.employment_details ? (
@@ -323,7 +325,7 @@ console.log(
                 <InfoRow label={t('employees.job_title', 'hr') || 'المسمى الوظيفي'} value={employee.employment_details.job_title} />
                 <div className="flex items-center justify-between gap-2">
                   <InfoRow label={t('employees.job_status', 'hr') || 'الحالة الوظيفية'} value={employee.job_status ? (getLocalizedName(employee.job_status.name) || employee.job_status_id) : employee.job_status_id} />
-                  <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setJobStatusLogsOpen(true)} />
+                  <Info className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => { if (hasPermission('shared.audit-logs.view')) setJobStatusLogsOpen(true) }} />
                 </div>
                 <InfoRow label={t('employees.job_status_note', 'hr') || 'ملاحظات الحالة الوظيفية'} value={employee.job_status_note} />
                 <InfoRow label={t('employees.assigned_job', 'hr') || 'العمل المكلف به'} value={employee.assigned_job} />
@@ -344,7 +346,7 @@ console.log(
                   <GraduationCap size={20} className="text-primary" />
                   {t('show_employee.education_details', 'hr') || 'المؤهلات العلمية'}
                 </div>
-                <History className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setEducation(employee.educations.map(e => e.id))} />
+                <History className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => { if (hasPermission('shared.audit-logs.view')) setEducation(employee.educations.map(e => e.id)) }} />
               </div>
             </h2>
             {employee.educations && employee.educations.length > 0 ? (
@@ -389,7 +391,7 @@ console.log(
                     <User size={20} className="text-primary" />
                     {t('employees.children', 'hr') || 'الأولاد'}
                   </div>
-                  <History className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => setChild(employee.children.map(c => c.id))} />
+                  <History className='text-primary hover:text-primary-dark cursor-pointer' onClick={() => { if (hasPermission('shared.audit-logs.view')) setChild(employee.children.map(c => c.id)) }} />
                 </div>
 
               </h2>

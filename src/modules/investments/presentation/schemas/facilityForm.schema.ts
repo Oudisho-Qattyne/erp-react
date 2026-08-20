@@ -91,8 +91,8 @@ export const getCreateFacilityFormSchema = (t: (key: string, module?: string) =>
   yearly_production_capacities: z.array(getProductionMatrixRowSchema(t)).min(1, t('facilities.validation.yearly_production_capacities_required', 'investments') || 'At least one row is required'),
   daily_consumption: z.array(getDailyConsumptionRowSchema(t)).optional(),
   electrical_power_capacity: z.string().min(1, t('facilities.validation.electrical_power_capacity_required', 'investments') || 'Required'),
-  yearly_estimated_drinking_water_consumption: z.number().positive(t('facilities.validation.yearly_estimated_drinking_water_consumption_positive', 'investments') || 'Must be positive'),
-  yearly_estimated_industrial_water_consumption: z.number().positive(t('facilities.validation.yearly_estimated_industrial_water_consumption_positive', 'investments') || 'Must be positive'),
+  yearly_estimated_drinking_water_consumption: z.number().min(0 ,t('facilities.validation.yearly_estimated_drinking_water_consumption_positive', 'investments') || 'Must be positive'),
+  yearly_estimated_industrial_water_consumption: z.number().min(0 ,t('facilities.validation.yearly_estimated_industrial_water_consumption_positive', 'investments') || 'Must be positive'),
   authorized_persons: z.array(getAuthorizedPersonSchema(t)).optional(),
   require_all_persons_for_legal_matters: z.boolean().optional().default(true),
 }).superRefine((data, ctx) => {

@@ -174,6 +174,7 @@ export function UserLeaveRequests() {
             size="sm"
             onClick={(e) => { e.stopPropagation(); window.open(`/hr/leave-requests/${row.id}` , '_blank') }}
             title={t("common.view", "shared") || "View"}
+            requiredPermission="hr.leave-requests.list"
           >
             <Eye size={16} />
           </Button>
@@ -182,6 +183,7 @@ export function UserLeaveRequests() {
             size="sm"
             onClick={(e) => { e.stopPropagation(); setAuditItem(row) }}
             title={t("leave_request.edit_log", "hr") || "Edit Log"}
+            requiredPermission="shared.audit-logs.view"
           >
             <History size={16} />
           </Button>
@@ -191,6 +193,7 @@ export function UserLeaveRequests() {
               size="sm"
               onClick={(e) => { e.stopPropagation(); window.open(`/hr/leave-requests/${row.id}/edit` , '_blank') }}
               title={t("common.edit", "shared") || "Edit"}
+              requiredPermission="hr.leave-requests.manage"
             >
               <Pencil size={16} />
             </Button>
@@ -202,6 +205,7 @@ export function UserLeaveRequests() {
               onClick={(e) => { e.stopPropagation(); setCancelId(row.id) }}
               title={t("common.cancel", "shared") || "Cancel"}
               className="text-danger hover:text-danger"
+              requiredPermission="hr.leave-requests.manage"
             >
               <XCircle size={16} />
             </Button>
@@ -215,7 +219,7 @@ export function UserLeaveRequests() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{t("leave_request.my_requests", "hr") || "My Leave Requests"}</h1>
-        <Button variant="primary" onClick={() => navigate("/hr/leave-requests/create")} leftIcon={<Plus size={16} />}>
+        <Button variant="primary" onClick={() => navigate("/hr/leave-requests/create")} leftIcon={<Plus size={16} />} requiredPermission="hr.leave-requests.manage">
           {t("leave_request.new_request", "hr") || "New Request"}
         </Button>
       </div>
