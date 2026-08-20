@@ -330,7 +330,8 @@
     "add": "Add Facility",
     "edit": "Edit Facility",
     "view": "View Facility",
-    "name": "Name",
+    "picker_title": "Select Facility",
+    "name": "Facility Name",
     "plot_code": "Plot Code",
     "dossier_number": "Dossier Number",
     "partnership_type": "Partnership Type",
@@ -1168,6 +1169,9 @@
     },
     "facilities": {
       "title": "Facilities"
+    },
+    "facility_industrial_licenses": {
+      "title": "Industrial Licenses"
     },
     "contract": {
       "title": "Contracts"

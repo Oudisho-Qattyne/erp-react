@@ -2,6 +2,7 @@ import type { Dossier } from "./dossier";
 import type { Plot } from "./plot";
 import type { PartnershipType } from "./partnershipType";
 import type { AuthorizedPerson } from "./authorizedPerson";
+import type { ConsumptionMaterial } from "./consumptionMaterial";
 
 export interface ProductionCapacityRow {
   material: string;
@@ -10,6 +11,7 @@ export interface ProductionCapacityRow {
 
 export interface DailyConsumptionRow {
   id: number;
+  consumable_material?:ConsumptionMaterial
   consumption: string;
 }
 

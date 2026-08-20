@@ -331,7 +331,8 @@
     "add": "إضافة منشأة",
     "edit": "تعديل المنشأة",
     "view": "عرض المنشأة",
-    "name": "الاسم",
+    "picker_title": "اختيار منشأة",
+    "name": "اسم المنشأة",
     "plot_code": "رمز المقسم",
     "dossier_number": "رقم الملف",
     "partnership_type": "نوع الشراكة",
@@ -1169,6 +1170,9 @@
     },
     "facilities": {
       "title": "المنشآت"
+    },
+    "facility_industrial_licenses": {
+      "title": "التراخيص الصناعية"
     },
     "contract": {
       "title": "العقود"

@@ -672,6 +672,8 @@
     "system_correction_added": "تصحيح +",
     "system_correction_deducted": "تصحيح -",
     "balance": "رصيد الإجازة",
+    "adjustment_added_units": "التعديلات (إضافة)",
+    "adjustment_deducted_units": "التعديلات (خصم)",
     "adjustments_net": "التعديلات (صافي)",
     "no_data": "لا توجد أرصدة إجازات",
     "load_error": "فشل تحميل أرصدة الإجازات: {message}",

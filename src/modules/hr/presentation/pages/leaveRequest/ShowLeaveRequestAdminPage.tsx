@@ -289,22 +289,24 @@ export function ShowLeaveRequestAdminPage() {
   const isBand = leaveType?.entitlement_rules?.type === "bands"
   const leaveBalance = leaveBalances.find((b) => b.leave_type_id === lr.leave_type_id)
   const adjustmentsNet = leaveBalance
-    ? Math.max(0, leaveBalance.adjustment_added_units + leaveBalance.system_correction_added_units - leaveBalance.adjustment_deducted_units - leaveBalance.system_correction_deducted_units)
-    : 0
-  const consumedUnits = leaveBalance
-    ? Math.max(0, leaveBalance.entitled_units - leaveBalance.available_units)
+    ? Math.max(0, leaveBalance.adjustment_added_units + leaveBalance.adjustment_deducted_units )
     : 0
   const donutData = leaveBalance
     ? [
-        { name: t("leave_balance.available", "hr"), value: Math.max(0, leaveBalance.available_units), color: "var(--color-success)" },
-        { name: t("leave_balance.consumed", "hr"), value: consumedUnits, color: "var(--color-danger)" },
-        { name: t("leave_balance.carried_forward", "hr"), value: Math.max(0, leaveBalance.carried_forward_units), color: "var(--color-primary)" },
+        { name: t("leave_balance.available", "hr"), value: Math.max(0,leaveBalance.available_units), color: "var(--color-success)" },
+        { name: t("leave_balance.consumed", "hr"), value:  Math.max(0, leaveBalance.consumed_units*-1), color: "var(--color-danger)" },
+        { name: t("leave_balance.carried_forward", "hr"), value: Math.max(0, leaveBalance.carried_forward_units), color: "var(--color-secondary)" },
         {
-          name: t("leave_balance.adjustments_net", "hr"),
-          value: adjustmentsNet,
-          color: "var(--color-text-muted)",
+          name: t("leave_balance.adjustment_added_units", "hr"),
+          value:  Math.max(0,leaveBalance.adjustment_added_units),
+          color: "var(--color-warning)",
         },
-      ].filter((d) => d.value > 0)
+        {
+          name: t("leave_balance.adjustment_deducted_units", "hr"),
+          value:  Math.max(0,leaveBalance.adjustment_deducted_units*-1),
+          color: "color-mix(in srgb, var(--color-danger) 50%, var(--color-background))",
+        },
+      ]
     : []
 
   const employeeAge = ageFromDate(employee?.date_birth)
@@ -510,7 +512,7 @@ export function ShowLeaveRequestAdminPage() {
                         <span className="text-sm font-bold text-text">{entry.value}</span>
                         {leaveBalance.entitled_units > 0 && (
                           <span className="text-[10px] text-text-muted">
-                            ({Math.round((entry.value / leaveBalance.entitled_units) * 100)}%)
+                            ({Math.round((entry.value / (leaveBalance.entitled_units + leaveBalance.adjustment_added_units + leaveBalance.adjustment_deducted_units)) * 100)}%)
                           </span>
                         )}
                       </div>
@@ -531,8 +533,8 @@ export function ShowLeaveRequestAdminPage() {
                 <InfoRow label={t("leave_balance.carried_forward", "hr")} value={leaveBalance.carried_forward_units} />
                 <InfoRow label={t("leave_balance.adjustment_added", "hr")} value={leaveBalance.adjustment_added_units} />
                 <InfoRow label={t("leave_balance.adjustment_deducted", "hr")} value={leaveBalance.adjustment_deducted_units} />
-                <InfoRow label={t("leave_balance.system_correction_added", "hr")} value={leaveBalance.system_correction_added_units} />
-                <InfoRow label={t("leave_balance.system_correction_deducted", "hr")} value={leaveBalance.system_correction_deducted_units} />
+                {/* <InfoRow label={t("leave_balance.system_correction_added", "hr")} value={leaveBalance.system_correction_added_units} /> */}
+                {/* <InfoRow label={t("leave_balance.system_correction_deducted", "hr")} value={leaveBalance.system_correction_deducted_units} /> */}
                  <InfoRow
                 label={t("leave_balance.accrual_period", "hr")}
                 value={leaveBalance.accrual_period === "month"

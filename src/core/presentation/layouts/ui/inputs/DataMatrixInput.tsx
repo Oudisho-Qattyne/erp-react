@@ -271,7 +271,7 @@ export function DataMatrixInput({
               {matrixFields.map((field) => (
                 <th
                   key={field.name}
-                  className={`group relative px-3 py-2 text-xs font-semibold text-text text-left border-b border-border ${baseClasses}`}
+                  className={`group relative px-3 py-2 text-xs font-semibold text-text text-center border-b border-border ${baseClasses}`}
                 >
                   {field.label}
                   <div

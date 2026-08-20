@@ -9,6 +9,7 @@ import type { IndustrialLicenseSource } from '../../../../domain/entities/indust
 import { Button } from '../../../../../../core/presentation/layouts/ui/buttons/Button';
 import { ErrorState } from '../../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { DataTable } from '../../../../../../core/presentation/layouts/ui/tables/ResizableTable';
+import { FilterDialog, type FilterField } from '../../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { GenericCreateForm } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
@@ -16,7 +17,7 @@ import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card
 import { getCreateFacilityIndustrialLicenseFormSchema } from '../../../schemas/facilityIndustrialLicenseForm.schema';
 import { buildFacilityIndustrialLicenseFormFields, buildFacilityIndustrialLicenseFormGroups, buildFacilityIndustrialLicenseDefaultValues } from '../../../forms/facilityIndustrialLicenseFormConfig';
 import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
-import { FileCheck, Plus, Pencil, Trash2, Eye, Check, X, History } from 'lucide-react';
+import { FileCheck, Plus, Pencil, Trash2, Eye, Check, X, History, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
 import { getLocalizedName } from '../../../../../../core/presentation/utils/helpes';
@@ -41,12 +42,23 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
   const [viewingLicense, setViewingLicense] = useState<FacilityIndustrialLicense | null>(null);
   const [deletingLicense, setDeletingLicense] = useState<FacilityIndustrialLicense | null>(null);
   const [auditItem, setAuditItem] = useState<FacilityIndustrialLicense | null>(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filters, setFilters] = useState<Record<string, any>>({});
 
-  const listUrl = `/investments/facility-industrial-licenses?facility_id=${facilityId}`;
+  const FILTER_KEYS = ["industry_category_id", "industry_type_id", "industrial_decision_type_id", "industrial_license_source_id"];
+
+  const buildListUrl = () => {
+    const params = new URLSearchParams({ facility_id: facilityId });
+    for (const key of FILTER_KEYS) {
+      const val = filters[key];
+      if (val !== undefined && val !== null && val !== "") params.set(key, String(val));
+    }
+    return `/investments/facility-industrial-licenses?${params.toString()}`;
+  };
 
   useEffect(() => {
-    if (facilityId) getLicenses(listUrl);
-  }, [facilityId]);
+    if (facilityId) getLicenses(buildListUrl());
+  }, [facilityId, filters]);
 
   useEffect(() => {
     getCategories('/investments/industry-categories?is_active=true');
@@ -59,7 +71,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
     try {
       const res = await createLicense({ ...data, facility_id: Number(facilityId) });
       toast.success(t('facility_industrial_licenses.created', 'investments') || 'License created successfully');
-      getLicenses(listUrl);
+      getLicenses(buildListUrl());
       setIsCreateOpen(false);
       return res;
     } catch (err: any) {
@@ -73,7 +85,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
     try {
       const res = await updateLicense(editingLicense.id, data);
       toast.success(t('facility_industrial_licenses.updated', 'investments') || 'License updated successfully');
-      getLicenses(listUrl);
+      getLicenses(buildListUrl());
       setEditingLicense(null);
       return res;
     } catch (err: any) {
@@ -87,11 +99,53 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
     try {
       await deleteLicense(deletingLicense.id);
       toast.success(t('facility_industrial_licenses.deleted', 'investments') || 'License deleted successfully');
-      getLicenses(listUrl);
+      getLicenses(buildListUrl());
     } catch (err: any) {
       handleApiError(err, { module: "investments" });
     }
     setDeletingLicense(null);
+  };
+
+  const selectOptions = (entities: { id: number; name: any }[]) => [
+    { value: "", label: t('common.all', 'shared') || 'All' },
+    ...entities.map((e) => ({ value: String(e.id), label: getLocalizedName(e.name) })),
+  ];
+
+  const filterFields: FilterField[] = [
+    {
+      name: "industry_category_id",
+      label: t('facility_industrial_licenses.industry_category', 'investments') || 'Category',
+      type: "select",
+      options: selectOptions(categories),
+    },
+    {
+      name: "industry_type_id",
+      label: t('facility_industrial_licenses.industry_type', 'investments') || 'Type',
+      type: "select",
+      options: selectOptions(industryTypes),
+    },
+    {
+      name: "industrial_decision_type_id",
+      label: t('facility_industrial_licenses.decision_type', 'investments') || 'Decision Type',
+      type: "select",
+      options: selectOptions(decisionTypes),
+    },
+    {
+      name: "industrial_license_source_id",
+      label: t('facility_industrial_licenses.license_source', 'investments') || 'Source',
+      type: "select",
+      options: selectOptions(licenseSources),
+    },
+  ];
+
+  const handleApplyFilter = (values: Record<string, any>) => {
+    const parsed: Record<string, any> = {};
+    for (const [key, val] of Object.entries(values)) {
+      if (val === "" || val === undefined) continue;
+      parsed[key] = String(val);
+    }
+    setFilters(parsed);
+    setIsFilterOpen(false);
   };
 
   const fields = buildFacilityIndustrialLicenseFormFields(t, { categories, createCategory, industryTypes, createIndustryType, decisionTypes, createDecisionType, licenseSources, createLicenseSource });
@@ -164,13 +218,20 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
         icon={<FileCheck size={20} />}
       >
         <div className="flex items-center justify-between mb-4">
-          <div />
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={16} />}>
+              {t('common.filter', 'shared') || 'Filter'}
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setFilters({})} disabled={Object.keys(filters).length === 0}>
+              {t('common.reset', 'shared') || 'Reset'}
+            </Button>
+          </div>
           <Button variant="outline" size="sm" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="investments.facility-industrial-licenses.create">
             {t('facility_industrial_licenses.add', 'investments') || 'Add License'}
           </Button>
         </div>
         {licError["getAll"] ? (
-          <ErrorState message={licError["getAll"]} onRetry={() => getLicenses(listUrl)} />
+          <ErrorState message={licError["getAll"]} onRetry={() => getLicenses(buildListUrl())} />
         ) : (
           <DataTable
             columns={columns}
@@ -237,10 +298,6 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
                 <span className="text-sm text-muted-foreground">{t('facility_industrial_licenses.license_source', 'investments') || 'License Source'}</span>
                 <p className="font-medium">{getLocalizedName(viewingLicense.industrial_license_source?.name) || '—'}</p>
               </div>
-              <div>
-                <span className="text-sm text-muted-foreground">{t('common.is_active', 'shared') || 'Is Active'}</span>
-                <p className="font-medium">{viewingLicense.is_active ? (t('common.yes', 'shared') || 'Yes') : (t('common.no', 'shared') || 'No')}</p>
-              </div>
             </div>
           </div>
         )}
@@ -277,6 +334,15 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
         confirmLoading={licLoading["remove"]}
         confirmLabel={t('common.delete', 'shared') || 'Delete'}
         cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
+      />
+
+      <FilterDialog
+        isOpen={isFilterOpen}
+        fields={filterFields}
+        initialValues={filters}
+        onFilter={handleApplyFilter}
+        onCancel={() => setIsFilterOpen(false)}
+        onReset={() => { setFilters({}); setIsFilterOpen(false) }}
       />
     </>
   );

@@ -12,12 +12,14 @@ import { SectionCard } from '../../../../../core/presentation/layouts/ui/card/Se
 import { InfoRow } from '../../../../../core/presentation/layouts/ui/card/InfoRow';
 import { DossierDetailsSection } from './components/DossierDetailsSection';
 import { PlotDetailsSection } from './components/PlotDetailsSection';
+import { FacilityIndustrialLicensesSection } from './components/FacilityIndustrialLicensesSection';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 import { ArrowRight, Factory, History, FolderOpen, Users } from 'lucide-react';
 import { useStorage } from '../../../../../core/registry/storage/StorageProvider';
 import { DataMatrixInput, type MatrixFieldConfig } from '../../../../../core/presentation/layouts/ui/inputs/DataMatrixInput';
 import { authorizedPersonsPayloadToRows } from '../../forms/authorizedPersons';
+import { buildProductionMatrixFields } from '../../forms/facilityFormConfig';
 import type { ProductionCapacityRow, DailyConsumptionRow } from '../../../domain/entities/facility';
 import type { ConsumptionMaterial } from '../../../domain/entities/consumptionMaterial';
 
@@ -29,11 +31,6 @@ export function ShowFacilityPage() {
 
   const { getById } = useEntityCrud<Facility>(`/investments/facilities`, `/investments/facilities`);
 
-  const { entities: consumptionMaterials, getAll: loadConsumptionMaterials } = useEntityCrud<ConsumptionMaterial>('/investments/consumable-materials', '/investments/consumable-materials');
-
-  useEffect(() => {
-    loadConsumptionMaterials('/investments/consumable-materials?is_active=true');
-  }, []);
 
   const { getById: getDossierById } = useEntityCrud<Dossier>(
     `/investments/plots/${plotId}/dossiers`,
@@ -75,7 +72,7 @@ export function ShowFacilityPage() {
         if (dossierRes?.data) setDossier(dossierRes.data);
         if (plotRes?.data) setPlot(plotRes.data);
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setRelationsLoading(false));
   }, [dossierId, plotId]);
 
@@ -94,63 +91,44 @@ export function ShowFacilityPage() {
 
   const renderConsumptionMatrix = (rows?: DailyConsumptionRow[]) => {
     if (!rows || rows.length === 0) return null;
-    const materialLabel = (id: number | string) => {
-      const found = consumptionMaterials.find(cm => String(cm.id) === String(id));
-      return found ? getLocalizedName(found.name) : String(id);
-    };
-    const materialUnit = (id: number | string) => {
-      const found = consumptionMaterials.find(cm => String(cm.id) === String(id));
-      return found?.unit || '—';
-    };
+
+    const consumptionFields: MatrixFieldConfig[] = [
+      {
+        name: 'id',
+        type: 'text',
+        label: t('facilities.consumption_material', 'investments') || 'Material',
+      },
+      { name: 'consumption', type: 'text', label: t('facilities.consumption_value', 'investments') || 'Consumption' },
+      { name: 'unit', type: 'text', label: t('facilities.consumption_unit', 'investments') || 'Unit', disabled: true },
+    ];
+
     return (
       <div className="mb-4 last:mb-0">
         <h3 className="text-sm font-semibold text-text mb-2">{t('facilities.daily_consumption', 'investments') || 'Daily Consumption Volume'}</h3>
-        <table className="w-full text-sm border-collapse">
-          <thead>
-            <tr className="border-b border-border bg-primary-light/10">
-              <th className="py-2 px-3 text-left font-semibold text-text-muted">{t('facilities.consumption_material', 'investments') || 'Material'}</th>
-              <th className="py-2 px-3 text-left font-semibold text-text-muted">{t('facilities.consumption_value', 'investments') || 'Consumption'}</th>
-              <th className="py-2 px-3 text-left font-semibold text-text-muted">{t('facilities.consumption_unit', 'investments') || 'Unit'}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, i) => (
-              <tr key={i} className="border-b border-border/50">
-                <td className="py-2 px-3">{materialLabel(row.id)}</td>
-                <td className="py-2 px-3">{row.consumption}</td>
-                <td className="py-2 px-3">{materialUnit(row.id)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <DataMatrixInput
+          baseClasses='text-right'
+          maxRows={0}
+          minRows={Infinity}
+          value={rows.map((row) => ({ id: row.consumable_material?.name, consumption: String(row.consumption), unit: row.consumable_material?.unit }))}
+          onChange={() => { }}
+          disabled
+          matrixFields={consumptionFields}
+        />
       </div>
     );
   };
 
 
   console.log(facility);
-  
+
   const renderProductionMatrix = (title: string, rows?: ProductionCapacityRow[]) => {
     if (!rows || rows.length === 0) return null;
+    console.log(rows);
+
     return (
       <div className="mb-4 last:mb-0">
         <h3 className="text-sm font-semibold text-text mb-2">{title}</h3>
-        <table className="w-full text-sm border-collapse">
-          <thead>
-            <tr className="border-b border-border bg-primary-light/10">
-              <th className="py-2 px-3 text-left font-semibold text-text-muted">{t('facilities.production_material', 'investments') || 'Material'}</th>
-              <th className="py-2 px-3 text-left font-semibold text-text-muted">{t('facilities.production_output', 'investments') || 'Production'}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, i) => (
-              <tr key={i} className="border-b border-border/50">
-                <td className="py-2 px-3">{row.material}</td>
-                <td className="py-2 px-3">{row.production}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <DataMatrixInput baseClasses='text-right' value={rows} onChange={() => { }} disabled matrixFields={buildProductionMatrixFields(t)} maxRows={0} minRows={Infinity} />
       </div>
     );
   };
@@ -174,8 +152,8 @@ export function ShowFacilityPage() {
       </div>
 
       <SectionCard
-        // title={facility.name}
-        // icon={<Factory size={20} />}
+      // title={facility.name}
+      // icon={<Factory size={20} />}
       >
         <div className='relative w-full flex justify-between items-center mb-6 pb-4'>
           <h2 className="text-lg font-bold text-text flex items-center gap-2 border-b border-border/50">
@@ -246,8 +224,11 @@ export function ShowFacilityPage() {
         </div>
         {facility.authorized_persons?.length ? (
           <DataMatrixInput
+            baseClasses='text-right'
+            maxRows={0}
+            minRows={Infinity}
             value={authorizedPersonsPayloadToRows(facility.authorized_persons)}
-            onChange={() => {}}
+            onChange={() => { }}
             disabled
             matrixFields={[
               { name: 'id', label: 'ID', type: 'numeric', disabled: true },
@@ -264,6 +245,8 @@ export function ShowFacilityPage() {
           <div className="text-sm text-muted-foreground">—</div>
         )}
       </SectionCard>
+
+      <FacilityIndustrialLicensesSection facilityId={facilityId!} />
       {plotId && dossierId &&
         (relationsLoading
           ? <div className="py-8"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>

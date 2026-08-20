@@ -13,7 +13,7 @@ import type { EmployeeListItem } from "../../../domain/entities/EmployeeListItem
 import type { EntityWithNameOnly } from "../../../../../core/domain/entities/EntityWithNameOnly"
 import type { UseFormReturn } from "react-hook-form"
 import { User, X, FileText, Filter, Search } from "lucide-react"
-import { MiniRing } from "../../../../../core/presentation/layouts/ui/statistics/MiniRing"
+import { LeaveBalanceDonut } from "../../components/leaveBalance/LeaveBalanceDonut"
 import Input from "../../../../../core/presentation/layouts/ui/inputs/Input"
 import { inputBaseClasses } from "../../../../../core/presentation/layouts/ui/inputs/styles"
 import { ro } from "zod/locales"
@@ -169,8 +169,8 @@ export const EmployeeLeaveBalances = () => {
         { key: "adjustment_added_units", label: t("leave_balance.adjustment_added", "hr") || "Adj +", width: 80, sortable: true },
         { key: "adjustment_deducted_units", label: t("leave_balance.adjustment_deducted", "hr") || "Adj -", width: 80, sortable: true },
         {
-            key: "ring", label: "", width: 100, align: "center",
-            render: (row) => <MiniRing value={row.available_units} total={row.entitled_units} />,
+            key: "chart", label: "", width: 340,
+            render: (row) => <LeaveBalanceDonut leaveBalance={row} size={112} />,
         },
     ]
 

@@ -11,8 +11,8 @@ import { useLeaveBalance } from "../../hooks/leaveBalance/useLeaveBalance"
 import type { LeaveBalance } from "../../../domain/entities/leaveBalance/leaveBalance"
 import type { EntityWithNameOnly } from "../../../../../core/domain/entities/EntityWithNameOnly"
 import type { UseFormReturn } from "react-hook-form"
-import { MiniRing } from "../../../../../core/presentation/layouts/ui/statistics/MiniRing"
 import { Filter, FileText, X } from "lucide-react"
+import { LeaveBalanceDonut } from "../../components/leaveBalance/LeaveBalanceDonut"
 
 export const UserLeaveBalances = () => {
   const { t, language } = useLanguage()
@@ -94,8 +94,8 @@ export const UserLeaveBalances = () => {
     { key: "adjustment_added_units", label: t("leave_balance.adjustment_added", "hr") || "Adj +", width: 80 },
     { key: "adjustment_deducted_units", label: t("leave_balance.adjustment_deducted", "hr") || "Adj -", width: 80 },
     {
-      key: "ring", label: "", width: 200, align: "center",
-      render: (row) => <MiniRing value={row.available_units} total={row.entitled_units} />,
+      key: "chart", label: "", width: 340,
+      render: (row) => <LeaveBalanceDonut leaveBalance={row} size={112} />,
     },
   ]
   

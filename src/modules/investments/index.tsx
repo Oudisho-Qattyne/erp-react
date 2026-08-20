@@ -33,6 +33,7 @@ import { ServiceStatusConditionsPage } from './presentation/pages/service-status
 import { MapPin, Users, Clock, Building2, FileText, Factory, FileSignature } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import { ShowFacilityPage } from './presentation/pages/plots/ShowFacilityPage';
+import { FacilityIndustrialLicensesPage } from './presentation/pages/facility-industrial-licenses/FacilityIndustrialLicensesPage';
 
 registerPersonDetailRoute({
   type: 'investor',
@@ -108,6 +109,18 @@ const investmentsModule: Module = {
       requiredPermission: 'investments.facilities.list',
       moduleName: 'investments',
       icon: <Factory size={18} />,
+      group: 'investments',
+    },
+    {
+      path: '/investments/facility-industrial-licenses',
+      element: <FacilityIndustrialLicensesPage />,
+      layout: 'dashboard',
+      label: 'facility_industrial_licenses.title',
+      nav: true,
+      order: 9,
+      requiredPermission: 'investments.facility-industrial-licenses.list',
+      moduleName: 'investments',
+      icon: <BadgeCheck size={18} />,
       group: 'investments',
     },
     {

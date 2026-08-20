@@ -675,6 +675,8 @@
     "system_correction_added": "Sys +",
     "system_correction_deducted": "Sys -",
     "balance": "Leave Balance",
+    "adjustment_added_units": "Adjustments (added)",
+    "adjustment_deducted_units": "Adjustments (removed)",
     "adjustments_net": "Adjustments (net)",
     "no_data": "No leave balances found",
     "load_error": "Failed to load leave balances: {message}",

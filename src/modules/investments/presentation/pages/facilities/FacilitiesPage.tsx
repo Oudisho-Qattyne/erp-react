@@ -186,7 +186,7 @@ export function FacilitiesPage() {
     {
       key: "partnership_type",
       label: t("facilities.partnership_type", "investments") || "Partnership Type",
-      width: 150,
+      width: 100,
       render: (row: Facility) => row.partnership_type ? getLocalizedName(row.partnership_type.name) : '—',
     },
     { key: "first_phone_number", label: t("facilities.first_phone_number", "investments") || "Phone", width: 140 },
@@ -194,7 +194,7 @@ export function FacilitiesPage() {
     {
       key: "plot",
       label: t("plots.code", "investments") || "Code",
-      width: 140,
+      width: 100,
       render: (row: Facility) => {
         const pid = row.plot?.id || row.plot_id;
         const label = row.plot?.code || row.plot?.identifier || '—';
@@ -209,7 +209,7 @@ export function FacilitiesPage() {
     {
       key: "plot_dossier",
       label: t("dossier.number", "investments") || "Dossier Number",
-      width: 140,
+      width: 100,
       render: (row: Facility) => {
         const pid = row.plot?.id || row.plot_id;
         const did = row.plot_dossier?.id || row.plot_dossier_id;
@@ -222,8 +222,8 @@ export function FacilitiesPage() {
         ) : <span>{label}</span>;
       },
     },
-    { key: "number_of_workers", label: t("facilities.number_of_workers", "investments") || "Workers", width: 100, sortable: true },
-    { key: "total_capital_in_usd", label: t("facilities.total_capital_in_usd", "investments") || "Capital (USD)", width: 140, sortable: true },
+    { key: "number_of_workers", label: t("facilities.number_of_workers", "investments") || "Workers", width: 100},
+    { key: "total_capital_in_usd", label: t("facilities.total_capital_in_usd", "investments") || "Capital (USD)", width: 100 },
     {
       key: "actions",
       label: t("common.actions", "shared") || "Actions",
