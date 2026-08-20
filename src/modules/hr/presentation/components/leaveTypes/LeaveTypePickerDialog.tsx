@@ -25,11 +25,14 @@ export function LeaveTypePickerDialog({
     defaultFilter,
 }: LeaveTypePickerDialogProps) {
     const { t, language } = useLanguage()
-    const { items: leaveTypes, userEligibleLeaveTypes, loading ,isLoading, error, pagination, filter, setSearch, setPage, setFilter, setSort, resetFilter , findUserEligibleLeaveTypes } = useLeaveTypes()
+    const { items: leaveTypes, userEligibleLeaveTypes, loading ,isLoading, error, pagination, filter, setSearch, setPage, setFilter, setSort, resetFilter , findUserEligibleLeaveTypes , findAll } = useLeaveTypes()
 
     useEffect(() => {
         if(eligible){
             findUserEligibleLeaveTypes()
+        }
+        else{
+            findAll()
         }
     } ,[])
 

@@ -288,14 +288,20 @@ export function ShowLeaveRequestAdminPage() {
   const eligibilityFields = getEligibilityFields(t)
   const isBand = leaveType?.entitlement_rules?.type === "bands"
   const leaveBalance = leaveBalances.find((b) => b.leave_type_id === lr.leave_type_id)
+  const adjustmentsNet = leaveBalance
+    ? Math.max(0, leaveBalance.adjustment_added_units + leaveBalance.system_correction_added_units - leaveBalance.adjustment_deducted_units - leaveBalance.system_correction_deducted_units)
+    : 0
+  const consumedUnits = leaveBalance
+    ? Math.max(0, leaveBalance.entitled_units - leaveBalance.available_units)
+    : 0
   const donutData = leaveBalance
     ? [
         { name: t("leave_balance.available", "hr"), value: Math.max(0, leaveBalance.available_units), color: "var(--color-success)" },
-        { name: t("leave_balance.consumed", "hr"), value: Math.max(0, leaveBalance.consumed_units), color: "var(--color-warning)" },
+        { name: t("leave_balance.consumed", "hr"), value: consumedUnits, color: "var(--color-danger)" },
         { name: t("leave_balance.carried_forward", "hr"), value: Math.max(0, leaveBalance.carried_forward_units), color: "var(--color-primary)" },
         {
           name: t("leave_balance.adjustments_net", "hr"),
-          value: Math.max(0, leaveBalance.adjustment_added_units + leaveBalance.system_correction_added_units - leaveBalance.adjustment_deducted_units - leaveBalance.system_correction_deducted_units),
+          value: adjustmentsNet,
           color: "var(--color-text-muted)",
         },
       ].filter((d) => d.value > 0)
@@ -454,17 +460,12 @@ export function ShowLeaveRequestAdminPage() {
         ) : leaveBalance ? (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <InfoRow
+              {/* <InfoRow
                 label={t("leave_balance.leave_type", "hr")}
                 value={leaveBalance.leave_type_name || getLeaveTypeName()}
-              />
-              <InfoRow
-                label={t("leave_balance.accrual_period", "hr")}
-                value={leaveBalance.accrual_period === "month"
-                  ? t("leave_balance.monthly", "hr")
-                  : t("leave_balance.yearly", "hr")}
-              />
-              <InfoRow label={t("leave_balance.entitled", "hr")} value={leaveBalance.entitled_units} />
+              /> */}
+             
+              {/* <InfoRow label={t("leave_balance.entitled", "hr")} value={leaveBalance.entitled_units} /> */}
             </div>
 
             {donutData.length > 0 ? (
@@ -505,6 +506,7 @@ export function ShowLeaveRequestAdminPage() {
                         <span className="text-xs font-semibold text-text-muted">{entry.name}</span>
                       </div>
                       <div className="flex items-baseline gap-2">
+                        <span className="text-sm font-bold text-text">{entry.name}</span>
                         <span className="text-sm font-bold text-text">{entry.value}</span>
                         {leaveBalance.entitled_units > 0 && (
                           <span className="text-[10px] text-text-muted">
@@ -516,69 +518,40 @@ export function ShowLeaveRequestAdminPage() {
                   ))}
                 </div>
               </div>
-            ) : (
-              <p className="text-sm text-text-muted">{t("leave_balance.no_data", "hr")}</p>
-            )}
+            ) : null}
+
+            <div className="border-t border-border/60 pt-5">
+              <p className="text-sm font-semibold text-text-muted mb-3">
+                {t("leave_balance.overview", "hr") || "Overview"}
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <InfoRow label={t("leave_balance.entitled", "hr")} value={leaveBalance.entitled_units} />
+                <InfoRow label={t("leave_balance.consumed", "hr")} value={leaveBalance.consumed_units} />
+                <InfoRow label={t("leave_balance.available", "hr")} value={leaveBalance.available_units} />
+                <InfoRow label={t("leave_balance.carried_forward", "hr")} value={leaveBalance.carried_forward_units} />
+                <InfoRow label={t("leave_balance.adjustment_added", "hr")} value={leaveBalance.adjustment_added_units} />
+                <InfoRow label={t("leave_balance.adjustment_deducted", "hr")} value={leaveBalance.adjustment_deducted_units} />
+                <InfoRow label={t("leave_balance.system_correction_added", "hr")} value={leaveBalance.system_correction_added_units} />
+                <InfoRow label={t("leave_balance.system_correction_deducted", "hr")} value={leaveBalance.system_correction_deducted_units} />
+                 <InfoRow
+                label={t("leave_balance.accrual_period", "hr")}
+                value={leaveBalance.accrual_period === "month"
+                  ? t("leave_balance.monthly", "hr")
+                  : t("leave_balance.yearly", "hr")}
+              />
+              </div>
+            </div>
           </div>
         ) : (
           <p className="text-sm text-text-muted">{t("leave_balance.no_data", "hr")}</p>
         )}
       </SectionCard>
 
-      <SectionCard title={t("leave_request.employee_history", "hr")}>
-        {error.findAllEmployeeLeaveRequests ? (
-          <ErrorState
-            message={error.findAllEmployeeLeaveRequests}
-            onRetry={() => lr.employee_id !== undefined && findAllEmployeeLeaveRequests(lr.employee_id)}
-          />
-        ) : (
-          <div className="relative w-full space-y-3">
-            <div className="relative flex gap-3 py-1 flex-wrap">
-              <div className="relative flex-1 max-w-sm">
-                <Input
-                  type="text"
-                  placeholder={t("common.search", "shared") || "Search..."}
-                  value={localSearch}
-                  onChange={(val) => setLocalSearch(val as string)}
-                  baseClasses={inputBaseClasses}
-                />
-              </div>
-              <Button variant="primary" size="sm" onClick={handleSearch} leftIcon={<Search size={14} />}>
-                {t("common.search", "shared") || "Search"}
-              </Button>
-              <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
-                {t("common.filter", "shared") || "Filter"}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => { resetFilter(); setSelectedLeaveTypeName("") }}
-              >
-                {t("common.reset", "shared") || "Reset"}
-              </Button>
-            </div>
-            <DataTable
-              columns={historyColumns}
-              data={historyRows}
-              rowKey="id"
-              loading={loading.findAllEmployeeLeaveRequests}
-              onRowClick={(row) => window.open(`/hr/employee-leave-requests/${row.id}`, "_blank")}
-              emptyMessage={t("leave_request.no_data", "hr") || "No leave requests found"}
-              pagination={{
-                page: pagination.currentPage,
-                totalPages: pagination.lastPage,
-                totalItems: pagination.total,
-                itemsPerPage: filter.per_page,
-                onPageChange: setPage,
-                onItemsPerPageChange: (size) => setFilter({ per_page: size, page: 1 }),
-                itemsPerPageOptions: [10, 25, 50, 100],
-              }}
-            />
-          </div>
-        )}
-      </SectionCard>
 
-      <SectionCard title={t("leave_request.leave_type_details", "hr")}>
+   
+<div className="relative w-full flex gap-4">
+
+      <SectionCard className="flex-1 " title={t("leave_request.leave_type_details", "hr")}>
         {leaveTypesLoading.findById ? (
           <p className="text-sm text-text-muted">{t("common.loading", "shared")}</p>
         ) : leaveType ? (
@@ -665,7 +638,7 @@ export function ShowLeaveRequestAdminPage() {
         ) : null}
       </SectionCard>
 
-      <SectionCard title={t("leave_request.employee_details", "hr")}>
+      <SectionCard className="flex-1 " title={t("leave_request.employee_details", "hr")}>
         {employeeLoading ? (
           <p className="text-sm text-text-muted">{t("common.loading", "shared")}</p>
         ) : employeeError ? (
@@ -853,6 +826,8 @@ export function ShowLeaveRequestAdminPage() {
           <p className="text-sm text-text-muted">{t("common.not_found", "shared")}</p>
         )}
       </SectionCard>
+</div>
+
 
       <SectionCard title={t("leave_request.eligibility_assessment", "hr")}>
         {employeeLoading ? (
@@ -894,7 +869,58 @@ export function ShowLeaveRequestAdminPage() {
           </div>
         )}
       </SectionCard>
-
+   <SectionCard title={t("leave_request.employee_history", "hr")}>
+        {error.findAllEmployeeLeaveRequests ? (
+          <ErrorState
+            message={error.findAllEmployeeLeaveRequests}
+            onRetry={() => lr.employee_id !== undefined && findAllEmployeeLeaveRequests(lr.employee_id)}
+          />
+        ) : (
+          <div className="relative w-full space-y-3">
+            <div className="relative flex gap-3 py-1 flex-wrap">
+              <div className="relative flex-1 max-w-sm">
+                <Input
+                  type="text"
+                  placeholder={t("common.search", "shared") || "Search..."}
+                  value={localSearch}
+                  onChange={(val) => setLocalSearch(val as string)}
+                  baseClasses={inputBaseClasses}
+                />
+              </div>
+              <Button variant="primary" size="sm" onClick={handleSearch} leftIcon={<Search size={14} />}>
+                {t("common.search", "shared") || "Search"}
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
+                {t("common.filter", "shared") || "Filter"}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { resetFilter(); setSelectedLeaveTypeName("") }}
+              >
+                {t("common.reset", "shared") || "Reset"}
+              </Button>
+            </div>
+            <DataTable
+              columns={historyColumns}
+              data={historyRows}
+              rowKey="id"
+              loading={loading.findAllEmployeeLeaveRequests}
+              onRowClick={(row) => window.open(`/hr/employee-leave-requests/${row.id}`, "_blank")}
+              emptyMessage={t("leave_request.no_data", "hr") || "No leave requests found"}
+              pagination={{
+                page: pagination.currentPage,
+                totalPages: pagination.lastPage,
+                totalItems: pagination.total,
+                itemsPerPage: filter.per_page,
+                onPageChange: setPage,
+                onItemsPerPageChange: (size) => setFilter({ per_page: size, page: 1 }),
+                itemsPerPageOptions: [10, 25, 50, 100],
+              }}
+            />
+          </div>
+        )}
+      </SectionCard>
       <Dialog
         isOpen={processAction !== null}
         onClose={() => { setProcessAction(null); setReviewNotes("") }}

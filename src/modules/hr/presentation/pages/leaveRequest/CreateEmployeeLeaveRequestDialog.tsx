@@ -302,7 +302,7 @@ export function CreateEmployeeLeaveRequestDialog({ isOpen, onClose, onSuccess }:
             />
 
             <LeaveTypePickerDialog
-                eligible={true}
+                eligible={false}
                 isOpen={isLeaveTypePickerOpen}
                 onClose={() => setIsLeaveTypePickerOpen(false)}
                 onConfirm={handleLeaveTypePicked}
