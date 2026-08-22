@@ -1,9 +1,8 @@
 import type { DomainResponse } from "../../../../../core/domain/common/responce/DomainResponse";
-import type { DpomainResponsePaginated } from "../../../../hr/domain/entities/common/DomainResponsePaginated";
 import type { User } from "../../entities/user/user";
 
 export interface IUserRepository {
-    getAllUsers: (filter: any) => Promise<DpomainResponsePaginated<User[]>>;
+    getAllUsers: (filter: any) => Promise<DomainResponse<User[]>>;
     getCurrentUsers: () => Promise<DomainResponse<User>>;
 
     createUser: (user: any, idempotencyKey?: string) => Promise<DomainResponse<User>>;

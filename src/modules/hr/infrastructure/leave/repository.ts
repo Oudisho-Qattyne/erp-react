@@ -26,8 +26,10 @@ export const createLeaveTypeRepository = (apiClient: ApiClient): ILeaveTypeRepos
     deleteLeaveType(id: number) {
       return apiClient.delete<DomainResponse<Leave>> (`${baseUrl}/${id}`)
     },
-    getUserEligibleLeaveTypes() {
-      return apiClient.get<DomainResponse<EntityWithNameOnly[]>>(`/hr/employees/eligible-leave-types/my`)
+    getUserEligibleLeaveTypes(filter?: { page?: number; per_page?: number }) {
+      return apiClient.get<DomainResponse<EntityWithNameOnly[]>>(`/hr/employees/eligible-leave-types/my`, {
+        params: filter as Record<string, string | number | boolean | (string | number)[]> | undefined,
+      })
     }
   };
 };

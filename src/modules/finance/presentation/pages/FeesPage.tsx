@@ -77,8 +77,8 @@ export function FeesPage() {
 
   const columns: ColumnDef<Fee>[] = [
     { key: "id", label: "#", width: 60 },
-    { key: "name", label: t("fee.name", MODULE) || "Name", width: 180 },
-    { key: "code", label: t("fee.code", MODULE) || "Code", width: 140 },
+    { key: "name", label: t("fee.name", MODULE) || "Name", width: 180, sortable: true },
+    { key: "code", label: t("fee.code", MODULE) || "Code", width: 140, sortable: true },
     {
       key: "fee_value",
       label: t("fee.fee_value", MODULE) || "Fee Value",
@@ -95,6 +95,13 @@ export function FeesPage() {
           {t(`fee.status_${row.fee_status}`, MODULE) || row.fee_status}
         </span>
       ),
+    },
+    {
+      key: "created_at",
+      label: t("fee.created_at", MODULE) || "Created At",
+      width: 160,
+      sortable: true,
+      render: (row) => row.created_at,
     },
     {
       key: "actions",
@@ -169,14 +176,16 @@ export function FeesPage() {
       label: t("fee.value_to", MODULE) || "Max Value",
       decimalPlaces: 2,
     },
+    { name: "from_date", type: "date", label: t("fee.from_date", MODULE) || "From Date" },
+    { name: "to_date", type: "date", label: t("fee.to_date", MODULE) || "To Date" },
   ]
 
   const handleApplyFilter = (values: Record<string, any>) => {
-    const parsed: Partial<FeeFilters> = { page: 1, per_page: filter.per_page }
+    const parsed: Record<string, unknown> = { page: 1, per_page: filter.per_page }
     for (const [key, val] of Object.entries(values)) {
-      if (val !== "" && val !== undefined) parsed[key as keyof FeeFilters] = val as any
+      if (val !== "" && val !== undefined) parsed[key] = val
     }
-    setFilter(parsed)
+    setFilter(parsed as Partial<FeeFilters>)
     setIsFilterOpen(false)
   }
 

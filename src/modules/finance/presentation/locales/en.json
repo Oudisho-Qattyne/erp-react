@@ -2,11 +2,17 @@
   "title": "Finance",
   "navigation": {
     "title": "Finance",
+    "settings": {
+      "title": "Finance Settings"
+    },
     "fees": {
       "title": "Fees"
     },
     "transactions": {
       "title": "Transactions"
+    },
+    "currencies": {
+      "title": "Currencies"
     }
   },
   "fees": {
@@ -26,6 +32,9 @@
     "value": "Value",
     "value_from": "Min Value",
     "value_to": "Max Value",
+    "created_at": "Created At",
+    "from_date": "From Date",
+    "to_date": "To Date",
     "status_active": "Active",
     "status_archived": "Archived",
     "created": "Fee created successfully",
@@ -94,6 +103,44 @@
       "value_decimals": "Value must have at most 2 decimal places",
       "reason_max": "Reason must be at most 500 characters",
       "transactionable_id_required": "Please select a transactionable item"
+    }
+  },
+  "currencies": {
+    "title": "Currencies",
+    "add": "Add Currency",
+    "add_title": "Add New Currency",
+    "edit_title": "Edit Currency",
+    "edit": "Edit",
+    "search_placeholder": "Search by name...",
+    "no_data": "No currencies found"
+  },
+  "currency": {
+    "name": "Name",
+    "code": "Code",
+    "symbol": "Symbol",
+    "decimal_places": "Decimal Places",
+    "created_at": "Created At",
+    "is_base": "Base",
+    "created": "Currency created successfully",
+    "create_error": "Failed to create currency",
+    "updated": "Currency updated successfully",
+    "update_error": "Failed to update currency",
+    "deleted": "Currency deleted successfully",
+    "delete_error": "Failed to delete currency",
+    "delete": "Delete",
+    "delete_confirm": "Are you sure you want to delete this currency?",
+    "status_active": "Active",
+    "status_inactive": "Inactive",
+    "load_error": "Failed to load currencies",
+    "validation": {
+      "name_min": "Name must be at least 3 letters",
+      "name_max": "Name must be at most 255 letters",
+      "code_required": "Code is required",
+      "code_max": "Code must be at most 10 characters",
+      "symbol_max": "Symbol must be at most 10 characters",
+      "decimal_places_invalid": "Decimal places must be a whole number",
+      "decimal_places_min": "Decimal places cannot be negative",
+      "decimal_places_max": "Decimal places must be at most 8"
     }
   },
   "notifications": {

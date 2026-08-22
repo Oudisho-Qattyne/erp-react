@@ -18,15 +18,36 @@ function initRecord<T>(value: T): Record<string, T> {
 
 const DEFAULT_FILTER: FilterLeaveBalancesDto = {}
 
+export interface LeaveBalancePaginationInfo {
+  currentPage: number
+  lastPage: number
+  total: number
+  hasMore: boolean
+}
+
+const EMPTY_PAGINATION: LeaveBalancePaginationInfo = { currentPage: 1, lastPage: 1, total: 0, hasMore: false }
+
+function extractPagination(res: { pagination?: { currentPage?: number; lastPage?: number; total?: number; hasMore?: boolean } }): LeaveBalancePaginationInfo {
+  return {
+    currentPage: res.pagination?.currentPage || 1,
+    lastPage: res.pagination?.lastPage || 1,
+    total: Number(res.pagination?.total) || 0,
+    hasMore: res.pagination?.hasMore || false,
+  }
+}
+
 export interface UseLeaveBalanceReturn {
   myLeaveBalances: LeaveBalance[]
   employeeLeaveBalances: LeaveBalance[]
+  myPagination: LeaveBalancePaginationInfo
+  employeePagination: LeaveBalancePaginationInfo
   loading: Record<string, boolean>
   isLoading: () => boolean
   error: Record<string, string | null>
   hasErrors: () => boolean
   filter: FilterLeaveBalancesDto
   setFilter: (patch: Partial<FilterLeaveBalancesDto> | ((prev: FilterLeaveBalancesDto) => FilterLeaveBalancesDto)) => void
+  setPage: (page: number) => void
   resetFilter: () => void
   clearError: () => void
   findAllMyLeaveBalances: () => Promise<void>
@@ -41,6 +62,8 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
 
   const [myLeaveBalances, setMyLeaveBalances] = useState<LeaveBalance[]>([])
   const [employeeLeaveBalances, setEmployeeLeaveBalances] = useState<LeaveBalance[]>([])
+  const [myPagination, setMyPagination] = useState<LeaveBalancePaginationInfo>(EMPTY_PAGINATION)
+  const [employeePagination, setEmployeePagination] = useState<LeaveBalancePaginationInfo>(EMPTY_PAGINATION)
   const [loading, setLoading] = useState<Record<string, boolean>>(() => initRecord(false))
   const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null))
   const [filter, setFilterState] = useState<FilterLeaveBalancesDto>(DEFAULT_FILTER)
@@ -60,6 +83,10 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
 
   const resetFilter = useCallback(() => setFilterState(DEFAULT_FILTER), [])
 
+  const setPage = useCallback((page: number) => {
+    setFilterState((prev) => ({ ...prev, page }))
+  }, [])
+
   const setSearch = useCallback((search: string) => {
     setFilterState((prev) => {
       const next = { ...prev }
@@ -78,6 +105,7 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
     try {
       const res = await useCase.findAllMyLeaveBalances(filter)
       setMyLeaveBalances(res.data)
+      setMyPagination(extractPagination(res))
     } catch (err: any) {
       setFnError("findAllMyLeaveBalances", handleApiError(err, { module: "hr" , passThrough:true }))
     } finally {
@@ -91,6 +119,7 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
     try {
       const res = await useCase.findAllEmployeeLeaveBalances(employeeId, filter)
       setEmployeeLeaveBalances(res.data)
+      setEmployeePagination(extractPagination(res))
     } catch (err: any) {
       setFnError("findAllEmployeeLeaveBalances", handleApiError(err, { module: "hr" }))
     } finally {
@@ -119,12 +148,15 @@ export const useLeaveBalance = (): UseLeaveBalanceReturn => {
   return {
     myLeaveBalances,
     employeeLeaveBalances,
+    myPagination,
+    employeePagination,
     loading,
     isLoading,
     error,
     hasErrors,
     filter,
     setFilter,
+    setPage,
     resetFilter,
     clearError,
     findAllMyLeaveBalances,

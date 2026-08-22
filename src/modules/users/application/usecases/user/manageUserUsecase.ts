@@ -1,5 +1,4 @@
 import type { DomainResponse } from "../../../../../core/domain/common/responce/DomainResponse";
-import type { DpomainResponsePaginated } from "../../../../hr/domain/entities/common/DomainResponsePaginated";
 import type { User } from "../../../domain/entities/user/user";
 import type { IUserRepository } from "../../../domain/repositories/user/IUserRepository";
 import type { FilterUserDto } from "../../dtos/user/filterUserDto";
@@ -10,7 +9,7 @@ export const createManageUserUseCase = (
   repository: IUserRepository
 ) => {
   return {
-    getAllUsers: (filter : FilterUserDto): Promise<DpomainResponsePaginated<User[]>> => {
+    getAllUsers: (filter : FilterUserDto): Promise<DomainResponse<User[]>> => {
       return repository.getAllUsers(filter);
     },
 

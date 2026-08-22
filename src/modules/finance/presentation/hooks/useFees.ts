@@ -81,10 +81,10 @@ export const useFees = (): UseFeesReturn => {
       const res = await useCase.findAllFees(filter)
       setFees(res.data)
       setPagination({
-        currentPage: res.currentPage || 1,
-        lastPage: res.lastPage || 1,
-        total: Number(res.total) || 0,
-        hasMore: res.hasMore || false,
+        currentPage: res.pagination?.currentPage || 1,
+        lastPage: res.pagination?.lastPage || 1,
+        total: Number(res.pagination?.total) || 0,
+        hasMore: res.pagination?.hasMore || false,
       })
     } catch (err: unknown) {
       setFnError("findAllFees", handleApiError(err, { module: MODULE }))

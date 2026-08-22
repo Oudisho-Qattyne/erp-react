@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nProvider"
 import { Button } from "../../../../../core/presentation/layouts/ui/buttons/Button"
 import { DataTable, type ColumnDef } from "../../../../../core/presentation/layouts/ui/tables/ResizableTable"
@@ -12,7 +13,7 @@ import { useManageUsers } from "../../hooks/user/userManageUsers"
 import { CreateUserForm } from "../../components/CreateUserForm"
 import { ShowUserDialog } from "../../components/ShowUserDialog"
 import type { User } from "../../../domain/entities/user/user"
-import { Search, Download, FileText, Plus, Filter, Eye, Pencil, Lock } from "lucide-react"
+import { Search, Download, FileText, Plus, Filter, Eye, Pencil, Lock, Link2 } from "lucide-react"
 import { ChangePassword } from "../../components/ChangePassword"
 
 const statusStyles: Record<string, string> = {
@@ -23,6 +24,7 @@ const statusStyles: Record<string, string> = {
 
 export function AllUsers() {
   const { t, language } = useLanguage()
+  const navigate = useNavigate()
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [localSearch, setLocalSearch] = useState("")
@@ -78,7 +80,7 @@ export function AllUsers() {
     {
       key: "actions",
       label: "",
-      width: 100,
+      width: 130,
       align: "center",
       render: (row) => (
         <div className="flex items-center justify-center gap-1">
@@ -108,6 +110,27 @@ export function AllUsers() {
             requiredPermission="users.users.edit"
           >
             <Lock size={16} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              const params = new URLSearchParams({
+                user_id: String(row.id),
+                user_name: row.name || "",
+                email: row.email || "",
+                mobile: row.mobile || "",
+                status: row.status || "",
+                role_name: row.role?.name || "",
+                role_display_name: row.role?.display_name || "",
+              })
+              window.open(`/users/link-to-employee?${params.toString()}` , '_blank')
+            }}
+            title={t("link_user.title", "users") || "Link User to Employee"}
+            disabled={!!row.employee_id}
+            requiredPermission="users.users.link-to-employee"
+          >
+            <Link2 size={16} />
           </Button>
         </div>
       ),

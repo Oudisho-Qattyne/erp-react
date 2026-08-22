@@ -18,15 +18,38 @@ export function RolesListPage() {
   const navigate = useNavigate();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [roles, setRoles] = useState<Role[]>([]);
+  const [roleFilter, setRoleFilter] = useState<{ page?: number; per_page?: number }>({});
+  const [rolePagination, setRolePagination] = useState({
+    currentPage: 1,
+    lastPage: 1,
+    total: 0,
+    hasMore: false,
+  });
 
   const { getAll, create, remove, loading, error } = useManageRoles();
   const isLoading = loading['getAll'];
   const listError = error['getAll'];
   const [roleToDelete, setRoleToDelete] = useState<Role | null>(null);
 
+  const fetchRoles = async () => {
+    try {
+      const res = await getAll(roleFilter);
+      setRoles(res.data);
+      setRolePagination({
+        currentPage: res.pagination?.currentPage || 1,
+        lastPage: res.pagination?.lastPage || 1,
+        total: Number(res.pagination?.total) || 0,
+        hasMore: res.pagination?.hasMore || false,
+      });
+    } catch {
+      // error is tracked by the hook
+    }
+  };
+
   useEffect(() => {
-    getAll().then((res) => setRoles(res.data)).catch(() => {});
-  }, []);
+    fetchRoles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roleFilter]);
 
   const handleDeleteConfirm = async () => {
     if (!roleToDelete) return;
@@ -42,7 +65,7 @@ export function RolesListPage() {
   const handleCreateRole = async (data: RoleFormValues) => {
     await create(data);
     setIsAddDialogOpen(false);
-    getAll().then((res) => setRoles(res.data)).catch(() => {});
+    fetchRoles();
   };
 
   const columns: ColumnDef<Role>[] = [
@@ -115,7 +138,7 @@ export function RolesListPage() {
         </Button>
       </div>
 
-      {listError && <ErrorState message={listError} onRetry={() => getAll().then((res) => setRoles(res.data)).catch(() => {})} />}
+      {listError && <ErrorState message={listError} onRetry={fetchRoles} />}
       {!listError && (
         <DataTable
           columns={columns}
@@ -123,6 +146,15 @@ export function RolesListPage() {
           rowKey="id"
           loading={isLoading}
           emptyMessage={t('roles.no_data', 'users') || 'No roles found'}
+          pagination={{
+            page: rolePagination.currentPage,
+            totalPages: rolePagination.lastPage,
+            totalItems: rolePagination.total,
+            onPageChange: (page) => setRoleFilter((prev) => ({ ...prev, page })),
+            itemsPerPage: roleFilter.per_page,
+            onItemsPerPageChange: (size) => setRoleFilter({ per_page: size, page: 1 }),
+            itemsPerPageOptions: [10, 25, 50, 100],
+          }}
         />
       )}
 

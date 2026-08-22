@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
 import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nProvider"
 import { Button } from "../../../../../core/presentation/layouts/ui/buttons/Button"
 import Input from "../../../../../core/presentation/layouts/ui/inputs/Input"
@@ -16,6 +17,7 @@ import { User, X, Plus, Minus, FileText, Info, Calendar, Clock } from "lucide-re
 
 export function AdjustEmployeesLeaveBalance() {
     const { t, language } = useLanguage()
+    const [searchParams] = useSearchParams()
     const { adjustLeaveBalance, loading } = useLeaveBalance()
     const { currentLeave, findById, loading: leaveTypeLoading } = useLeaveTypes()
     const { getLeaveLabel } = useLeaveTypeLocalization()
@@ -28,6 +30,24 @@ export function AdjustEmployeesLeaveBalance() {
     const [adjustmentType, setAdjustmentType] = useState<"add" | "deduct">("add")
     const [quantity, setQuantity] = useState<number>(0)
     const [notes, setNotes] = useState("")
+
+    useEffect(() => {
+        const employeeId = searchParams.get("employee_id")
+        if (employeeId) {
+            setSelectedEmployees([{
+                id: Number(employeeId),
+                full_name: searchParams.get("employee_name") || "",
+            } as EmployeeListItem])
+        }
+        const leaveTypeId = searchParams.get("leave_type_id")
+        if (leaveTypeId) {
+            setSelectedLeaveType({
+                id: Number(leaveTypeId),
+                name: searchParams.get("leave_type_name") || "",
+            } as EntityWithNameOnly)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     useEffect(() => {
         if (selectedLeaveType) {

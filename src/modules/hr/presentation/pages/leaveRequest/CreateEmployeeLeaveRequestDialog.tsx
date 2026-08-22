@@ -13,6 +13,7 @@ import { useLeaveTypeLocalization } from "../../hooks/leave/useLeaveTypeLocaliza
 import { getCreateLeaveRequestSchema } from "../../schemas/leaveRequestForm.schema"
 import type { z } from "zod"
 import type { EmployeeListItem } from "../../../domain/entities/EmployeeListItem"
+import type { LeaveRequest } from "../../../domain/entities/leaveRequest/leaveRequest"
 import type { EntityWithNameOnly } from "../../../../../core/domain/entities/EntityWithNameOnly"
 import { FileText, Info, X, Plus, AlertCircle, User } from "lucide-react"
 
@@ -22,6 +23,7 @@ interface CreateEmployeeLeaveRequestDialogProps {
     isOpen: boolean
     onClose: () => void
     onSuccess: () => void
+    editData?: LeaveRequest | null
 }
 
 function formatDate(input: string): string {
@@ -31,11 +33,21 @@ function formatDate(input: string): string {
     return `${d}-${m}-${y}`
 }
 
-export function CreateEmployeeLeaveRequestDialog({ isOpen, onClose, onSuccess }: CreateEmployeeLeaveRequestDialogProps) {
+function parseApiDate(input: string): string {
+    if (!input) return ""
+    const datePart = input.split("T")[0]
+    const [d, m, y] = datePart.split("-")
+    if (!d || !m || !y) return ""
+    return `${y}-${m}-${d}`
+}
+
+export function CreateEmployeeLeaveRequestDialog({ isOpen, onClose, onSuccess, editData = null }: CreateEmployeeLeaveRequestDialogProps) {
     const { t, language } = useLanguage()
-    const { createEmployeeLeaveRequest, loading } = useLeaveRequest()
+    const { createEmployeeLeaveRequest, updateLeaveRequest, loading } = useLeaveRequest()
     const { currentLeave, findById, loading: leaveTypeLoading } = useLeaveTypes()
     const { getLeaveLabel } = useLeaveTypeLocalization()
+
+    const isEdit = !!editData
 
     const [selectedEmployee, setSelectedEmployee] = useState<EmployeeListItem | null>(null)
     const [isEmployeePickerOpen, setIsEmployeePickerOpen] = useState(false)
@@ -49,15 +61,24 @@ export function CreateEmployeeLeaveRequestDialog({ isOpen, onClose, onSuccess }:
 
     useEffect(() => {
         if (isOpen) {
-            setSelectedEmployee(null)
-            setSelectedLeaveType(null)
-            setStartDate("")
-            setEndDate("")
-            setRequestedUnits(0)
-            setReason("")
+            if (editData) {
+                setSelectedEmployee({ id: editData.employee_id, full_name: editData.employee?.full_name || "" } as EmployeeListItem)
+                setSelectedLeaveType({ id: editData.leave_type_id, name: editData.leave_type?.name ?? "" } as EntityWithNameOnly)
+                setStartDate(parseApiDate(editData.start_date))
+                setEndDate(parseApiDate(editData.end_date))
+                setRequestedUnits(editData.requested_units)
+                setReason(editData.reason || "")
+            } else {
+                setSelectedEmployee(null)
+                setSelectedLeaveType(null)
+                setStartDate("")
+                setEndDate("")
+                setRequestedUnits(0)
+                setReason("")
+            }
             setErrors({})
         }
-    }, [isOpen])
+    }, [isOpen, editData])
 
     useEffect(() => {
         if (selectedLeaveType) {
@@ -119,27 +140,39 @@ export function CreateEmployeeLeaveRequestDialog({ isOpen, onClose, onSuccess }:
             return
         }
 
-        await createEmployeeLeaveRequest({
-            employee_id: selectedEmployee.id,
-            leave_type_id: selectedLeaveType!.id,
-            start_date: formatDate(startDate),
-            end_date: formatDate(endDate),
-            requested_units: requestedUnits,
-            reason,
-        })
+        if (editData) {
+            await updateLeaveRequest(editData.id, {
+                leave_type_id: selectedLeaveType!.id,
+                start_date: formatDate(startDate),
+                end_date: formatDate(endDate),
+                requested_units: requestedUnits,
+                reason,
+            })
+        } else {
+            await createEmployeeLeaveRequest({
+                employee_id: selectedEmployee.id,
+                leave_type_id: selectedLeaveType!.id,
+                start_date: formatDate(startDate),
+                end_date: formatDate(endDate),
+                requested_units: requestedUnits,
+                reason,
+            })
+        }
 
         onSuccess()
         onClose()
     }
 
-    const isSubmitting = loading.createEmployeeLeaveRequest
+    const isSubmitting = loading.createEmployeeLeaveRequest || loading.updateLeaveRequest
     const canSubmit = selectedEmployee && selectedLeaveType && startDate && endDate && requestedUnits > 0 && reason
 
     return (
         <Dialog
             isOpen={isOpen}
             onClose={onClose}
-            title={t("leave_request.create_for_employee_title", "hr") || "Create Leave Request for Employee"}
+            title={isEdit
+                ? (t("leave_request.edit_title", "hr") || "Edit Leave Request")
+                : (t("leave_request.create_for_employee_title", "hr") || "Create Leave Request for Employee")}
             size="2xl"
         >
             <div className="space-y-6">
@@ -151,11 +184,13 @@ export function CreateEmployeeLeaveRequestDialog({ isOpen, onClose, onSuccess }:
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm border border-primary/20">
                             <User size={14} />
                             {selectedEmployee.full_name}
-                            <button onClick={() => { setSelectedEmployee(null); setErrors((prev) => ({ ...prev, employee_id: undefined })) }} className="hover:text-danger transition-colors">
-                                <X size={14} />
-                            </button>
+                            {!isEdit && (
+                                <button onClick={() => { setSelectedEmployee(null); setErrors((prev) => ({ ...prev, employee_id: undefined })) }} className="hover:text-danger transition-colors">
+                                    <X size={14} />
+                                </button>
+                            )}
                         </span>
-                    ) : (
+                    ) : !isEdit && (
                         <Button variant="outline" onClick={() => setIsEmployeePickerOpen(true)} leftIcon={<Plus size={16} />}>
                             {t("leave_request.select_employee", "hr") || "Select Employee"}
                         </Button>
@@ -173,11 +208,13 @@ export function CreateEmployeeLeaveRequestDialog({ isOpen, onClose, onSuccess }:
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm border border-primary/20">
                             <FileText size={14} />
                             {getLeaveTypeName(selectedLeaveType)}
-                            <button onClick={() => { setSelectedLeaveType(null); setErrors((prev) => ({ ...prev, leave_type_id: undefined })) }} className="hover:text-danger transition-colors">
-                                <X size={14} />
-                            </button>
+                            {!isEdit && (
+                                <button onClick={() => { setSelectedLeaveType(null); setErrors((prev) => ({ ...prev, leave_type_id: undefined })) }} className="hover:text-danger transition-colors">
+                                    <X size={14} />
+                                </button>
+                            )}
                         </span>
-                    ) : (
+                    ) : !isEdit && (
                         <Button variant="outline" onClick={() => setIsLeaveTypePickerOpen(true)} leftIcon={<Plus size={16} />}>
                             {t("leave_request.select_leave_type", "hr") || "Select Leave Type"}
                         </Button>
@@ -290,7 +327,7 @@ export function CreateEmployeeLeaveRequestDialog({ isOpen, onClose, onSuccess }:
                         isLoading={isSubmitting}
                         requiredPermission="hr.leave-requests.manage"
                     >
-                        {t("leave_request.submit", "hr") || "Submit Request"}
+                        {isEdit ? (t("common.save", "shared") || "Save") : (t("leave_request.submit", "hr") || "Submit Request")}
                     </Button>
                 </div>
             </div>

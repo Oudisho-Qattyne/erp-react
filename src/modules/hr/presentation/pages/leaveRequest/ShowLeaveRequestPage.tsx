@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nProvider"
 import { useLeaveRequest } from "../../hooks/leaveRequest/useLeaveRequest"
@@ -8,7 +8,8 @@ import { ErrorState } from "../../../../../core/presentation/layouts/ui/state/Er
 import { SectionCard } from "../../../../../core/presentation/layouts/ui/card/SectionCard"
 import { InfoRow } from "../../../../../core/presentation/layouts/ui/card/InfoRow"
 import { YesNo } from "../../../../../core/presentation/layouts/ui/card/YesNo"
-import { ArrowRight } from "lucide-react"
+import { CreateEmployeeLeaveRequestDialog } from "./CreateEmployeeLeaveRequestDialog"
+import { ArrowRight, Pencil } from "lucide-react"
 
 const statusStyles: Record<string, string> = {
   draft: "bg-gray-100 text-gray-600 border-gray-300",
@@ -23,6 +24,7 @@ export function ShowLeaveRequestPage() {
   const navigate = useNavigate()
   const { t, language, direction } = useLanguage()
   const { currentLeaveRequest, findLeaveRequestById, loading, error } = useLeaveRequest()
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
 
   useEffect(() => {
     if (id) findLeaveRequestById(Number(id))
@@ -59,6 +61,15 @@ export function ShowLeaveRequestPage() {
         >
           {t("common.back", "shared")}
         </Button>
+        {lr.status === "pending" && (
+          <Button
+            variant="outline"
+            leftIcon={<Pencil size={16} />}
+            onClick={() => setEditDialogOpen(true)}
+          >
+            {t("common.edit", "shared")}
+          </Button>
+        )}
       </div>
 
       <div className="bg-card/60 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-border shadow-sm">
@@ -98,6 +109,13 @@ export function ShowLeaveRequestPage() {
           </div>
         </SectionCard>
       </div>
+
+      <CreateEmployeeLeaveRequestDialog
+        isOpen={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        onSuccess={() => findLeaveRequestById(Number(id))}
+        editData={currentLeaveRequest}
+      />
     </div>
   )
 }

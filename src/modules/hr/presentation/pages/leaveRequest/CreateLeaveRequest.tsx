@@ -156,11 +156,13 @@ export function CreateLeaveRequest() {
                         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm border border-primary/20">
                             <FileText size={14} />
                             {getLeaveTypeName(selectedLeaveType)}
-                            <button onClick={() => { setSelectedLeaveType(null); setErrors((prev) => ({ ...prev, leave_type_id: undefined })) }} className="hover:text-danger transition-colors">
-                                <X size={14} />
-                            </button>
+                            {!isEdit && (
+                                <button onClick={() => { setSelectedLeaveType(null); setErrors((prev) => ({ ...prev, leave_type_id: undefined })) }} className="hover:text-danger transition-colors">
+                                    <X size={14} />
+                                </button>
+                            )}
                         </span>
-                    ) : (
+                    ) : !isEdit && (
                         <Button variant="outline" onClick={() => setIsLeaveTypePickerOpen(true)} leftIcon={<Plus size={16} />}>
                             {t("leave_request.select_leave_type", "hr") || "Select Leave Type"}
                         </Button>

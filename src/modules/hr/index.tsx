@@ -1,7 +1,7 @@
 // import UsersPage from './presentation/pages/UsersPage'
 import enLocales from './presentation/locales/en.json'
 import arLocales from './presentation/locales/ar.json'
-import { Users, CalendarClock, Database, BarChart3, CalendarDays, UserCheck, Wallet, Gauge, FileText, FileSearch, SlidersHorizontal, Flag, Building2, Map, GraduationCap, BookOpen, Beaker, Briefcase, BadgeCheck, Heart, StarIcon,  } from 'lucide-react'
+import { Users, CalendarClock, Database, BarChart3, CalendarDays, UserCheck, Wallet, Gauge, FileText, FileSearch, SlidersHorizontal, Flag, Building2, Map, GraduationCap, BookOpen, Beaker, Briefcase, BadgeCheck, Heart, StarIcon, CalendarCheck,  } from 'lucide-react'
 import type { Module } from '../../core/moduleRegistry'
 import { registerHrApi, type HrApi } from '../../core/registry/hr/hrRegistry'
 import { registerPersonDetailRoute } from '../../core/registry/person/personRegistry'
@@ -103,6 +103,19 @@ const usersModule: Module = {
       requiredPermission: 'hr.leave-types.view',
     },
     {
+      path: '/hr/my-leaves',
+      element: <Navigate to="/hr/my-leave-requests" replace />,
+      layout: 'dashboard',
+      label: 'my_leaves.title',
+      nav: true,
+      order: 5,
+      moduleName: 'hr',
+      icon: <CalendarCheck size={18} />,
+      group: 'hr',
+      requiresAuth: true,
+      requiredPermission: ['hr.employees.view-eligible-leave-types', 'hr.leave-balance.list', 'hr.leave-requests.list'],
+    },
+    {
       path: '/hr/my-eligible-leave-types',
       element: <UserEligibleLeaveTypes />,
       layout: 'dashboard',
@@ -112,6 +125,7 @@ const usersModule: Module = {
       moduleName: 'hr',
       icon: <UserCheck size={18} />,
       group: 'hr',
+      parentNav: '/hr/my-leaves',
       requiresAuth: true,
       requiredPermission: 'hr.employees.view-eligible-leave-types',
     },
@@ -125,6 +139,7 @@ const usersModule: Module = {
       moduleName: 'hr',
       icon: <Wallet size={18} />,
       group: 'hr',
+      parentNav: '/hr/my-leaves',
       requiresAuth: true,
       requiredPermission: 'hr.leave-balance.list',
     },
@@ -152,6 +167,7 @@ const usersModule: Module = {
       moduleName: 'hr',
       icon: <FileText size={18} />,
       group: 'hr',
+      parentNav: '/hr/my-leaves',
       requiresAuth: true,
       requiredPermission: 'hr.leave-requests.list',
     },

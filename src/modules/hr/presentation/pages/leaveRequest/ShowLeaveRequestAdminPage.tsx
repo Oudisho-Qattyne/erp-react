@@ -16,13 +16,14 @@ import { YesNo } from "../../../../../core/presentation/layouts/ui/card/YesNo"
 import { DataTable, type ColumnDef } from "../../../../../core/presentation/layouts/ui/tables/ResizableTable"
 import { FilterDialog, type FilterField } from "../../../../../core/presentation/layouts/ui/filter/FilterDialog"
 import { LeaveTypePickerDialog } from "../../components/leaveTypes/LeaveTypePickerDialog"
+import { CreateEmployeeLeaveRequestDialog } from "./CreateEmployeeLeaveRequestDialog"
 import { Dialog } from "../../../../../core/presentation/layouts/ui/dialog/Dialog"
 import Input from "../../../../../core/presentation/layouts/ui/inputs/Input"
 import { inputBaseClasses } from "../../../../../core/presentation/layouts/ui/inputs/styles"
 import { RuleGroupComponent } from "../../components/leaveRules/RuleGroupComponent"
 import { getEligibilityFields } from "../../utils/RulesFields"
 import { getLocalizedName } from "../../../../../core/presentation/utils/helpes"
-import { ArrowRight, Check, X, CheckCircle2, XCircle, User, Briefcase, GraduationCap, HeartPulse, Users, FileText, Filter, Search } from "lucide-react"
+import { ArrowRight, Check, X, Pencil, CheckCircle2, XCircle, User, Briefcase, GraduationCap, HeartPulse, Users, FileText, Filter, Search } from "lucide-react"
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
 import type { LeaveRequest } from "../../../domain/entities/leaveRequest/leaveRequest"
 import type { Leave, FixedGrantCase, RuleCondition, RuleGroup } from "../../../domain/entities/leave/leave"
@@ -109,6 +110,7 @@ export function ShowLeaveRequestAdminPage() {
   const [employeeError, setEmployeeError] = useState<string | null>(null)
   const [processAction, setProcessAction] = useState<"approve" | "reject" | null>(null)
   const [reviewNotes, setReviewNotes] = useState("")
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [localSearch, setLocalSearch] = useState<string>("")
   const [leaveTypePickerOpen, setLeaveTypePickerOpen] = useState(false)
@@ -288,25 +290,11 @@ export function ShowLeaveRequestAdminPage() {
   const eligibilityFields = getEligibilityFields(t)
   const isBand = leaveType?.entitlement_rules?.type === "bands"
   const leaveBalance = leaveBalances.find((b) => b.leave_type_id === lr.leave_type_id)
-  const adjustmentsNet = leaveBalance
-    ? Math.max(0, leaveBalance.adjustment_added_units + leaveBalance.adjustment_deducted_units )
-    : 0
   const donutData = leaveBalance
     ? [
-        { name: t("leave_balance.available", "hr"), value: Math.max(0,leaveBalance.available_units), color: "var(--color-success)" },
-        { name: t("leave_balance.consumed", "hr"), value:  Math.max(0, leaveBalance.consumed_units*-1), color: "var(--color-danger)" },
-        { name: t("leave_balance.carried_forward", "hr"), value: Math.max(0, leaveBalance.carried_forward_units), color: "var(--color-secondary)" },
-        {
-          name: t("leave_balance.adjustment_added_units", "hr"),
-          value:  Math.max(0,leaveBalance.adjustment_added_units),
-          color: "var(--color-warning)",
-        },
-        {
-          name: t("leave_balance.adjustment_deducted_units", "hr"),
-          value:  Math.max(0,leaveBalance.adjustment_deducted_units*-1),
-          color: "color-mix(in srgb, var(--color-danger) 50%, var(--color-background))",
-        },
-      ]
+        { name: t("leave_balance.available", "hr"), value: Math.max(0, leaveBalance.available_units), color: "var(--color-success)" },
+        { name: t("leave_balance.consumed", "hr"), value: Math.max(0, leaveBalance.consumed_units * -1), color: "var(--color-danger)" },
+      ].filter((d) => d.value > 0)
     : []
 
   const employeeAge = ageFromDate(employee?.date_birth)
@@ -399,6 +387,13 @@ export function ShowLeaveRequestAdminPage() {
         </Button>
         {lr.status === "pending" && hasPermission('hr.leave-requests.manage') && (
           <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              leftIcon={<Pencil size={16} />}
+              onClick={() => setEditDialogOpen(true)}
+            >
+              {t("common.edit", "shared")}
+            </Button>
             <Button
               variant="primary"
               leftIcon={<Check size={16} />}
@@ -508,11 +503,10 @@ export function ShowLeaveRequestAdminPage() {
                         <span className="text-xs font-semibold text-text-muted">{entry.name}</span>
                       </div>
                       <div className="flex items-baseline gap-2">
-                        <span className="text-sm font-bold text-text">{entry.name}</span>
                         <span className="text-sm font-bold text-text">{entry.value}</span>
                         {leaveBalance.entitled_units > 0 && (
                           <span className="text-[10px] text-text-muted">
-                            ({Math.round((entry.value / (leaveBalance.entitled_units + leaveBalance.adjustment_added_units + leaveBalance.adjustment_deducted_units)) * 100)}%)
+                            ({Math.round((entry.value / (leaveBalance.available_units - leaveBalance.consumed_units)) * 100)}%)
                           </span>
                         )}
                       </div>
@@ -968,6 +962,13 @@ export function ShowLeaveRequestAdminPage() {
           </div>
         </div>
       </Dialog>
+
+      <CreateEmployeeLeaveRequestDialog
+        isOpen={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        onSuccess={() => findLeaveRequestById(Number(id))}
+        editData={currentLeaveRequest}
+      />
 
       <FilterDialog
         isOpen={isFilterOpen}

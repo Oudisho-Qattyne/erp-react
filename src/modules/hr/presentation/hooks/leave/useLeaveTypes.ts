@@ -48,6 +48,15 @@ export interface UseLeaveTypesReturn {
     total: number
     hasMore: boolean
   }
+  eligiblePagination: {
+    currentPage: number
+    lastPage: number
+    total: number
+    hasMore: boolean
+  }
+  eligibleFilter: { page?: number; per_page?: number }
+  setEligiblePage: (page: number) => void
+  setEligiblePerPage: (size: number) => void
   filter: FilterLeaveDto
   setFilter: (patch: Partial<FilterLeaveDto> | ((prev: FilterLeaveDto) => FilterLeaveDto)) => void
   resetFilter: () => void
@@ -75,6 +84,8 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
   const [error, setError] = useState<Record<string, string | null>>(() => initRecord(null))
   const [filter, setFilterState] = useState<FilterLeaveDto>(DEFAULT_FILTER)
   const [pagination, setPagination] = useState({ currentPage: 1, lastPage: 1, total: 0, hasMore: false })
+  const [eligiblePagination, setEligiblePagination] = useState({ currentPage: 1, lastPage: 1, total: 0, hasMore: false })
+  const [eligibleFilter, setEligibleFilterState] = useState<{ page?: number; per_page?: number }>({})
 
   const repository = createLeaveTypeRepository(apiClient)
   const useCase = createManageLeaveTypesUseCase(repository)
@@ -210,14 +221,28 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
     setFnLoading("findUserEligibleLeaveTypes", true)
     setFnError("findUserEligibleLeaveTypes", null)
     try {
-      const res = await useCase.findUserEligibleLeaveTypes()
+      const res = await useCase.findUserEligibleLeaveTypes(eligibleFilter)
       setUserEligibleLeaveTypes(res.data)
+      setEligiblePagination({
+        currentPage: res.pagination?.currentPage || 1,
+        lastPage: res.pagination?.lastPage || 1,
+        total: Number(res.pagination?.total) || 0,
+        hasMore: res.pagination?.hasMore || false,
+      })
     } catch (err: any) {
       setFnError("findUserEligibleLeaveTypes", handleApiError(err, { module: "hr" , passThrough:true }))
     } finally {
       setFnLoading("findUserEligibleLeaveTypes", false)
     }
-  }, [useCase])
+  }, [useCase, eligibleFilter])
+
+  const setEligiblePage = useCallback((page: number) => {
+    setEligibleFilterState((prev) => ({ ...prev, page }))
+  }, [])
+
+  const setEligiblePerPage = useCallback((size: number) => {
+    setEligibleFilterState({ per_page: size, page: 1 })
+  }, [])
 
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])
@@ -235,6 +260,10 @@ export const useLeaveTypes = (): UseLeaveTypesReturn => {
     error,
     hasErrors,
     pagination,
+    eligiblePagination,
+    eligibleFilter,
+    setEligiblePage,
+    setEligiblePerPage,
     filter,
     setFilter,
     resetFilter,

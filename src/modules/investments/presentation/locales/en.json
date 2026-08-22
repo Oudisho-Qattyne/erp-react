@@ -1118,6 +1118,9 @@
   },
   "navigation": {
     "title": "Investments",
+    "settings": {
+      "title": "Investments Settings"
+    },
     "plot_areas": {
       "title": "Plot Areas"
     },

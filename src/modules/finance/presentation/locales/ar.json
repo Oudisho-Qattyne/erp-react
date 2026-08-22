@@ -2,11 +2,17 @@
   "title": "المالية",
   "navigation": {
     "title": "المالية",
+    "settings": {
+      "title": "إعدادات المالية"
+    },
     "fees": {
       "title": "الرسوم"
     },
     "transactions": {
       "title": "المناقلات"
+    },
+    "currencies": {
+      "title": "العملات"
     }
   },
   "fees": {
@@ -26,6 +32,9 @@
     "value": "القيمة",
     "value_from": "أدنى قيمة",
     "value_to": "أقصى قيمة",
+    "created_at": "تاريخ الإنشاء",
+    "from_date": "من تاريخ",
+    "to_date": "إلى تاريخ",
     "status_active": "نشط",
     "status_archived": "مؤرشف",
     "created": "تم إنشاء الرسم بنجاح",
@@ -94,6 +103,44 @@
       "value_decimals": "يجب ألا تتجاوز القيمة منزلتين عشريتين",
       "reason_max": "يجب ألا يتجاوز السبب 500 حرفاً",
       "transactionable_id_required": "يرجى اختيار عنصر مرتبط بالمعاملة"
+    }
+  },
+  "currencies": {
+    "title": "العملات",
+    "add": "إضافة عملة",
+    "add_title": "إضافة عملة جديدة",
+    "edit_title": "تعديل العملة",
+    "edit": "تعديل",
+    "search_placeholder": "ابحث بالاسم...",
+    "no_data": "لا توجد عملات"
+  },
+  "currency": {
+    "name": "الاسم",
+    "code": "الكود",
+    "symbol": "الرمز",
+    "decimal_places": "عدد المنازل العشرية",
+    "created_at": "تاريخ الإنشاء",
+    "is_base": "أساسية",
+    "created": "تم إنشاء العملة بنجاح",
+    "create_error": "فشل إنشاء العملة",
+    "updated": "تم تحديث العملة بنجاح",
+    "update_error": "فشل تحديث العملة",
+    "deleted": "تم حذف العملة بنجاح",
+    "delete_error": "فشل حذف العملة",
+    "delete": "حذف",
+    "delete_confirm": "هل أنت متأكد من حذف هذه العملة؟",
+    "status_active": "نشطة",
+    "status_inactive": "غير نشطة",
+    "load_error": "فشل تحميل العملات",
+    "validation": {
+      "name_min": "يجب أن يتكون الاسم من 3 أحرف على الأقل",
+      "name_max": "يجب ألا يتجاوز الاسم 255 حرفاً",
+      "code_required": "الكود مطلوب",
+      "code_max": "يجب ألا يتجاوز الكود 10 أحرف",
+      "symbol_max": "يجب ألا يتجاوز الرمز 10 أحرف",
+      "decimal_places_invalid": "يجب أن يكون عدد المنازل العشرية رقماً صحيحاً",
+      "decimal_places_min": "لا يمكن أن يكون عدد المنازل العشرية سالباً",
+      "decimal_places_max": "يجب ألا يتجاوز عدد المنازل العشرية 8"
     }
   },
   "notifications": {

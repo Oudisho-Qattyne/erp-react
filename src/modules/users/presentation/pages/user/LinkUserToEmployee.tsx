@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams } from "react-router-dom"
 import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nProvider"
 import { Button } from "../../../../../core/presentation/layouts/ui/buttons/Button"
 import { SectionCard } from "../../../../../core/presentation/layouts/ui/card/SectionCard"
@@ -17,6 +18,7 @@ const statusStyles: Record<string, string> = {
 
 export function LinkUserToEmployee() {
   const { t, language } = useLanguage()
+  const [searchParams] = useSearchParams()
   const { EmployeePickerComponent } = useHr() || {}
   const { linkUserToEmployee, loading } = useManageUsers()
 
@@ -24,6 +26,24 @@ export function LinkUserToEmployee() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [showEmployeePicker, setShowEmployeePicker] = useState(false)
   const [showUserPicker, setShowUserPicker] = useState(false)
+
+  useEffect(() => {
+    const userId = searchParams.get("user_id")
+    if (userId) {
+      const roleName = searchParams.get("role_name") || ""
+      setSelectedUser({
+        id: Number(userId),
+        name: searchParams.get("user_name") || "",
+        email: searchParams.get("email") || "",
+        mobile: searchParams.get("mobile") || "",
+        status: (searchParams.get("status") || undefined) as User["status"],
+        role: roleName
+          ? ({ name: roleName, display_name: searchParams.get("role_display_name") || "" } as User["role"])
+          : undefined,
+      } as User)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleLink = async () => {
     if (!selectedUser || !selectedEmployee) return
@@ -141,9 +161,13 @@ export function LinkUserToEmployee() {
                     <Briefcase size={16} className="text-primary shrink-0" />
                     <div>
                       <p className="text-xs text-text-muted">{t("users.status", "users") || "Status"}</p>
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold border mt-0.5 ${statusStyles[selectedUser.status] || ""}`}>
-                        {t(`users.status_${selectedUser.status}`, "users") || selectedUser.status}
-                      </span>
+                      {selectedUser.status ? (
+                        <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold border mt-0.5 ${statusStyles[selectedUser.status] || ""}`}>
+                          {t(`users.status_${selectedUser.status}`, "users") || selectedUser.status}
+                        </span>
+                      ) : (
+                        <p className="text-sm font-medium">-</p>
+                      )}
                     </div>
                   </div>
                 </div>

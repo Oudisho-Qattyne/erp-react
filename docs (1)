@@ -1354,12 +1354,472 @@ paths:
           $ref: '#/components/responses/ValidationError'
         500:
           $ref: '#/components/responses/InternalServerError'
+  /financial-management/currencies:
+    get:
+      tags:
+        - 'Financial Management'
+      summary: 'Get all Currencies'
+      description: "List currencies with pagination, filtering and sorting.\n\n**Filters:**\n- `search` - partial match (LIKE) on `name` or `code`\n- `code` - partial match (LIKE) on `code`\n- `is_active` - exact match on `is_active` (`true`, `false`, `1`, `0`)\n\n**Sorting** via `sort_by[column]=asc|desc`: `name`, `code`, `decimal_places`, `is_active`, `created_at` - default `created_at` desc if omitted.\n\nRequires permission: `financial.currencies.list`\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: 'Page number'
+        -
+          name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: 'Items per page'
+        -
+          name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'Partial match (LIKE) on `name` or `code`'
+        -
+          name: code
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'Partial match (LIKE) on `code`'
+        -
+          name: is_active
+          in: query
+          required: false
+          schema:
+            type: boolean
+          description: 'Filter by active state'
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `name`'
+        -
+          name: 'sort_by[code]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `code`'
+        -
+          name: 'sort_by[decimal_places]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `decimal_places`'
+        -
+          name: 'sort_by[is_active]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `is_active`'
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `created_at`'
+      responses:
+        200:
+          description: 'List of currencies'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { pagination: { type: object, properties: { lastPage: { type: integer, example: 1 }, currentPage: { type: integer, example: 1 }, hasMore: { type: boolean, example: false }, total: { type: integer, example: 5 } } }, data: { type: array, items: { $ref: '#/components/schemas/CurrencyInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - 'Financial Management'
+      summary: 'Create a Currency'
+      description: "Create a new currency. `code`, `name` and `symbol` must be unique.\n\nRequires permission: `financial.currencies.add`\n"
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrencyDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/CurrencyInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /financial-management/currencies/convert:
+    post:
+      tags:
+        - 'Financial Management'
+      summary: 'Convert an amount to/from the base currency'
+      description: "Convert an amount between a currency and the system base currency, using the latest exchange rate\n(newest `effective_date`). If the given currency is the base currency itself, the amount is returned unchanged.\n\nRequires permission: `financial.currencies.view`\n"
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrencyConvertRequest'
+      responses:
+        200:
+          description: 'Conversion result'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/CurrencyConvertResult' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+          description: 'Currency not found, or no exchange rate exists for the currency pair'
+        422:
+          $ref: '#/components/responses/ValidationError'
+          description: 'No exchange rate exists for the currency pair'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  '/financial-management/currencies/{currencyCode}':
+    get:
+      tags:
+        - 'Financial Management'
+      summary: 'Get a Currency by code'
+      description: "Retrieve a single currency by its code.\n\nRequires permission: `financial.currencies.view`\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: currencyCode
+          in: path
+          required: true
+          schema:
+            type: string
+          example: USD
+      responses:
+        200:
+          description: 'Currency details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/CurrencyInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - 'Financial Management'
+      summary: 'Update a Currency'
+      description: "Partially update a currency by its code. Only provided fields are updated.\n\nRequires permission: `financial.currencies.update`\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: currencyCode
+          in: path
+          required: true
+          schema:
+            type: string
+          example: USD
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CurrencyUpdateRequest'
+      responses:
+        200:
+          description: 'Updated successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/CurrencyInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - 'Financial Management'
+      summary: 'Delete a Currency'
+      description: "Soft delete a currency by its code.\n\nRequires permission: `financial.currencies.delete`\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: currencyCode
+          in: path
+          required: true
+          schema:
+            type: string
+          example: USD
+      responses:
+        200:
+          description: 'Deleted successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  /financial-management/exchange-rates:
+    get:
+      tags:
+        - 'Financial Management'
+      summary: 'Get all Exchange Rates'
+      description: "List exchange rates with pagination, filtering and sorting.\n\n**Filters:**\n- `from_currency_code` - exact match on source currency code (e.g. `USD`)\n- `to_currency_code` - exact match on target currency code (e.g. `SYP`)\n- `effective_date` - exact match on `effective_date`\n- `effective_from` - minimum `effective_date` (inclusive)\n- `effective_to` - maximum `effective_date` (inclusive)\n\n**Sorting** via `sort_by[column]=asc|desc`: `from_currency_code`, `to_currency_code`, `rate`, `effective_date`, `created_at` - default `created_at` desc if omitted.\n\nRequires permission: `financial.exchange-rates.list`\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: 'Page number'
+        -
+          name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: 'Items per page'
+        -
+          name: from_currency_code
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'Exact match on source currency code'
+        -
+          name: to_currency_code
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'Exact match on target currency code'
+        -
+          name: effective_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: 'Exact match on `effective_date`'
+        -
+          name: effective_from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: 'Minimum `effective_date` (inclusive)'
+        -
+          name: effective_to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: 'Maximum `effective_date` (inclusive)'
+        -
+          name: 'sort_by[from_currency_code]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `from_currency_code`'
+        -
+          name: 'sort_by[to_currency_code]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `to_currency_code`'
+        -
+          name: 'sort_by[rate]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `rate`'
+        -
+          name: 'sort_by[effective_date]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `effective_date`'
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `created_at`'
+      responses:
+        200:
+          description: 'List of exchange rates'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { pagination: { type: object, properties: { lastPage: { type: integer, example: 1 }, currentPage: { type: integer, example: 1 }, hasMore: { type: boolean, example: false }, total: { type: integer, example: 5 } } }, data: { type: array, items: { $ref: '#/components/schemas/ExchangeRateInfoResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - 'Financial Management'
+      summary: 'Create an Exchange Rate'
+      description: "Create a new exchange rate record.\n\nRequires permission: `financial.exchange-rates.add`\n"
+      security:
+        -
+          sanctumAuth: {  }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExchangeRateDTO'
+      responses:
+        200:
+          description: 'Created successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ExchangeRateInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  '/financial-management/exchange-rates/{exchangeRateId}':
+    get:
+      tags:
+        - 'Financial Management'
+      summary: 'Get an Exchange Rate by ID'
+      description: "Retrieve a single exchange rate by its ID.\n\nRequires permission: `financial.exchange-rates.view`\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: exchangeRateId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: 'Exchange rate details'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/ExchangeRateInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /financial-management/payment-fees:
     get:
       tags:
         - 'Financial Management'
       summary: 'Get all Payment Fees'
-      description: "List payment fees with pagination, filtering and sorting.\n\n**Filters:**\n- `search` - partial match (LIKE) on `name`\n- `code` - partial match (LIKE) on `code`\n- `status` - exact match on `fee_status` (`active`, `archived`)\n- `value` - exact match on `fee_value`\n- `value_from` - minimum `fee_value` (inclusive)\n- `value_to` - maximum `fee_value` (inclusive)\n\n**Sorting** via `sort_by[column]=asc|desc`: `fee_value`, `created_at` - default `created_at` desc if omitted.\n"
+      description: "List payment fees with pagination, filtering and sorting.\n\n**Filters:**\n- `search` - partial match (LIKE) on `name`\n- `code` - partial match (LIKE) on `code`\n- `status` - exact match on `fee_status` (`active`, `archived`)\n- `value` - exact match on `fee_value`\n- `value_from` - minimum `fee_value` (inclusive)\n- `value_to` - maximum `fee_value` (inclusive)\n\n**Sorting** via `sort_by[column]=asc|desc`: `name`, `code`, `fee_value`, `created_at` - default `created_at` desc if omitted.\n"
       security:
         -
           sanctumAuth: {  }
@@ -1428,6 +1888,26 @@ paths:
             type: number
             format: float
           description: 'Maximum `fee_value` (inclusive)'
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `name`'
+        -
+          name: 'sort_by[code]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `code`'
         -
           name: 'sort_by[fee_value]'
           in: query
@@ -1561,7 +2041,7 @@ paths:
       tags:
         - 'Financial Management'
       summary: 'Get all Transactions'
-      description: "List transactions with pagination, filtering and sorting.\n\n**Filters:**\n- `search` - partial match (LIKE) on `reason`\n- `status` - exact match on `transaction_status` (`pending`, `approved`, `canceled`)\n- `type` - exact match on `transaction_type` (`incoming`, `outgoing`)\n- `value` - exact match on `transaction_value`\n- `value_from` - minimum `transaction_value` (inclusive)\n- `value_to` - maximum `transaction_value` (inclusive)\n- `from_date` - minimum `transaction_date` (inclusive)\n- `to_date` - maximum `transaction_date` (inclusive)\n\n**Sorting** via `sort_by[column]=asc|desc`: `transaction_value`, `transaction_date`, `created_at` - default `created_at` desc if omitted.\n"
+      description: "List transactions with pagination, filtering and sorting.\n\n**Filters:**\n- `id` - exact match on transaction UUID\n- `search` - partial match (LIKE) on `reason`\n- `status` - exact match on `transaction_status` (`pending`, `approved`, `canceled`)\n- `type` - exact match on `transaction_type` (`incoming`, `outgoing`)\n- `value` - exact match on `transaction_value`\n- `value_from` - minimum `transaction_value` (inclusive)\n- `value_to` - maximum `transaction_value` (inclusive)\n- `from_date` - minimum `transaction_date` (inclusive)\n- `to_date` - maximum `transaction_date` (inclusive)\n\n**Sorting** via `sort_by[column]=asc|desc`: `id`, `transaction_value`, `exchange_rate`, `transaction_date`, `created_at` - default `created_at` desc if omitted.\n"
       security:
         -
           sanctumAuth: {  }
@@ -1582,6 +2062,14 @@ paths:
             type: integer
             default: 10
           description: 'Items per page'
+        -
+          name: id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+          description: 'Exact match on transaction UUID'
         -
           name: search
           in: query
@@ -1651,6 +2139,16 @@ paths:
             format: date
           description: 'Maximum `transaction_date` (inclusive)'
         -
+          name: 'sort_by[id]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `id`'
+        -
           name: 'sort_by[transaction_value]'
           in: query
           required: false
@@ -1660,6 +2158,16 @@ paths:
               - asc
               - desc
           description: 'Sort by `transaction_value`'
+        -
+          name: 'sort_by[exchange_rate]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by `exchange_rate`'
         -
           name: 'sort_by[transaction_date]'
           in: query
@@ -1697,6 +2205,7 @@ paths:
       tags:
         - 'Financial Management'
       summary: 'Create a Transaction'
+      description: "Create a new transaction.\n\n**Base currency conversion & paid amount validation:**\n- The latest exchange rate (by newest `effective_date`) from the transaction currency to the base currency is applied.\n- If the transaction currency equals the base currency, an implicit rate of `1.0` is used (no exchange rate record is linked).\n- If no exchange rate exists for the currency pair, the request fails with `422`.\n- `client_payed_amount` must equal the transaction value converted to the base currency, otherwise it fails with `422`.\n"
       security:
         -
           sanctumAuth: {  }
@@ -1726,7 +2235,7 @@ paths:
       tags:
         - 'Financial Management'
       summary: 'Change Transaction status'
-      description: "Change a transaction status (e.g. from `pending` to `approved` or `canceled`).\n"
+      description: "Change a transaction status (from `pending` to `approved` or `canceled`) and record how the client paid:\n\n- `transaction_currency_id` is the currency the client pays with on this status change. It may differ\n  from the transaction currency (e.g. a transaction created in SYP paid later in USD).\n- `client_payed_amount` (expressed in that currency), once converted to the base currency with the\n  latest applicable rate, must match the transaction's expected base amount fixed at creation time,\n  otherwise the request fails with `422`.\n- On success the transaction's paying currency, paid amount, applied rate and linked exchange rate\n  record are updated accordingly (implicit rate `1.0`, no record, when paying with the base currency).\n"
       security:
         -
           sanctumAuth: {  }
@@ -3286,6 +3795,24 @@ paths:
           schema:
             type: integer
           description: 'Filter by by-industry license ID'
+        -
+          name: 'sort_by[building_license_number]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of building licenses'
@@ -3435,6 +3962,24 @@ paths:
           in: query
           schema:
             type: boolean
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of By Duration Licenses'
@@ -3584,6 +4129,24 @@ paths:
           in: query
           schema:
             type: boolean
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of By Industry Licenses'
@@ -3729,7 +4292,24 @@ paths:
           in: query
           schema:
             type: boolean
-          description: 'Filter by active status'
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of consumable materials'
@@ -3907,6 +4487,42 @@ paths:
             type: string
             format: date
           description: 'Filter contracts with contract_date <= this date'
+        -
+          name: 'sort_by[contract_number]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[contract_date]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[total_price]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of contracts'
@@ -4124,6 +4740,24 @@ paths:
           in: query
           schema:
             type: boolean
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of plot areas'
@@ -4273,6 +4907,24 @@ paths:
           in: query
           schema:
             type: boolean
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of plot classifications'
@@ -4475,6 +5127,42 @@ paths:
             type: string
             format: date
           description: 'Filter plots created on or before this date'
+        -
+          name: 'sort_by[code]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[identifier]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[area]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of plots'
@@ -4716,6 +5404,15 @@ paths:
           schema:
             type: integer
             default: 1
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of plot status histories'
@@ -4910,6 +5607,33 @@ paths:
           schema:
             type: integer
           description: 'Filter by linked user ID'
+        -
+          name: 'sort_by[first_name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[last_name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of investors'
@@ -5059,6 +5783,24 @@ paths:
           in: query
           schema:
             type: boolean
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of industry categories'
@@ -5208,6 +5950,24 @@ paths:
           in: query
           schema:
             type: boolean
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of industry types'
@@ -5357,6 +6117,24 @@ paths:
           in: query
           schema:
             type: boolean
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of industrial decision types'
@@ -5506,6 +6284,24 @@ paths:
           in: query
           schema:
             type: boolean
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of industrial license sources'
@@ -5697,6 +6493,33 @@ paths:
           schema:
             type: integer
             default: 1
+        -
+          name: 'sort_by[dossier_number]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[dossier_date]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of dossiers'
@@ -5951,6 +6774,24 @@ paths:
             items:
               type: integer
           description: 'Filter by specific facility IDs'
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of facilities'
@@ -6151,6 +6992,33 @@ paths:
           schema:
             type: integer
           description: 'Filter by industrial license source ID'
+        -
+          name: 'sort_by[industrial_decision_number]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[industrial_decision_date]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of facility industrial licenses'
@@ -6466,6 +7334,24 @@ paths:
           in: query
           schema:
             type: boolean
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of license statuses'
@@ -6615,6 +7501,24 @@ paths:
           in: query
           schema:
             type: boolean
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of partnership types'
@@ -6805,6 +7709,24 @@ paths:
           in: query
           schema:
             type: boolean
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of rent contract industries'
@@ -6959,6 +7881,42 @@ paths:
           in: query
           schema:
             type: string
+        -
+          name: 'sort_by[renter_name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[rent_contract_number]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[rent_contract_date]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of rent contracts'
@@ -7108,6 +8066,24 @@ paths:
           in: query
           schema:
             type: boolean
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
       responses:
         200:
           description: 'List of service status conditions'
@@ -8550,6 +9526,173 @@ components:
           type: integer
           description: 'The ID of the user receiving the message. A conversation will be found or created between the authenticated user and this receiver.'
           example: 2
+    CurrencyDTO:
+      type: object
+      required:
+        - code
+        - name
+        - decimal_places
+        - is_active
+      properties:
+        code:
+          type: string
+          maxLength: 255
+          description: 'Unique currency ISO code, used as identifier.'
+          example: USD
+        name:
+          type: string
+          maxLength: 255
+          example: 'US Dollar'
+        symbol:
+          type: string
+          nullable: true
+          example: $
+        decimal_places:
+          type: integer
+          example: 2
+        is_active:
+          type: boolean
+          example: true
+    CurrencyUpdateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'US Dollar'
+          description: 'Optional. Must be unique.'
+        is_active:
+          type: boolean
+          example: false
+    CurrencyConvertRequest:
+      type: object
+      required:
+        - action
+        - currency_code
+        - amount
+      properties:
+        action:
+          type: string
+          enum:
+            - to_base
+            - from_base
+          description: "Conversion direction:\n- `to_base` - convert the given amount **from** `currency_code` to the base currency\n- `from_base` - convert the given amount **from** the base currency to `currency_code`\n"
+          example: to_base
+        currency_code:
+          type: string
+          description: 'Target currency ISO code (source currency when action is `to_base`, destination currency when action is `from_base`).'
+          example: USD
+        amount:
+          type: number
+          format: double
+          minimum: 0
+          description: 'Amount to convert, expressed in the source currency of the conversion.'
+          example: 100
+    CurrencyConvertResult:
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+            - to_base
+            - from_base
+          example: to_base
+        currency_code:
+          type: string
+          example: USD
+        amount:
+          type: number
+          format: double
+          description: 'The input amount.'
+          example: 100
+        result:
+          type: number
+          format: double
+          description: 'Converted amount, expressed in the destination currency of the conversion.'
+          example: 1400000
+    CurrencyInfoResource:
+      type: object
+      properties:
+        code:
+          type: string
+          example: USD
+        name:
+          type: string
+          example: 'US Dollar'
+        is_base:
+          type: boolean
+          description: 'Whether this currency is the base currency of the system.'
+          example: false
+        symbol:
+          type: string
+          nullable: true
+          example: $
+        decimal_places:
+          type: integer
+          example: 2
+        is_active:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date
+          example: 20-08-2026
+    ExchangeRateDTO:
+      type: object
+      required:
+        - from_currency_code
+        - to_currency_code
+        - rate
+        - effective_date
+      properties:
+        from_currency_code:
+          type: string
+          description: 'Code of the currency being converted from. Must exist in currencies.'
+          example: USD
+        to_currency_code:
+          type: string
+          description: 'Code of the currency being converted to. Must exist in currencies.'
+          example: SYP
+        rate:
+          type: number
+          format: double
+          description: 'Conversion rate applied on `effective_date`.'
+          example: 13000.5
+        effective_date:
+          type: string
+          format: date
+          example: '2026-08-22'
+        notes:
+          type: string
+          nullable: true
+          example: 'Official rate'
+    ExchangeRateInfoResource:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        from_currency_code:
+          type: string
+          example: USD
+        to_currency_code:
+          type: string
+          example: SYP
+        rate:
+          type: number
+          format: double
+          example: 13000.5
+        effective_date:
+          type: string
+          format: date
+          example: 22-08-2026
+        notes:
+          type: string
+          nullable: true
+          example: 'Official rate'
+        created_at:
+          type: string
+          format: date
+          example: 22-08-2026
     PaymentFeeDTO:
       type: object
       required:
@@ -8620,6 +9763,7 @@ components:
         - transaction_value
         - transaction_type
         - transaction_status
+        - transaction_currency_id
       properties:
         transaction_value:
           type: number
@@ -8643,6 +9787,15 @@ components:
             - approved
             - canceled
           example: pending
+        transaction_currency_id:
+          type: string
+          description: 'Code of the transaction currency (must exist in currencies).'
+          example: SYP
+        client_payed_amount:
+          type: number
+          format: float
+          description: "Amount paid by the client. Must equal the transaction value converted to the base currency\nusing the latest applicable rate, otherwise the request fails with `422`.\nExample : transaction value `100` USD with a `USD -> SYP` rate of `13000` requires `1300000`.\n"
+          example: 1300000
         reason:
           type: string
           nullable: true
@@ -8651,6 +9804,8 @@ components:
       type: object
       required:
         - transaction_status
+        - transaction_currency_id
+        - client_payed_amount
       properties:
         transaction_status:
           type: string
@@ -8658,12 +9813,22 @@ components:
             - approved
             - canceled
           example: approved
+        transaction_currency_id:
+          type: string
+          description: 'Code of the currency the client pays with on this status change (must exist in currencies). May differ from the transaction currency.'
+          example: USD
+        client_payed_amount:
+          type: number
+          format: float
+          description: "Amount paid by the client, expressed in `transaction_currency_id`.\nOnce converted to the base currency, it must match the expected base amount of the transaction,\notherwise the request fails with `422`.\n"
+          example: 250.5
     TransactionInfoResource:
       type: object
       properties:
         id:
-          type: integer
-          example: 1
+          type: string
+          format: uuid
+          example: 0198b4a2-7f1e-7f92-a3d1-2c6f4a9e5b10
         transaction_type:
           type: string
           enum:
@@ -8681,6 +9846,28 @@ components:
           type: number
           format: float
           example: 250.5
+        client_payed_amount:
+          type: number
+          format: float
+          nullable: true
+          description: 'Amount paid by the client (in `transaction_currency_id`).'
+          example: 3256500
+        exchange_rate_id:
+          type: integer
+          nullable: true
+          description: 'ID of the exchange rate record used. Null when the transaction currency equals the base currency.'
+          example: 4
+        exchange_rate:
+          type: number
+          format: double
+          nullable: true
+          description: 'Applied conversion rate (1.0 when transaction currency equals the base currency).'
+          example: 13000.0
+        transaction_currency_id:
+          type: string
+          nullable: true
+          description: 'Code of the transaction currency.'
+          example: USD
         transaction_date:
           type: string
           format: date
@@ -8697,6 +9884,14 @@ components:
           type: string
           format: date
           example: 04-08-2026
+        sourceable:
+          description: 'The model that sourced the transaction (e.g. a payment fee definition). Null when the transaction has no source.'
+          type: object
+          nullable: true
+        transactionable:
+          description: 'The model the transaction belongs to (e.g. a plot dossier). Null when the transaction is not attached to any model.'
+          type: object
+          nullable: true
     OrganizationalLevel:
       type: object
       properties:
@@ -13451,7 +14646,7 @@ tags:
     description: 'Conversations and messages'
   -
     name: 'Financial Management'
-    description: 'Manage Payment Fee definitions'
+    description: 'Manage Currencies'
   -
     name: 'Organizational Levels'
     description: 'Manage organizational hierarchy units'

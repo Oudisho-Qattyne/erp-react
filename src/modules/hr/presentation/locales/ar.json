@@ -21,6 +21,9 @@
     "none": "بدون"
   },
   "navigation": {
+    "my_leaves": {
+      "title": "إجازاتي"
+    },
     "reports": {
       "title": "التقارير"
     },
@@ -34,7 +37,7 @@
       "title": "تعديل الموظف"
     },
     "lookups": {
-      "title": "إدارة البيانات الأساسية",
+      "title": "إعدادات النطام",
       "tabs": {
         "countries": "الدول",
         "cities": "المدن",
@@ -440,7 +443,7 @@
     "unsaved_stay": "البقاء"
   },
   "lookups": {
-    "title": "إدارة البيانات الأساسية",
+    "title": "إعدادات النطام",
     "tabs": {
       "countries": "الدول",
       "cities": "المدن",
@@ -679,7 +682,9 @@
     "load_error": "فشل تحميل أرصدة الإجازات: {message}",
     "employee_load_error": "فشل تحميل أرصدة إجازات الموظف: {message}",
     "adjusted": "تم تعديل رصيد الإجازات بنجاح",
-    "adjust_error": "فشل تعديل رصيد الإجازات: {message}"
+    "adjust_error": "فشل تعديل رصيد الإجازات: {message}",
+    "adjust" : "تعديل"
+
   },
   "employee_leave_requests": {
     "title": "طلبات إجازة الموظفين",

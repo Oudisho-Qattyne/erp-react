@@ -26,7 +26,7 @@ export function SystemLookupsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold">{t('lookups.title', 'hr') || 'إدارة البيانات الأساسية'}</h1>
+      <h1 className="text-2xl font-bold">{t('lookups.title', 'hr') || 'إعدادات النطام'}</h1>
 
       <div className="flex space-x-2 space-x-reverse border-b border-border pb-2 overflow-x-auto">
         {(['countries', 'cities', 'regions', 'universities', 'faculties', 'specializations'] as Tab[]).map((tab) => (

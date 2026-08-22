@@ -11,6 +11,8 @@ export interface UpdateFeeDto {
 }
 
 export type FeeSortField =
+  | "name"
+  | "code"
   | "fee_value"
   | "created_at";
 
@@ -29,6 +31,9 @@ export interface FeeFilters {
   value_from?: number;
   // Maximum fee_value (inclusive)
   value_to?: number;
+  // Created-at range (YYYY-MM-DD, inclusive)
+  from_date?: string;
+  to_date?: string;
   // Sent as sort_by[column]=asc|desc (default: created_at desc)
   sort_by?: Partial<Record<FeeSortField, SortOrder>>;
 }

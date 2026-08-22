@@ -21,6 +21,9 @@
     "none": "None"
   },
   "navigation": {
+    "my_leaves": {
+      "title": "My Leaves"
+    },
     "reports": {
       "title": "Reports"
     },
@@ -682,7 +685,8 @@
     "load_error": "Failed to load leave balances: {message}",
     "employee_load_error": "Failed to load employee leave balances: {message}",
     "adjusted": "Leave balance adjusted successfully",
-    "adjust_error": "Failed to adjust leave balance: {message}"
+    "adjust_error": "Failed to adjust leave balance: {message}",
+    "adjust" : "Adjust"
   },
   "employee_leave_requests": {
     "title": "Employee Leave Requests",

@@ -22,6 +22,7 @@ import { authorizedPersonsPayloadToRows } from '../../forms/authorizedPersons';
 import { buildProductionMatrixFields } from '../../forms/facilityFormConfig';
 import type { ProductionCapacityRow, DailyConsumptionRow } from '../../../domain/entities/facility';
 import type { ConsumptionMaterial } from '../../../domain/entities/consumptionMaterial';
+import { BuildingLicenseSection } from './components/BuildingLicenseSection';
 
 export function ShowFacilityPage() {
   const { t } = useLanguage();
@@ -247,6 +248,8 @@ export function ShowFacilityPage() {
       </SectionCard>
 
       <FacilityIndustrialLicensesSection facilityId={facilityId!} />
+      <BuildingLicenseSection facilityId={facilityId!} />
+      
       {plotId && dossierId &&
         (relationsLoading
           ? <div className="py-8"><LoadingState message={t('common.loading', 'shared') || 'Loading...'} /></div>

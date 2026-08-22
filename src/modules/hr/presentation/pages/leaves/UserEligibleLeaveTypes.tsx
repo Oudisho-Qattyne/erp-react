@@ -6,12 +6,12 @@ import { ErrorState } from "../../../../../core/presentation/layouts/ui/state/Er
 import { useLeaveTypes } from "../../hooks/leave/useLeaveTypes"
 
 export const UserEligibleLeaveTypes = () => {
-    const { userEligibleLeaveTypes, loading, error, findUserEligibleLeaveTypes } = useLeaveTypes()
+    const { userEligibleLeaveTypes, eligiblePagination, eligibleFilter, setEligiblePage, setEligiblePerPage, loading, error, findUserEligibleLeaveTypes } = useLeaveTypes()
     const { t } = useLanguage()
 
     useEffect(() => {
         findUserEligibleLeaveTypes()
-    }, [])
+    }, [eligibleFilter])
 
     const columns = [
         {
@@ -19,7 +19,7 @@ export const UserEligibleLeaveTypes = () => {
             render: (row: any) => typeof row.name === "string" ? row.name : (row.name?.ar || row.name?.en || "")
         },
     ]
-    
+
     return (
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-6">{t("leave.user_eligible_leave_types", "hr") || "User Eligible Leave Types"}</h1>
@@ -32,6 +32,15 @@ export const UserEligibleLeaveTypes = () => {
                     rowKey="id"
                     loading={loading.findUserEligibleLeaveTypes}
                     emptyMessage={t("leave.no_eligible_leave_types", "hr") || "No eligible leave types found"}
+                    pagination={{
+                        page: eligiblePagination.currentPage,
+                        totalPages: eligiblePagination.lastPage,
+                        totalItems: eligiblePagination.total,
+                        onPageChange: setEligiblePage,
+                        itemsPerPage: eligibleFilter.per_page,
+                        onItemsPerPageChange: setEligiblePerPage,
+                        itemsPerPageOptions: [10, 25, 50, 100],
+                    }}
                 />
             )}
         </div>

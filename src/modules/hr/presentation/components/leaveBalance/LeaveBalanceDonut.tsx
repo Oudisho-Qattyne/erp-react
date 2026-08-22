@@ -13,21 +13,10 @@ export function LeaveBalanceDonut({ leaveBalance, size = 192 }: LeaveBalanceDonu
   const donutData = [
     { name: t("leave_balance.available", "hr"), value: Math.max(0, leaveBalance.available_units), color: "var(--color-success)" },
     { name: t("leave_balance.consumed", "hr"), value: Math.max(0, leaveBalance.consumed_units * -1), color: "var(--color-danger)" },
-    { name: t("leave_balance.carried_forward", "hr"), value: Math.max(0, leaveBalance.carried_forward_units), color: "var(--color-secondary)" },
-    {
-      name: `+ ${t("leave_balance.adjustment_added_units", "hr")}`,
-      value: Math.max(0, leaveBalance.adjustment_added_units),
-      color: "var(--color-warning)",
-    },
-    {
-      name: `- ${t("leave_balance.adjustment_deducted_units", "hr")}`,
-      value: Math.max(0, leaveBalance.adjustment_deducted_units * -1),
-      color: "color-mix(in srgb, var(--color-danger) 50%, var(--color-background))",
-    },
   ].filter((d) => d.value > 0)
 
-  const total = Math.max(0, leaveBalance.entitled_units)
-
+  const total = Math.max(0, leaveBalance.available_units - leaveBalance.consumed_units)
+  
   if (donutData.length === 0) return null
 
   return (

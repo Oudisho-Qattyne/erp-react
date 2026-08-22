@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react"
+import { useNavigate } from "react-router-dom"
 import { useLanguage } from "../../../../../core/presentation/context/i18n/I18nProvider"
 import { Button } from "../../../../../core/presentation/layouts/ui/buttons/Button"
 import { DataTable, type ColumnDef } from "../../../../../core/presentation/layouts/ui/tables/ResizableTable"
@@ -12,7 +13,7 @@ import type { LeaveBalance } from "../../../domain/entities/leaveBalance/leaveBa
 import type { EmployeeListItem } from "../../../domain/entities/EmployeeListItem"
 import type { EntityWithNameOnly } from "../../../../../core/domain/entities/EntityWithNameOnly"
 import type { UseFormReturn } from "react-hook-form"
-import { User, X, FileText, Filter, Search } from "lucide-react"
+import { User, X, FileText, Filter, Search, SlidersHorizontal } from "lucide-react"
 import { LeaveBalanceDonut } from "../../components/leaveBalance/LeaveBalanceDonut"
 import Input from "../../../../../core/presentation/layouts/ui/inputs/Input"
 import { inputBaseClasses } from "../../../../../core/presentation/layouts/ui/inputs/styles"
@@ -20,7 +21,8 @@ import { ro } from "zod/locales"
 
 export const EmployeeLeaveBalances = () => {
     const { t, language } = useLanguage()
-    const { employeeLeaveBalances, findAllEmployeeLeaveBalances, loading, error, filter, setFilter, resetFilter, setSearch } = useLeaveBalance()
+    const navigate = useNavigate()
+    const { employeeLeaveBalances, employeePagination, findAllEmployeeLeaveBalances, loading, error, filter, setFilter, setPage, resetFilter, setSearch } = useLeaveBalance()
 
     const [sortColumn, setSortColumn] = useState<string>("leave_type_name")
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
@@ -56,6 +58,16 @@ export const EmployeeLeaveBalances = () => {
     }
 
     const handleSearch = () => setSearch(localSearch)
+
+    const handleAdjustBalance = (row: LeaveBalance) => {
+        const params = new URLSearchParams({
+            employee_id: String(row.employee_id),
+            employee_name: `${row.employee_first_name} ${row.employee_last_name}`,
+            leave_type_id: String(row.leave_type_id),
+            leave_type_name: row.leave_type_name,
+        })
+        window.open(`/hr/adjust-leave-balance?${params.toString()} `, '_blank')
+    }
 
     const getLocalizedTypeName = (lt: EntityWithNameOnly) =>
         typeof lt.name === "string" ? lt.name : language === "ar" ? lt.name.ar : lt.name.en
@@ -169,9 +181,29 @@ export const EmployeeLeaveBalances = () => {
         { key: "adjustment_added_units", label: t("leave_balance.adjustment_added", "hr") || "Adj +", width: 80, sortable: true },
         { key: "adjustment_deducted_units", label: t("leave_balance.adjustment_deducted", "hr") || "Adj -", width: 80, sortable: true },
         {
+            key: "actions",
+            label: t('common.actions', 'shared') || 'Actions',
+            width: 60,
+            align: "center" as const,
+            render: (row) => (
+                <div className="flex items-center justify-center">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleAdjustBalance(row)}
+                        title={t("leave_balance.adjust", "hr") || "Adjust Leave Balance"}
+                        requiredPermission="hr.leave-balance.adjust"
+                    >
+                        <SlidersHorizontal size={16} />
+                    </Button>
+                </div>
+            ),
+        },
+        {
             key: "chart", label: "", width: 340,
             render: (row) => <LeaveBalanceDonut leaveBalance={row} size={112} />,
         },
+        
     ]
 
     return (
@@ -212,6 +244,15 @@ export const EmployeeLeaveBalances = () => {
                         sortColumn={sortColumn}
                         sortOrder={sortOrder}
                         onSort={handleSort}
+                        pagination={{
+                            page: employeePagination.currentPage,
+                            totalPages: employeePagination.lastPage,
+                            totalItems: employeePagination.total,
+                            onPageChange: setPage,
+                            itemsPerPage: filter.per_page,
+                            onItemsPerPageChange: (size) => setFilter({ per_page: size, page: 1 }),
+                            itemsPerPageOptions: [10, 25, 50, 100],
+                        }}
                     />
                 </div>
             )}

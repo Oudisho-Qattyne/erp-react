@@ -80,7 +80,7 @@ const usersModule: Module = {
   ],
   locales: { en: enLocales, ar: arLocales },
   navGroups: [
-    { id: 'users', label: 'roles_and_permissions', order: 20, icon: <Shield size={18} className="shrink-0" /> },
+    { id: 'users', label: 'roles_and_permissions', order: 23, icon: <Shield size={18} className="shrink-0" /> },
   ],
 }
 

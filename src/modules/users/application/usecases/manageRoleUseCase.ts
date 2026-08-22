@@ -8,8 +8,8 @@ export const createManageRoleUseCase = (
   repository: ICrudRoleRepository
 ) => {
   return {
-    getAll(): Promise<DomainResponse<Role[]>> {
-      return repository.getRoles();
+    getAll(filter?: { page?: number; per_page?: number }): Promise<DomainResponse<Role[]>> {
+      return repository.getRoles(filter);
     },
 
     getById(id: number): Promise<DomainResponse<DetailedRole>> {

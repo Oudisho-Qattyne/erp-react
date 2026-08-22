@@ -1,9 +1,11 @@
-import type { DpomainResponsePaginated } from "../entities/common/DomainResponsePaginated";
+import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
 
 import type { LeaveBalance } from "../entities/leaveBalance/leaveBalance";
+import type { FilterLeaveBalancesDto } from "../../application/dtos/LeaveBalance/FilterLeaveBalanceDto";
+import type { AdjustLeaveBalanceDto } from "../../application/dtos/LeaveBalance/AdjustLeaveBalanceDto";
 
 export interface ILeaveBalanceRepository {
-    findAllEmployeeLeaveBalances(employeeId:number | undefined ,  filter?: any): Promise<DpomainResponsePaginated<LeaveBalance[]>>;
-    findAllMyLeaveBalances(filter?: any): Promise<DpomainResponsePaginated<LeaveBalance[]>>;
-    adjustLeaveBalance(adjust : any, idempotencyKey?: string) : Promise<DpomainResponsePaginated<any>>
+    findAllEmployeeLeaveBalances(employeeId?: number, filter?: FilterLeaveBalancesDto): Promise<DomainResponse<LeaveBalance[]>>;
+    findAllMyLeaveBalances(filter?: FilterLeaveBalancesDto): Promise<DomainResponse<LeaveBalance[]>>;
+    adjustLeaveBalance(adjust: AdjustLeaveBalanceDto, idempotencyKey?: string): Promise<DomainResponse<LeaveBalance>>;
 }

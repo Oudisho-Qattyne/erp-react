@@ -1,6 +1,5 @@
 import type { ApiClient } from "../../../../../core/domain/common/api/ApiClient"
 import {type DomainResponse } from "../../../../../core/domain/common/responce/DomainResponse"
-import {type DpomainResponsePaginated } from "../../../../hr/domain/entities/common/DomainResponsePaginated"
 import type { User } from "../../../domain/entities/user/user"
 import type { IUserRepository } from "../../../domain/repositories/user/IUserRepository"
 
@@ -8,7 +7,7 @@ export const createUserRepository = (apiClient: ApiClient): IUserRepository => {
     const baseUrl = '/users'
     return (
         {
-           getAllUsers : (filter : any) => apiClient.get<DpomainResponsePaginated<User[]>>(baseUrl, { params: filter }),
+           getAllUsers : (filter : any) => apiClient.get<DomainResponse<User[]>>(baseUrl, { params: filter }),
 
            getCurrentUsers: () => apiClient.get<DomainResponse<User>>(`${baseUrl}/current`),
 

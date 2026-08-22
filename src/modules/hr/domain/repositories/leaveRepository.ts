@@ -9,5 +9,5 @@ export interface ILeaveTypeRepository {
     updateLeaveType(id: number, data: any, idempotencyKey?: string): Promise<DomainResponse<Leave>>;
     archiveLeaveType(id: number, idempotencyKey?: string): Promise<DomainResponse<Leave>>;
     deleteLeaveType(id: number): Promise<DomainResponse<Leave>>;
-    getUserEligibleLeaveTypes(): Promise<DomainResponse<EntityWithNameOnly[]>>;
+    getUserEligibleLeaveTypes(filter?: { page?: number; per_page?: number }): Promise<DomainResponse<EntityWithNameOnly[]>>;
 }

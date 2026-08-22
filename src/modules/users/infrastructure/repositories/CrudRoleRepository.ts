@@ -7,8 +7,10 @@ import type { ICrudRoleRepository } from "../../domain/repositories/ICrudRoleRep
 export const createCrudRoleRepository = (apiClient: ApiClient): ICrudRoleRepository => {
     return (
         {
-            getRoles() {
-                return (apiClient.get<DomainResponse<Role[]>>("/users/roles"))
+            getRoles(filter?: { page?: number; per_page?: number }) {
+                return (apiClient.get<DomainResponse<Role[]>>("/users/roles", {
+                    params: filter as Record<string, string | number | boolean | (string | number)[]> | undefined,
+                }))
             },
             getRoleId(id: number) {
                 return (apiClient.get<DomainResponse<DetailedRole>>(`/users/roles/${id}`))

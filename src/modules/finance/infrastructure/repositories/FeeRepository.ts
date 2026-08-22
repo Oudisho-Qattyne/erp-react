@@ -1,5 +1,5 @@
 import type { ApiClient } from "../../../../core/domain/common/api/ApiClient";
-import type { DpomainResponsePaginated } from "../../../hr/domain/entities/common/DomainResponsePaginated";
+import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
 import type { CreateFeeDto, FeeFilters, UpdateFeeDto } from "../../application/dtos/feeDtos";
 import type { Fee } from "../../domain/entities/Fee";
 import type { IFeeRepository } from "../../domain/repositories/IFeeRepository";
@@ -29,21 +29,21 @@ export const createFeeRepository = (apiClient: ApiClient): IFeeRepository => {
 
   return {
     findAllFees: (params) =>
-      apiClient.get<DpomainResponsePaginated<Fee[]>>(baseUrl, params ? { params: serializeParams(params) } : undefined),
+      apiClient.get<DomainResponse<Fee[]>>(baseUrl, params ? { params: serializeParams(params) } : undefined),
     findFeeById: (id) =>
-      apiClient.get<DpomainResponsePaginated<Fee>>(`${baseUrl}/${id}`),
+      apiClient.get<DomainResponse<Fee>>(`${baseUrl}/${id}`),
     createFee: (data, idempotencyKey) =>
-      apiClient.post<DpomainResponsePaginated<Fee>, CreateFeeDto>(baseUrl, data, idempotencyConfig(idempotencyKey)),
+      apiClient.post<DomainResponse<Fee>, CreateFeeDto>(baseUrl, data, idempotencyConfig(idempotencyKey)),
     updateFee: (id, data, idempotencyKey) =>
-      apiClient.put<DpomainResponsePaginated<Fee>, UpdateFeeDto>(`${baseUrl}/${id}`, data, idempotencyConfig(idempotencyKey)),
+      apiClient.put<DomainResponse<Fee>, UpdateFeeDto>(`${baseUrl}/${id}`, data, idempotencyConfig(idempotencyKey)),
     archiveFee: (fee, idempotencyKey) =>
-      apiClient.put<DpomainResponsePaginated<Fee>, UpdateFeeDto>(
+      apiClient.put<DomainResponse<Fee>, UpdateFeeDto>(
         `${baseUrl}/${fee.id}`,
         { name: fee.name, fee_status: "archived" },
         idempotencyConfig(idempotencyKey),
       ),
     activeFee: (fee, idempotencyKey) =>
-      apiClient.put<DpomainResponsePaginated<Fee>, UpdateFeeDto>(
+      apiClient.put<DomainResponse<Fee>, UpdateFeeDto>(
         `${baseUrl}/${fee.id}`,
         { name: fee.name, fee_status: "active" },
         idempotencyConfig(idempotencyKey),

@@ -13,7 +13,7 @@ export interface UseManageRolesReturn {
   loading: Record<string, boolean>;
   error: Record<string, string | null>;
   clearError: (key?: string) => void;
-  getAll: () => Promise<DomainResponse<Role[]>>;
+  getAll: (filter?: { page?: number; per_page?: number }) => Promise<DomainResponse<Role[]>>;
   getById: (id: number) => Promise<DomainResponse<DetailedRole>>;
   create: (data: CreateRoleData) => Promise<DomainResponse<Role>>;
   update: (id: number, data: UpdateRoleData) => Promise<DomainResponse<DetailedRole>>;
@@ -58,7 +58,7 @@ export function useManageRoles(): UseManageRolesReturn {
     loading,
     error,
     clearError,
-    getAll: () => wrap('getAll', () => usecase.getAll()),
+    getAll: (filter) => wrap('getAll', () => usecase.getAll(filter)),
     getById: (id) => wrap('getById', () => usecase.getById(id)),
     create: (data) => wrap('create', () => idem.run('createRole', data, (key) => usecase.create(data, key))),
     update: (id, data) => wrap('update', () => idem.run('updateRole', { id, data }, (key) => usecase.update(id, data, key))),

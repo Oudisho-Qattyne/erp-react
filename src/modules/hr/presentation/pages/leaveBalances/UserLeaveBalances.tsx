@@ -16,7 +16,7 @@ import { LeaveBalanceDonut } from "../../components/leaveBalance/LeaveBalanceDon
 
 export const UserLeaveBalances = () => {
   const { t, language } = useLanguage()
-  const { myLeaveBalances, findAllMyLeaveBalances, loading, error, filter, setFilter, resetFilter } = useLeaveBalance()
+  const { myLeaveBalances, myPagination, findAllMyLeaveBalances, loading, error, filter, setFilter, setPage, resetFilter } = useLeaveBalance()
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [leaveTypePickerOpen, setLeaveTypePickerOpen] = useState(false)
   const [selectedLeaveTypeName, setSelectedLeaveTypeName] = useState<string | undefined>("")
@@ -125,6 +125,15 @@ export const UserLeaveBalances = () => {
             rowKey="leave_type_id"
             loading={loading.findAllMyLeaveBalances}
             emptyMessage={t("leave_balance.no_data", "hr") || "No leave balances found"}
+            pagination={{
+              page: myPagination.currentPage,
+              totalPages: myPagination.lastPage,
+              totalItems: myPagination.total,
+              onPageChange: setPage,
+              itemsPerPage: filter.per_page,
+              onItemsPerPageChange: (size) => setFilter({ per_page: size, page: 1 }),
+              itemsPerPageOptions: [10, 25, 50, 100],
+            }}
           />
         </>
       )}

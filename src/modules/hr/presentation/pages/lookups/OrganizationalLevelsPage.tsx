@@ -74,7 +74,7 @@ export function OrganizationalLevelsPage() {
       toast.success(t('lookups.deleted', 'hr').replace('{name}', entity));
       setConfirmDelete(null);
     } catch (err : any) {
-      handleApiError(err, { module: "hr" });
+      handleApiError(err, { module: "hr", passThrough:true});
       getAll();
     }
   };
