@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import type { Role, DetailedRole } from '../../domain/entities/role';
+import type { RoleListFilter } from '../../domain/repositories/ICrudRoleRepositry';
 import type { DomainResponse } from '../../../../core/domain/common/responce/DomainResponse';
 import { useApiClient } from '../../../../core/presentation/context/api/ApiClinetProvider';
 import { createManageRoleUseCase } from '../../application/usecases/manageRoleUseCase';
@@ -13,7 +14,7 @@ export interface UseManageRolesReturn {
   loading: Record<string, boolean>;
   error: Record<string, string | null>;
   clearError: (key?: string) => void;
-  getAll: (filter?: { page?: number; per_page?: number }) => Promise<DomainResponse<Role[]>>;
+  getAll: (filter?: RoleListFilter) => Promise<DomainResponse<Role[]>>;
   getById: (id: number) => Promise<DomainResponse<DetailedRole>>;
   create: (data: CreateRoleData) => Promise<DomainResponse<Role>>;
   update: (id: number, data: UpdateRoleData) => Promise<DomainResponse<DetailedRole>>;

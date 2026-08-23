@@ -6,20 +6,15 @@ import { DataTable, type ColumnDef } from "../../../../../core/presentation/layo
 import { LoadingState } from "../../../../../core/presentation/layouts/ui/state/LoadingState"
 import { ErrorState } from "../../../../../core/presentation/layouts/ui/state/ErrorState"
 import { ConfirmDialog } from "../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog"
-import { FilterDialog, type FilterField } from "../../../../../core/presentation/layouts/ui/filter/FilterDialog"
 import { useLeaveRequest } from "../../hooks/leaveRequest/useLeaveRequest"
-import { LeaveTypePickerDialog } from "../../components/leaveTypes/LeaveTypePickerDialog"
 import type { LeaveRequest } from "../../../domain/entities/leaveRequest/leaveRequest"
-import type { EntityWithNameOnly } from "../../../../../core/domain/entities/EntityWithNameOnly"
 import Input from "../../../../../core/presentation/layouts/ui/inputs/Input"
 import { inputBaseClasses } from "../../../../../core/presentation/layouts/ui/inputs/styles"
-import type { UseFormReturn } from "react-hook-form"
 import { AuditLog } from "../../../../../core/presentation/layouts/ui/auditLogs/AuditLog"
-import { Plus, Eye, Pencil, XCircle, Filter, Search, FileText, X, History } from "lucide-react"
+import { Plus, Eye, Pencil, XCircle, Search, History } from "lucide-react"
 
 const CANCELLABLE_STATUSES = [ "pending"]
 const EDITABLE_STATUSES = ["pending" , "draft"]
-const LEAVE_REQUEST_STATUSES = ["draft", "pending", "approved", "rejected", "cancelled"]
 
 const statusStyles: Record<string, string> = {
   pending: "bg-warning/10 text-warning border-warning/20",
@@ -33,12 +28,8 @@ export function UserLeaveRequests() {
   const navigate = useNavigate()
   const { myLeaveRequests, findAllMyLeaveRequests, loading, error, pagination, filter, setPage, setFilter, resetFilter, processLeaveRequest } = useLeaveRequest()
   const [cancelId, setCancelId] = useState<number | null>(null)
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [localSearch, setLocalSearch] = useState<string>("")
-  const [leaveTypePickerOpen, setLeaveTypePickerOpen] = useState(false)
-  const [selectedLeaveTypeName, setSelectedLeaveTypeName] = useState<string | undefined>("")
   const [auditItem, setAuditItem] = useState<LeaveRequest | null>(null)
-    const formRef = useRef<UseFormReturn | null>(null)
     const handleSearch = () => setFilter({ search: localSearch, page: 1 })
 
     useEffect(() => {
@@ -64,9 +55,6 @@ export function UserLeaveRequests() {
     }
   }
 
-  const getLocalizedTypeName = (lt: EntityWithNameOnly) =>
-    typeof lt.name === "string" ? lt.name : language === "ar" ? lt.name.ar : lt.name.en
-
   const handleTranslateValues = (field: string, value: string) => {
     if (field === "status") {
       return t(`leave_request.status_${value}`, "hr") || value
@@ -74,70 +62,6 @@ export function UserLeaveRequests() {
     if (value === "true") return t("common.yes", "shared") || "Yes"
     if (value === "false") return t("common.no", "shared") || "No"
     return value
-  }
-
-  const handleLeaveTypePicked = (types: EntityWithNameOnly[]) => {
-    const lt = types[0]
-    if (lt) {
-      setSelectedLeaveTypeName(getLocalizedTypeName(lt))
-      formRef.current?.setValue("leave_type_id", String(lt.id))
-    }
-    setLeaveTypePickerOpen(false)
-  }
-
-  const filterFields: FilterField[] = [
-    {
-      name: "leave_type_id",
-      render: (form) => {
-        formRef.current = form
-        return (
-          <div>
-            <label className="block text-sm font-medium text-text mb-1">
-              {t("leave_request.leave_type", "hr") || "Leave Type"}
-            </label>
-            <div className="flex items-center gap-2">
-              <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-background text-sm text-text-muted">
-                <FileText size={14} />
-                {selectedLeaveTypeName || (t("common.all", "shared") || "All")}
-              </div>
-              <Button variant="outline" size="sm" onClick={() => setLeaveTypePickerOpen(true)}>
-                {t("common.select", "shared") || "Select"}
-              </Button>
-              {selectedLeaveTypeName && (
-                <Button variant="ghost" size="sm" onClick={() => { setSelectedLeaveTypeName(""); form.setValue("leave_type_id", "") }}>
-                  <X size={14} />
-                </Button>
-              )}
-            </div>
-          </div>
-        )
-      },
-    },
-    {
-      name: "status",
-      label: t("leave_request.status", "hr") || "Status",
-      type: "select",
-      options: [
-        { value: "", label: t("common.all", "shared") || "All" },
-        ...LEAVE_REQUEST_STATUSES.map((s) => ({ value: s, label: t(`leave_request.status_${s}`, "hr") || s })),
-      ],
-    },
-    { name: "from_date", label: t("leave_request.from_date", "hr") || "From", type: "date" },
-    { name: "to_date", label: t("leave_request.to_date", "hr") || "To", type: "date" },
-  ]
-
-  const handleApplyFilter = (values: Record<string, any>) => {
-    const parsed: Record<string, any> = { page: 1, per_page: filter.per_page }
-    for (const [key, val] of Object.entries(values)) {
-      if (val === "" || val === undefined) continue
-      if (key === "leave_type_id") {
-        parsed[key] = Number(val)
-      } else {
-        parsed[key] = val
-      }
-    }
-    setFilter(() => parsed as any)
-    setIsFilterOpen(false)
   }
 
   const columns: ColumnDef<LeaveRequest>[] = [
@@ -241,10 +165,7 @@ export function UserLeaveRequests() {
             <Button variant="primary" size="sm" onClick={handleSearch} leftIcon={<Search size={14} />}>
               {t("common.search", "shared") || "Search"}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
-              {t("common.filter", "shared") || "Filter"}
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => { resetFilter(); setSelectedLeaveTypeName("") }}>
+            <Button variant="outline" size="sm" onClick={resetFilter}>
               {t("common.reset", "shared") || "Reset"}
             </Button>
           </div>
@@ -278,21 +199,6 @@ export function UserLeaveRequests() {
         onConfirm={handleCancel}
         onCancel={() => setCancelId(null)}
       />
-      <FilterDialog
-        isOpen={isFilterOpen}
-        fields={filterFields}
-        initialValues={filter}
-        onFilter={handleApplyFilter}
-        onCancel={() => setIsFilterOpen(false)}
-        onReset={() => { resetFilter(); setSelectedLeaveTypeName(""); setIsFilterOpen(false) }}
-      />
-      <LeaveTypePickerDialog
-        isOpen={leaveTypePickerOpen}
-        onClose={() => setLeaveTypePickerOpen(false)}
-        onConfirm={handleLeaveTypePicked}
-        multiple={false}
-      />
-
       <AuditLog
         isOpen={!!auditItem}
         onClose={() => setAuditItem(null)}

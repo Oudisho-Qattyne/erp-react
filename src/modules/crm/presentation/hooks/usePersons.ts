@@ -24,9 +24,12 @@ export interface UsePersonsReturn {
   clearError: () => void
   pagination: { currentPage: number; lastPage: number; total: number; hasMore: boolean }
   filter: PersonFilters
+  sortColumn: string | undefined
+  sortOrder: "asc" | "desc" | undefined
   setFilter: (patch: Partial<PersonFilters>) => void
   resetFilter: () => void
   setPage: (page: number) => void
+  setSort: (column: string) => void
   findAllPersons: () => Promise<void>
   searchPersons: (query: string, perPage?: number) => Promise<PersonSearchResult[]>
 }
@@ -60,11 +63,32 @@ export const usePersons = (): UsePersonsReturn => {
     setFilterState((prev) => ({ ...prev, page }))
   }, [])
 
+  const setSort = useCallback((column: string) => {
+    setFilterState((prev) => ({
+      ...prev,
+      sortColumn: column,
+      sortOrder: prev.sortColumn === column && prev.sortOrder === "asc" ? "desc" : "asc",
+      page: 1,
+    }))
+  }, [])
+
+  const buildListParams = useCallback((): Record<string, string | number> | undefined => {
+    const params: Record<string, string | number> = {}
+    for (const [key, val] of Object.entries(filter)) {
+      if (key === "sortColumn" || key === "sortOrder") continue
+      if (val !== undefined && val !== "") params[key] = String(val)
+    }
+    if (filter.sortColumn) {
+      params[`sort_by[${filter.sortColumn}]`] = filter.sortOrder ?? "asc"
+    }
+    return Object.keys(params).length ? params : undefined
+  }, [filter])
+
   const findAllPersons = useCallback(async () => {
     setFnLoading("findAllPersons", true)
     setFnError("findAllPersons", null)
     try {
-      const res = await useCase.findAllPersons(filter)
+      const res = await useCase.findAllPersons(buildListParams())
       setPersons(res.data)
       setPagination({
         currentPage: res.pagination?.currentPage ?? 1,
@@ -77,7 +101,7 @@ export const usePersons = (): UsePersonsReturn => {
     } finally {
       setFnLoading("findAllPersons", false)
     }
-  }, [useCase, filter])
+  }, [useCase, buildListParams])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -88,14 +112,7 @@ export const usePersons = (): UsePersonsReturn => {
   const searchPersons = useCallback(
     async (query: string, perPage = 10): Promise<PersonSearchResult[]> => {
       const res = await useCase.findAllPersons({ search: query, per_page: perPage })
-      return (res.data ?? []).map((p) => ({
-        id: p.id,
-        name: p.name,
-        email: p.email,
-        primary_phone_number: p.primary_phone_number,
-        whatsapp: p.whatsapp,
-        facebook: p.facebook,
-      }))
+      return (res.data )
     },
     [useCase]
   )
@@ -112,9 +129,12 @@ export const usePersons = (): UsePersonsReturn => {
     clearError,
     pagination,
     filter,
+    sortColumn: filter.sortColumn,
+    sortOrder: filter.sortOrder,
     setFilter,
     resetFilter,
     setPage,
+    setSort,
     findAllPersons,
     searchPersons,
   }

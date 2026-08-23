@@ -120,9 +120,10 @@ export function DossierPickerDialog({
   ]
 
   const columns: ColumnDef<Dossier>[] = [
-    { key: "dossier_number", label: t("dossier.number", "investments") || "Dossier Number", width: 160 },
+    { key: "dossier_number", label: t("dossier.number", "investments") || "Dossier Number", width: 160, sortable: true },
     { key: "dossier_date", label: t("dossier.date", "investments") || "Date", width: 120, sortable: true },
     { key: "status", label: t("dossier.status", "investments") || "Status", width: 120 },
+    { key: "created_at", label: t("dossier.created_at", "investments") || "Created At", width: 160, sortable: true, render: (row: Dossier) => row.created_at || "—" },
   ]
 
   return (

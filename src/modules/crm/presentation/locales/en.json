@@ -21,7 +21,9 @@
     "x": "X",
     "linkedin": "LinkedIn",
     "facebook": "Facebook",
+    "created_at": "Created At",
     "type": "Type",
+    "role": "Role",
     "type_employee": "Employee",
     "type_investor": "Investor"
   },

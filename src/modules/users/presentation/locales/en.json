@@ -22,6 +22,7 @@
     "add": "Add Role",
     "search_placeholder": "Search by name or display name",
     "no_data": "No roles found",
+    "id": "ID",
     "name": "Name",
     "display_name": "Display Name",
     "number_of_users": "Users Count",

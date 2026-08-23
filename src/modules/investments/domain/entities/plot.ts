@@ -22,6 +22,7 @@ export interface Plot {
   service_status_conditions:PlotServiceStatusCondition[]
   // notes?: string;
   status_date?: string;
+  created_at?: string;
   updated_at?: string;
   folder_id?: string;
   allocated_dossier_id?:number;

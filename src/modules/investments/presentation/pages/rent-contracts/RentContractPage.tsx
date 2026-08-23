@@ -1,8 +1,9 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
-import type { Contract } from '../../../domain/entities/contract';
+import type { RentContract } from '../../../domain/entities/rentContract';
 import type { Dossier } from '../../../domain/entities/dossier';
+import type { RentContractIndustry } from '../../../domain/entities/rentContractIndustry';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { inputBaseClasses } from '../../../../../core/presentation/layouts/ui/inputs/styles';
 import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
@@ -12,22 +13,29 @@ import { FilterDialog, type FilterField } from '../../../../../core/presentation
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
-import { Eye, Trash2, Search, History, FileSignature, Filter, X, MapPin, FileText } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Eye, Trash2, Search, History, FileSignature, Filter, X, FileText } from 'lucide-react';
+import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 import { DossierPickerDialog } from '../plots/components/DossierPickerDialog';
 
-export function ContractsPage() {
+export function RentContractPage() {
   const { t } = useLanguage();
-  const navigate = useNavigate();
-  const { entities: contracts, remove, loadingMap, errorMap, list } = useEntityCrud<Contract>(
-    '/investments/contracts',
-    '/investments/contracts',
+  const { entities: contracts, remove, loadingMap, errorMap, list } = useEntityCrud<RentContract>(
+    '/investments/rent-contracts',
+    '/investments/rent-contracts',
     { listState: true, paginate: false }
   );
 
+  const { entities: industries, getAll: getIndustries } = useEntityCrud<RentContractIndustry>(
+    '/investments/rent-contract-industries',
+    '/investments/rent-contract-industries'
+  );
+  useEffect(() => {
+    getIndustries('/investments/rent-contract-industries?is_active=true');
+  }, [getIndustries]);
+
   const [localSearch, setLocalSearch] = useState('');
-  const [confirmDelete, setConfirmDelete] = useState<Contract | null>(null);
-  const [auditItem, setAuditItem] = useState<Contract | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<RentContract | null>(null);
+  const [auditItem, setAuditItem] = useState<RentContract | null>(null);
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterDossierName, setFilterDossierName] = useState<string>('');
@@ -52,7 +60,7 @@ export function ContractsPage() {
     if (!confirmDelete) return;
     try {
       await remove(confirmDelete.id);
-      toast.success(t('contract.deleted', 'investments') || 'Contract deleted successfully');
+      toast.success(t('rent_contract.deleted', 'investments') || 'Rent contract deleted successfully');
       setConfirmDelete(null);
       list.refresh();
     } catch (err: any) {
@@ -89,27 +97,15 @@ export function ContractsPage() {
       },
     },
     {
-      name: 'contract_number',
-      label: t('contract.contract_number', 'investments') || 'Contract Number',
-      type: 'text',
-    },
-    {
-      name: 'payment_method',
-      label: t('contract.payment_method', 'investments') || 'Payment Method',
+      name: 'rent_contract_industry_id',
+      label: t('rent_contract.rent_contract_industry_id', 'investments') || 'Industry',
       type: 'select',
       options: [
         { value: '', label: t('common.all', 'shared') || 'All' },
-        { value: 'cash', label: t('contract.payment_method_cash', 'investments') || 'Cash' },
-        { value: 'installment', label: t('contract.payment_method_installment', 'investments') || 'Installment' },
+        ...industries.map((ind) => ({ value: ind.id, label: getLocalizedName(ind.name) })),
       ],
     },
-    {
-      name: 'paid_full_amount',
-      label: t('contract.paid_full_amount', 'investments') || 'Paid Full Amount',
-      type: 'checkbox',
-    },
-    { name: 'from_date', label: t('contract.from_date', 'investments') || 'From Date', type: 'date' },
-    { name: 'to_date', label: t('contract.to_date', 'investments') || 'To Date', type: 'date' },
+    { name: 'renter_phone', label: t('rent_contract.renter_phone', 'investments') || 'Renter Phone', type: 'text' },
   ];
 
   const filterInitialValues = useMemo(
@@ -124,9 +120,7 @@ export function ContractsPage() {
     const parsed: Record<string, any> = {};
     for (const [key, val] of Object.entries(values)) {
       if (val === '' || val === undefined) { parsed[key] = undefined; continue; }
-      if (val === 'true') parsed[key] = true;
-      else if (val === 'false') parsed[key] = false;
-      else if (key === 'plot_id' || key === 'dossier_id') parsed[key] = Number(val);
+      if (key === 'dossier_id' || key === 'rent_contract_industry_id') parsed[key] = Number(val);
       else parsed[key] = val;
     }
     if (parsed.dossier_id) {
@@ -149,33 +143,30 @@ export function ContractsPage() {
     setIsFilterOpen(false);
   };
 
-  const handleTranslateValues = (field: string, value: string) => {
-    if (field === 'payment_method') {
-      return t(`contract.payment_method_${value}`, 'investments') || value;
-    }
-    return value;
-  };
+  const handleTranslateValues = (field: string, value: string) => value;
 
   const columns = [
-    { key: "contract_number", label: t("contract.contract_number", "investments") || "Contract Number", width: 160, sortable: true },
-    { key: "contract_date", label: t("contract.contract_date", "investments") || "Date", width: 120, sortable: true },
-    { key: "total_price", label: t("contract.total_price", "investments") || "Total", width: 130, sortable: true },
+    { key: "rent_contract_number", label: t("rent_contract.rent_contract_number", "investments") || "Contract No.", width: 140, sortable: true },
+    { key: "rent_contract_date", label: t("rent_contract.rent_contract_date", "investments") || "Date", width: 120, sortable: true },
+    { key: "renter_name", label: t("rent_contract.renter_name", "investments") || "Renter Name", width: 160, sortable: true },
+    { key: "renter_phone", label: t("rent_contract.renter_phone", "investments") || "Phone", width: 130 },
+    { key: "rent_area", label: t("rent_contract.rent_area", "investments") || "Area", width: 100 },
     {
-      key: "payment_method",
-      label: t("contract.payment_method", "investments") || "Payment",
-      width: 110,
-      render: (row: Contract) => t(`contract.payment_method_${row.payment_method}`, 'investments') || row.payment_method,
+      key: "rent_contract_industry_id",
+      label: t("rent_contract.rent_contract_industry_id", "investments") || "Industry",
+      width: 150,
+      render: (row: RentContract) => getLocalizedName(row.rent_contract_industry?.name) || row.rent_contract_industry_id || '—',
     },
     {
       key: "plot",
       label: t("plots.code", "investments") || "Code",
-      width: 140,
-      render: (row: Contract) => {
-        const p = row.plot || row.dossier?.plot;
+      width: 120,
+      render: (row: RentContract) => {
         const pid = row.plot_id || row.dossier?.plot_id;
+        const p = row.dossier?.plot;
         const label = p?.code || p?.identifier || pid?.toString() || '—';
         return pid ? (
-          <button type="button" onClick={() => window.open(`/investments/plots/${pid}/edit` , '_blank')} className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
+          <button type="button" onClick={() => window.open(`/investments/plots/${pid}/edit`, '_blank')} className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
             <Eye size={14} />
             <span>{label}</span>
           </button>
@@ -186,12 +177,12 @@ export function ContractsPage() {
       key: "dossier",
       label: t("dossier.number", "investments") || "Dossier Number",
       width: 140,
-      render: (row: Contract) => {
+      render: (row: RentContract) => {
         const did = row.dossier_id || row.dossier?.id;
         const pid = row.plot_id || row.dossier?.plot_id;
         const label = row.dossier?.dossier_number || did?.toString() || '—';
         return pid && did ? (
-          <button type="button" onClick={() => window.open(`/investments/plots/${pid}/dossiers/${did}` ,'_blank')} className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
+          <button type="button" onClick={() => window.open(`/investments/plots/${pid}/dossiers/${did}`, '_blank')} className="flex items-center gap-1.5 text-primary hover:underline cursor-pointer">
             <Eye size={14} />
             <span>{label}</span>
           </button>
@@ -200,31 +191,31 @@ export function ContractsPage() {
     },
     {
       key: "created_at",
-      label: t("contract.created_at", "investments") || "Created At",
-      width: 180,
+      label: t("rent_contract.created_at", "investments") || "Created At",
+      width: 160,
       sortable: true,
-      render: (row: Contract) => row.created_at || '—',
+      render: (row: RentContract) => row.created_at || '—',
     },
     {
       key: "actions",
       label: t("common.actions", "shared") || "Actions",
       width: 120,
-      render: (row: Contract) => {
+      render: (row: RentContract) => {
         const pid = row.plot_id || row.dossier?.plot_id;
         const did = row.dossier_id || row.dossier?.id;
         return (
           <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
             <Button variant="ghost" size="sm" onClick={() => {
               if (pid && did) {
-                window.open(`/investments/plots/${pid}/dossiers/${did}/contract/${row.id}` , '_blank');
+                window.open(`/investments/plots/${pid}/dossiers/${did}`, '_blank');
               }
-            }} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.contracts.view">
+            }} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.rent-contracts.view">
               <Eye size={16} />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)} title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.contracts.delete">
+            <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)} title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.rent-contracts.delete">
               <Trash2 size={16} className="text-danger" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)} title={t('contract.edit_log', 'investments') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
+            <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)} title={t('rent_contract.edit_log', 'investments') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
               <History size={16} />
             </Button>
           </div>
@@ -238,7 +229,7 @@ export function ContractsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <FileSignature size={24} className="text-primary" />
-          {t('contract.title', 'investments') || 'Contracts'}
+          {t('rent_contract.title', 'investments') || 'Rent Contracts'}
         </h1>
       </div>
 
@@ -273,7 +264,7 @@ export function ContractsPage() {
           data={contracts}
           rowKey="id"
           loading={loadingMap["getAll"]}
-          emptyMessage={t('contract.no_records', 'investments') || 'No contracts found'}
+          emptyMessage={t('rent_contract.no_records', 'investments') || 'No rent contracts found'}
           sortColumn={list.filter.sortColumn}
           sortOrder={list.filter.sortOrder}
           onSort={list.setSort}
@@ -282,8 +273,8 @@ export function ContractsPage() {
 
       <ConfirmDialog
         isOpen={!!confirmDelete}
-        title={t('contract.delete_title', 'investments') || 'Delete Contract'}
-        message={t('contract.delete_message', 'investments') || 'Are you sure you want to delete this contract?'}
+        title={t('rent_contract.delete_title', 'investments') || 'Delete Rent Contract'}
+        message={t('rent_contract.delete_message', 'investments') || 'Are you sure you want to delete this rent contract?'}
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(null)}
         confirmLoading={loadingMap["remove"]}
@@ -313,22 +304,22 @@ export function ContractsPage() {
       <AuditLog
         isOpen={!!auditItem}
         onClose={() => setAuditItem(null)}
-        model="contract"
+        model="rent_contract"
         modelId={auditItem?.id}
         module="investments"
         labels={{
-          title: t('contract.edit_log', 'investments') || 'Edit Log',
-          event: t('contract.event', 'investments') || 'Event',
-          created_at: t('contract.created_at', 'investments') || 'Created At',
-          changed_by: t('contract.changed_by', 'investments') || 'Changed By',
-          changes: t('contract.changes', 'investments') || 'Changes',
-          field: t('contract.field', 'investments') || 'Field',
-          old_value: t('contract.old_value', 'investments') || 'Old Value',
-          new_value: t('contract.new_value', 'investments') || 'New Value',
-          no_records: t('contract.no_edit_log', 'investments') || 'No edit logs found',
-          subject_id: t('contract.subject_id', 'investments') || 'Contract ID',
+          title: t('rent_contract.edit_log', 'investments') || 'Edit Log',
+          event: t('rent_contract.event', 'investments') || 'Event',
+          created_at: t('rent_contract.created_at', 'investments') || 'Created At',
+          changed_by: t('rent_contract.changed_by', 'investments') || 'Changed By',
+          changes: t('rent_contract.changes', 'investments') || 'Changes',
+          field: t('rent_contract.field', 'investments') || 'Field',
+          old_value: t('rent_contract.old_value', 'investments') || 'Old Value',
+          new_value: t('rent_contract.new_value', 'investments') || 'New Value',
+          no_records: t('rent_contract.no_edit_log', 'investments') || 'No edit logs found',
+          subject_id: t('rent_contract.subject_id', 'investments') || 'Rent Contract ID',
         }}
-        translateField={(key) => t(`contract.${key}`, 'investments') || key}
+        translateField={(key) => t(`rent_contract.${key}`, 'investments') || key}
         translateValues={handleTranslateValues}
       />
     </div>

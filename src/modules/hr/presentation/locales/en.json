@@ -18,7 +18,8 @@
     "name": "Name",
     "name_required": "Name is required",
     "parent": "Parent Unit",
-    "none": "None"
+    "none": "None",
+    "created_at": "Created At"
   },
   "navigation": {
     "my_leaves": {
@@ -483,6 +484,7 @@
     "edit_log": "Edit Log",
     "event": "Event",
     "created_at": "Created At",
+    "submitted_at": "Submitted At",
     "changed_by": "Changed By",
     "changes": "Changes",
     "field": "Field",

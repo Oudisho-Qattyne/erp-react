@@ -13,4 +13,5 @@ export interface RentContract {
     rent_contract_duration: string;
     rent_contract_industry_id?: number;
     rent_contract_industry?: { id: number; name: string };
+    created_at?: string;
 }

@@ -2,8 +2,14 @@ import type { DomainResponse } from "../../../../core/domain/common/responce/Dom
 import type { Permissions } from "../entities/permissions";
 import type { CreateRoleData, DetailedRole, Role, UpdateRoleData } from "../entities/role";
 
+export interface RoleListFilter {
+  page?: number;
+  per_page?: number;
+  [key: `sort_by[${string}]`]: string | undefined;
+}
+
 export interface ICrudRoleRepository{
-    getRoles: (filter?: { page?: number; per_page?: number }) => Promise<DomainResponse<Role[]>>,
+    getRoles: (filter?: RoleListFilter) => Promise<DomainResponse<Role[]>>,
     getRoleId: (id:number) => Promise<DomainResponse<DetailedRole>>,
     createRole: (data:CreateRoleData, idempotencyKey?: string) => Promise<DomainResponse<Role>>,
     updateRole : (id:number , data:UpdateRoleData, idempotencyKey?: string) => Promise<DomainResponse<DetailedRole>>,

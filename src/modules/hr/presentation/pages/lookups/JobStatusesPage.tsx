@@ -64,6 +64,7 @@ export function JobStatusesPage() {
       render: (row: any) => row.is_default
         ? <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full"><Star size={12} /> {t('common.yes', 'shared') || 'Yes'}</span>
         : <span className="text-xs text-text-muted">—</span> },
+    { key: 'created_at', label: t('lookups.created_at', 'hr') || 'Created At', width: 180, sortable: true, render: (row: any) => row.created_at || '—' },
     { key: 'actions', label: t('common.actions', 'shared') || 'Actions', width: 200,
       render: (row: any) => (
         <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>

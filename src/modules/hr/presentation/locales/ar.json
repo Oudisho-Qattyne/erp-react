@@ -18,7 +18,8 @@
     "name": "الاسم",
     "name_required": "الاسم مطلوب",
     "parent": "الوحدة الأم",
-    "none": "بدون"
+    "none": "بدون",
+    "created_at": "تاريخ الإنشاء"
   },
   "navigation": {
     "my_leaves": {
@@ -481,6 +482,7 @@
     "edit_log": "سجل التعديل",
     "event": "الحدث",
     "created_at": "تاريخ الإنشاء",
+    "submitted_at": "تاريخ التقديم",
     "changed_by": "تم التعديل بواسطة",
     "changes": "التغييرات",
     "field": "الحقل",

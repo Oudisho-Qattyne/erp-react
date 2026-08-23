@@ -20,6 +20,8 @@ export function getPermissionDisplayName(
     if (segments[0] === 'permissions' && segments.length >= 3) {
       const resolved = t(value, segments[1]);
       if (resolved !== value) return resolved;
+      const sharedResolved = t(value, 'shared');
+      if (sharedResolved !== value) return sharedResolved;
     }
   }
   return value;

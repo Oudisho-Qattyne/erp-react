@@ -9,4 +9,6 @@ export interface FilterLeaveRequestDto {
     status?: LeaveRequestStatus;
     from_date?: string;
     to_date?: string;
+    sortColumn?: string;
+    sortOrder?: 'asc' | 'desc';
 }

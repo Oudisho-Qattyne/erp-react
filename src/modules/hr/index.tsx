@@ -1,7 +1,7 @@
 // import UsersPage from './presentation/pages/UsersPage'
 import enLocales from './presentation/locales/en.json'
 import arLocales from './presentation/locales/ar.json'
-import { Users, CalendarClock, Database, BarChart3, CalendarDays, UserCheck, Wallet, Gauge, FileText, FileSearch, SlidersHorizontal, Flag, Building2, Map, GraduationCap, BookOpen, Beaker, Briefcase, BadgeCheck, Heart, StarIcon, CalendarCheck,  } from 'lucide-react'
+import { Users, CalendarClock, Database, BarChart3, CalendarDays, UserCheck, Wallet, Gauge, FileText, FileSearch, SlidersHorizontal, Flag, Building2, Map, GraduationCap, BookOpen, Beaker, Briefcase, BadgeCheck, Heart, StarIcon, CalendarCheck, Settings } from 'lucide-react'
 import type { Module } from '../../core/moduleRegistry'
 import { registerHrApi, type HrApi } from '../../core/registry/hr/hrRegistry'
 import { registerPersonDetailRoute } from '../../core/registry/person/personRegistry'
@@ -294,6 +294,18 @@ const usersModule: Module = {
       requiresAuth: true,
     },
     {
+      path: '/hr/hr-settings',
+      element: <Navigate to="/hr/hr-settings/job-statuses" replace />,
+      layout: 'dashboard',
+      label: 'إعدادات الموارد البشرية',
+      nav: true,
+      order: 50,
+      moduleName: 'hr',
+      icon: <Settings size={18} />,
+      group: 'hr',
+      requiresAuth: true,
+    },
+    {
       path: '/hr/lookups/countries',
       element: <CountriesPage />,
       layout: 'dashboard',
@@ -374,8 +386,8 @@ const usersModule: Module = {
       order: 7,
       moduleName: 'hr',
       icon: <Briefcase size={18} />,
-      group: 'lookups',
-      parentNav: '/hr/lookups',
+      group: 'hr',
+      parentNav: '/hr/hr-settings',
       requiredPermission: 'hr.job-statuses.list',
     },
     {
@@ -387,8 +399,8 @@ const usersModule: Module = {
       order: 8,
       moduleName: 'hr',
       icon: <BadgeCheck size={18} />,
-      group: 'lookups',
-      parentNav: '/hr/lookups',
+      group: 'hr',
+      parentNav: '/hr/hr-settings',
       requiredPermission: 'hr.employee-statuses.list',
     },
     {
@@ -400,8 +412,8 @@ const usersModule: Module = {
       order: 9,
       moduleName: 'hr',
       icon: <Heart size={18} />,
-      group: 'lookups',
-      parentNav: '/hr/lookups',
+      group: 'hr',
+      parentNav: '/hr/hr-settings',
       requiredPermission: 'hr.chronic-diseases.list',
     },
     {
@@ -413,8 +425,8 @@ const usersModule: Module = {
       order: 10,
       moduleName: 'hr',
       icon: <StarIcon size={18} />,
-      group: 'lookups',
-      parentNav: '/hr/lookups',
+      group: 'hr',
+      parentNav: '/hr/hr-settings',
       requiredPermission: 'hr.organizational-levels.list',
     }
   ],

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEntityCrud } from '../../../../../../core/presentation/hooks/data/useEntity';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
@@ -6,6 +6,7 @@ import { DataTable } from '../../../../../../core/presentation/layouts/ui/tables
 import { Button } from '../../../../../../core/presentation/layouts/ui/buttons/Button';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
+import { FilterDialog, type FilterField } from '../../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { ErrorState } from '../../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { LoadingState } from '../../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { GenericCreateForm } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
@@ -13,7 +14,7 @@ import { getCreateDossierSchema, type DossierFormData } from '../../../schemas/d
 import { buildDossierDefaultValues, buildDossierFormFields } from '../../../forms/dossierFormConfig';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
-import { Plus, Eye, Trash2, CheckCircle, Pencil } from 'lucide-react';
+import { Plus, Eye, Trash2, CheckCircle, Pencil, Filter } from 'lucide-react';
 import type { Dossier } from '../../../../domain/entities/dossier';
 import type { PlotStatus } from '../../../../domain/valueObjects/plots/plotStatus';
 
@@ -39,26 +40,61 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
   const [confirmAllocateNewDossier, setConfirmAllocatedNewDossier] = useState<DossierFormData | null>(null);
   const [confirmAllocate, setConfirmAllocate] = useState<Dossier | null>(null);
   const [confirmEditAllocate, setConfirmEditAllocate] = useState<DossierFormData | null>(null);
-  const [page, setPage] = useState(1);
-  const [perPage, setPerPage] = useState(25);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const pendingSubmitRef = useRef<Deferred | null>(null);
 
-  const { entities: dossiers, getAll, create, remove, loadingMap, errorMap, pagination, update } = useEntityCrud<Dossier>(
+  const { entities: dossiers, create, remove, loadingMap, errorMap, pagination, update, list } = useEntityCrud<Dossier>(
     `/investments/plots/${plotId}/dossiers`,
-    `/investments/plots/${plotId}/dossiers`
+    `/investments/plots/${plotId}/dossiers`,
+    { listState: true }
   );
 
-  const fetchUrl = useCallback(() => {
-    const params = new URLSearchParams();
-    params.append('page', String(page));
-    params.append('per_page', String(perPage));
-    return `/investments/plots/${plotId}/dossiers?${params.toString()}`;
-  }, [plotId, page, perPage]);
+  const filterFields: FilterField[] = [
+    {
+      name: 'status',
+      label: t('dossier.status', 'investments') || 'Status',
+      type: 'select',
+      options: [
+        { value: '', label: t('common.all', 'shared') || 'All' },
+        { value: 'active', label: t('dossier.status_active', 'investments') || 'Active' },
+        { value: 'allocatable', label: t('dossier.status_allocatable', 'investments') || 'Allocatable' },
+        { value: 'cancelled', label: t('dossier.status_cancelled', 'investments') || 'Cancelled' },
+        { value: 'draft', label: t('dossier.status_draft', 'investments') || 'Draft' },
+      ],
+    },
+    { name: 'dossier_number', label: t('dossier.number', 'investments') || 'Dossier Number', type: 'text' },
+    { name: 'from_dossier_date', label: t('dossier.from_dossier_date', 'investments') || 'From Dossier Date', type: 'date' },
+    { name: 'to_dossier_date', label: t('dossier.to_dossier_date', 'investments') || 'To Dossier Date', type: 'date' },
+    { name: 'from_subscription_date', label: t('dossier.from_subscription_date', 'investments') || 'From Subscription Date', type: 'date' },
+    { name: 'to_subscription_date', label: t('dossier.to_subscription_date', 'investments') || 'To Subscription Date', type: 'date' },
+  ];
 
-  useEffect(() => {
-    if (plotId) getAll(fetchUrl());
-  }, [plotId, getAll, fetchUrl]);
+  const filterInitialValues = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(list.filter)
+          .filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k))
+          .map(([k, v]) => [k, v === undefined || v === null ? '' : v])
+      ),
+    [list.filter]
+  );
+
+  const handleApplyFilter = (values: Record<string, unknown>) => {
+    const parsed: Record<string, any> = {};
+    for (const [key, val] of Object.entries(values)) {
+      parsed[key] = val === '' || val === undefined ? undefined : val;
+    }
+    list.setFilter(parsed);
+    list.setPage(1);
+    setIsFilterOpen(false);
+  };
+
+  const handleResetFilter = () => {
+    list.resetFilter();
+    list.setPage(1);
+    setIsFilterOpen(false);
+  };
 
   const schema = useMemo(() => getCreateDossierSchema(t), [t]);
 
@@ -194,17 +230,26 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       key: 'dossier_number',
       label: t('dossier.number', 'investments') || 'Dossier Number',
       width: 180,
+      sortable: true,
     },
     {
       key: 'dossier_date',
       label: t('dossier.date', 'investments') || 'Dossier Date',
       width: 140,
+      sortable: true,
     },
     {
       key: 'allocated_date',
       label: t('dossier.allocated_date', 'investments') || 'Allocated Date',
       width: 140,
       render: (row: Dossier) => row.allocated_date || '—',
+    },
+    {
+      key: 'created_at',
+      label: t('dossier.created_at', 'investments') || 'Created At',
+      width: 140,
+      sortable: true,
+      render: (row: Dossier) => row.created_at || '—',
     },
     {
       key: 'status',
@@ -261,6 +306,9 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">{t('dossier.title', 'investments') || 'Dossiers'}</h2>
         <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
+            {t('common.filter', 'shared') || 'Filter'}
+          </Button>
           {canManage && (
             <Button size="sm" onClick={() => setShowAdd(true)}
               requiredPermission="investments.plot-dossier.create">
@@ -271,7 +319,7 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
         </div>
       </div>
 
-      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll(fetchUrl())} />}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => list.refresh()} />}
 
       {!errorMap['getAll'] && (
         <DataTable
@@ -280,13 +328,16 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
           rowKey="id"
           loading={loadingMap['getAll']}
           emptyMessage={t('dossier.no_records', 'investments') || 'No dossiers found'}
+          sortColumn={list.filter.sortColumn}
+          sortOrder={list.filter.sortOrder}
+          onSort={list.setSort}
           pagination={{
             page: pagination?.currentPage || 1,
             totalPages: pagination?.lastPage || 1,
             totalItems: pagination?.total || 0,
-            onPageChange: (newPage: number) => setPage(newPage),
-            itemsPerPage: perPage,
-            onItemsPerPageChange: (size: number) => { setPerPage(size); setPage(1) },
+            onPageChange: (newPage: number) => list.setPage(newPage),
+            itemsPerPage: list.perPage,
+            onItemsPerPageChange: (size: number) => { list.setPerPage(size); list.setPage(1) },
             itemsPerPageOptions: [10, 25, 50, 100],
           }}
         />
@@ -366,6 +417,15 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
         onConfirm={handleConfirmEditAllocate}
         onCancel={handleCancelEditAllocateConfirm}
         confirmLoading={loadingMap['update']}
+      />
+
+      <FilterDialog
+        isOpen={isFilterOpen}
+        fields={filterFields}
+        initialValues={filterInitialValues}
+        onFilter={handleApplyFilter}
+        onCancel={() => setIsFilterOpen(false)}
+        onReset={handleResetFilter}
       />
     </div>
   );

@@ -34,6 +34,8 @@ export function PlotPickerDialog({
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState(25)
   const [filterValues, setFilterValues] = useState<Record<string, any>>({})
+  const [sortColumn, setSortColumn] = useState<"code" | "identifier" | "area" | "created_at" | "">("")
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
 
   useEffect(() => {
     getAreas()
@@ -50,6 +52,7 @@ export function PlotPickerDialog({
         sp.append(k, String(v))
       }
     })
+    if (params.sortColumn && params.sortOrder) sp.append(`sort_by[${params.sortColumn}]`, params.sortOrder)
     getAll(`/investments/plots?${sp.toString()}`)
   }
 
@@ -119,10 +122,20 @@ export function PlotPickerDialog({
     { name: "to_date", label: t("plots.to_date", "investments") || "To Date", type: "date" },
   ]
 
+  const SORT_FIELDS = ["code", "identifier", "area", "created_at"]
+  const handleSort = (column: string) => {
+    if (!SORT_FIELDS.includes(column)) return
+    const field = column as "code" | "identifier" | "area" | "created_at"
+    const newOrder = sortColumn === field && sortOrder === "asc" ? "desc" : "asc"
+    setSortColumn(field)
+    setSortOrder(newOrder)
+    fetchPlots({ ...filterValues, search: searchQuery, page: 1, per_page: perPage, sortColumn: field, sortOrder: newOrder })
+  }
+
   const columns: ColumnDef<Plot>[] = [
-    { key: "code", label: t("plots.code", "investments") || "Code", width: 120 },
-    { key: "identifier", label: t("plots.identifier", "investments") || "Identifier", width: 120 },
-    { key: "area", label: t("plots.area", "investments") || "Area", width: 100 },
+    { key: "code", label: t("plots.code", "investments") || "Code", width: 120, sortable: true },
+    { key: "identifier", label: t("plots.identifier", "investments") || "Identifier", width: 120, sortable: true },
+    { key: "area", label: t("plots.area", "investments") || "Area", width: 100, sortable: true },
     { key: "plot_area_name", label: t("plots.plot_area_id", "investments") || "Plot Area", width: 120 },
     { key: "plot_classification_name", label: t("plots.plot_classification_id", "investments") || "Classification", width: 120 },
   ]
@@ -150,6 +163,9 @@ export function PlotPickerDialog({
       filterValues={filterValues}
       onApplyFilter={handleApplyFilter}
       onResetFilter={handleResetFilter}
+      sortColumn={sortColumn}
+      sortOrder={sortOrder}
+      onSort={handleSort}
       page={page}
       perPage={perPage}
       totalPages={pagination?.lastPage || 1}

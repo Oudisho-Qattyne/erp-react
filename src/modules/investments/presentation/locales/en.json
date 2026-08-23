@@ -344,6 +344,10 @@
     "company_type_under_incorporation": "Under Incorporation",
     "commercial_register": "Commercial Registry",
     "commercial_register_date": "Commercial Registry Date",
+    "from_commercial_register_date": "From Commercial Registry Date",
+    "to_commercial_register_date": "To Commercial Registry Date",
+    "from_created_at": "From Created At",
+    "to_created_at": "To Created At",
     "company_nationality": "Company Nationality",
     "company_nationality_id": "Company Nationality",
     "add_country": "Add Country",
@@ -1175,6 +1179,12 @@
     },
     "facility_industrial_licenses": {
       "title": "Industrial Licenses"
+    },
+    "building_license": {
+      "title": "Building Licenses"
+    },
+    "rent_contract": {
+      "title": "Rent Contracts"
     },
     "contract": {
       "title": "Contracts"

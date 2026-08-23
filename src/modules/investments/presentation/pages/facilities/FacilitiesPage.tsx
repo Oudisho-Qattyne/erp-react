@@ -1,9 +1,11 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import type { Facility } from '../../../domain/entities/facility';
 import type { Plot } from '../../../domain/entities/plot';
 import type { Dossier } from '../../../domain/entities/dossier';
+import type { PartnershipType } from '../../../domain/entities/partnershipType';
+import type { Country } from '../../../../../core/domain/entities/regions/Country';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { inputBaseClasses } from '../../../../../core/presentation/layouts/ui/inputs/styles';
 import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
@@ -31,6 +33,19 @@ export function FacilitiesPage() {
   const [localSearch, setLocalSearch] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<Facility | null>(null);
   const [auditItem, setAuditItem] = useState<Facility | null>(null);
+
+  const { entities: partnershipTypes, getAll: getPartnershipTypes } = useEntityCrud<PartnershipType>(
+    '/investments/partnership-types',
+    '/investments/partnership-types'
+  );
+  const { entities: countries, getAll: getCountries } = useEntityCrud<Country>(
+    '/shared-kernal/countries',
+    '/shared-kernal/countries'
+  );
+  useEffect(() => {
+    getPartnershipTypes('/investments/partnership-types?is_active=true');
+    getCountries('/shared-kernal/countries');
+  }, [getPartnershipTypes, getCountries]);
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filterPlotName, setFilterPlotName] = useState<string>('');
@@ -134,19 +149,63 @@ export function FacilitiesPage() {
         );
       },
     },
+    {
+      name: 'company_type',
+      label: t('facilities.company_type', 'investments') || 'Company Type',
+      type: 'select',
+      options: [
+        { value: '', label: t('common.all', 'shared') || 'All' },
+        { value: 'existing', label: t('facilities.company_type_existing', 'investments') || 'Existing' },
+        { value: 'under_incorporation', label: t('facilities.company_type_under_incorporation', 'investments') || 'Under Incorporation' },
+      ],
+    },
+    {
+      name: 'partnership_type_id',
+      label: t('facilities.partnership_type', 'investments') || 'Partnership Type',
+      type: 'select',
+      options: [
+        { value: '', label: t('common.all', 'shared') || 'All' },
+        ...partnershipTypes.map((pt) => ({ value: pt.id, label: getLocalizedName(pt.name) })),
+      ],
+    },
+    {
+      name: 'company_nationality_id',
+      label: t('facilities.company_nationality', 'investments') || 'Company Nationality',
+      type: 'select',
+      options: [
+        { value: '', label: t('common.all', 'shared') || 'All' },
+        ...countries.map((c) => ({ value: c.id, label: getLocalizedName(c.name) })),
+      ],
+    },
+    { name: 'number_or_patrols', label: t('facilities.number_or_patrols', 'investments') || 'Number of Patrols', type: 'number' },
+    { name: 'commercial_register_date', label: t('facilities.commercial_register_date', 'investments') || 'Commercial Register Date', type: 'date' },
+    { name: 'from_commercial_register_date', label: t('facilities.from_commercial_register_date', 'investments') || 'From Commercial Register Date', type: 'date' },
+    { name: 'to_commercial_register_date', label: t('facilities.to_commercial_register_date', 'investments') || 'To Commercial Register Date', type: 'date' },
+    { name: 'from_created_at', label: t('facilities.from_created_at', 'investments') || 'From Created At', type: 'date' },
+    { name: 'to_created_at', label: t('facilities.to_created_at', 'investments') || 'To Created At', type: 'date' },
   ];
 
   const filterInitialValues = useMemo(() => ({
     email: (list.filter.email as string | undefined) || '',
+    company_type: (list.filter.company_type as string | undefined) || '',
+    partnership_type_id: (list.filter.partnership_type_id as number | undefined) || '',
+    company_nationality_id: (list.filter.company_nationality_id as number | undefined) || '',
+    number_or_patrols: (list.filter.number_or_patrols as number | undefined) || '',
+    commercial_register_date: (list.filter.commercial_register_date as string | undefined) || '',
+    from_commercial_register_date: (list.filter.from_commercial_register_date as string | undefined) || '',
+    to_commercial_register_date: (list.filter.to_commercial_register_date as string | undefined) || '',
+    from_created_at: (list.filter.from_created_at as string | undefined) || '',
+    to_created_at: (list.filter.to_created_at as string | undefined) || '',
     plot_id: (list.filter.plot_id as number | undefined) || '',
     plot_dossier_id: (list.filter.plot_dossier_id as number | undefined) || '',
   }), [list.filter]);
 
   const handleApplyFilter = (values: Record<string, any>) => {
     const parsed: Record<string, any> = {};
+    const numericKeys = ['plot_id', 'plot_dossier_id', 'partnership_type_id', 'company_nationality_id', 'number_or_patrols'];
     for (const [key, val] of Object.entries(values)) {
-      if (val === '' || val === undefined) continue;
-      if (key === 'plot_id' || key === 'plot_dossier_id') {
+      if (val === '' || val === undefined) { parsed[key] = undefined; continue; }
+      if (numericKeys.includes(key)) {
         parsed[key] = Number(val);
       } else {
         parsed[key] = val;
@@ -224,6 +283,12 @@ export function FacilitiesPage() {
     },
     { key: "number_of_workers", label: t("facilities.number_of_workers", "investments") || "Workers", width: 100},
     { key: "total_capital_in_usd", label: t("facilities.total_capital_in_usd", "investments") || "Capital (USD)", width: 100 },
+    {
+      key: "created_at",
+      label: t("common.created_at", "shared") || "Created At",
+      width: 150,
+      sortable: true,
+    },
     {
       key: "actions",
       label: t("common.actions", "shared") || "Actions",

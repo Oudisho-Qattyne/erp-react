@@ -43,6 +43,7 @@
     "click_map_to_select": "Click on the map to select a location",
     "new": "New",
     "create": "Create",
+    "created_at": "Created At",
     "notes": "Notes",
     "confirm_delete": "Are you sure you want to delete this?",
     "error": "An error occurred",
@@ -81,6 +82,138 @@
     "shared": {
       "audit-logs": {
         "view": "View Audit Logs"
+      }
+    },
+    "financial": {
+      "currencies": {
+        "list": "List Currencies",
+        "view": "View Currency",
+        "add": "Add Currency",
+        "update": "Edit Currency",
+        "delete": "Delete Currency"
+      },
+      "exchange-rates": {
+        "list": "List Exchange Rates",
+        "view": "View Exchange Rate",
+        "add": "Add Exchange Rate"
+      },
+      "payment-fees": {
+        "list": "List Payment Fees",
+        "view": "View Payment Fee",
+        "add": "Add Payment Fee",
+        "update": "Edit Payment Fee"
+      },
+      "transactions": {
+        "list": "List Transactions",
+        "view": "View Transaction",
+        "add": "Add Transaction",
+        "change-status": "Change Transaction Status"
+      }
+    },
+    "investments": {
+      "consumable-materials": {
+        "list": "List Consumable Materials",
+        "view": "View Consumable Material",
+        "add": "Add Consumable Material",
+        "update": "Edit Consumable Material",
+        "delete": "Delete Consumable Material"
+      },
+      "contract-payment-installments": {
+        "list": "List Contract Installments",
+        "update": "Pay Contract Installment"
+      },
+      "service-conditions": {
+        "list": "List Service Conditions",
+        "view": "View Service Condition",
+        "create": "Create Service Condition",
+        "update": "Edit Service Condition",
+        "delete": "Delete Service Condition"
+      },
+      "plot-reqeusts": {
+        "subscription_request": "Subscription Request"
+      },
+      "contracts": {
+        "list": "List Contracts",
+        "view": "View Contract",
+        "create": "Create Contract",
+        "update": "Edit Contract",
+        "delete": "Delete Contract"
+      },
+      "by-duration-licenses": {
+        "list": "List Duration Licenses",
+        "view": "View Duration License",
+        "create": "Create Duration License",
+        "update": "Edit Duration License",
+        "delete": "Delete Duration License"
+      },
+      "by-industry-licenses": {
+        "list": "List Industry Licenses",
+        "view": "View Industry License",
+        "create": "Create Industry License",
+        "update": "Edit Industry License",
+        "delete": "Delete Industry License"
+      },
+      "building-licenses": {
+        "list": "List Building Licenses",
+        "view": "View Building License",
+        "create": "Create Building License",
+        "update": "Edit Building License",
+        "delete": "Delete Building License"
+      }
+    },
+    "crm": {
+      "people": {
+        "list": "List People",
+        "add": "Add Person",
+        "update": "Edit Person"
+      }
+    },
+    "chat": {
+      "users": {
+        "list": "List Chat Users"
+      },
+      "conversations": {
+        "list": "List Conversations"
+      },
+      "messages": {
+        "list": "List Messages",
+        "send": "Send Message"
+      }
+    },
+    "storage": {
+      "storage": {
+        "view": "View Storage"
+      },
+      "folder": {
+        "create": "Create Folder",
+        "rename": "Rename Folder",
+        "move": "Move Folder",
+        "delete": "Delete Folder"
+      },
+      "file": {
+        "upload": "Upload File",
+        "download": "Download File",
+        "rename": "Rename File",
+        "move": "Move File",
+        "delete": "Delete File"
+      }
+    },
+    "settings": {
+      "update": "Change Settings"
+    },
+    "users": {
+      "users": {
+        "view": "View Users",
+        "add": "Add Users",
+        "edit": "Edit Users",
+        "export": "Export Users",
+        "link-to-employee": "Link User to Employee"
+      },
+      "roles": {
+        "view": "View Roles",
+        "add": "Add Roles",
+        "edit": "Edit Roles",
+        "delete": "Delete Roles"
       }
     }
   },

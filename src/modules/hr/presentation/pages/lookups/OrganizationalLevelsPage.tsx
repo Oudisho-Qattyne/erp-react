@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../hooks';
 import { organizationalLevelFormSchema } from '../../../../../core/presentation/schemas/organizationalLevels/organizationalLevel.Schema';
@@ -9,6 +9,8 @@ import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialo
 import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { LoadingState } from '../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
+import Input from '../../../../../core/presentation/layouts/ui/inputs/Input';
+import { inputBaseClasses } from '../../../../../core/presentation/layouts/ui/inputs/styles';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
@@ -45,15 +47,18 @@ function flattenTree(nodes: OrgLevelNode[], depth: number, expanded: Set<number>
 
 export function OrganizationalLevelsPage() {
   const { t } = useLanguage();
-  const { entities: items, getAll, create, update, remove, loadingMap, errorMap } = useEntityCrud<OrganizationalLevels>('/hr/organizational-levels', '/hr/organizational-levels');
+  const { entities: items, create, update, remove, loadingMap, errorMap, list } = useEntityCrud<OrganizationalLevels>('/hr/organizational-levels', '/hr/organizational-levels', {
+    listState: true,
+    defaultSortColumn: 'name',
+    paginate: false,
+    debounceMs: 300,
+  });
   const entity = t('lookups.tabs.organizational_levels', 'hr') || 'Organizational Levels';
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [confirmDelete, setConfirmDelete] = useState<any>(null);
   const [auditItem, setAuditItem] = useState<any>(null);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
-
-  useEffect(() => { getAll(); }, []);
 
   const tree = useMemo(() => buildTree(items), [items]);
   const flatRows = useMemo(() => flattenTree(tree, 0, expanded), [tree, expanded]);
@@ -75,7 +80,7 @@ export function OrganizationalLevelsPage() {
       setConfirmDelete(null);
     } catch (err : any) {
       handleApiError(err, { module: "hr", passThrough:true});
-      getAll();
+      list?.refresh();
     }
   };
 
@@ -87,7 +92,7 @@ export function OrganizationalLevelsPage() {
   const columns = [
     { key: 'id', label: 'ID', width: 80 },
     {
-      key: 'name', label: t('organizational_unit.name', 'hr') || 'Name', width: 400,
+      key: 'name', label: t('organizational_unit.name', 'hr') || 'Name', width: 400, sortable: true,
       render: (row: any) => {
         const flatRow = flatRows.find(r => r.node.id === row.id);
         const depth = flatRow?.depth ?? 0;
@@ -112,6 +117,7 @@ export function OrganizationalLevelsPage() {
         return parent ? (typeof parent.name === 'string' ? parent.name : (parent.name?.ar || parent.name?.en || '')) : `#${row.parent_id}`;
       },
     },
+    { key: 'created_at', label: t('organizational_unit.created_at', 'hr') || 'Created At', width: 180, sortable: true, render: (row: any) => row.created_at || '—' },
     { key: 'actions', label: t('common.actions', 'shared') || 'Actions', width: 200,
       render: (row: any) => (
         <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
@@ -136,6 +142,9 @@ export function OrganizationalLevelsPage() {
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-bold">{t('lookups.tabs.organizational_levels', 'hr') || 'Organizational Levels'}</h1>
         <div className="w-full flex gap-2">
+          <Input type="text" value={list?.filter.search ?? ''} onChange={list?.setSearch}
+            placeholder={t('common.search', 'shared') || 'Search...'}
+            baseClasses={inputBaseClasses} className="w-60" />
           <Button onClick={() => setIsCreateOpen(true)} requiredPermission="hr.organizational-levels.create">{t('employee_form.add_org_unit', 'hr') || 'Add Organizational Unit'}</Button>
         </div>
       </div>
@@ -149,7 +158,7 @@ export function OrganizationalLevelsPage() {
           ]}
           schema={organizationalLevelFormSchema}
           onSubmit={async (data) => { try { return await create({ ...data , parent_id:data.parent_id == 0 ? null : data.parent_id, name:  data.name  }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
-          onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); getAll(); setIsCreateOpen(false); }}
+          onSuccess={() => { toast.success(t('lookups.created', 'hr').replace('{name}', entity)); list?.refresh(); setIsCreateOpen(false); }}
           onCancel={() => setIsCreateOpen(false)}
           submitLabel={t('employee_form.add_org_unit', 'hr') || 'Add Organizational Unit'}
         />
@@ -165,15 +174,18 @@ export function OrganizationalLevelsPage() {
           schema={organizationalLevelFormSchema}
           defaultValues={editItem ? { name: typeof editItem.name === 'string' ? editItem.name : (editItem.name?.ar || editItem.name?.en || ''), parent_id: editItem.parent_id  } : undefined}
           onSubmit={async (data) => { try { await update(editItem.id, { ...data, name: data.name }); } catch (err : any) { handleApiError(err, { module: "hr" }); throw {}; } }}
-          onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); getAll(); setEditItem(null); }}
+          onSuccess={() => { toast.success(t('lookups.updated', 'hr').replace('{name}', entity)); list?.refresh(); setEditItem(null); }}
           onCancel={() => setEditItem(null)}
           submitLabel={t('common.save', 'shared') || 'Save'}
         />
       </Dialog>
 
-      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => getAll()} />}
+      {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => list?.refresh()} />}
       {!errorMap['getAll'] && (
         <DataTable columns={columns} data={flatRows.map(r => ({ ...r.node, _depth: r.depth }))} rowKey="id" loading={loadingMap['getAll']}
+          sortColumn={list?.filter.sortColumn}
+          sortOrder={list?.filter.sortOrder}
+          onSort={list ? (col) => list.setSort(col) : undefined}
           emptyMessage={t('lookups.no_organizational_levels', 'hr') || 'No organizational levels found'} />
       )}
 

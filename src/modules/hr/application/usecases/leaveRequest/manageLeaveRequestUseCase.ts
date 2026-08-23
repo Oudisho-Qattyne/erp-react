@@ -8,8 +8,8 @@ export const createManageLeaveRequestUseCase = (repository: ILeaveRequestReposit
         createLeaveRequset : (leaveRequest : CreateLeaveRequestDto, idempotencyKey?: string) => repository.createLeaveRequest(leaveRequest, idempotencyKey),
         createEmployeeLeaveRequest : (leaveRequest : CreateEmployeeLeaveRequestDto, idempotencyKey?: string) => repository.createLeaveRequest(leaveRequest, idempotencyKey),
         
-        findAllEmployeeLeaveRequests : (filter : FilterLeaveRequestDto) => repository.getAllLeaveRequests(filter),
-        findAllMyLeaveRequests : (filter : FilterLeaveRequestDto) => repository.getAllMyLeaveRequests(filter),
+        findAllEmployeeLeaveRequests : (filter : Record<string, any>) => repository.getAllLeaveRequests(filter),
+        findAllMyLeaveRequests : (filter : Record<string, any>) => repository.getAllMyLeaveRequests(filter),
         findLeaveRequestById : (id:number) => repository.getLeaveRequestById(id),
 
         updateLeaveRequest : (id:number , leaveRequest : UpdateLeaveRequestDto, idempotencyKey?: string) => repository.updateLeaveRequest(id , leaveRequest, idempotencyKey),

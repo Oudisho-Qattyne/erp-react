@@ -28,8 +28,11 @@ export function PersonsPage() {
     error,
     pagination,
     filter,
+    sortColumn,
+    sortOrder,
     setFilter,
     resetFilter,
+    setSort,
     findAllPersons,
   } = usePersons()
 
@@ -43,7 +46,7 @@ export function PersonsPage() {
 
   const columns: ColumnDef<Person>[] = [
     { key: "id", label: "#", width: 60, align: "center", render: (row) => row.id },
-    { key: "name", label: t("persons.person_name", MODULE) || "Name", width: 180, align: "center", render: (row) => row.name || "—" },
+    { key: "name", label: t("persons.person_name", MODULE) || "Name", width: 180, align: "center", sortable: true, render: (row) => row.name || "—" },
     {
       key: "type",
       label: t("persons.type", MODULE) || "Type",
@@ -56,9 +59,11 @@ export function PersonsPage() {
             ? t("persons.type_employee", MODULE) || "Employee"
             : "—",
     },
+    { key: "role", label: t("persons.role", MODULE) || "Role", width: 130, align: "center", sortable: true, render: (row) => row.role || "—" },
     { key: "primary_phone_number", label: t("persons.primary_phone", MODULE) || "Primary Phone", width: 170, align: "center", render: (row) => row.primary_phone_number || "—" },
-    { key: "email", label: t("persons.email", MODULE) || "Email", width: 180, align: "center", render: (row) => row.email || "—" },
+    { key: "email", label: t("persons.email", MODULE) || "Email", width: 180, align: "center", sortable: true, render: (row) => row.email || "—" },
     { key: "whatsapp", label: t("persons.whatsapp", MODULE) || "WhatsApp", width: 150, align: "center", render: (row) => row.whatsapp || "—" },
+    { key: "created_at", label: t("persons.created_at", MODULE) || "Created At", width: 160, align: "center", sortable: true, render: (row) => row.created_at || "—" },
     {
       key: "actions",
       label: "",
@@ -100,6 +105,7 @@ export function PersonsPage() {
         { value: "investor", label: t("persons.type_investor", MODULE) || "Investor" },
       ],
     },
+    { name: "role", type: "text", label: t("persons.role", MODULE) || "Role" },
   ]
 
   const handleApplyFilter = (values: Record<string, any>) => {
@@ -156,6 +162,9 @@ export function PersonsPage() {
             data={persons}
             rowKey="id"
             onRowClick={() => {}}
+            sortColumn={sortColumn}
+            sortOrder={sortOrder}
+            onSort={setSort}
             loading={loading.findAllPersons}
             emptyMessage={t("persons.no_data", MODULE) || "No persons found"}
             pagination={{

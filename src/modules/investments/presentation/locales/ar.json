@@ -345,6 +345,10 @@
     "company_type_under_incorporation": "قيد التأسيس",
     "commercial_register": "السجل التجاري",
     "commercial_register_date": "تاريخ السجل التجاري",
+    "from_commercial_register_date": "من تاريخ السجل التجاري",
+    "to_commercial_register_date": "إلى تاريخ السجل التجاري",
+    "from_created_at": "من تاريخ الإنشاء",
+    "to_created_at": "إلى تاريخ الإنشاء",
     "company_nationality": "جنسية الشركة",
     "company_nationality_id": "جنسية الشركة",
     "add_country": "إضافة دولة",
@@ -1176,6 +1180,12 @@
     },
     "facility_industrial_licenses": {
       "title": "التراخيص الصناعية"
+    },
+    "building_license": {
+      "title": "رخص البناء"
+    },
+    "rent_contract": {
+      "title": "عقود الإيجار"
     },
     "contract": {
       "title": "العقود"

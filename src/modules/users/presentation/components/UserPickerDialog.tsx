@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProvider"
 import { SelectFromTable } from "../../../../core/presentation/layouts/ui/picker/SelectFromTable"
 import type { ColumnDef } from "../../../../core/presentation/layouts/ui/tables/ResizableTable"
@@ -31,14 +31,18 @@ export function UserPickerDialog({
   const { t } = useLanguage()
   const { users, loading, error, pagination, filter, setPage, setFilter, resetFilter, getAllUsers } = useManageUsers()
 
+  const SORT_FIELDS = ["name", "email", "created_at"]
+  const [sortColumn, setSortColumn] = useState<"name" | "email" | "created_at" | "">("")
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
+
   useEffect(() => {
     if (isOpen) getAllUsers()
   }, [isOpen, filter])
 
   const columns: ColumnDef<User>[] = [
     { key: "id", label: "#", width: 60 },
-    { key: "name", label: t("users.name", "users") || "Name", width: 180 },
-    { key: "email", label: t("users.email", "users") || "Email", width: 200 },
+    { key: "name", label: t("users.name", "users") || "Name", width: 180, sortable: true },
+    { key: "email", label: t("users.email", "users") || "Email", width: 200, sortable: true },
     { key: "mobile", label: t("users.mobile", "users") || "Mobile", width: 140 },
     {
       key: "status",
@@ -50,7 +54,22 @@ export function UserPickerDialog({
         </span>
       ),
     },
+    { key: "created_at", label: t("users.created_at", "users") || "Created At", width: 160, sortable: true, render: (row) => row.created_at || "—" },
   ]
+
+  const handleSort = (column: string) => {
+    if (!SORT_FIELDS.includes(column)) return
+    const field = column as "name" | "email" | "created_at"
+    const newOrder = sortColumn === field && sortOrder === "asc" ? "desc" : "asc"
+    setSortColumn(sortColumn === field ? field : field)
+    setSortOrder(newOrder)
+    setFilter((prev: any) => {
+      const next = { ...prev }
+      for (const k of SORT_FIELDS) delete next[`sort_by[${k}]`]
+      next[`sort_by[${field}]`] = newOrder
+      return next
+    })
+  }
 
   const filterFields = [
     { name: "status", label: t("users.status", "users"), type: "select" as const, options: [
@@ -96,7 +115,10 @@ export function UserPickerDialog({
       filterFields={filterFields}
       filterValues={filter}
       onApplyFilter={handleApplyFilter}
-      onResetFilter={resetFilter}
+      onResetFilter={() => { setSortColumn(""); setSortOrder("asc"); resetFilter() }}
+      sortColumn={sortColumn}
+      sortOrder={sortOrder}
+      onSort={handleSort}
       page={pagination.currentPage}
       perPage={filter.per_page}
       totalPages={pagination.lastPage}

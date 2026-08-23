@@ -35,6 +35,8 @@ export function InvestorPickerDialog({
   const [perPage, setPerPage] = useState(25)
   const [extraFilters, setExtraFilters] = useState<Record<string, any>>({})
   const [searchQuery, setSearchQuery] = useState("")
+  const [sortColumn, setSortColumn] = useState<"first_name" | "">("")
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
 
   useEffect(() => {
     if (!isOpen) return
@@ -43,10 +45,18 @@ export function InvestorPickerDialog({
     for (const [key, val] of Object.entries(extraFilters)) {
       if (val !== undefined && val !== "") params.append(key, String(val))
     }
+    if (sortColumn) params.append(`sort_by[${sortColumn}]`, sortOrder)
     params.append("page", String(page))
     params.append("per_page", String(perPage))
     getAll(`/investments/investors?${params.toString()}`)
-  }, [isOpen, searchQuery, page, perPage, extraFilters])
+  }, [isOpen, searchQuery, page, perPage, extraFilters, sortColumn, sortOrder])
+
+  const handleSort = (column: string) => {
+    if (column !== "first_name") return
+    const newOrder = sortColumn === "first_name" && sortOrder === "asc" ? "desc" : "asc"
+    setSortColumn("first_name")
+    setSortOrder(newOrder)
+  }
 
   const handleApplyFilter = (values: Record<string, any>) => {
     const parsed: Record<string, any> = {}
@@ -67,7 +77,7 @@ export function InvestorPickerDialog({
 
   const columns: ColumnDef<Investor>[] = [
     { key: "id", label: "#", width: 60 },
-    { key: "full_name", label: t("investors.full_name", "investments") || "Full Name", width: 180, render: (row: Investor) => [row.first_name, row.father_name, row.last_name].filter(Boolean).join(' ') },
+    { key: "full_name", label: t("investors.full_name", "investments") || "Full Name", width: 180, sortable: true, render: (row: Investor) => [row.first_name, row.father_name, row.last_name].filter(Boolean).join(' ') },
     { key: "national_id", label: t("investors.national_id", "investments") || "National ID", width: 150 },
     { key: "phone", label: t("investors.phone", "investments") || "Phone", width: 140 },
     { key: "nationality", label: t("investors.nationality", "investments") || "Nationality", width: 130 },
@@ -162,6 +172,9 @@ export function InvestorPickerDialog({
       filterValues={extraFilters}
       onApplyFilter={handleApplyFilter}
       onResetFilter={handleResetFilter}
+      sortColumn={sortColumn}
+      sortOrder={sortOrder}
+      onSort={handleSort}
       page={page}
       perPage={perPage}
       totalPages={pagination?.lastPage || 1}

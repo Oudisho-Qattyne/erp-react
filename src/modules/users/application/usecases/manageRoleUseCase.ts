@@ -1,5 +1,5 @@
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
-import type { ICrudRoleRepository } from "../../domain/repositories/ICrudRoleRepositry";
+import type { ICrudRoleRepository, RoleListFilter } from "../../domain/repositories/ICrudRoleRepositry";
 import type { Role, DetailedRole } from "../../domain/entities/role";
 import type { Permissions } from "../../domain/entities/permissions";
 import type { CreateRoleData, UpdateRoleData } from "../dtos/roleDto";
@@ -8,7 +8,7 @@ export const createManageRoleUseCase = (
   repository: ICrudRoleRepository
 ) => {
   return {
-    getAll(filter?: { page?: number; per_page?: number }): Promise<DomainResponse<Role[]>> {
+    getAll(filter?: RoleListFilter): Promise<DomainResponse<Role[]>> {
       return repository.getRoles(filter);
     },
 

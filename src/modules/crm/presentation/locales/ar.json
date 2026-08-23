@@ -21,7 +21,9 @@
     "x": "إكس",
     "linkedin": "لينكد إن",
     "facebook": "فيسبوك",
+    "created_at": "تاريخ الإنشاء",
     "type": "النوع",
+    "role": "الدور",
     "type_employee": "موظف",
     "type_investor": "مستثمر"
   },

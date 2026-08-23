@@ -35,7 +35,7 @@ const LEAVE_REQUEST_STATUSES = ["draft", "pending", "approved", "rejected", "can
 export const EmployeeLeaveRequests = () => {
     const { t, language } = useLanguage()
     const { hasPermission } = useAuth()
-    const { employeeLeaveRequests, findAllEmployeeLeaveRequests, loading, error, pagination, filter, setPage, setFilter, resetFilter, setSearch, processLeaveRequest } = useLeaveRequest()
+    const { employeeLeaveRequests, findAllEmployeeLeaveRequests, loading, error, pagination, filter, setPage, setFilter, resetFilter, setSearch, setSort, processLeaveRequest } = useLeaveRequest()
 
     const { items: leaveTypes } = useLeaveTypes()
     const [isFilterOpen, setIsFilterOpen] = useState(false)
@@ -201,19 +201,22 @@ export const EmployeeLeaveRequests = () => {
             width: 160,
             render: (row) => getLeaveTypeName(row),
         },
-        { key: "start_date", label: t("leave_request.start_date", "hr") || "Start Date", width: 120 },
-        { key: "end_date", label: t("leave_request.end_date", "hr") || "End Date", width: 120 },
-        { key: "requested_units", label: t("leave_request.units", "hr") || "Units", width: 80, align: "center" },
+        { key: "start_date", label: t("leave_request.start_date", "hr") || "Start Date", width: 120, sortable: true },
+        { key: "end_date", label: t("leave_request.end_date", "hr") || "End Date", width: 120, sortable: true },
+        { key: "requested_units", label: t("leave_request.units", "hr") || "Units", width: 80, align: "center", sortable: true },
         {
             key: "status",
             label: t("leave_request.status", "hr") || "Status",
             width: 110,
+            sortable: true,
             render: (row) => (
                 <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold border ${statusStyles[row.status] || ""}`}>
                     {t(`leave_request.status_${row.status}`, "hr") || row.status}
                 </span>
             ),
         },
+        { key: "created_at", label: t("leave_request.created_at", "hr") || "Created At", width: 160, align: "center", sortable: true, render: (row) => row.created_at || "—" },
+        { key: "submitted_at", label: t("leave_request.submitted_at", "hr") || "Submitted At", width: 160, align: "center", sortable: true, render: (row) => row.submitted_at || "—" },
         { key: "reason", label: t("leave_request.reason", "hr") || "Reason", width: 200 },
         {
             key: "actions",
@@ -305,6 +308,9 @@ export const EmployeeLeaveRequests = () => {
                         data={employeeLeaveRequests}
                         rowKey="id"
                         loading={loading.findAllEmployeeLeaveRequests}
+                        sortColumn={filter.sortColumn}
+                        sortOrder={filter.sortOrder}
+                        onSort={setSort}
                         onRowClick={(row) => window.open(`/hr/employee-leave-requests/${row.id}` , '_blank')}
                         emptyMessage={t("leave_request.no_data", "hr") || "No leave requests found"}
                         pagination={{

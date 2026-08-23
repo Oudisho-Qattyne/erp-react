@@ -6,7 +6,8 @@ export interface Dossier {
     dossier_number: string;
     dossier_date: string;
     allocated_date?: string;
-    subscription_date?: null,
+    subscription_date?: string;
+    created_at?: string;
     notes?: string;
     status: DossierStatus;
     plot_id?: number;

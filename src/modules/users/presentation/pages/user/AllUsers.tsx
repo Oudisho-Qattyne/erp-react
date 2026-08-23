@@ -31,6 +31,8 @@ export function AllUsers() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [editUser, setEditUser] = useState<User | null>(null)
   const [changePassword, setChangePassword] = useState<User | null>(null)
+  const [sortColumn, setSortColumn] = useState<"name" | "email" | "created_at" | "">("created_at")
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
 
   const {
     users,
@@ -54,10 +56,21 @@ export function AllUsers() {
     getAllUsers()
   }, [filter])
 
+  useEffect(() => {
+    setFilter((prev) => {
+      const next: any = { ...prev }
+      delete next["sort_by[name]"]
+      delete next["sort_by[email]"]
+      delete next["sort_by[created_at]"]
+      if (sortColumn) next[`sort_by[${sortColumn}]`] = sortOrder
+      return next as typeof prev
+    })
+  }, [sortColumn, sortOrder, setFilter])
+
   const columns: ColumnDef<User>[] = [
     { key: "id", label: "#", width: 60 },
-    { key: "name", label: t("users.name", "users") || "Name", width: 180 },
-    { key: "email", label: t("users.email", "users") || "Email", width: 200 },
+    { key: "name", label: t("users.name", "users") || "Name", width: 180, sortable: true },
+    { key: "email", label: t("users.email", "users") || "Email", width: 200, sortable: true },
     { key: "mobile", label: t("users.mobile", "users") || "Mobile", width: 120 },
     {
       key: "status",
@@ -76,7 +89,7 @@ export function AllUsers() {
       render: (row) => (language === "ar" ? row.role?.display_name : row.role?.name) || "-",
     },
     { key: "", label: t("users.employee_name", "users") || "Name", width: 180, render: row => row.employee_first_name ? `${row.employee_first_name} ${row.employee_last_name}` : '-' },
-    { key: "created_at", label: t("users.created_at", "users") || "Created At", width: 160, render: (row) => row.created_at },
+    { key: "created_at", label: t("users.created_at", "users") || "Created At", width: 160, sortable: true, },
     {
       key: "actions",
       label: "",
@@ -159,8 +172,26 @@ export function AllUsers() {
     for (const [key, val] of Object.entries(values)) {
       if (val !== "" && val !== undefined) parsed[key] = val
     }
+    parsed["sort_by[name]"] = (filter as any)["sort_by[name]"]
+    parsed["sort_by[email]"] = (filter as any)["sort_by[email]"]
+    parsed["sort_by[created_at]"] = (filter as any)["sort_by[created_at]"]
     setFilter(() => parsed as any)
     setIsFilterOpen(false)
+  }
+
+  const handleReset = () => {
+    resetFilter()
+    setSortColumn("created_at")
+    setSortOrder("desc")
+  }
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"))
+    } else {
+      setSortColumn(column as "name" | "email" | "created_at")
+      setSortOrder("asc")
+    }
   }
 
   return (
@@ -221,7 +252,7 @@ export function AllUsers() {
             <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
               {t("common.filter", "shared") || "Filter"}
             </Button>
-            <Button variant="outline" size="sm" onClick={resetFilter}>
+            <Button variant="outline" size="sm" onClick={handleReset}>
               {t("common.reset", "shared") || "Reset"}
             </Button>
           </div>
@@ -232,7 +263,7 @@ export function AllUsers() {
             initialValues={filter}
             onFilter={handleApplyFilter}
             onCancel={() => setIsFilterOpen(false)}
-            onReset={() => { resetFilter(); setIsFilterOpen(false) }}
+            onReset={() => { handleReset(); setIsFilterOpen(false) }}
           />
 
           <DataTable
@@ -240,6 +271,9 @@ export function AllUsers() {
             data={users}
             rowKey="id"
             onRowClick={() => { }}
+            sortColumn={sortColumn}
+            sortOrder={sortOrder}
+            onSort={handleSort}
             loading={loading.getAllUsers}
             emptyMessage={t("users.no_data", "users") || "No users found"}
             pagination={{

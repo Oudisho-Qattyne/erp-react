@@ -12,6 +12,7 @@ export interface Person {
   linkedin: string | null;
   facebook: string | null;
   type: PersonType;
+  role?:string;
   personable: any;
   created_at?: string;
   updated_at?: string;

@@ -44,6 +44,7 @@ export interface UseLeaveRequestReturn {
   processLeaveRequest: (id: number, operation: LeaveRequestProcessOperations, reviewNotes: string) => Promise<void>
   setSearch: (search: string) => void
   setPage: (page: number) => void
+  setSort: (column: string) => void
 }
 
 export const useLeaveRequest = (): UseLeaveRequestReturn => {
@@ -89,11 +90,29 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
     setFilterState((prev) => ({ ...prev, page }))
   }, [])
 
+  const setSort = useCallback((column: string) => {
+    setFilterState((prev) => ({
+      ...prev,
+      sortColumn: column,
+      sortOrder: prev.sortColumn === column && prev.sortOrder === "asc" ? "desc" : "asc",
+      page: 1,
+    }))
+  }, [])
+
+  const buildListParams = useCallback((f: FilterLeaveRequestDto, employeeId?: number): Record<string, string | number> => {
+    const params: Record<string, any> = { ...f }
+    delete params.sortColumn
+    delete params.sortOrder
+    if (f.sortColumn) params[`sort_by[${f.sortColumn}]`] = f.sortOrder ?? "asc"
+    if (employeeId !== undefined) params.employee_id = employeeId
+    return params
+  }, [])
+
   const findAllMyLeaveRequests = useCallback(async () => {
     setFnLoading("findAllMyLeaveRequests", true)
     setFnError("findAllMyLeaveRequests", null)
     try {
-      const res = await useCase.findAllMyLeaveRequests(filter)
+      const res = await useCase.findAllMyLeaveRequests(buildListParams(filter))
       setMyLeaveRequests(res.data)
       setPagination({
         currentPage: res.pagination?.currentPage || 1,
@@ -112,7 +131,7 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
     setFnLoading("findAllEmployeeLeaveRequests", true)
     setFnError("findAllEmployeeLeaveRequests", null)
     try {
-      const res = await useCase.findAllEmployeeLeaveRequests({ ...filter, ...(employeeId !== undefined ? { employee_id: employeeId } : {}) })
+      const res = await useCase.findAllEmployeeLeaveRequests(buildListParams(filter, employeeId))
       setEmployeeLeaveRequests(res.data)
       setPagination({
         currentPage: res.pagination?.currentPage || 1,
@@ -223,5 +242,6 @@ export const useLeaveRequest = (): UseLeaveRequestReturn => {
     processLeaveRequest,
     setSearch,
     setPage,
+    setSort,
   }
 }

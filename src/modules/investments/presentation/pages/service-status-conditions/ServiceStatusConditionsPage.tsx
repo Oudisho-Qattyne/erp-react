@@ -85,6 +85,12 @@ export function ServiceStatusConditionsPage() {
         : <span className="text-xs text-text-muted">—</span>
     },
     {
+      key: 'created_at',
+      label: t('common.created_at', 'shared') || 'Created At',
+      width: 150,
+      sortable: true,
+    },
+    {
       key: 'actions',
       label: t('common.actions', 'shared') || 'Actions',
       width: 200,
@@ -136,10 +142,8 @@ export function ServiceStatusConditionsPage() {
   const handleApplyFilter = (values: Record<string, unknown>) => {
     const parsed: Record<string, any> = {};
     for (const [key, val] of Object.entries(values)) {
-      if (val === '' || val === undefined) continue;
-      if (val === 'true') parsed[key] = true;
-      else if (val === 'false') parsed[key] = false;
-      else parsed[key] = val;
+      if (val === '' || val === undefined) { parsed[key] = undefined; continue; }
+      parsed[key] = val;
     }
     list.setFilter(parsed);
     setIsFilterOpen(false);

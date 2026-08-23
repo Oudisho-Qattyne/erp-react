@@ -50,6 +50,7 @@ export interface Facility {
   yearly_estimated_drinking_water_consumption?: number;
   yearly_estimated_industrial_water_consumption?: number;
   folder_id?: string;
+  created_at?: string;
   require_all_persons_for_legal_matters:boolean;
   authorized_persons?:AuthorizedPerson[]
 }

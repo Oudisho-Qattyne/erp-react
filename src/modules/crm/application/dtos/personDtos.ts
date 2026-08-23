@@ -26,6 +26,8 @@ export interface PersonFilters {
   linkedin?: string;
   facebook?: string;
   type?: PersonType;
+  role?: string;
   // Sent as sort_by[column]=asc|desc (default: created_at desc)
-  sort_by?: Partial<Record<PersonSortField, SortOrder>>;
+  sortColumn?: string;
+  sortOrder?: SortOrder;
 }

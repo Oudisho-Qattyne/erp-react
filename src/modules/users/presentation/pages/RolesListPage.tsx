@@ -7,6 +7,7 @@ import { DataTable, type ColumnDef } from '../../../../core/presentation/layouts
 import { Dialog } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import type { Role } from '../../domain/entities/role';
+import type { RoleListFilter } from '../../domain/repositories/ICrudRoleRepositry';
 import { useManageRoles } from '../hooks/useManageRoles';
 import { RoleForm } from '../components/RoleForm';
 import type { RoleFormValues } from '../schemas/roleForm';
@@ -18,7 +19,9 @@ export function RolesListPage() {
   const navigate = useNavigate();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [roleFilter, setRoleFilter] = useState<{ page?: number; per_page?: number }>({});
+  const [roleFilter, setRoleFilter] = useState<RoleListFilter>({});
+  const [sortColumn, setSortColumn] = useState<string>('');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [rolePagination, setRolePagination] = useState({
     currentPage: 1,
     lastPage: 1,
@@ -33,7 +36,9 @@ export function RolesListPage() {
 
   const fetchRoles = async () => {
     try {
-      const res = await getAll(roleFilter);
+      const filter: RoleListFilter = { ...roleFilter };
+      if (sortColumn) filter[`sort_by[${sortColumn}]`] = sortOrder;
+      const res = await getAll(filter);
       setRoles(res.data);
       setRolePagination({
         currentPage: res.pagination?.currentPage || 1,
@@ -49,7 +54,16 @@ export function RolesListPage() {
   useEffect(() => {
     fetchRoles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [roleFilter]);
+  }, [roleFilter, sortColumn, sortOrder]);
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(column);
+      setSortOrder('asc');
+    }
+  };
 
   const handleDeleteConfirm = async () => {
     if (!roleToDelete) return;
@@ -70,9 +84,16 @@ export function RolesListPage() {
 
   const columns: ColumnDef<Role>[] = [
     {
+      key: 'id',
+      label: t('roles.id', 'users') || 'ID',
+      width: 80,
+      sortable: true,
+    },
+    {
       key: 'name',
       label: t('roles.name', 'users') || 'Name',
       width: 180,
+      sortable: true,
     },
     {
       key: 'display_name',
@@ -83,11 +104,13 @@ export function RolesListPage() {
       key: 'number_of_users',
       label: t('roles.number_of_users', 'users') || 'Users Count',
       width: 140,
+      sortable: true,
     },
     {
       key: 'created_at',
       label: t('roles.created_at', 'users') || 'Created At',
       width: 160,
+      sortable: true,
     },
     {
       key: 'actions',
@@ -145,6 +168,9 @@ export function RolesListPage() {
           data={roles}
           rowKey="id"
           loading={isLoading}
+          sortColumn={sortColumn}
+          sortOrder={sortOrder}
+          onSort={handleSort}
           emptyMessage={t('roles.no_data', 'users') || 'No roles found'}
           pagination={{
             page: rolePagination.currentPage,

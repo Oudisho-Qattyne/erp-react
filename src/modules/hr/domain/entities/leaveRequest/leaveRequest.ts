@@ -12,6 +12,8 @@ export interface LeaveRequest {
     reason: string;
     status: LeaveRequestStatus
     review_notes: string | null;
+    created_at?: string;
+    submitted_at?: string;
     employee?: EmployeeListItem; // included only when employee relation is loaded
     leave_type?: Leave;              // TODO: replace with LeaveType interface once defined
 }

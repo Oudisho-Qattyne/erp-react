@@ -35,7 +35,7 @@ export function InvestorsPage() {
   const handleApplyFilter = (values: Record<string, any>) => {
     const parsed: Record<string, any> = {};
     for (const [key, val] of Object.entries(values)) {
-      if (val === '' || val === undefined) continue;
+      if (val === '' || val === undefined) { parsed[key] = undefined; continue; }
       if (val === 'true') parsed[key] = true;
       else if (val === 'false') parsed[key] = false;
       else parsed[key] = val;
@@ -51,7 +51,10 @@ export function InvestorsPage() {
   };
 
   const filterInitialValues = useMemo(
-    () => Object.fromEntries(Object.entries(list.filter).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k))),
+    () => {
+      const entries = Object.entries(list.filter).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k));
+      return Object.fromEntries(entries.map(([k, v]) => [k, v === undefined || v === null ? '' : v]));
+    },
     [list.filter]
   );
 
@@ -91,9 +94,10 @@ export function InvestorsPage() {
 
   const columns = [
     {
-      key: 'full_name',
+      key: 'first_name',
       label: t('investors.full_name', 'investments') || 'Full Name',
       width: 200,
+      sortable: true,
       render: (row: Investor) => <span className="font-medium">{[row.first_name, row.father_name, row.last_name].filter(Boolean).join(' ')}</span>
     },
     {

@@ -14,7 +14,7 @@ import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialo
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
-import { Pencil, Trash2, Star, Check, X, History, Filter } from 'lucide-react';
+import { Pencil, Trash2, Star, Check, X, History, Filter, Search } from 'lucide-react';
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 
 export function PlotClassificationsPage() {
@@ -31,9 +31,13 @@ export function PlotClassificationsPage() {
   const [confirmDelete, setConfirmDelete] = useState<PlotClassification | null>(null);
   const [confirmSetDefault, setConfirmSetDefault] = useState<PlotClassification | null>(null);
   const [auditItem, setAuditItem] = useState<PlotClassification | null>(null);
+  const [searchText, setSearchText] = useState<string>(list.filter.search ?? '');
   
   const filterInitialValues = useMemo(
-    () => Object.fromEntries(Object.entries(list.filter).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k))),
+    () => {
+      const entries = Object.entries(list.filter).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k));
+      return Object.fromEntries(entries.map(([k, v]) => [k, v === undefined || v === null ? '' : typeof v === 'boolean' ? String(v) : v]));
+    },
     [list.filter]
   );
 
@@ -76,15 +80,22 @@ export function PlotClassificationsPage() {
         ? <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full"><Check size={12} /> {t('common.yes', 'shared') || 'Yes'}</span>
         : <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full"><X size={12} /> {t('common.no', 'shared') || 'No'}</span> 
     },
-    { 
-      key: 'is_default', 
-      label: t('common.is_default', 'shared') || 'Default', 
+    {
+      key: 'is_default',
+      label: t('common.is_default', 'shared') || 'Default',
       width: 120,
       render: (row: PlotClassification) => row.is_default
         ? <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full"><Star size={12} /> {t('common.yes', 'shared') || 'Yes'}</span>
-        : <span className="text-xs text-text-muted">—</span> 
+        : <span className="text-xs text-text-muted">—</span>
     },
-    { 
+    {
+      key: 'created_at',
+      label: t('plot_classifications.created_at', 'investments') || 'Created At',
+      width: 180,
+      sortable: true,
+      render: (row: PlotClassification) => row.created_at || '—',
+    },
+    {
       key: 'actions', 
       label: t('common.actions', 'shared') || 'Actions', 
       width: 200,
@@ -136,7 +147,7 @@ export function PlotClassificationsPage() {
   const handleApplyFilter = (values: Record<string, unknown>) => {
     const parsed: Record<string, any> = {};
     for (const [key, val] of Object.entries(values)) {
-      if (val === '' || val === undefined) continue;
+      if (val === '' || val === undefined) { parsed[key] = undefined; continue; }
       if (val === 'true') parsed[key] = true;
       else if (val === 'false') parsed[key] = false;
       else parsed[key] = val;
@@ -147,6 +158,7 @@ export function PlotClassificationsPage() {
 
   const handleResetFilter = () => {
     list.resetFilter();
+    setSearchText('');
     setIsFilterOpen(false);
   };
 
@@ -155,12 +167,15 @@ export function PlotClassificationsPage() {
       <div className="flex flex-col gap-2">
         <h1 className="text-2xl font-bold">{t('plot_classifications.title', 'investments')}</h1>
         <div className="w-full flex gap-2">
-          <Input type="text" value={list.filter.search ?? ''} onChange={list.setSearch} 
-            placeholder={t('common.search', 'shared') || 'Search...'} 
+          <Input type="text" value={searchText} onChange={(val) => setSearchText(val)}
+            placeholder={t('common.search', 'shared') || 'Search...'}
             baseClasses={inputBaseClasses} className="w-60" />
-            <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
-              {t('common.filter', 'shared') || 'تصفية'}
-            </Button>
+          <Button variant="outline" size="sm" onClick={() => list.setSearch(searchText)} leftIcon={<Search size={14} />}>
+            {t('common.search', 'shared') || 'Search'}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
+            {t('common.filter', 'shared') || 'تصفية'}
+          </Button>
           <Button onClick={() => setIsCreateOpen(true)} requiredPermission="investments.plot-classifications.create">{t('plot_classifications.add', 'investments')}</Button>
         </div>
       </div>

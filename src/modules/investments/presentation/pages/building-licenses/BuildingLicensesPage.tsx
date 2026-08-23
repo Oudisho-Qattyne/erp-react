@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
-import type { FacilityIndustrialLicense } from '../../../domain/entities/facilityIndustrialLicense';
+import type { BuildingLicense } from '../../../domain/entities/buildinglicense';
 import type { Facility } from '../../../domain/entities/facility';
-import type { IndustryCategory } from '../../../domain/entities/industryCategory';
-import type { IndustryType } from '../../../domain/entities/industryType';
-import type { IndustrialDecisionType } from '../../../domain/entities/industrialDecisionType';
-import type { IndustrialLicenseSource } from '../../../domain/entities/industrialLicenseSource';
+import type { LicensingStatus } from '../../../domain/entities/licensingStatus';
+import type { ByDurationLicense } from '../../../domain/entities/byDurationLicense';
+import type { ByIndustryLicense } from '../../../domain/entities/byIndustryLicense';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
+import Input from '../../../../../core/presentation/layouts/ui/inputs/Input';
+import { inputBaseClasses } from '../../../../../core/presentation/layouts/ui/inputs/styles';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
@@ -16,26 +17,25 @@ import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/
 import { FacilityPickerDialog } from '../plots/components/FacilityPickerDialog';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
-import { Eye, Trash2, History, FileCheck, Filter, Factory, X } from 'lucide-react';
+import { Eye, Trash2, History, FileCheck, Filter, Factory, X, Search } from 'lucide-react';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 
-const FILTER_KEYS = ["facility_id", "industry_category_id", "industry_type_id", "industrial_decision_type_id", "industrial_license_source_id"];
+const FILTER_KEYS = ["facility_id", "licensing_status_id", "by_duration_license_id", "by_industry_license_id"];
 
-export function FacilityIndustrialLicensesPage() {
+export function BuildingLicensesPage() {
   const { t } = useLanguage();
-  const { entities: licenses, getAll, remove, loadingMap, errorMap, pagination, list } = useEntityCrud<FacilityIndustrialLicense>(
-    '/investments/facility-industrial-licenses',
-    '/investments/facility-industrial-licenses',
-    { listState: true }
+  const { entities: licenses, getAll, remove, loadingMap, errorMap, pagination, list } = useEntityCrud<BuildingLicense>(
+    '/investments/building-licenses',
+    '/investments/building-licenses',
+    { listState: true, defaultSortColumn: 'building_license_number', debounceMs: 300 }
   );
 
-  const { entities: categories, getAll: getCategories } = useEntityCrud<IndustryCategory>('/investments/industry-categories', '/investments/industry-categories');
-  const { entities: industryTypes, getAll: getIndustryTypes } = useEntityCrud<IndustryType>('/investments/industry-types', '/investments/industry-types');
-  const { entities: decisionTypes, getAll: getDecisionTypes } = useEntityCrud<IndustrialDecisionType>('/investments/industrial-decision-types', '/investments/industrial-decision-types');
-  const { entities: licenseSources, getAll: getLicenseSources } = useEntityCrud<IndustrialLicenseSource>('/investments/industrial-license-sources', '/investments/industrial-license-sources');
+  const { entities: licensingStatuses, getAll: getLicensingStatuses } = useEntityCrud<LicensingStatus>('/investments/license-statuses', '/investments/license-statuses');
+  const { entities: durationLicenses, getAll: getDurationLicenses } = useEntityCrud<ByDurationLicense>('/investments/by-duration-licenses', '/investments/by-duration-licenses');
+  const { entities: industryLicenses, getAll: getIndustryLicenses } = useEntityCrud<ByIndustryLicense>('/investments/by-industry-licenses', '/investments/by-industry-licenses');
 
-  const [confirmDelete, setConfirmDelete] = useState<FacilityIndustrialLicense | null>(null);
-  const [auditItem, setAuditItem] = useState<FacilityIndustrialLicense | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<BuildingLicense | null>(null);
+  const [auditItem, setAuditItem] = useState<BuildingLicense | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [isFacilityPickerOpen, setIsFacilityPickerOpen] = useState(false);
   const [filterFacilityName, setFilterFacilityName] = useState('');
@@ -43,19 +43,18 @@ export function FacilityIndustrialLicensesPage() {
   const confirmedFilterRef = useRef({ facilityName: '' });
 
   useEffect(() => {
-    getCategories('/investments/industry-categories?is_active=true');
-    getIndustryTypes('/investments/industry-types?is_active=true');
-    getDecisionTypes('/investments/industrial-decision-types?is_active=true');
-    getLicenseSources('/investments/industrial-license-sources?is_active=true');
+    getLicensingStatuses('/investments/license-statuses?is_active=true');
+    getDurationLicenses('/investments/by-duration-licenses?is_active=true');
+    getIndustryLicenses('/investments/by-industry-licenses?is_active=true');
   }, []);
 
   const handleDelete = async () => {
     if (!confirmDelete) return;
     try {
       await remove(confirmDelete.id);
-      toast.success(t('facility_industrial_licenses.deleted', 'investments') || 'License deleted successfully');
+      toast.success(t('building_license.deleted', 'investments') || 'License deleted successfully');
       setConfirmDelete(null);
-      getAll(`/investments/facility-industrial-licenses?page=${list.page}&per_page=${list.perPage}`);
+      getAll(`/investments/building-licenses?page=${list.page}&per_page=${list.perPage}`);
     } catch (err: any) {
       handleApiError(err, { module: "investments" });
     }
@@ -95,28 +94,22 @@ export function FacilityIndustrialLicensesPage() {
       },
     },
     {
-      name: "industry_category_id",
-      label: t('facility_industrial_licenses.industry_category', 'investments') || 'Category',
+      name: "licensing_status_id",
+      label: t('building_license.licensing_status_id', 'investments') || 'Licensing Status',
       type: "select",
-      options: selectOptions(categories),
+      options: selectOptions(licensingStatuses),
     },
     {
-      name: "industry_type_id",
-      label: t('facility_industrial_licenses.industry_type', 'investments') || 'Type',
+      name: "by_duration_license_id",
+      label: t('building_license.by_duration_license_id', 'investments') || 'Duration License',
       type: "select",
-      options: selectOptions(industryTypes),
+      options: selectOptions(durationLicenses),
     },
     {
-      name: "industrial_decision_type_id",
-      label: t('facility_industrial_licenses.decision_type', 'investments') || 'Decision Type',
+      name: "by_industry_license_id",
+      label: t('building_license.by_industry_license_id', 'investments') || 'Industry License',
       type: "select",
-      options: selectOptions(decisionTypes),
-    },
-    {
-      name: "industrial_license_source_id",
-      label: t('facility_industrial_licenses.license_source', 'investments') || 'Source',
-      type: "select",
-      options: selectOptions(licenseSources),
+      options: selectOptions(industryLicenses),
     },
   ];
 
@@ -169,56 +162,46 @@ export function FacilityIndustrialLicensesPage() {
   };
 
   const columns = [
-    { key: "industrial_decision_number", label: t("facility_industrial_licenses.decision_number", "investments") || "Decision #", width: 160, sortable: true },
     {
       key: "facility",
       label: t("facilities.name", "investments") || "Facility",
       width: 180,
-      render: (row: FacilityIndustrialLicense) => row.facility?.name || '—',
+      render: (row: BuildingLicense) => row.facility?.name || '—',
     },
+    { key: "building_license_number", label: t("building_license.building_license_number", "investments") || "License Number", width: 160, sortable: true },
+    { key: "building_license_date", label: t("building_license.building_license_date", "investments") || "Date", width: 120 },
+    { key: "licensed_area", label: t("building_license.licensed_area", "investments") || "Area", width: 100 },
     {
-      key: "industry_category",
-      label: t("facility_industrial_licenses.industry_category", "investments") || "Category",
+      key: "licensing_status",
+      label: t("building_license.licensing_status_id", "investments") || "Licensing Status",
       width: 140,
-      render: (row: FacilityIndustrialLicense) => getLocalizedName(row.industry_category?.name) || '—',
+      render: (row: BuildingLicense) => getLocalizedName(row.licensing_status?.name) || '—',
     },
     {
-      key: "industry_type",
-      label: t("facility_industrial_licenses.industry_type", "investments") || "Type",
+      key: "by_duration_license",
+      label: t("building_license.by_duration_license_id", "investments") || "Duration License",
       width: 140,
-      render: (row: FacilityIndustrialLicense) => getLocalizedName(row.industry_type?.name) || '—',
-    },
-    { key: "industrial_decision_date", label: t("facility_industrial_licenses.decision_date", "investments") || "Date", width: 120, sortable: true },
-    {
-      key: "industrial_decision_type",
-      label: t("facility_industrial_licenses.decision_type", "investments") || "Decision Type",
-      width: 130,
-      render: (row: FacilityIndustrialLicense) => getLocalizedName(row.industrial_decision_type?.name) || '—',
+      render: (row: BuildingLicense) => getLocalizedName(row.by_duration_license?.name) || '—',
     },
     {
-      key: "industrial_license_source",
-      label: t("facility_industrial_licenses.license_source", "investments") || "Source",
-      width: 130,
-      render: (row: FacilityIndustrialLicense) => getLocalizedName(row.industrial_license_source?.name) || '—',
+      key: "by_industry_license",
+      label: t("building_license.by_industry_license_id", "investments") || "Industry License",
+      width: 140,
+      render: (row: BuildingLicense) => getLocalizedName(row.by_industry_license?.name) || '—',
     },
+    { key: "administrative_license_decision_number", label: t("building_license.administrative_license_decision_number", "investments") || "Admin Decision", width: 150 },
     {
       key: "created_at",
-      label: t("common.created_at", "shared") || "Created At",
-      width: 150,
+      label: t("building_license.created_at", "investments") || "Created At",
+      width: 180,
       sortable: true,
-    },
-    {
-      key: "is_active",
-      label: t("common.is_active", "shared") || "Active",
-      width: 90,
-      align: "center" as const,
-      render: (row: FacilityIndustrialLicense) => row.is_active ? (t('common.yes', 'shared') || 'Yes') : (t('common.no', 'shared') || 'No'),
+      render: (row: BuildingLicense) => row.created_at || '—',
     },
     {
       key: "actions",
       label: t("common.actions", "shared") || "Actions",
       width: 130,
-      render: (row: FacilityIndustrialLicense) => (
+      render: (row: BuildingLicense) => (
         <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
           <Button
             variant="ghost"
@@ -235,10 +218,10 @@ export function FacilityIndustrialLicensesPage() {
           >
             <Eye size={16} />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)} title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.facility-industrial-licenses.delete">
+          <Button variant="ghost" size="sm" onClick={() => setConfirmDelete(row)} title={t('common.delete', 'shared') || 'Delete'} requiredPermission="investments.building-licenses.delete">
             <Trash2 size={16} className="text-danger" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)} title={t('facility_industrial_licenses.edit_log', 'investments') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
+          <Button variant="ghost" size="sm" onClick={() => setAuditItem(row)} title={t('building_license.edit_log', 'investments') || 'Edit Log'} requiredPermission="shared.audit-logs.view">
             <History size={16} />
           </Button>
         </div>
@@ -251,11 +234,22 @@ export function FacilityIndustrialLicensesPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <FileCheck size={24} className="text-primary" />
-          {t('facility_industrial_licenses.title', 'investments') || 'Industrial Licenses'}
+          {t('building_license.title', 'investments') || 'Building Licenses'}
         </h1>
       </div>
 
       <div className="flex items-center gap-3">
+        <div className="relative">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+          <Input
+            type="text"
+            value={list.filter.search ?? ''}
+            onChange={list.setSearch}
+            placeholder={t('common.search', 'shared') || 'Search...'}
+            baseClasses={inputBaseClasses}
+            className="w-60 pl-9"
+          />
+        </div>
         <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
           {t('common.filter', 'shared') || 'Filter'}
         </Button>
@@ -265,14 +259,14 @@ export function FacilityIndustrialLicensesPage() {
       </div>
 
       {errorMap["getAll"] ? (
-        <ErrorState message={errorMap["getAll"]} onRetry={() => getAll(`/investments/facility-industrial-licenses?page=${list.page}&per_page=${list.perPage}`)} />
+        <ErrorState message={errorMap["getAll"]} onRetry={() => getAll(`/investments/building-licenses?page=${list.page}&per_page=${list.perPage}`)} />
       ) : (
         <DataTable
           columns={columns}
           data={licenses}
           rowKey="id"
           loading={loadingMap["getAll"]}
-          emptyMessage={t('facility_industrial_licenses.no_records', 'investments') || 'No licenses found'}
+          emptyMessage={t('building_license.no_records', 'investments') || 'No licenses found'}
           sortColumn={list.filter.sortColumn}
           sortOrder={list.filter.sortOrder}
           onSort={list.setSort}
@@ -290,8 +284,8 @@ export function FacilityIndustrialLicensesPage() {
 
       <ConfirmDialog
         isOpen={!!confirmDelete}
-        title={t('facility_industrial_licenses.delete_title', 'investments') || 'Delete License'}
-        message={t('facility_industrial_licenses.delete_message', 'investments') || 'Are you sure you want to delete this license?'}
+        title={t('building_license.delete_title', 'investments') || 'Delete License'}
+        message={t('building_license.delete_message', 'investments') || 'Are you sure you want to delete this license?'}
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(null)}
         confirmLoading={loadingMap["remove"]}
@@ -321,22 +315,22 @@ export function FacilityIndustrialLicensesPage() {
       <AuditLog
         isOpen={!!auditItem}
         onClose={() => setAuditItem(null)}
-        model="facility_industrial_license"
+        model="building_license"
         modelId={auditItem?.id}
         module="investments"
         labels={{
-          title: t('facility_industrial_licenses.edit_log', 'investments') || 'Edit Log',
-          event: t('facility_industrial_licenses.event', 'investments') || 'Event',
-          created_at: t('facility_industrial_licenses.created_at', 'investments') || 'Created At',
-          changed_by: t('facility_industrial_licenses.changed_by', 'investments') || 'Changed By',
-          changes: t('facility_industrial_licenses.changes', 'investments') || 'Changes',
-          field: t('facility_industrial_licenses.field', 'investments') || 'Field',
-          old_value: t('facility_industrial_licenses.old_value', 'investments') || 'Old Value',
-          new_value: t('facility_industrial_licenses.new_value', 'investments') || 'New Value',
-          no_records: t('facility_industrial_licenses.no_edit_log', 'investments') || 'No edit logs found',
-          subject_id: t('facility_industrial_licenses.subject_id', 'investments') || 'License ID',
+          title: t('building_license.edit_log', 'investments') || 'Edit Log',
+          event: t('building_license.event', 'investments') || 'Event',
+          created_at: t('building_license.created_at', 'investments') || 'Created At',
+          changed_by: t('building_license.changed_by', 'investments') || 'Changed By',
+          changes: t('building_license.changes', 'investments') || 'Changes',
+          field: t('building_license.field', 'investments') || 'Field',
+          old_value: t('building_license.old_value', 'investments') || 'Old Value',
+          new_value: t('building_license.new_value', 'investments') || 'New Value',
+          no_records: t('building_license.no_edit_log', 'investments') || 'No edit logs found',
+          subject_id: t('building_license.subject_id', 'investments') || 'License ID',
         }}
-        translateField={(key) => t(`facility_industrial_licenses.${key}`, 'investments') || key}
+        translateField={(key) => t(`building_license.${key}`, 'investments') || key}
         translateValues={handleTranslateValues}
       />
     </div>

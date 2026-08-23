@@ -2,12 +2,12 @@ import type { ApiClient } from "../../../../core/domain/common/api/ApiClient";
 import { type DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
 import type { Permissions } from "../../domain/entities/permissions";
 import type { DetailedRole, Role, CreateRoleData, UpdateRoleData } from "../../domain/entities/role";
-import type { ICrudRoleRepository } from "../../domain/repositories/ICrudRoleRepositry";
+import type { ICrudRoleRepository, RoleListFilter } from "../../domain/repositories/ICrudRoleRepositry";
 
 export const createCrudRoleRepository = (apiClient: ApiClient): ICrudRoleRepository => {
     return (
         {
-            getRoles(filter?: { page?: number; per_page?: number }) {
+            getRoles(filter?: RoleListFilter) {
                 return (apiClient.get<DomainResponse<Role[]>>("/users/roles", {
                     params: filter as Record<string, string | number | boolean | (string | number)[]> | undefined,
                 }))

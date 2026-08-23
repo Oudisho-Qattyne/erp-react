@@ -30,10 +30,12 @@ import { LicensingStatusesPage } from './presentation/pages/licensing-statuses/L
 import { ByDurationLicensesPage } from './presentation/pages/by-duration-licenses/ByDurationLicensesPage';
 import { ByIndustryLicensesPage } from './presentation/pages/by-industry-licenses/ByIndustryLicensesPage';
 import { RentContractIndustriesPage } from './presentation/pages/rent-contract-industries/RentContractIndustriesPage';
+import { RentContractPage } from './presentation/pages/rent-contracts/RentContractPage';
 import { ServiceStatusConditionsPage } from './presentation/pages/service-status-conditions/ServiceStatusConditionsPage';
 import { MapPin, Users, Clock, Building2, FileText, Factory, FileSignature } from 'lucide-react';
 import { ShowFacilityPage } from './presentation/pages/plots/ShowFacilityPage';
 import { FacilityIndustrialLicensesPage } from './presentation/pages/facility-industrial-licenses/FacilityIndustrialLicensesPage';
+import { BuildingLicensesPage } from './presentation/pages/building-licenses/BuildingLicensesPage';
 
 registerPersonDetailRoute({
   type: 'investor',
@@ -131,6 +133,30 @@ const investmentsModule: Module = {
       nav: true,
       order: 9,
       requiredPermission: 'investments.contracts.list',
+      moduleName: 'investments',
+      icon: <FileSignature size={18} />,
+      group: 'investments',
+    },
+    {
+      path: '/investments/building-licenses',
+      element: <BuildingLicensesPage />,
+      layout: 'dashboard',
+      label: 'building_license.title',
+      nav: true,
+      order: 10,
+      requiredPermission: 'investments.building-licenses.list',
+      moduleName: 'investments',
+      icon: <Building2 size={18} />,
+      group: 'investments',
+    },
+    {
+      path: '/investments/rent-contracts',
+      element: <RentContractPage />,
+      layout: 'dashboard',
+      label: 'rent_contract.title',
+      nav: true,
+      order: 11,
+      requiredPermission: 'investments.rent-contracts.list',
       moduleName: 'investments',
       icon: <FileSignature size={18} />,
       group: 'investments',

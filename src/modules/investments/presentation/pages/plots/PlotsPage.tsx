@@ -47,7 +47,7 @@ export function PlotsPage() {
   const handleApplyFilter = (values: Record<string, unknown>) => {
     const parsed: Record<string, any> = {};
     for (const [key, val] of Object.entries(values)) {
-      if (val === '' || val === undefined) continue;
+      if (val === '' || val === undefined) { parsed[key] = undefined; continue; }
       if (val === 'true') parsed[key] = true;
       else if (val === 'false') parsed[key] = false;
       else parsed[key] = val;
@@ -63,7 +63,10 @@ export function PlotsPage() {
   };
 
   const filterInitialValues = useMemo(
-    () => Object.fromEntries(Object.entries(list.filter).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k))),
+    () => {
+      const entries = Object.entries(list.filter).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k));
+      return Object.fromEntries(entries.map(([k, v]) => [k, v === undefined || v === null ? '' : v]));
+    },
     [list.filter]
   );
 
@@ -104,12 +107,14 @@ export function PlotsPage() {
       key: 'code',
       label: t('plots.code', 'investments') || 'Plot Code',
       width: 120,
+      sortable: true,
       render: (row: Plot) => <span className="font-medium">{row.code}</span>
     },
     {
       key: 'identifier',
       label: t('plots.identifier', 'investments') || 'Plot Identifier',
       width: 120,
+      sortable: true,
       render: (row: Plot) => <span className="font-medium">{row.identifier}</span>
     },
     {
@@ -131,6 +136,7 @@ export function PlotsPage() {
       key: 'area',
       label: t('plots.area', 'investments') || 'Area',
       width: 100,
+      sortable: true,
       render: (row: Plot) => `${row.area} ㎡`
     },
     {
@@ -144,6 +150,13 @@ export function PlotsPage() {
       label: t('plots.plot_classification_id', 'investments') || 'Classification',
       width: 150,
       render: (row: Plot) => row.plot_classification_name || '—'
+    },
+    {
+      key: 'created_at',
+      label: t('plots.created_at', 'investments') || 'Created At',
+      width: 180,
+      sortable: true,
+      render: (row: Plot) => row.created_at || '—',
     },
     {
       key: 'actions',
@@ -241,6 +254,9 @@ export function PlotsPage() {
           loading={loadingMap['getAll']}
           emptyMessage={t('plots.no_records', 'investments') || 'No plots found'}
           pagination={tablePagination}
+          sortColumn={list.filter.sortColumn}
+          sortOrder={list.filter.sortOrder}
+          onSort={list.setSort}
         />
       )}
 
