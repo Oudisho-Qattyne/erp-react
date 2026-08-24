@@ -7,7 +7,8 @@ import { EditRolePage } from './presentation/pages/EditRolePage'
 import { ShowRolePage } from './presentation/pages/ShowRolePage'
 import { AllUsers } from './presentation/pages/user/AllUsers'
 import { LinkUserToEmployee } from './presentation/pages/user/LinkUserToEmployee'
-import { registerUserApi } from '../../core/registry/user/userRegistry'
+import { registerUserApi, registerUserPickerDialog } from '../../core/registry/user/userRegistry'
+import { UserPickerDialog } from './presentation/components/UserPickerDialog'
 import { createFetchApiClient } from '../../core/infrastructure/api/fetchApiClient'
 import { createUserRepository } from './infrastructure/repositories/user/repository'
 import { createManageUserUseCase } from './application/usecases/user/manageUserUsecase'
@@ -19,6 +20,7 @@ const repository = createUserRepository(client)
 const useCase = createManageUserUseCase(repository)
 
 registerUserApi({ getCurrentUser: useCase.getCurrentUser })
+registerUserPickerDialog(UserPickerDialog)
 
 const usersModule: Module = {
   name: 'users',

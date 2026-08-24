@@ -13,6 +13,9 @@
     },
     "currencies": {
       "title": "Currencies"
+    },
+    "exchange_rates":{
+      "title" : "Exchange Rates"
     }
   },
   "fees": {
@@ -96,6 +99,9 @@
     "updated": "Transaction updated successfully",
     "update_error": "Failed to update transaction",
     "load_error": "Failed to load transactions",
+    "payment_currency": "Payment currency",
+    "paid_amount": "Paid amount",
+    "confirm_payment": "Confirm payment",
     "validation": {
       "type_required": "Transaction type is required",
       "value_required": "Value is required",
@@ -117,6 +123,7 @@
   "currency": {
     "name": "Name",
     "code": "Code",
+    "picker_title": "Select Currency",
     "symbol": "Symbol",
     "decimal_places": "Decimal Places",
     "created_at": "Created At",

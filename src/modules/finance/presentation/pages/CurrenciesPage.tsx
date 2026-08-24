@@ -132,7 +132,6 @@ export function CurrenciesPage() {
   ]
 
   const filterFields: FilterField[] = [
-    { name: "search", type: "text", label: t("currency.name", MODULE) || "Name" },
     { name: "code", type: "text", label: t("currency.code", MODULE) || "Code" },
     {
       name: "is_active",

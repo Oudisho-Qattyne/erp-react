@@ -246,7 +246,7 @@ export function ShowFacilityPage() {
           <div className="text-sm text-muted-foreground">—</div>
         )}
       </SectionCard>
-
+        
       <FacilityIndustrialLicensesSection facilityId={facilityId!} />
       <BuildingLicenseSection facilityId={facilityId!} />
       

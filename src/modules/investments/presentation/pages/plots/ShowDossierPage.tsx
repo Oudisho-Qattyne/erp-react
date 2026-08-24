@@ -101,7 +101,7 @@ export function ShowDossierPage() {
       {dossierId && plotId && canShowContracts &&
         <ContractsSection plotId={plotId} dossierId={dossierId} />
       }
-      {dossierId && plotId &&
+      {dossierId && plotId && canShowContracts &&
         <RentContractSection plotId={plotId} dossierId={dossierId} />
       }
 

@@ -5,7 +5,7 @@ import { Button } from "../../../../core/presentation/layouts/ui/buttons/Button"
 import { DataTable, type ColumnDef } from "../../../../core/presentation/layouts/ui/tables/ResizableTable"
 import { ErrorState } from "../../../../core/presentation/layouts/ui/state/ErrorState"
 import { FilterDialog, type FilterField } from "../../../../core/presentation/layouts/ui/filter/FilterDialog"
-import { ConfirmDialog } from "../../../../core/presentation/layouts/ui/dialog/ConfirmDialog"
+import { useCurrencies } from "../hooks/useCurrencies"
 import Input from "../../../../core/presentation/layouts/ui/inputs/Input"
 import { inputBaseClasses } from "../../../../core/presentation/layouts/ui/inputs/styles"
 import { useTransactions } from "../hooks/useTransactions"
@@ -13,6 +13,8 @@ import { CreateTransactionForm } from "../components/CreateTransactionForm"
 import type { Transaction } from "../../domain/entities/Transaction"
 import type { TransactionFilters } from "../../application/dtos/transactionDtos"
 import { Dialog } from "../../../../core/presentation/layouts/ui/dialog/Dialog"
+import { GenericCreateForm } from "../../../../core/presentation/layouts/ui/forms/GenericCreateForm"
+import { getApproveTransactionSchema, buildApproveTransactionFields } from "../forms/transactionApprovalFormConfig"
 import { Search, Filter, Plus, Check, X } from "lucide-react"
 
 const MODULE = "finance"
@@ -41,7 +43,7 @@ export function TransactionsPage() {
   const navigate = useNavigate()
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [isAddOpen, setIsAddOpen] = useState(false)
-  const [confirmAction, setConfirmAction] = useState<{ id: number; action: "approved" | "canceled" } | null>(null)
+  const [paymentTarget, setPaymentTarget] = useState<{ transaction: Transaction; action: "approved" | "canceled" } | null>(null)
 
   const [initialSearch] = useState(
     () => (location.state as TransactionsNavState | null)?.filter?.search ?? ""
@@ -60,6 +62,12 @@ export function TransactionsPage() {
     findAllTransactions,
     updateTransactionStatus,
   } = useTransactions(initialSearch ? { search: initialSearch, page: 1 } : undefined)
+
+  const {
+    currencies,
+    findAllCurrencies,
+    convertCurrency,
+  } = useCurrencies()
 
   const handleSearch = () => {
     setFilter({ search: localSearch, page: 1 })
@@ -82,21 +90,16 @@ export function TransactionsPage() {
     navigate(location.pathname, { replace: true, state: null })
   }, [location.state, location.pathname, navigate, setFilter])
 
-  useEffect(() => {
-    findAllTransactions()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter])
+  // useEffect(() => {
+  //   findAllTransactions()
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [filter])
 
-  const handleConfirm = async () => {
-    if (!confirmAction) return
-    try {
-      await updateTransactionStatus(confirmAction.id, { transaction_status: confirmAction.action })
-      setConfirmAction(null)
-      findAllTransactions()
-    } catch {
-      setConfirmAction(null)
+  useEffect(() => {
+    if (paymentTarget && currencies.length === 0) {
+      findAllCurrencies()
     }
-  }
+  }, [paymentTarget, currencies.length])
 
   const sortColumn = filter.sort_by ? (Object.keys(filter.sort_by)[0] as string) : undefined
   const sortOrder = sortColumn ? filter.sort_by?.[sortColumn as keyof TransactionFilters["sort_by"]] : undefined
@@ -141,7 +144,7 @@ export function TransactionsPage() {
       label: t("transaction.value", MODULE) || "Value",
       width: 120,
       sortable: true,
-      render: (row) => row.transaction_value.toFixed(2),
+      render: (row) => row.transaction_value.toFixed(2) + " SYP",
     },
     { key: "reason", label: t("transaction.reason", MODULE) || "Reason", width: 240, render: (row) => row.reason || "—" },
     {
@@ -170,7 +173,7 @@ export function TransactionsPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setConfirmAction({ id: row.id, action: "approved" })}
+              onClick={() => setPaymentTarget({ transaction: row, action: "approved" })}
               title={t("transaction.approve", MODULE) || "Approve"}
               requiredPermission="financial.transactions.change-status"
             >
@@ -179,7 +182,7 @@ export function TransactionsPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setConfirmAction({ id: row.id, action: "canceled" })}
+              onClick={() => setPaymentTarget({ transaction: row, action: "canceled" })}
               title={t("transaction.cancel", MODULE) || "Cancel"}
               requiredPermission="financial.transactions.change-status"
             >
@@ -329,23 +332,42 @@ export function TransactionsPage() {
         />
       </Dialog>
 
-      <ConfirmDialog
-        isOpen={!!confirmAction}
-        title={confirmAction?.action === "approved"
-          ? t("transaction.approve", MODULE) || "Approve"
-          : t("transaction.cancel", MODULE) || "Cancel"}
-        message={confirmAction?.action === "approved"
-          ? t("transaction.approve_confirm", MODULE) || "Are you sure you want to approve this transaction?"
-          : t("transaction.cancel_confirm", MODULE) || "Are you sure you want to cancel this transaction?"}
-        type={confirmAction?.action === "approved" ? "friendly" : "danger"}
-        confirmLabel={confirmAction?.action === "approved"
-          ? t("transaction.approve", MODULE) || "Approve"
-          : t("transaction.cancel", MODULE) || "Cancel"}
-        cancelLabel={t("common.cancel", "shared") || "Cancel"}
-        confirmLoading={loading.updateTransactionStatus}
-        onConfirm={handleConfirm}
-        onCancel={() => setConfirmAction(null)}
-      />
+      <Dialog
+        isOpen={!!paymentTarget}
+        onClose={() => setPaymentTarget(null)}
+        title={paymentTarget?.action === "approved"
+          ? t("transaction.approve", MODULE) || "اعتماد المعاملة"
+          : t("transaction.cancel", MODULE) || "إلغاء المعاملة"}
+        size="md"
+      >
+        {paymentTarget && (
+          <GenericCreateForm
+            schema={getApproveTransactionSchema()}
+            fields={buildApproveTransactionFields(t, {
+              currencies,
+              convertCurrency,
+              transactionValue: paymentTarget.transaction.transaction_value,
+            })}
+            defaultValues={{
+              transaction_currency_id: "SYP",
+              client_payed_amount: paymentTarget.transaction.transaction_value,
+            }}
+            onSubmit={async (data) => {
+              await updateTransactionStatus(paymentTarget.transaction.id, {
+                transaction_status: paymentTarget.action,
+                transaction_currency_id: data.transaction_currency_id,
+                client_payed_amount: Number(data.client_payed_amount),
+              })
+            }}
+            onSuccess={() => {
+              setPaymentTarget(null)
+              findAllTransactions()
+            }}
+            onCancel={() => setPaymentTarget(null)}
+            submitLabel={t("transaction.confirm_payment", MODULE) || "تأكيد الدفع"}
+          />
+        )}
+      </Dialog>
     </div>
   )
 }

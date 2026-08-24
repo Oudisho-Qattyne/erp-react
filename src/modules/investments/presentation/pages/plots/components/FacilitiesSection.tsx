@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../../core/presentation/hooks/data/useEntity';
 import type { Facility } from '../../../../domain/entities/facility';
@@ -55,15 +55,14 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
     loadCountries()
   } ,[])
 
+  const loadFacility = useCallback(async (id: number) => {
+    const res = await getFacilityById(id);
+    if (res) setFacility(res.data);
+  }, [getFacilityById]);
+
   useEffect(() => {
-    const fetchFacilityById = async () => {
-      if(editingFacility){
-        const res = await getFacilityById(editingFacility.id)
-        setFacility(res.data)
-      }
-    }
-    fetchFacilityById()
-  } , [editingFacility])
+    if (editingFacility) loadFacility(editingFacility.id);
+  } , [editingFacility, loadFacility])
   const handleSearch = () => {
     list.setSearch(localSearch);
   };
@@ -297,19 +296,26 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
 
       <Dialog size='3xl' isOpen={!!editingFacility} onClose={() => setEditingFacility(null)} title={t('facilities.edit', 'investments') || 'Edit Facility'}>
         {editingFacility && (
-          loadingMap['getById'] || !faclitiy ?
-          <LoadingState />
-          :
-          <GenericCreateForm
-            schema={getCreateFacilityFormSchema(t)}
-            fields={fields}
-            groups={formGroups}
-            defaultValues={buildFacilityDefaultValues(faclitiy)}
-            onSubmit={handleUpdate}
-            onSuccess={() => setEditingFacility(null)}
-            onCancel={() => setEditingFacility(null)}
-            submitLabel={t('common.edit', 'shared') || 'Edit'}
-          />
+          errorMap['getById'] ? (
+            <ErrorState
+              message={errorMap['getById']}
+              retryLabel={t('common.retry', 'shared') || 'Retry'}
+              onRetry={() => loadFacility(editingFacility.id)}
+            />
+          ) : loadingMap['getById'] || !faclitiy ? (
+            <LoadingState message={t('facilities.loading', 'investments') || 'Loading facility...'} />
+          ) : (
+            <GenericCreateForm
+              schema={getCreateFacilityFormSchema(t)}
+              fields={fields}
+              groups={formGroups}
+              defaultValues={buildFacilityDefaultValues(faclitiy, consumptionMaterials)}
+              onSubmit={handleUpdate}
+              onSuccess={() => setEditingFacility(null)}
+              onCancel={() => setEditingFacility(null)}
+              submitLabel={t('common.edit', 'shared') || 'Edit'}
+            />
+          )
         )}
       </Dialog>
 

@@ -4,7 +4,7 @@ import { useLanguage } from "../../../../core/presentation/context/i18n/I18nProv
 import { createCurrencyRepository } from "../../infrastructure/repositories/CurrencyRepository"
 import { createManageCurrenciesUseCase } from "../../application/usecases/manageCurrenciesUseCase"
 import { handleApiError } from "../../../../core/presentation/utils/handleApiError"
-import type { CreateCurrencyDto, CurrencyFilters, UpdateCurrencyDto } from "../../application/dtos/currencyDtos"
+import type { CreateCurrencyDto, CurrencyConversionRequest, CurrencyConversionResult, CurrencyFilters, UpdateCurrencyDto } from "../../application/dtos/currencyDtos"
 import type { Currency } from "../../domain/entities/Currency"
 import { toast } from "sonner"
 import { useIdempotency } from "../../../../core/presentation/hooks/useIdempotency"
@@ -35,6 +35,7 @@ export interface UseCurrenciesReturn {
   createCurrency: (data: CreateCurrencyDto) => Promise<void>
   updateCurrency: (code: string, data: UpdateCurrencyDto) => Promise<void>
   deleteCurrency: (currency: Pick<Currency, "code">) => Promise<void>
+  convertCurrency: (data: CurrencyConversionRequest) => Promise<CurrencyConversionResult>
 }
 
 export const useCurrencies = (): UseCurrenciesReturn => {
@@ -130,6 +131,20 @@ export const useCurrencies = (): UseCurrenciesReturn => {
     }
   }, [useCase, t, idem])
 
+  const convertCurrency = useCallback(async (data: CurrencyConversionRequest): Promise<CurrencyConversionResult> => {
+    setFnLoading("convertCurrency", true)
+    setFnError("convertCurrency", null)
+    try {
+      const res = await idem.run("convertCurrency", data, (key) => useCase.convertCurrency(data, key))
+      return res.data
+    } catch (err: unknown) {
+      setFnError("convertCurrency", handleApiError(err, { module: MODULE , passThrough:true }))
+      throw err
+    } finally {
+      setFnLoading("convertCurrency", false)
+    }
+  }, [useCase, t, idem])
+
   const isLoading = useCallback(() => Object.values(loading).some(Boolean), [loading])
   const hasErrors = useCallback(() => Object.values(error).some((e) => e !== null), [error])
 
@@ -151,5 +166,6 @@ export const useCurrencies = (): UseCurrenciesReturn => {
     createCurrency,
     updateCurrency,
     deleteCurrency,
+    convertCurrency,
   }
 }

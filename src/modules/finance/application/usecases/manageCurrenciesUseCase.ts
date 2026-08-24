@@ -1,6 +1,7 @@
-import type { CreateCurrencyDto, CurrencyFilters, UpdateCurrencyDto } from "../dtos/currencyDtos";
+import type { CreateCurrencyDto, CurrencyConversionRequest, CurrencyConversionResult, CurrencyFilters, UpdateCurrencyDto } from "../dtos/currencyDtos";
 import type { Currency } from "../../domain/entities/Currency";
 import type { ICurrencyRepository } from "../../domain/repositories/ICurrencyRepository";
+import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
 
 export const createManageCurrenciesUseCase = (repository: ICurrencyRepository) => {
   return {
@@ -15,6 +16,9 @@ export const createManageCurrenciesUseCase = (repository: ICurrencyRepository) =
     },
     deleteCurrency: (currency: Pick<Currency, "code">, idempotencyKey?: string) => {
       return repository.deleteCurrency(currency, idempotencyKey)
+    },
+    convertCurrency: (data: CurrencyConversionRequest, idempotencyKey?: string): Promise<DomainResponse<CurrencyConversionResult>> => {
+      return repository.convertCurrency(data, idempotencyKey)
     }
   }
 }

@@ -258,9 +258,9 @@ export const buildFacilityFormGroups = (t: Translate): GroupConfig[] => [
   },
 ];
 
-export type DailyConsumptionMatrixRow = { material: number; consumption: string; unit: string };
+export type DailyConsumptionMatrixRow = { id: number | null; consumption: string; unit: string };
 
-export const buildFacilityDefaultValues = (facility: Facility): Record<string, string | number | boolean | AuthorizedPersonPayload[] | ProductionCapacityRow[] | DailyConsumptionMatrixRow[] | null | undefined> => ({
+export const buildFacilityDefaultValues = (facility: Facility, consumptionMaterials: ConsumptionMaterial[] = []): Record<string, string | number | boolean | AuthorizedPersonPayload[] | ProductionCapacityRow[] | DailyConsumptionMatrixRow[] | null | undefined> => ({
   name: facility.name,
   partnership_type_id: facility.partnership_type?.id ?? facility.partnership_type_id ?? null,
   address: facility.address,
@@ -284,11 +284,19 @@ export const buildFacilityDefaultValues = (facility: Facility): Record<string, s
   daily_production_capacities: facility.daily_production_capacities ?? [],
   monthly_production_capacities: facility.monthly_production_capacities ?? [],
   yearly_production_capacities: facility.yearly_production_capacities ?? [],
-  daily_consumption: (facility.daily_consumption ?? []).map((row) => ({
-    material: row.consumable_material.id,
-    consumption: String(row.consumption ?? ''),
-    unit: '',
-  })),
+  daily_consumption: (facility.daily_consumption ?? []).map((row) => {
+    const cm = row.consumable_material;
+    const materialId = (cm?.id ?? (row as { consumable_material_id?: number }).consumable_material_id ?? null) as number | null;
+    let unit = cm?.unit ?? '';
+    if (!unit && materialId != null) {
+      unit = consumptionMaterials.find((m) => m.id === materialId)?.unit ?? '';
+    }
+    return {
+      id: materialId,
+      consumption: String(row.consumption ?? ''),
+      unit,
+    };
+  }),
   electrical_power_capacity: String(facility.electrical_power_capacity ?? ''),
   yearly_estimated_drinking_water_consumption: facility.yearly_estimated_drinking_water_consumption,
   yearly_estimated_industrial_water_consumption: facility.yearly_estimated_industrial_water_consumption ?? null,

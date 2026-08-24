@@ -71,9 +71,9 @@ export function FeesPage() {
     setFilter({ sort_by: { [key]: order } as FeeFilters["sort_by"], page: 1 })
   }
 
-  useEffect(() => {
-    findAllFees()
-  }, [filter])
+  // useEffect(() => {
+  //   findAllFees()
+  // }, [filter])
 
   const columns: ColumnDef<Fee>[] = [
     { key: "id", label: "#", width: 60 },
@@ -175,9 +175,7 @@ export function FeesPage() {
       type: "decimal",
       label: t("fee.value_to", MODULE) || "Max Value",
       decimalPlaces: 2,
-    },
-    { name: "from_date", type: "date", label: t("fee.from_date", MODULE) || "From Date" },
-    { name: "to_date", type: "date", label: t("fee.to_date", MODULE) || "To Date" },
+    }
   ]
 
   const handleApplyFilter = (values: Record<string, any>) => {

@@ -13,6 +13,9 @@
     },
     "currencies": {
       "title": "العملات"
+    },
+    "exchange_rates":{
+      "title" : "اسعار صرف العملات"
     }
   },
   "fees": {
@@ -96,6 +99,9 @@
     "updated": "تم تحديث المناقلة بنجاح",
     "update_error": "فشل تحديث المناقلة",
     "load_error": "فشل تحميل المناقلات",
+    "payment_currency": "عملة الدفع",
+    "paid_amount": "الكمية المدفوعة",
+    "confirm_payment": "تأكيد الدفع",
     "validation": {
       "type_required": "نوع المناقلة مطلوب",
       "value_required": "القيمة مطلوبة",
@@ -117,6 +123,7 @@
   "currency": {
     "name": "الاسم",
     "code": "الكود",
+    "picker_title": "اختر عملة",
     "symbol": "الرمز",
     "decimal_places": "عدد المنازل العشرية",
     "created_at": "تاريخ الإنشاء",

@@ -388,6 +388,7 @@
     "delete_title": "Delete Facility",
     "delete_message": "Are you sure you want to delete this facility?",
     "not_found": "Facility not found",
+    "loading": "Loading facility...",
     "load_error": "Failed to load facility",
     "back_to_dossier": "Back to Dossier",
     "edit_log": "Edit Log",

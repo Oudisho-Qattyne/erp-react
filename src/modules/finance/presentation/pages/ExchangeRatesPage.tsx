@@ -1,18 +1,22 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../core/presentation/hooks/data/useEntity';
 import type { ExchangeRate } from '../../domain/entities/ExchangeRate';
+import type { Currency } from '../../domain/entities/Currency';
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
 import { DataTable, type ColumnDef } from '../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { ErrorState } from '../../../../core/presentation/layouts/ui/state/ErrorState';
 import { Dialog } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { FilterDialog, type FilterField } from '../../../../core/presentation/layouts/ui/filter/FilterDialog';
-import { GenericCreateForm, type FieldConfig } from '../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
-import { AuditLog } from '../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
+import { GenericCreateForm } from '../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import Input from '../../../../core/presentation/layouts/ui/inputs/Input';
+import { inputBaseClasses } from '../../../../core/presentation/layouts/ui/inputs/styles';
 import { getCreateExchangeRateFormSchema } from '../schemas/exchangeRateForm.schema';
-import { Plus, Pencil, Trash2, History, Filter as FilterIcon } from 'lucide-react';
+import { buildExchangeRateFormFields, buildExchangeRateFormGroups } from '../forms/exchangeRateFormConfig';
+import { CurrencyPickerDialog } from '../components/CurrencyPickerDialog';
+import { getLocalizedName } from '../../../../core/presentation/utils/helpes';
+import { Plus, Pencil, Trash2, Search, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../core/presentation/utils/handleApiError';
 
@@ -20,6 +24,7 @@ const MODULE = 'finance';
 
 export function ExchangeRatesPage() {
   const { t } = useLanguage();
+
   const { entities: rates, create, update, remove, loadingMap, errorMap, list, pagination } = useEntityCrud<ExchangeRate>(
     '/financial-management/exchange-rates',
     '/financial-management/exchange-rates',
@@ -32,18 +37,32 @@ export function ExchangeRatesPage() {
     },
   );
 
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(false);
   const [editing, setEditing] = useState<ExchangeRate | null>(null);
   const [deleting, setDeleting] = useState<ExchangeRate | null>(null);
-  const [auditItem, setAuditItem] = useState<ExchangeRate | null>(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [localSearch, setLocalSearch] = useState('');
+
+  const { entities: currencies, create: createCurrency, getAll: loadCurrencies } = useEntityCrud<Currency & { id: number }>(
+    '/financial-management/currencies',
+    '/financial-management/currencies',
+  );
+
+  useEffect(() => {
+    loadCurrencies();
+  }, []);
+
+  const handleSearch = () => {
+    list?.setSearch(localSearch);
+    list?.setPage(1);
+  };
 
   const handleCreate = async (data: any) => {
     try {
       const res = await create(data);
       toast.success(t('exchange_rate.created', MODULE) || 'Exchange rate created successfully');
       list?.refresh();
-      setIsCreateOpen(false);
+      setIsAddOpen(false);
       return res;
     } catch (err: any) {
       handleApiError(err, { module: MODULE });
@@ -77,45 +96,17 @@ export function ExchangeRatesPage() {
     }
   };
 
-  const filterFields: FilterField[] = [
-    { name: 'from_currency_code', label: t('exchange_rate.from_currency_code', MODULE) || 'From Currency', type: 'text' },
-    { name: 'to_currency_code', label: t('exchange_rate.to_currency_code', MODULE) || 'To Currency', type: 'text' },
-    { name: 'effective_date', label: t('exchange_rate.effective_date', MODULE) || 'Effective Date', type: 'date' },
-    { name: 'effective_from', label: t('exchange_rate.effective_from', MODULE) || 'Effective From', type: 'date' },
-    { name: 'effective_to', label: t('exchange_rate.effective_to', MODULE) || 'Effective To', type: 'date' },
-  ];
-
-  const filterInitialValues = useMemo(() => {
-    const excluded = ['search', 'sortColumn', 'sortOrder'];
-    const entries = Object.entries(list?.filter ?? {}).filter(([k]) => !excluded.includes(k));
-    return Object.fromEntries(entries.map(([k, v]) => [k, v === undefined || v === null ? '' : v]));
-  }, [list?.filter]);
-
-  const handleApplyFilter = (values: Record<string, any>) => {
-    const parsed: Record<string, any> = {};
-    for (const [key, val] of Object.entries(values)) {
-      parsed[key] = val === '' || val === undefined ? undefined : val;
-    }
-    list?.setFilter(parsed);
-    setIsFilterOpen(false);
-  };
-
-  const handleResetFilter = () => {
-    list?.resetFilter();
-    setIsFilterOpen(false);
-  };
-
   const columns: ColumnDef<ExchangeRate>[] = [
     {
       key: 'from_currency_code',
-      label: t('exchange_rate.from_currency_code', MODULE) || 'From',
-      width: 140,
+      label: t('exchange_rate.from_currency_code', MODULE) || 'From Currency',
+      width: 160,
       sortable: true,
     },
     {
       key: 'to_currency_code',
-      label: t('exchange_rate.to_currency_code', MODULE) || 'To',
-      width: 140,
+      label: t('exchange_rate.to_currency_code', MODULE) || 'To Currency',
+      width: 160,
       sortable: true,
     },
     {
@@ -141,125 +132,168 @@ export function ExchangeRatesPage() {
     {
       key: 'actions',
       label: '',
-      width: 120,
+      width: 100,
       align: 'center',
       render: (row) => (
         <div className="flex items-center justify-center gap-1">
-          <button
-            type="button"
-            title={t('exchange_rate.edit', MODULE) || 'Edit'}
-            className="rounded-md p-2 text-text-muted hover:bg-surface-hover hover:text-primary"
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setEditing(row)}
+            title={t('exchange_rates.edit', MODULE) || 'Edit'}
+            requiredPermission="financial.exchange-rates.update"
           >
-            <Pencil className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            title={t('exchange_rate.audit', MODULE) || 'History'}
-            className="rounded-md p-2 text-text-muted hover:bg-surface-hover hover:text-primary"
-            onClick={() => setAuditItem(row)}
-          >
-            <History className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            title={t('exchange_rate.delete', MODULE) || 'Delete'}
-            className="rounded-md p-2 text-text-muted hover:bg-surface-hover hover:text-error"
+            <Pencil size={16} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setDeleting(row)}
+            title={t('exchange_rate.delete', MODULE) || 'Delete'}
+            requiredPermission="financial.exchange-rates.delete"
           >
-            <Trash2 className="h-4 w-4" />
-          </button>
+            <Trash2 size={16} className="text-danger" />
+          </Button>
         </div>
       ),
     },
   ];
 
-  const fields: FieldConfig<any>[] = [
-    { name: 'from_currency_code', label: t('exchange_rate.from_currency_code', MODULE) || 'From Currency', type: 'text', required: true, group: 'details' },
-    { name: 'to_currency_code', label: t('exchange_rate.to_currency_code', MODULE) || 'To Currency', type: 'text', required: true, group: 'details' },
-    { name: 'rate', label: t('exchange_rate.rate', MODULE) || 'Rate', type: 'number', required: true, group: 'details' },
-    { name: 'effective_date', label: t('exchange_rate.effective_date', MODULE) || 'Effective Date', type: 'date', required: true, group: 'details' },
+  const filterFields: FilterField[] = [
+    {
+      name: 'from_currency_code',
+      type: 'table-picker',
+      label: t('exchange_rate.from_currency_code', MODULE) || 'From Currency',
+      picker: CurrencyPickerDialog,
+      valueKey: 'code',
+      displayLabel: (code: any) => {
+        const c = currencies.find((x) => x.code === code)
+        return c ? `${getLocalizedName(c.name)} (${c.code})` : code || ''
+      },
+      pickerProps: { multiple: false },
+    },
+    {
+      name: 'to_currency_code',
+      type: 'table-picker',
+      label: t('exchange_rate.to_currency_code', MODULE) || 'To Currency',
+      picker: CurrencyPickerDialog,
+      valueKey: 'code',
+      displayLabel: (code: any) => {
+        const c = currencies.find((x) => x.code === code)
+        return c ? `${getLocalizedName(c.name)} (${c.code})` : code || ''
+      },
+      pickerProps: { multiple: false },
+    },
+    { name: 'effective_date', type: 'date', label: t('exchange_rate.effective_date', MODULE) || 'Effective Date' },
+    { name: 'effective_from', type: 'date', label: t('exchange_rate.effective_from', MODULE) || 'Effective From' },
+    { name: 'effective_to', type: 'date', label: t('exchange_rate.effective_to', MODULE) || 'Effective To' },
   ];
 
-  const groups = [
-    {
-      group: 'details',
-      title: t('exchange_rate.details', MODULE) || 'Details',
-      columns: 2,
-      rows: [['from_currency_code', 'to_currency_code'], ['rate', 'effective_date']],
-    },
-  ];
+  const handleApplyFilter = (values: Record<string, any>) => {
+    const parsed: Record<string, any> = { page: 1, per_page: list?.perPage };
+    for (const [key, val] of Object.entries(values)) {
+      if (val !== '' && val !== undefined) parsed[key] = val;
+    }
+    list?.setFilter(parsed);
+    setIsFilterOpen(false);
+  };
+
+  const filterInitialValues = useMemo(
+    () => ({
+      ...list?.filter,
+      search: list?.filter.search ?? '',
+    }),
+    [list?.filter],
+  );
+
+  const fields = buildExchangeRateFormFields(t, { currencies });
+  const groups = buildExchangeRateFormGroups(t);
 
   const editDefaultValues = editing
     ? {
         from_currency_code: editing.from_currency_code,
-        to_currency_code: editing.to_currency_code,
+        to_currency_code: 'SYP',
         rate: editing.rate,
         effective_date: editing.effective_date,
       }
     : undefined;
 
   return (
-    <div className="p-6">
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-text">{t('exchange_rates.title', MODULE) || 'Exchange Rates'}</h1>
-          <p className="mt-1 text-sm text-text-muted">
-            {t('exchange_rates.search_placeholder', MODULE) || 'Manage currency exchange rates'}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="secondary" onClick={() => setIsFilterOpen(true)}>
-            <FilterIcon className="h-4 w-4" /> {t('common.filter', 'shared') || 'Filter'}
-          </Button>
-          <Button variant="primary" onClick={() => setIsCreateOpen(true)}>
-            <Plus className="h-4 w-4" /> {t('exchange_rates.add', MODULE) || 'Add Exchange Rate'}
-          </Button>
-        </div>
-      </div>
-
-      <div className="mb-4 max-w-sm">
-        <Input
-          type="text"
-          value={list?.filter.search ?? ''}
-          onChange={(value: string) => list?.setSearch(value)}
-          placeholder={t('exchange_rates.search_placeholder', MODULE) || 'Search...'}
-        />
+    <div className="p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">{t('exchange_rates.title', MODULE) || 'Exchange Rates'}</h1>
+        <Button
+          variant="primary"
+          onClick={() => setIsAddOpen(true)}
+          leftIcon={<Plus size={16} />}
+          requiredPermission="financial.exchange-rates.add"
+        >
+          {t('exchange_rates.add', MODULE) || 'Add Exchange Rate'}
+        </Button>
       </div>
 
       {errorMap.list ? (
-        <ErrorState
-          message={errorMap.list}
-          retryLabel={t('common.retry', 'shared') || 'Retry'}
-          onRetry={() => list?.refresh()}
-        />
+        <ErrorState message={errorMap.list} onRetry={() => list?.refresh()} />
       ) : (
-        <DataTable<ExchangeRate>
-          columns={columns}
-          data={rates}
-          loading={loadingMap.list}
-          sortColumn={list?.filter.sortColumn}
-          sortOrder={list?.filter.sortOrder}
-          onSort={list?.setSort}
-          emptyMessage={t('exchange_rates.no_data', MODULE) || 'No exchange rates found'}
-          pagination={
-            list
-              ? {
-                  page: list.page,
-                  totalPages: pagination?.lastPage ?? 1,
-                  totalItems: pagination?.total ?? 0,
-                  onPageChange: list.setPage,
-                  itemsPerPage: list.perPage,
-                  onItemsPerPageChange: list.setPerPage,
-                }
-              : undefined
-          }
-        />
+        <div className="relative w-full">
+          <div className="relative flex gap-3 py-3">
+            {/* <div className="relative flex-1 max-w-sm">
+              <Input
+                type="text"
+                placeholder={t('exchange_rates.search_placeholder', MODULE) || 'Search...'}
+                value={localSearch}
+                onChange={(val) => setLocalSearch(val as string)}
+                baseClasses={inputBaseClasses}
+              />
+            </div>
+            <Button variant="primary" size="sm" onClick={handleSearch} leftIcon={<Search size={14} />}>
+              {t('common.search', 'shared') || 'Search'}
+            </Button> */}
+            <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
+              {t('common.filter', 'shared') || 'Filter'}
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => list?.resetFilter()}>
+              {t('common.reset', 'shared') || 'Reset'}
+            </Button>
+          </div>
+
+          <FilterDialog
+            isOpen={isFilterOpen}
+            fields={filterFields}
+            initialValues={filterInitialValues}
+            onFilter={handleApplyFilter}
+            onCancel={() => setIsFilterOpen(false)}
+            onReset={() => {
+              list?.resetFilter();
+              setIsFilterOpen(false);
+            }}
+          />
+
+          <DataTable<ExchangeRate>
+            columns={columns}
+            data={rates}
+            rowKey="id"
+            loading={loadingMap.getAll}
+            sortColumn={list?.filter.sortColumn}
+            sortOrder={list?.filter.sortOrder}
+            onSort={list?.setSort}
+            emptyMessage={t('exchange_rates.no_data', MODULE) || 'No exchange rates found'}
+            pagination={{
+              page: list?.page ?? 1,
+              totalPages: pagination?.lastPage ?? 1,
+              totalItems: pagination?.total ?? 0,
+              itemsPerPage: list?.perPage ?? 10,
+              onPageChange: (page: number) => list?.setPage(page),
+              onItemsPerPageChange: (size: number) => list?.setPerPage(size),
+              itemsPerPageOptions: [10, 25, 50, 100],
+            }}
+          />
+        </div>
       )}
 
       <Dialog
-        isOpen={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
+        isOpen={isAddOpen}
+        onClose={() => setIsAddOpen(false)}
         title={t('exchange_rates.add_title', MODULE) || 'Add New Exchange Rate'}
         size="md"
       >
@@ -267,9 +301,10 @@ export function ExchangeRatesPage() {
           schema={getCreateExchangeRateFormSchema(t)}
           fields={fields}
           groups={groups}
+          defaultValues={{ to_currency_code: 'SYP' }}
           onSubmit={handleCreate}
-          onSuccess={() => setIsCreateOpen(false)}
-          onCancel={() => setIsCreateOpen(false)}
+          onSuccess={() => setIsAddOpen(false)}
+          onCancel={() => setIsAddOpen(false)}
           submitLabel={t('exchange_rates.add', MODULE) || 'Add'}
         />
       </Dialog>
@@ -296,37 +331,14 @@ export function ExchangeRatesPage() {
 
       <ConfirmDialog
         isOpen={!!deleting}
-        title={t('exchange_rate.delete', MODULE) || 'Delete Exchange Rate'}
+        title={t('exchange_rate.delete', MODULE) || 'Delete'}
         message={t('exchange_rate.delete_confirm', MODULE) || 'Are you sure you want to delete this exchange rate?'}
-        confirmLabel={t('common.delete', 'shared') || 'Delete'}
         type="danger"
+        confirmLabel={t('common.delete', 'shared') || 'Delete'}
+        cancelLabel={t('common.cancel', 'shared') || 'Cancel'}
         confirmLoading={loadingMap.delete}
         onConfirm={handleDelete}
         onCancel={() => setDeleting(null)}
-      />
-
-      <AuditLog
-        isOpen={!!auditItem}
-        onClose={() => setAuditItem(null)}
-        module="finance"
-        model="exchange_rate"
-        modelId={auditItem?.id}
-        labels={{
-          created_at: t('audit.created_at', 'shared') || 'Created At',
-          event: t('audit.event', 'shared') || 'Event',
-          old_value: t('audit.old_value', 'shared') || 'Old Value',
-          new_value: t('audit.new_value', 'shared') || 'New Value',
-          changed_by: t('audit.actor', 'shared') || 'Actor',
-        }}
-      />
-
-      <FilterDialog
-        isOpen={isFilterOpen}
-        fields={filterFields}
-        initialValues={filterInitialValues}
-        onFilter={handleApplyFilter}
-        onCancel={() => setIsFilterOpen(false)}
-        onReset={handleResetFilter}
       />
     </div>
   );

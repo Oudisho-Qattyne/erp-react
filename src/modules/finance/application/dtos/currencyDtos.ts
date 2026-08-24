@@ -31,3 +31,18 @@ export interface CurrencyFilters {
   // Sent as sort_by[column]=asc|desc (default: created_at desc)
   sort_by?: Partial<Record<CurrencySortField, SortOrder>>;
 }
+
+export type CurrencyConversionAction = 'to_base' | 'from_base';
+
+export interface CurrencyConversionRequest {
+  action: CurrencyConversionAction;
+  currency_code: string;
+  amount: number;
+}
+
+export interface CurrencyConversionResult {
+  action: CurrencyConversionAction;
+  currency_code: string;
+  amount: number;
+  result: number;
+}

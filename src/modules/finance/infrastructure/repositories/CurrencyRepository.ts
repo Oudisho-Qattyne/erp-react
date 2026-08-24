@@ -1,6 +1,6 @@
 import type { ApiClient } from "../../../../core/domain/common/api/ApiClient";
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
-import type { CreateCurrencyDto, CurrencyFilters, UpdateCurrencyDto } from "../../application/dtos/currencyDtos";
+import type { CreateCurrencyDto, CurrencyConversionRequest, CurrencyConversionResult, CurrencyFilters, UpdateCurrencyDto } from "../../application/dtos/currencyDtos";
 import type { Currency } from "../../domain/entities/Currency";
 import type { ICurrencyRepository } from "../../domain/repositories/ICurrencyRepository";
 
@@ -36,5 +36,7 @@ export const createCurrencyRepository = (apiClient: ApiClient): ICurrencyReposit
       apiClient.put<DomainResponse<Currency>, UpdateCurrencyDto>(`${baseUrl}/${code}`, data, idempotencyConfig(idempotencyKey)),
     deleteCurrency: (currency, idempotencyKey) =>
       apiClient.delete<void>(`${baseUrl}/${currency.code}`, undefined, idempotencyConfig(idempotencyKey)),
+    convertCurrency: (data: CurrencyConversionRequest, idempotencyKey) =>
+      apiClient.post<DomainResponse<CurrencyConversionResult>, CurrencyConversionRequest>(`${baseUrl}/convert`, data, idempotencyConfig(idempotencyKey)),
   };
 };
