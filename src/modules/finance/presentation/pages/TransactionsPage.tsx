@@ -178,15 +178,15 @@ export function TransactionsPage() {
       render: (row) => row.transaction_value.toFixed(2) + " SYP",
     },
     { key: "reason", label: t("transaction.reason", MODULE) || "Reason", width: 240, render: (row) => row.reason || "—" },
-    {
-      key: "transactionable_type",
-      label: t("transaction.transactionable_type", MODULE) || "Transactionable Type",
-      width: 150,
-      render: (row) =>
-        row.transactionable_type
-          ? t(`transaction.transactionable_type_${row.transactionable_type}`, MODULE) || row.transactionable_type
-          : "—",
-    },
+    // {
+    //   key: "transactionable_type",
+    //   label: t("transaction.transactionable_type", MODULE) || "Transactionable Type",
+    //   width: 150,
+    //   render: (row) =>
+    //     row.transactionable_type
+    //       ? t(`transaction.transactionable_type_${row.transactionable_type}`, MODULE) || row.transactionable_type
+    //       : "—",
+    // },
     {
       key: "transactionable_id",
       label: t("transaction.transactionable_id", MODULE) || "Transactionable",
