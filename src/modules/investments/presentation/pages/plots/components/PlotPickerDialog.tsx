@@ -15,6 +15,7 @@ interface PlotPickerDialogProps {
   multiple?: boolean
   initialSelected?: Plot[]
   defaultFilter?: Record<string, any>
+  filterFields?: Partial<FilterField>[]
 }
 
 const parseFilterValues = (values: Record<string, any>) => {
@@ -35,12 +36,13 @@ export function PlotPickerDialog({
   multiple = false,
   initialSelected = [],
   defaultFilter,
+  filterFields: filterFieldsOverride,
 }: PlotPickerDialogProps) {
   const { t } = useLanguage()
   const { entities: plots, loadingMap, errorMap, pagination, list } = useEntityCrud<Plot>(
     isOpen ? '/investments/plots' : '',
     '/investments/plots',
-    { listState: true }
+    { listState: true , defaultFilter  } 
   )
   const { entities: areas, getAll: getAreas } = useEntityCrud<EntityWithNameOnly>('/investments/plot-areas', '/investments/plot-areas')
   const { entities: classifications, getAll: getClassifications } = useEntityCrud<EntityWithNameOnly>('/investments/plot-classifications', '/investments/plot-classifications')
@@ -87,7 +89,7 @@ export function PlotPickerDialog({
     { value: "separated", label: t("plot_status.separated", "investments") || "Separated" },
   ]
 
-  const filterFields: FilterField[] = [
+  const defaultFilterFields: FilterField[] = [
     { name: "status", label: t("plots.status", "investments") || "Status", type: "multi-select", options: statusOptions },
     { name: "plot_area_id", label: t("plots.plot_area_id", "investments") || "Region", type: "select", options: areas.map(a => ({ value: String(a.id), label: getLocalizedName(a.name) })) },
     { name: "plot_classification_id", label: t("plots.plot_classification_id", "investments") || "Classification", type: "select", options: classifications.map(c => ({ value: String(c.id), label: getLocalizedName(c.name) })) },
@@ -97,6 +99,15 @@ export function PlotPickerDialog({
     { name: "from_date", label: t("plots.from_date", "investments") || "From Date", type: "date" },
     { name: "to_date", label: t("plots.to_date", "investments") || "To Date", type: "date" },
   ]
+
+  const filterFields = useMemo(() => {
+    if (!filterFieldsOverride || filterFieldsOverride.length === 0) return defaultFilterFields
+    const overrideByName = new Map(filterFieldsOverride.map((f) => [f.name, f]))
+    return defaultFilterFields.map((f) => {
+      const override = overrideByName.get(f.name)
+      return override ? ({ ...f, ...override } as FilterField) : f
+    })
+  }, [filterFieldsOverride, defaultFilterFields, areas, classifications])
 
   const columns: ColumnDef<Plot>[] = [
     { key: "code", label: t("plots.code", "investments") || "Code", width: 120, sortable: true },

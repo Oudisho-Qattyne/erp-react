@@ -144,6 +144,45 @@
       "decimal_places_max": "Decimal places must be at most 8"
     }
   },
+  "exchange_rates": {
+    "title": "Exchange Rates",
+    "add": "Add Exchange Rate",
+    "add_title": "Add New Exchange Rate",
+    "edit_title": "Edit Exchange Rate",
+    "search_placeholder": "Search exchange rates...",
+    "no_data": "No exchange rates found"
+  },
+  "exchange_rate": {
+    "from_currency_code": "From Currency",
+    "to_currency_code": "To Currency",
+    "rate": "Rate",
+    "effective_date": "Effective Date",
+    "effective_from": "Effective From",
+    "effective_to": "Effective To",
+    "details": "Details",
+    "created_at": "Created At",
+    "edit": "Edit",
+    "delete": "Delete",
+    "audit": "History",
+    "delete_confirm": "Are you sure you want to delete this exchange rate?",
+    "created": "Exchange rate created successfully",
+    "create_error": "Failed to create exchange rate",
+    "updated": "Exchange rate updated successfully",
+    "update_error": "Failed to update exchange rate",
+    "deleted": "Exchange rate deleted successfully",
+    "delete_error": "Failed to delete exchange rate",
+    "load_error": "Failed to load exchange rates",
+    "validation": {
+      "from_currency_code_required": "Source currency code is required",
+      "from_currency_code_max": "Code must be at most 10 characters",
+      "to_currency_code_required": "Target currency code is required",
+      "to_currency_code_max": "Code must be at most 10 characters",
+      "rate_required": "Rate is required",
+      "rate_invalid": "Rate must be a number",
+      "rate_positive": "Rate must be positive",
+      "effective_date_required": "Effective date is required"
+    }
+  },
   "notifications": {
     "subscription_request_transaction_created_title": "Subscription request transaction created",
     "subscription_request_transaction_created_description": "A transaction was created for the subscription request",

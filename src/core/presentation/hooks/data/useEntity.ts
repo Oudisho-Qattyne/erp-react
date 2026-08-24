@@ -64,6 +64,8 @@ export interface UseEntityCrudOptions {
   /** Column used as the initial sort (e.g. 'name' for lookups). Omit for no initial sort. */
   defaultSortColumn?: string;
   defaultSortOrder?: 'asc' | 'desc';
+  /** Initial filter applied to the list (e.g. { status: 'active' }). `resetFilter` returns to this. */
+  defaultFilter?: ListStateFilter;
   /** Send page/per_page query params. Default true. Set false for lookup-style lists. */
   paginate?: boolean;
   /** Debounce list refetches (ms). Default 0 (immediate). */
@@ -161,10 +163,17 @@ export function useEntityCrud<T extends { id: number }>(
   const defaultPerPage = options?.defaultPerPage ?? 25;
   const defaultSortColumn = options?.defaultSortColumn;
   const defaultSortOrder = options?.defaultSortOrder ?? 'asc';
+  const defaultFilterOption = options?.defaultFilter;
+  const initialSortColumn = defaultSortColumn ?? defaultFilterOption?.sortColumn;
+  const initialSortOrder = defaultSortOrder ?? defaultFilterOption?.sortOrder ?? 'asc';
   const paginate = options?.paginate ?? true;
   const debounceMs = options?.debounceMs ?? 0;
 
-  const [filter, setFilterState] = useState<ListStateFilter>({ sortColumn: defaultSortColumn, sortOrder: defaultSortOrder });
+  const [filter, setFilterState] = useState<ListStateFilter>(() => ({
+    ...(defaultFilterOption ?? {}),
+    sortColumn: initialSortColumn,
+    sortOrder: initialSortOrder,
+  }));
   const [page, setPageState] = useState(1);
   const [perPage, setPerPageState] = useState(defaultPerPage);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -194,8 +203,12 @@ export function useEntityCrud<T extends { id: number }>(
 
   const resetFilter = useCallback(() => {
     setPageState(1);
-    setFilterState({ sortColumn: defaultSortColumn, sortOrder: defaultSortOrder });
-  }, [defaultSortColumn, defaultSortOrder]);
+    setFilterState({
+      ...(defaultFilterOption ?? {}),
+      sortColumn: initialSortColumn,
+      sortOrder: initialSortOrder,
+    });
+  }, [defaultFilterOption, initialSortColumn, initialSortOrder]);
 
   const refresh = useCallback(() => setRefreshKey((k) => k + 1), []);
 

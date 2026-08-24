@@ -61,6 +61,10 @@ export function CreateSubscriptionPage() {
       group: 'plot',
       picker: PlotPickerDialog,
       labelKey: 'code',
+      pickerProps: {
+        defaultFilter: { status: ['announced', 'subscribed'] },
+        filterFields: [{ name: 'status', disabled: true }],
+      },
     },
     {
       name: 'investors',
@@ -124,7 +128,7 @@ export function CreateSubscriptionPage() {
           daily_production_capacities: (data.daily_production_capacities as ProductionCapacityRow[] | undefined) ?? [],
           monthly_production_capacities: (data.monthly_production_capacities as ProductionCapacityRow[] | undefined) ?? [],
           yearly_production_capacities: (data.yearly_production_capacities as ProductionCapacityRow[] | undefined) ?? [],
-          daily_consumption: ((data.daily_consumption as { material: number; consumption: string }[] | undefined) ?? []).map(row => ({ id: row.material, consumption: row.consumption })),
+          daily_consumption: ((data.daily_consumption as { id: number; consumption: string }[] | undefined) ?? []).map(row => ({ id: row.id, consumption: row.consumption })),
           electrical_power_capacity: String(data.electrical_power_capacity ?? ''),
           yearly_estimated_drinking_water_consumption: Number(data.yearly_estimated_drinking_water_consumption),
           yearly_estimated_industrial_water_consumption: Number(data.yearly_estimated_industrial_water_consumption),

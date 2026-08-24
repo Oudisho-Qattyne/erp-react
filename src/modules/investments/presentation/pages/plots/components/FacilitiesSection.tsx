@@ -21,6 +21,7 @@ import { getLocalizedName } from '../../../../../../core/presentation/utils/help
 import { Factory, Plus, Eye, Pencil, Trash2, History, Search, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
+import { LoadingState } from '../../../../../../core/presentation/layouts/ui/state/LoadingState';
 
 interface FacilitiesSectionProps {
   plotId: string;
@@ -30,27 +31,39 @@ interface FacilitiesSectionProps {
 export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps) {
   const { t } = useLanguage();
 
-  const { entities: facilities, create, update, remove, loadingMap, errorMap, list, pagination } = useEntityCrud<Facility>(
+  const { entities: facilities, create, update, remove, loadingMap, errorMap, list, pagination , getById:getFacilityById } = useEntityCrud<Facility>(
     `/investments/facilities?plot_id=${plotId}&plot_dossier_id=${dossierId}`,
     '/investments/facilities',
     { listState: true }
   );
-  const { entities: partnershipTypes, getAll: getPartnershipTypes, create: createPartnershipType } = useEntityCrud<PartnershipType>('/investments/partnership-types', '/investments/partnership-types');
+  const { entities: partnershipTypes, getAll: laodPartnershipTypes, create: createPartnershipType } = useEntityCrud<PartnershipType>('/investments/partnership-types', '/investments/partnership-types');
   const { entities: countries, getAll: loadCountries, create: createCountry } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
   const { entities: consumptionMaterials, getAll: loadConsumptionMaterials, create: createConsumptionMaterial } = useEntityCrud<ConsumptionMaterial>('/investments/consumable-materials', '/investments/consumable-materials');
 
   const [localSearch, setLocalSearch] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingFacility, setEditingFacility] = useState<Facility | null>(null);
+  const [faclitiy , setFacility] = useState<Facility | null>(null) 
   const [deletingFacility, setDeletingFacility] = useState<Facility | null>(null);
   const [auditItem, setAuditItem] = useState<Facility | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
 
   useEffect(() => {
-    getPartnershipTypes()
+    loadConsumptionMaterials()
+    laodPartnershipTypes()
     loadCountries()
   } ,[])
+
+  useEffect(() => {
+    const fetchFacilityById = async () => {
+      if(editingFacility){
+        const res = await getFacilityById(editingFacility.id)
+        setFacility(res.data)
+      }
+    }
+    fetchFacilityById()
+  } , [editingFacility])
   const handleSearch = () => {
     list.setSearch(localSearch);
   };
@@ -94,7 +107,7 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
     }
   };
 
-  const fields = buildFacilityFormFields(t, { partnershipTypes, createPartnershipType, countries, loadCountries, createCountry, consumptionMaterials, loadConsumptionMaterials, createConsumptionMaterial });
+  const fields = buildFacilityFormFields(t, { partnershipTypes , createPartnershipType, countries, loadCountries, createCountry, consumptionMaterials, loadConsumptionMaterials, createConsumptionMaterial });
   const formGroups = buildFacilityFormGroups(t);
 
   const filterFields: FilterField[] = [
@@ -284,11 +297,14 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
 
       <Dialog size='3xl' isOpen={!!editingFacility} onClose={() => setEditingFacility(null)} title={t('facilities.edit', 'investments') || 'Edit Facility'}>
         {editingFacility && (
+          loadingMap['getById'] || !faclitiy ?
+          <LoadingState />
+          :
           <GenericCreateForm
             schema={getCreateFacilityFormSchema(t)}
             fields={fields}
             groups={formGroups}
-            defaultValues={buildFacilityDefaultValues(editingFacility)}
+            defaultValues={buildFacilityDefaultValues(faclitiy)}
             onSubmit={handleUpdate}
             onSuccess={() => setEditingFacility(null)}
             onCancel={() => setEditingFacility(null)}

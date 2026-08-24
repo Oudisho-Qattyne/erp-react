@@ -1,4 +1,4 @@
-import { Wallet, Receipt, ArrowLeftRight, Coins, Settings } from 'lucide-react';
+import { Wallet, Receipt, ArrowLeftRight, Coins, Settings, Scale } from 'lucide-react';
 import { Navigate } from 'react-router-dom';
 import type { Module } from '../../core/moduleRegistry';
 import { registerNotificationHandler } from '../../core/registry/notifications/notificationRegistry';
@@ -6,6 +6,7 @@ import type { Notification } from '../../core/domain/entities/notification/notif
 import { FeesPage } from './presentation/pages/FeesPage';
 import { TransactionsPage } from './presentation/pages/TransactionsPage';
 import { CurrenciesPage } from './presentation/pages/CurrenciesPage';
+import { ExchangeRatesPage } from './presentation/pages/ExchangeRatesPage';
 import enLocales from './presentation/locales/en.json';
 import arLocales from './presentation/locales/ar.json';
 
@@ -199,7 +200,20 @@ const financeModule: Module = {
       moduleName: 'finance',
       icon: <Settings size={18} />,
       group: 'finance',
-      requiredPermission: ['financial.payment-fees.list', 'financial.currencies.list'],
+      requiredPermission: ['financial.payment-fees.list', 'financial.currencies.list', 'financial.exchange-rates.list'],
+    },
+    {
+      path: '/finance/exchange-rates',
+      element: <ExchangeRatesPage />,
+      layout: 'dashboard',
+      label: 'exchange_rates.title',
+      nav: true,
+      order: 29,
+      moduleName: 'finance',
+      icon: <Scale size={18} />,
+      group: 'finance',
+      parentNav: '/finance/settings',
+      requiredPermission: 'financial.exchange-rates.list',
     },
   ],
   locales: { en: enLocales, ar: arLocales },

@@ -3,6 +3,7 @@ import type { Plot } from "./plot";
 import type { PartnershipType } from "./partnershipType";
 import type { AuthorizedPerson } from "./authorizedPerson";
 import type { ConsumptionMaterial } from "./consumptionMaterial";
+import type { Country } from "../../../../core/domain/entities/regions/Country";
 
 export interface ProductionCapacityRow {
   material: string;
@@ -29,6 +30,7 @@ export interface Facility {
   commercial_register?: string;
   commercial_register_date?: string;
   company_nationality_id?: number;
+  company_nationality: Country;
   first_phone_number: string;
   second_phone_number?: string;
   email?: string;
