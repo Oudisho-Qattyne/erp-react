@@ -15,6 +15,10 @@ export interface Transaction {
   reason?: string;
   transactionable_type?: TransactionableType;
   transactionable_id?: number;
+  transactionable?: Record<string, any>;
+  sourceable_type?: string;
+  sourceable_id?: number;
+  sourceable?: Record<string, any>;
   created_at?: string;
   updated_at?: string;
 }

@@ -15,6 +15,7 @@ import type { TransactionFilters } from "../../application/dtos/transactionDtos"
 import { Dialog } from "../../../../core/presentation/layouts/ui/dialog/Dialog"
 import { GenericCreateForm } from "../../../../core/presentation/layouts/ui/forms/GenericCreateForm"
 import { getApproveTransactionSchema, buildApproveTransactionFields } from "../forms/transactionApprovalFormConfig"
+import { useTransactionableDetails } from "../../../../core/registry/transactionable/TransactionableProvider"
 import { Search, Filter, Plus, Check, X } from "lucide-react"
 
 const MODULE = "finance"
@@ -68,6 +69,36 @@ export function TransactionsPage() {
     findAllCurrencies,
     convertCurrency,
   } = useCurrencies()
+
+  const transactionableDetails = useTransactionableDetails()
+
+  const getLinkedTypeLabel = (type: string): string => {
+    const name = type.split("\\").pop() || type
+    const readable = name.replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    return t(`transaction.linked_${name}`, MODULE) || readable
+  }
+
+  const renderLinkedEntity = (type: string | undefined, entity: Record<string, any> | undefined) => {
+    if (!type) return "—"
+    const config = transactionableDetails.getTransactionableRoute(type)
+    if (!config || !entity) return <span>{entity?.id ?? "—"}</span>
+    const label = getLinkedTypeLabel(type)
+    return (
+      <Button
+        variant="ghost"
+        size="sm"
+        requiredPermission={config.permission}
+        className="underline underline-offset-2 hover:text-primary px-0"
+        onClick={(e) => {
+          e.stopPropagation()
+          window.open(config.resolve(entity), "_blank")
+        }}
+      >
+        {label}
+        {entity.id != null && <span className="text-text-muted"> #{entity.id}</span>}
+      </Button>
+    )
+  }
 
   const handleSearch = () => {
     setFilter({ search: localSearch, page: 1 })
@@ -159,8 +190,14 @@ export function TransactionsPage() {
     {
       key: "transactionable_id",
       label: t("transaction.transactionable_id", MODULE) || "Transactionable",
+      width: 130,
+      render: (row) => renderLinkedEntity(row.transactionable_type, row.transactionable),
+    },
+    {
+      key: "sourceable",
+      label: t("transaction.sourceable", MODULE) || "Source",
       width: 110,
-      render: (row) => row.transactionable_id ?? "—",
+      render: (row) => renderLinkedEntity(row.sourceable_type, row.sourceable),
     },
     {
       key: "actions",

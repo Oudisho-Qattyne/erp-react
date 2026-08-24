@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom';
 import { Map, List, FileCheck, BadgeCheck, Tags, Layers, Flag, SlidersHorizontal, Coins, Handshake, Package } from 'lucide-react';
 import type { Module } from '../../core/moduleRegistry';
 import { registerPersonDetailRoute } from '../../core/registry/person/personRegistry';
+import { registerTransactionableRoute } from '../../core/registry/transactionable/transactionableRegistry';
 import { PlotAreasPage } from './presentation/pages/plot-areas/PlotAreasPage';
 import { PlotClassificationsPage } from './presentation/pages/plot-classifications/PlotClassificationsPage';
 import { PlotsPage } from './presentation/pages/plots/PlotsPage';
@@ -42,6 +43,12 @@ registerPersonDetailRoute({
   routePattern: '/investments/investors/:id/edit',
   resolve: (id) => `/investments/investors/${id}/edit`,
   permission: 'investments.investors.update',
+});
+
+registerTransactionableRoute({
+  type: 'App\\Modules\\Investments\\Domain\\Entities\\PlotDossier',
+  resolve: (entity) => `/investments/plots/${entity.plot_id}/dossiers/${entity.id}`,
+  permission: 'investments.plot-dossier.view',
 });
 
 const investmentsModule: Module = {

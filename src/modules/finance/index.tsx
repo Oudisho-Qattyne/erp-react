@@ -2,6 +2,7 @@ import { Wallet, Receipt, ArrowLeftRight, Coins, Settings, Scale } from 'lucide-
 import { Navigate } from 'react-router-dom';
 import type { Module } from '../../core/moduleRegistry';
 import { registerNotificationHandler } from '../../core/registry/notifications/notificationRegistry';
+import { registerTransactionableRoute } from '../../core/registry/transactionable/transactionableRegistry';
 import type { Notification } from '../../core/domain/entities/notification/notification';
 import { FeesPage } from './presentation/pages/FeesPage';
 import { TransactionsPage } from './presentation/pages/TransactionsPage';
@@ -147,6 +148,12 @@ registerNotificationHandler('transaction_canceled.subscription_reqeust', {
   },
   data: (notification: Notification): SubscriptionTransactionPayload | null =>
     (notification.data?.payload as SubscriptionTransactionPayload | null) ?? null,
+});
+
+registerTransactionableRoute({
+  type: 'App\\Modules\\FinancialManagement\\Domain\\Entities\\PaymentFee',
+  resolve: () => `/finance/fees`,
+  permission: 'financial.payment-fees.list',
 });
 
 const financeModule: Module = {
