@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useMemo } from "react"
 import { useEntityCrud } from "../../../../../../core/presentation/hooks/data/useEntity"
 import { useLanguage } from "../../../../../../core/presentation/context/i18n/I18nProvider"
 import { SelectFromTable } from "../../../../../../core/presentation/layouts/ui/picker/SelectFromTable"
@@ -15,6 +15,15 @@ interface DossierPickerDialogProps {
   defaultFilter?: Record<string, any>
 }
 
+const parseFilterValues = (values: Record<string, any>) => {
+  const parsed: Record<string, any> = {}
+  for (const [key, val] of Object.entries(values)) {
+    if (val === "" || val === undefined) continue
+    parsed[key] = val
+  }
+  return parsed
+}
+
 export function DossierPickerDialog({
   isOpen,
   onClose,
@@ -24,81 +33,39 @@ export function DossierPickerDialog({
   defaultFilter,
 }: DossierPickerDialogProps) {
   const { t } = useLanguage()
-  const { entities: dossiers, getAll, loadingMap, errorMap, pagination } = useEntityCrud<Dossier>('/investments/dossiers', '/investments/dossiers')
-
-  const [searchQuery, setSearchQuery] = useState("")
-  const [sortBy, setSortBy] = useState<string | undefined>(undefined)
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
-  const [page, setPage] = useState(1)
-  const [perPage, setPerPage] = useState(25)
-  const [filterValues, setFilterValues] = useState<Record<string, any>>({})
-
-  const fetchDossiers = (params: Record<string, any> = {}) => {
-    const sp = new URLSearchParams()
-    if (params.search) sp.append("search", params.search)
-    if (params.sortColumn) sp.append(`sort_by[${params.sortColumn}]`, params.sortOrder)
-    if (params.page) sp.append("page", String(params.page))
-    if (params.per_page) sp.append("per_page", String(params.per_page))
-    Object.entries(params).forEach(([k, v]) => {
-      if (!["search", "sortColumn", "sortOrder", "page", "per_page"].includes(k) && v !== "" && v !== undefined) {
-        sp.append(k, String(v))
-      }
-    })
-    getAll(`/investments/dossiers?${sp.toString()}`)
-  }
-
-  useEffect(() => {
-    if (isOpen && !defaultFilter) {
-      fetchDossiers({ page: 1, per_page: perPage })
-    }
-  }, [isOpen, defaultFilter])
+  const { entities: dossiers, loadingMap, errorMap, pagination, list } = useEntityCrud<Dossier>(
+    isOpen ? '/investments/dossiers' : '',
+    '/investments/dossiers',
+    { listState: true }
+  )
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query)
-    setPage(1)
-    fetchDossiers({ ...filterValues, search: query, sortColumn: sortBy, sortOrder, page: 1, per_page: perPage })
+    list?.setSearch(query)
   }
 
   const handleSort = (columnKey: string) => {
-    const newOrder = sortBy === columnKey && sortOrder === "asc" ? "desc" : "asc"
-    setSortBy(columnKey)
-    setSortOrder(newOrder)
-    setPage(1)
-    fetchDossiers({ ...filterValues, search: searchQuery, sortColumn: columnKey, sortOrder: newOrder, page: 1, per_page: perPage })
+    list?.setSort(columnKey)
   }
 
   const handleApplyFilter = (values: Record<string, any>) => {
-    const parsed: Record<string, any> = {}
-    for (const [key, val] of Object.entries(values)) {
-      if (val === "" || val === undefined) continue
-      parsed[key] = val
-    }
-    setFilterValues({ page: 1, per_page: perPage, ...parsed })
-    setPage(1)
-    fetchDossiers({ ...parsed, search: searchQuery, sortColumn: sortBy, sortOrder, page: 1, per_page: perPage })
+    list?.setFilter(parseFilterValues(values))
   }
 
   const handleResetFilter = () => {
-    setFilterValues({})
-    setPage(1)
-    fetchDossiers({ search: searchQuery, sortColumn: sortBy, sortOrder, page: 1, per_page: perPage })
+    const { search, sortColumn, sortOrder } = list?.filter ?? {}
+    list?.resetFilter()
+    if (search) list?.setSearch(search)
+    if (sortColumn) list?.setFilter({ sortColumn, sortOrder })
   }
 
   const handleApplyDefaultFilter = (parsed: Record<string, any>) => {
-    setFilterValues({ page: 1, per_page: perPage, ...parsed })
-    fetchDossiers({ ...parsed, search: searchQuery, sortColumn: sortBy, sortOrder, page: 1, per_page: perPage })
+    list?.setFilter(parsed)
   }
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage)
-    fetchDossiers({ ...filterValues, search: searchQuery, sortColumn: sortBy, sortOrder, page: newPage, per_page: perPage })
-  }
-
-  const handlePerPageChange = (size: number) => {
-    setPerPage(size)
-    setPage(1)
-    fetchDossiers({ ...filterValues, search: searchQuery, sortColumn: sortBy, sortOrder, page: 1, per_page: size })
-  }
+  const filterInitialValues = useMemo(
+    () => Object.fromEntries(Object.entries(list?.filter ?? {}).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k))),
+    [list?.filter]
+  )
 
   const statusOptions = [
     { value: "draft", label: t("dossier.status_draft", "investments") || "Draft" },
@@ -141,23 +108,23 @@ export function DossierPickerDialog({
       rowKey="id"
       isLoading={loadingMap["getAll"]}
       error={errorMap["getAll"]}
-      onRetry={() => fetchDossiers({ ...filterValues, search: searchQuery, sortColumn: sortBy, sortOrder, page, per_page: perPage })}
+      onRetry={() => list?.refresh()}
       onSearch={handleSearch}
       searchPlaceholder={t("common.search", "shared") || "Search..."}
-      searchInitialValue={searchQuery}
+      searchInitialValue={list?.filter.search ?? ""}
       filterFields={filterFields}
-      filterValues={filterValues}
+      filterValues={filterInitialValues as Record<string, any>}
       onApplyFilter={handleApplyFilter}
       onResetFilter={handleResetFilter}
-      sortColumn={sortBy}
-      sortOrder={sortOrder}
+      sortColumn={(list?.filter.sortColumn as any) ?? ""}
+      sortOrder={list?.filter.sortOrder ?? "asc"}
       onSort={handleSort}
-      page={page}
-      perPage={perPage}
+      page={list?.page ?? 1}
+      perPage={list?.perPage ?? 25}
       totalPages={pagination?.lastPage || 1}
       totalItems={pagination?.total || 0}
-      onPageChange={handlePageChange}
-      onPerPageChange={handlePerPageChange}
+      onPageChange={(p: number) => list?.setPage(p)}
+      onPerPageChange={(size: number) => list?.setPerPage(size)}
       emptyMessage={t("dossier.no_records", "investments") || "No dossiers found"}
     />
   )

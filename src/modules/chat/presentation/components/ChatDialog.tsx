@@ -10,7 +10,6 @@ import type { Conversation } from "../../domain/entities/Conversation"
 import type { Message } from "../../domain/entities/Message"
 import type { SendMessageDto } from "../../application/dtos/SendMessageDto"
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse"
-import type { DpomainResponsePaginated } from "../../../hr/domain/entities/common/DomainResponsePaginated"
 
 interface ChatDialogProps {
   isOpen: boolean

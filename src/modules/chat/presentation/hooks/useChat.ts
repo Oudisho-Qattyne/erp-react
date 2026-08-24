@@ -12,7 +12,6 @@ import type { ChatUser } from "../../domain/entities/ChatUser"
 import type { SendMessageDto } from "../../application/dtos/SendMessageDto"
 import type { MessageEventData, ConversationEventData } from "../../application/dtos/chatEventData"
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse"
-import type { DpomainResponsePaginated } from "../../../hr/domain/entities/common/DomainResponsePaginated"
 import { playSentSound, playReceivedSound } from "../../../../core/infrastructure/audio/chatSounds"
 import { useIdempotency } from "../../../../core/presentation/hooks/useIdempotency"
 

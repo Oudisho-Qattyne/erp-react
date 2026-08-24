@@ -96,21 +96,20 @@ export const getCreateFacilityFormSchema = (t: (key: string, module?: string) =>
   authorized_persons: z.array(getAuthorizedPersonSchema(t)).optional(),
   require_all_persons_for_legal_matters: z.boolean().optional().default(true),
 }).superRefine((data, ctx) => {
-  if (data.company_type === 'existing') {
-    if (!data.commercial_register?.trim()) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['commercial_register'],
-        message: t('facilities.validation.commercial_register_required', 'investments') || 'Commercial Register is required',
-      });
-    }
-    if (!data.commercial_register_date?.trim()) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['commercial_register_date'],
-        message: t('facilities.validation.commercial_register_date_required', 'investments') || 'Commercial Register Date is required',
-      });
-    }
+  if (data.company_type !== 'existing') return;
+  if (!data.commercial_register?.trim()) {
+    ctx.addIssue({
+      code: "custom",
+      path: ['commercial_register'],
+      message: t('facilities.validation.commercial_register_required', 'investments') || 'Commercial Register is required',
+    });
+  }
+  if (!data.commercial_register_date?.trim()) {
+    ctx.addIssue({
+      code: "custom",
+      path: ['commercial_register_date'],
+      message: t('facilities.validation.commercial_register_date_required', 'investments') || 'Commercial Register Date is required',
+    });
   }
 });
 

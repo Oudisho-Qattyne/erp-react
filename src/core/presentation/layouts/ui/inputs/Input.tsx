@@ -2,16 +2,17 @@ import React, { useContext, useMemo, useState } from 'react';
 import { CustomSelect } from './CustomSelect';
 import { SelectOrCreate } from './SelectOrCreate';
 import { MultiSelectOrCreate } from './MultiSelectOrCreate';
+import { MultiSelect } from './MultiSelect';
 import { DatePicker } from './DatePicker';
 import { TimePicker } from './TimePicker';
 import { DateTimePicker } from './DateTimePicker';
 import { DataMatrixInput, type MatrixFieldConfig } from './DataMatrixInput';
 import { TablePickerInput } from './TablePickerInput';
-import type { PickerConfig } from '../picker/pickerTypes';
+import type { PickerComponent } from '../picker/pickerTypes';
 import { Toggle, type ToggleSize, type ToggleVariant } from './Toggle';
 import { Info, Eye, EyeOff } from 'lucide-react';
 import { AuthContext } from '../../../../infrastructure/auth/AuthProvider';
-export type InputType = 'text' | 'number' | 'numeric' | 'alpha' | 'alphanumeric' | 'decimal' | 'email' | 'password' | 'textarea' | 'date' | 'time' | 'datetime' | 'select' | 'select-or-create' | 'multi-select-or-create' | 'data-matrix' | 'table-picker' | 'checkbox' | 'toggle';
+export type InputType = 'text' | 'number' | 'numeric' | 'alpha' | 'alphanumeric' | 'decimal' | 'email' | 'password' | 'textarea' | 'date' | 'time' | 'datetime' | 'select' | 'select-or-create' | 'multi-select' | 'multi-select-or-create' | 'data-matrix' | 'table-picker' | 'checkbox' | 'toggle';
 
 interface InputProps {
   type: InputType;
@@ -50,7 +51,11 @@ interface InputProps {
   matrixErrors?: Record<number, Record<string, string>>;
   rowSchema?: { safeParse: (data: any) => { success: boolean; error?: { flatten: () => { fieldErrors: Record<string, string[]> } } } };
   // For table-picker
-  pickerConfig?: PickerConfig | null;
+  picker?: PickerComponent | null;
+  pickerProps?: Record<string, any>;
+  valueKey?: string;
+  labelKey?: string;
+  displayLabel?: string | ((value: any) => string);
   infoButton?: () => void | null;
   requiredPermission?: string | string[];
   createButtonPermission?: string | string[];
@@ -116,7 +121,11 @@ const InputTypes: React.FC<InputProps> = ({
   maxRows,
   matrixErrors,
   rowSchema,
-  pickerConfig,
+  picker,
+  pickerProps,
+  valueKey,
+  labelKey,
+  displayLabel,
   createButtonPermission,
   toggleVariant,
   toggleSize,
@@ -193,9 +202,9 @@ const InputTypes: React.FC<InputProps> = ({
         />
       );
 
-    case 'multi-select-or-create':
+    case 'multi-select':
       return (
-        <MultiSelectOrCreate
+        <MultiSelect
           value={value ?? []}
           onChange={onChange}
           options={finalOptions}
@@ -203,11 +212,7 @@ const InputTypes: React.FC<InputProps> = ({
           disabled={finalDisabled}
           required={finalRequired}
           searchable={searchable}
-          createTitle={createTitle}
-          renderCreateForm={renderCreateForm}
-          dependentData={dependentData}
           baseClasses={localClass}
-          labelPath={labelPath}
         />
       );
 
@@ -233,7 +238,11 @@ const InputTypes: React.FC<InputProps> = ({
         <TablePickerInput
           value={value}
           onChange={onChange}
-          pickerConfig={pickerConfig}
+          picker={picker}
+          pickerProps={pickerProps}
+          valueKey={valueKey}
+          labelKey={labelKey}
+          displayLabel={displayLabel}
           placeholder={finalPlaceholder}
           disabled={finalDisabled}
           baseClasses={localClass}

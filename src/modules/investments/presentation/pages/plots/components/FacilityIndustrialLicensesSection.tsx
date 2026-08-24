@@ -30,10 +30,10 @@ interface FacilityIndustrialLicensesSectionProps {
 export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndustrialLicensesSectionProps) {
   const { t } = useLanguage();
 
-  const { entities: licenses, create, update, remove, loadingMap, errorMap, list } = useEntityCrud<FacilityIndustrialLicense>(
+  const { entities: licenses, create, update, remove, loadingMap, errorMap, list, pagination } = useEntityCrud<FacilityIndustrialLicense>(
     `/investments/facility-industrial-licenses?facility_id=${facilityId}`,
     '/investments/facility-industrial-licenses',
-    { listState: true, paginate: false }
+    { listState: true }
   );
 
   const { entities: categories, getAll: getCategories, create: createCategory } = useEntityCrud<IndustryCategory>('/investments/industry-categories', '/investments/industry-categories');
@@ -265,6 +265,15 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
             sortColumn={list.filter.sortColumn}
             sortOrder={list.filter.sortOrder}
             onSort={list.setSort}
+            pagination={{
+              page: pagination?.currentPage || 1,
+              totalPages: pagination?.lastPage || 1,
+              totalItems: pagination?.total || 0,
+              onPageChange: list.setPage,
+              itemsPerPage: list.perPage,
+              onItemsPerPageChange: (size: number) => list.setPerPage(size),
+              itemsPerPageOptions: [10, 25, 50, 100],
+            }}
           />
         )}
       </SectionCard>

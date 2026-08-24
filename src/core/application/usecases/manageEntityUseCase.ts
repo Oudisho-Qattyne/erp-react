@@ -1,4 +1,4 @@
-import type { DpomainResponsePaginated } from "../../../modules/hr/domain/entities/common/DomainResponsePaginated";
+import type { DomainResponse } from "../../domain/common/responce/DomainResponse";
 import type { ICrudRepository } from "../../domain/repositories/ICrudRepository";
 import type { ManageEntityUsecase } from "../../domain/usecase/IManageUseCase";
 
@@ -9,7 +9,7 @@ export function createManageEntityUsecase<T,TCreate , TUpdate, ID = number>(
   validator?: EntityValidator<TCreate | TUpdate>
 ): ManageEntityUsecase<T,TCreate , TUpdate, ID> {
   return {
-    async getAll(params?: Record<string, string | boolean | number>): Promise<DpomainResponsePaginated<T[]>> {
+    async getAll(params?: Record<string, string | boolean | number>): Promise<DomainResponse<T[]>> {
       try {
         return await repository.findAll(params);
       } catch (error : any) {
@@ -17,7 +17,7 @@ export function createManageEntityUsecase<T,TCreate , TUpdate, ID = number>(
       }
     },
 
-    async getById(id: ID): Promise<DpomainResponsePaginated<T> | null> {
+    async getById(id: ID): Promise<DomainResponse<T> | null> {
       try {
         return await repository.findById(id);
       } catch (error : any) {
@@ -26,7 +26,7 @@ export function createManageEntityUsecase<T,TCreate , TUpdate, ID = number>(
       }
     },
 
-    async create(data: TCreate, idempotencyKey?: string): Promise<DpomainResponsePaginated<T>> {
+    async create(data: TCreate, idempotencyKey?: string): Promise<DomainResponse<T>> {
       if (validator) {
         await validator(data);
       }
@@ -37,7 +37,7 @@ export function createManageEntityUsecase<T,TCreate , TUpdate, ID = number>(
       }
     },
 
-    async update(id: ID, data: TUpdate, idempotencyKey?: string): Promise<DpomainResponsePaginated<T>> {
+    async update(id: ID, data: TUpdate, idempotencyKey?: string): Promise<DomainResponse<T>> {
       try {
         return await repository.update(id, data, idempotencyKey);
       } catch (error : any) {

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { DpomainResponsePaginated } from '../../../../modules/hr/domain/entities/common/DomainResponsePaginated';
+import type { DomainResponse } from '../../../domain/common/responce/DomainResponse';
 import type { ManageEntityUsecase } from '../../../domain/usecase/IManageUseCase';
 import { handleApiError } from '../../utils/handleApiError';
 
@@ -10,13 +10,14 @@ interface PaginationInfo {
   total: number;
 }
 
-function extractPagination(res: DpomainResponsePaginated<unknown>): PaginationInfo | undefined {
-  if (res.lastPage == null) return undefined;
+function extractPagination(res: DomainResponse<unknown>): PaginationInfo | undefined {
+  const p = res.pagination;
+  if (p == null || p.lastPage == null) return undefined;
   return {
-    lastPage: res.lastPage,
-    currentPage: res.currentPage ?? 1,
-    hasMore: res.hasMore ?? false,
-    total: Number((res as any).total ?? 0),
+    lastPage: p.lastPage,
+    currentPage: p.currentPage ?? 1,
+    hasMore: p.hasMore ?? false,
+    total: Number(p.total ?? 0),
   };
 }
 

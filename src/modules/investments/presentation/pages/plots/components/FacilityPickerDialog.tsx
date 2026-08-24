@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { useEntityCrud } from "../../../../../../core/presentation/hooks/data/useEntity"
 import { useLanguage } from "../../../../../../core/presentation/context/i18n/I18nProvider"
 import { SelectFromTable } from "../../../../../../core/presentation/layouts/ui/picker/SelectFromTable"
@@ -18,6 +18,16 @@ interface FacilityPickerDialogProps {
   defaultFilter?: Record<string, any>
 }
 
+const parseFilterValues = (values: Record<string, any>) => {
+  const parsed: Record<string, any> = {}
+  for (const [key, val] of Object.entries(values)) {
+    if (val === "" || val === undefined) continue
+    if (["company_nationality_id", "partnership_type_id"].includes(key)) parsed[key] = Number(val)
+    else parsed[key] = val
+  }
+  return parsed
+}
+
 export function FacilityPickerDialog({
   isOpen,
   onClose,
@@ -27,89 +37,48 @@ export function FacilityPickerDialog({
   defaultFilter,
 }: FacilityPickerDialogProps) {
   const { t } = useLanguage()
-  const { entities: facilities, getAll, loadingMap, errorMap, pagination } = useEntityCrud<Facility>('/investments/facilities', '/investments/facilities')
+  const { entities: facilities, loadingMap, errorMap, pagination, list } = useEntityCrud<Facility>(
+    isOpen ? '/investments/facilities' : '',
+    '/investments/facilities',
+    { listState: true }
+  )
   const { entities: partnershipTypes, getAll: getPartnershipTypes } = useEntityCrud<PartnershipType>('/investments/partnership-types', '/investments/partnership-types')
   const { entities: countries, getAll: loadCountries } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries')
 
-  const [searchQuery, setSearchQuery] = useState("")
-  const [page, setPage] = useState(1)
-  const [perPage, setPerPage] = useState(25)
-  const [filterValues, setFilterValues] = useState<Record<string, any>>({})
-  const [sortColumn, setSortColumn] = useState<"name" | "created_at" | "">("")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
-
   useEffect(() => {
+    if (!isOpen) return
     getPartnershipTypes('/investments/partnership-types?is_active=true')
     loadCountries('/shared-kernal/countries')
-  }, [])
-
-  const fetchFacilities = (params: Record<string, any> = {}) => {
-    const sp = new URLSearchParams()
-    if (params.search) sp.append("search", params.search)
-    if (params.sortColumn) sp.append(`sort_by[${params.sortColumn}]`, params.sortOrder)
-    if (params.page) sp.append("page", String(params.page))
-    if (params.per_page) sp.append("per_page", String(params.per_page))
-    Object.entries(params).forEach(([k, v]) => {
-      if (!["search", "sortColumn", "sortOrder", "page", "per_page"].includes(k) && v !== "" && v !== undefined) {
-        sp.append(k, String(v))
-      }
-    })
-    getAll(`/investments/facilities?${sp.toString()}`)
-  }
-
-  useEffect(() => {
-    if (isOpen) {
-      fetchFacilities({ page: 1, per_page: perPage })
-    }
   }, [isOpen])
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query)
-    setPage(1)
-    fetchFacilities({ ...filterValues, search: query, sortColumn, sortOrder, page: 1, per_page: perPage })
+    list?.setSearch(query)
   }
 
   const handleSort = (column: string) => {
     if (column !== "name" && column !== "created_at") return
-    const newOrder = sortColumn === column && sortOrder === "asc" ? "desc" : "asc"
-    setSortColumn(column)
-    setSortOrder(newOrder)
-    fetchFacilities({ ...filterValues, search: searchQuery, sortColumn: column, sortOrder: newOrder, page: 1, per_page: perPage })
-  }
-
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage)
-    fetchFacilities({ ...filterValues, search: searchQuery, sortColumn, sortOrder, page: newPage, per_page: perPage })
-  }
-
-  const handlePerPageChange = (size: number) => {
-    setPerPage(size)
-    setPage(1)
-    fetchFacilities({ ...filterValues, search: searchQuery, sortColumn, sortOrder, page: 1, per_page: size })
+    list?.setSort(column)
   }
 
   const handleApplyFilter = (values: Record<string, any>) => {
-    const parsed: Record<string, any> = {}
-    for (const [key, val] of Object.entries(values)) {
-      if (val === "" || val === undefined) continue
-      if (["company_nationality_id", "partnership_type_id"].includes(key)) parsed[key] = Number(val)
-      else parsed[key] = val
-    }
-    setFilterValues({ page: 1, per_page: perPage, ...parsed })
-    setPage(1)
-    fetchFacilities({ ...parsed, search: searchQuery, sortColumn, sortOrder, page: 1, per_page: perPage })
+    list?.setFilter(parseFilterValues(values))
   }
 
   const handleResetFilter = () => {
-    setFilterValues({})
-    setPage(1)
-    fetchFacilities({ search: searchQuery, sortColumn, sortOrder, page: 1, per_page: perPage })
+    const { search, sortColumn, sortOrder } = list?.filter ?? {}
+    list?.resetFilter()
+    if (search) list?.setSearch(search)
+    if (sortColumn) list?.setFilter({ sortColumn, sortOrder })
   }
 
   const handleApplyDefaultFilter = (parsed: Record<string, any>) => {
-    setFilterValues({ page: 1, per_page: perPage, ...parsed })
-    fetchFacilities({ ...parsed, search: searchQuery, sortColumn, sortOrder, page: 1, per_page: perPage })
+    list?.setFilter(parsed)
   }
+
+  const filterInitialValues = useMemo(
+    () => Object.fromEntries(Object.entries(list?.filter ?? {}).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k))),
+    [list?.filter]
+  )
 
   const selectOptions = (entities: { id: number; name: any }[]) => [
     { value: "", label: t("common.all", "shared") || "All" },
@@ -166,23 +135,23 @@ export function FacilityPickerDialog({
       rowKey="id"
       isLoading={loadingMap["getAll"]}
       error={errorMap["getAll"]}
-      onRetry={() => fetchFacilities({ ...filterValues, search: searchQuery, page, per_page: perPage })}
+      onRetry={() => list?.refresh()}
       onSearch={handleSearch}
       searchPlaceholder={t("common.search", "shared") || "Search..."}
-      searchInitialValue={searchQuery}
+      searchInitialValue={list?.filter.search ?? ""}
       filterFields={filterFields}
-      filterValues={filterValues}
+      filterValues={filterInitialValues as Record<string, any>}
       onApplyFilter={handleApplyFilter}
       onResetFilter={handleResetFilter}
-      sortColumn={sortColumn}
-      sortOrder={sortOrder}
+      sortColumn={(list?.filter.sortColumn as any) ?? ""}
+      sortOrder={list?.filter.sortOrder ?? "asc"}
       onSort={handleSort}
-      page={page}
-      perPage={perPage}
+      page={list?.page ?? 1}
+      perPage={list?.perPage ?? 25}
       totalPages={pagination?.lastPage || 1}
       totalItems={pagination?.total || 0}
-      onPageChange={handlePageChange}
-      onPerPageChange={handlePerPageChange}
+      onPageChange={(p: number) => list?.setPage(p)}
+      onPerPageChange={(size: number) => list?.setPerPage(size)}
       emptyMessage={t("facilities.no_records", "investments") || "No facilities found"}
     />
   )

@@ -102,10 +102,10 @@ export const useEmployee = (): UseEmployeeReturn => {
       const res = await useCase.findAllEmployees(filter)
       setEmployees(res.data)
       setPagination({
-        currentPage: res.currentPage || 1,
-        lastPage: res.lastPage || 1,
-        total: (res.total as any) || 0,
-        hasMore: res.hasMore || false,
+        currentPage: res.pagination?.currentPage || 1,
+        lastPage: res.pagination?.lastPage || 1,
+        total: res.pagination?.total || 0,
+        hasMore: res.pagination?.hasMore || false,
       })
     } catch (err: any) {
       setFnError("findAllEmployees", handleApiError(err, { module: MODULE }))
@@ -121,10 +121,10 @@ export const useEmployee = (): UseEmployeeReturn => {
       const res = await useCase.findEmployeeStatusLogs(employeeId, employeeStatusFilter)
       setEmployeeStatusLogs(res.data)
       setEmployeeStatusPagination({
-        currentPage: res.currentPage || 1,
-        lastPage: res.lastPage || 1,
-        total: res.total as any || 0,
-        hasMore: res.hasMore || false,
+        currentPage: res.pagination?.currentPage || 1,
+        lastPage: res.pagination?.lastPage || 1,
+        total: res.pagination?.total || 0,
+        hasMore: res.pagination?.hasMore || false,
       })
     } catch (err: any) {
       setFnError("findEmployeeStatusLogs", handleApiError(err, { module: MODULE }))
@@ -140,10 +140,10 @@ export const useEmployee = (): UseEmployeeReturn => {
       const res = await useCase.findJobStatusLogs(employeeId, jobStatusFilter)
       setJobStatusLogs(res.data)
       setJobStatusPagination({
-        currentPage: res.currentPage || 1,
-        lastPage: res.lastPage || 1,
-        total: res.total as any || 0,
-        hasMore: res.hasMore || false,
+        currentPage: res.pagination?.currentPage || 1,
+        lastPage: res.pagination?.lastPage || 1,
+        total: res.pagination?.total || 0,
+        hasMore: res.pagination?.hasMore || false,
       })
     } catch (err: any) {
       setFnError("findJobStatusLogs", handleApiError(err, { module: MODULE }))

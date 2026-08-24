@@ -94,6 +94,14 @@ export function CurrenciesPage() {
         : <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full"><X size={12} /> {t('common.no', 'shared') || 'No'}</span>
     },
     {
+      key: "is_active",
+      label: t("currency.is_active", MODULE) || "Active",
+      width: 100,
+      render: (row: Currency) => row.is_active
+        ? <span className="inline-flex items-center gap-1 text-xs font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-full"><Check size={12} /> {t('common.yes', 'shared') || 'Yes'}</span>
+        : <span className="inline-flex items-center gap-1 text-xs font-medium text-red-600 bg-red-50 px-2 py-0.5 rounded-full"><X size={12} /> {t('common.no', 'shared') || 'No'}</span>
+    },
+    {
       key: "actions",
       label: "",
       width: 100,

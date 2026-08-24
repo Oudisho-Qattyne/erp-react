@@ -35,7 +35,7 @@ export function PlotStatusHistoryModal({ isOpen, onClose, plotId }: PlotStatusHi
       const res = await getHistory(undefined, { page: targetPage, perPage: targetPerPage });
       if (res?.data) setHistories(res.data);
       else setHistories([]);
-      if (res?.lastPage != null) setTotalPages(res.lastPage);
+      if (res?.pagination?.lastPage != null) setTotalPages(res.pagination.lastPage);
       else setTotalPages(0);
     } catch {
       setHistories([]);

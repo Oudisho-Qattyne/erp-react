@@ -172,6 +172,7 @@ export function FacilitiesPage() {
       name: 'company_nationality_id',
       label: t('facilities.company_nationality', 'investments') || 'Company Nationality',
       type: 'select',
+      searchable:true,
       options: [
         { value: '', label: t('common.all', 'shared') || 'All' },
         ...countries.map((c) => ({ value: c.id, label: getLocalizedName(c.name) })),

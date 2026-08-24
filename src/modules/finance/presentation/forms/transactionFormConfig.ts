@@ -1,18 +1,10 @@
 import type { FieldConfig } from '../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
-import type { PickerConfig } from '../../../../core/presentation/layouts/ui/picker/pickerTypes';
 
 type Translate = (key: string, module?: string) => string;
 
 const MODULE = 'finance';
 
 const typeOptions = ['incoming', 'outgoing'];
-
-function pickerConfigForTransactionableType(transactionableType: string | undefined): PickerConfig | null {
-  switch (transactionableType) {
-    default:
-      return null;
-  }
-}
 
 export const buildTransactionFormFields = (t: Translate): FieldConfig[] => [
   {
@@ -61,9 +53,5 @@ export const buildTransactionFormFields = (t: Translate): FieldConfig[] => [
     label: t('transaction.transactionable_id', MODULE) || 'Transactionable',
     type: 'table-picker',
     required: false,
-    dependsOn: ['transactionable_type'],
-    compute: (values) => ({
-      pickerConfig: pickerConfigForTransactionableType(values.transactionable_type),
-    }),
   },
 ];

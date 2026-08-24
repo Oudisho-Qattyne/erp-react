@@ -13,7 +13,7 @@ import { SelectOrCreate } from './SelectOrCreate';
 import Input, { type InputType } from './Input';
 import type { ToggleVariant, ToggleSize } from './Toggle';
 import type { MatrixFieldConfig } from './DataMatrixInput';
-import type { PickerConfig } from '../picker/pickerTypes';
+import type { PickerComponent } from '../picker/pickerTypes';
 import { useDependentField, type ComputedProps } from './hooks/useDependentField';
 import { AuthContext } from '../../../../infrastructure/auth/AuthProvider';
 
@@ -59,7 +59,11 @@ export interface FormInputProps<T extends FieldValues> {
   matrixErrors?: Record<number, Record<string, string>>;
   rowSchema?: { safeParse: (data: any) => { success: boolean; error?: { flatten: () => { fieldErrors: Record<string, string[]> } } } };
   // For table-picker
-  pickerConfig?: PickerConfig | null;
+  picker?: PickerComponent | null;
+  pickerProps?: Record<string, any>;
+  valueKey?: string;
+  labelKey?: string;
+  displayLabel?: string | ((value: any) => string);
   // Dependency
   dependsOn?: Path<T>[];
   compute?: (values: Record<Path<T>, any>) => ComputedProps | Promise<ComputedProps>;
@@ -100,7 +104,11 @@ export function FormInput<T extends FieldValues>({
   maxRows,
   matrixErrors,
   rowSchema,
-  pickerConfig,
+  picker,
+  pickerProps,
+  valueKey,
+  labelKey,
+  displayLabel,
   dependsOn = [],
   compute,
   infoButton,
@@ -140,8 +148,9 @@ export function FormInput<T extends FieldValues>({
   const finalValue = computed.value !== undefined ? computed.value : currentValue;
   const finalMatrixFields = computed.matrixFields ?? matrixFields;
   const finalNumberOfRows = computed.numberOfRows ?? numberOfRows;
-  // compute can decide which picker dialog appears (or null to disable it)
-  const finalPickerConfig = computed.pickerConfig !== undefined ? computed.pickerConfig : pickerConfig;
+  // compute can decide which picker component appears (or null to disable it)
+  const finalPicker = computed.picker !== undefined ? computed.picker : picker;
+  const finalPickerProps = computed.pickerProps ?? pickerProps;
   // compute can change the allowed characters
   const finalRegex = computed.regex !== undefined ? computed.regex : regex;
 
@@ -282,7 +291,11 @@ export function FormInput<T extends FieldValues>({
         maxRows={maxRows}
         matrixErrors={combinedMatrixErrors}
         rowSchema={rowSchema}
-        pickerConfig={finalPickerConfig}
+        picker={finalPicker}
+        pickerProps={finalPickerProps}
+        valueKey={valueKey}
+        labelKey={labelKey}
+        displayLabel={displayLabel}
         baseClasses={baseClasses}
         requiredPermission={requiredPermission}
         createButtonPermission={createButtonPermission}

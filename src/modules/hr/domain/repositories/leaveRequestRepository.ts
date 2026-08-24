@@ -1,5 +1,4 @@
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
-import type { DpomainResponsePaginated } from "../entities/common/DomainResponsePaginated";
 import type { LeaveRequest } from "../entities/leaveRequest/leaveRequest";
 import type { LeaveRequestProcessOperations } from "../valueObjects/leaveRequest/leaveRequestProcessOperations";
 

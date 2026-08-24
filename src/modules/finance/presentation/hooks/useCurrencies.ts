@@ -57,10 +57,6 @@ export const useCurrencies = (): UseCurrenciesReturn => {
 
   const clearError = useCallback(() => setError(initRecord(null)), [])
 
-  useEffect(() => {
-    findAllCurrencies()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter])
 
   const setFilter = useCallback((patch: Partial<CurrencyFilters>) => {
     setFilterState((prev) => ({ ...prev, ...patch, page: 1 }))

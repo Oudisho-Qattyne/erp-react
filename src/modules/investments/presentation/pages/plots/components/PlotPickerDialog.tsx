@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { useEntityCrud } from "../../../../../../core/presentation/hooks/data/useEntity"
 import { useLanguage } from "../../../../../../core/presentation/context/i18n/I18nProvider"
 import { SelectFromTable } from "../../../../../../core/presentation/layouts/ui/picker/SelectFromTable"
@@ -17,6 +17,17 @@ interface PlotPickerDialogProps {
   defaultFilter?: Record<string, any>
 }
 
+const parseFilterValues = (values: Record<string, any>) => {
+  const parsed: Record<string, any> = {}
+  for (const [key, val] of Object.entries(values)) {
+    if (val === "" || val === undefined) continue
+    if (val === "true") parsed[key] = true
+    else if (val === "false") parsed[key] = false
+    else parsed[key] = val
+  }
+  return parsed
+}
+
 export function PlotPickerDialog({
   isOpen,
   onClose,
@@ -26,82 +37,47 @@ export function PlotPickerDialog({
   defaultFilter,
 }: PlotPickerDialogProps) {
   const { t } = useLanguage()
-  const { entities: plots, getAll, loadingMap, errorMap, pagination } = useEntityCrud<Plot>('/investments/plots', '/investments/plots')
+  const { entities: plots, loadingMap, errorMap, pagination, list } = useEntityCrud<Plot>(
+    isOpen ? '/investments/plots' : '',
+    '/investments/plots',
+    { listState: true }
+  )
   const { entities: areas, getAll: getAreas } = useEntityCrud<EntityWithNameOnly>('/investments/plot-areas', '/investments/plot-areas')
   const { entities: classifications, getAll: getClassifications } = useEntityCrud<EntityWithNameOnly>('/investments/plot-classifications', '/investments/plot-classifications')
-
-  const [searchQuery, setSearchQuery] = useState("")
-  const [page, setPage] = useState(1)
-  const [perPage, setPerPage] = useState(25)
-  const [filterValues, setFilterValues] = useState<Record<string, any>>({})
-  const [sortColumn, setSortColumn] = useState<"code" | "identifier" | "area" | "created_at" | "">("")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
 
   useEffect(() => {
     getAreas()
     getClassifications()
   }, [])
 
-  const fetchPlots = (params: Record<string, any> = {}) => {
-    const sp = new URLSearchParams()
-    if (params.search) sp.append("search", params.search)
-    if (params.page) sp.append("page", String(params.page))
-    if (params.per_page) sp.append("per_page", String(params.per_page))
-    Object.entries(params).forEach(([k, v]) => {
-      if (!["search", "page", "per_page"].includes(k) && v !== "" && v !== undefined) {
-        sp.append(k, String(v))
-      }
-    })
-    if (params.sortColumn && params.sortOrder) sp.append(`sort_by[${params.sortColumn}]`, params.sortOrder)
-    getAll(`/investments/plots?${sp.toString()}`)
-  }
-
-  useEffect(() => {
-    if (isOpen) {
-      fetchPlots({ page: 1, per_page: perPage })
-    }
-  }, [isOpen])
-
   const handleSearch = (query: string) => {
-    setSearchQuery(query)
-    setPage(1)
-    fetchPlots({ ...filterValues, search: query, page: 1, per_page: perPage })
+    list?.setSearch(query)
   }
 
   const handleApplyFilter = (values: Record<string, any>) => {
-    const parsed: Record<string, any> = {}
-    for (const [key, val] of Object.entries(values)) {
-      if (val === "" || val === undefined) continue
-      if (val === "true") parsed[key] = true
-      else if (val === "false") parsed[key] = false
-      else parsed[key] = val
-    }
-    setFilterValues({ page: 1, per_page: perPage, ...parsed })
-    setPage(1)
-    fetchPlots({ ...parsed, search: searchQuery, page: 1, per_page: perPage })
+    list?.setFilter(parseFilterValues(values))
   }
 
   const handleResetFilter = () => {
-    setFilterValues({})
-    setPage(1)
-    fetchPlots({ search: searchQuery, page: 1, per_page: perPage })
+    const search = list?.filter.search
+    list?.resetFilter()
+    if (search) list?.setSearch(search)
   }
 
   const handleApplyDefaultFilter = (parsed: Record<string, any>) => {
-    setFilterValues({ page: 1, per_page: perPage, ...parsed })
-    fetchPlots({ ...parsed, search: searchQuery, page: 1, per_page: perPage })
+    list?.setFilter(parsed)
   }
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage)
-    fetchPlots({ ...filterValues, search: searchQuery, page: newPage, per_page: perPage })
+  const SORT_FIELDS = ["code", "identifier", "area", "created_at"]
+  const handleSort = (column: string) => {
+    if (!SORT_FIELDS.includes(column)) return
+    list?.setSort(column)
   }
 
-  const handlePerPageChange = (size: number) => {
-    setPerPage(size)
-    setPage(1)
-    fetchPlots({ ...filterValues, search: searchQuery, page: 1, per_page: size })
-  }
+  const filterInitialValues = useMemo(
+    () => Object.fromEntries(Object.entries(list?.filter ?? {}).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k))),
+    [list?.filter]
+  )
 
   const statusOptions = [
     { value: "unsold", label: t("plot_status.unsold", "investments") || "Unsold" },
@@ -112,7 +88,7 @@ export function PlotPickerDialog({
   ]
 
   const filterFields: FilterField[] = [
-    { name: "status", label: t("plots.status", "investments") || "Status", type: "select", options: statusOptions },
+    { name: "status", label: t("plots.status", "investments") || "Status", type: "multi-select", options: statusOptions },
     { name: "plot_area_id", label: t("plots.plot_area_id", "investments") || "Region", type: "select", options: areas.map(a => ({ value: String(a.id), label: getLocalizedName(a.name) })) },
     { name: "plot_classification_id", label: t("plots.plot_classification_id", "investments") || "Classification", type: "select", options: classifications.map(c => ({ value: String(c.id), label: getLocalizedName(c.name) })) },
     { name: "code", label: t("plots.code", "investments") || "Plot Code", type: "text" },
@@ -121,16 +97,6 @@ export function PlotPickerDialog({
     { name: "from_date", label: t("plots.from_date", "investments") || "From Date", type: "date" },
     { name: "to_date", label: t("plots.to_date", "investments") || "To Date", type: "date" },
   ]
-
-  const SORT_FIELDS = ["code", "identifier", "area", "created_at"]
-  const handleSort = (column: string) => {
-    if (!SORT_FIELDS.includes(column)) return
-    const field = column as "code" | "identifier" | "area" | "created_at"
-    const newOrder = sortColumn === field && sortOrder === "asc" ? "desc" : "asc"
-    setSortColumn(field)
-    setSortOrder(newOrder)
-    fetchPlots({ ...filterValues, search: searchQuery, page: 1, per_page: perPage, sortColumn: field, sortOrder: newOrder })
-  }
 
   const columns: ColumnDef<Plot>[] = [
     { key: "code", label: t("plots.code", "investments") || "Code", width: 120, sortable: true },
@@ -155,23 +121,23 @@ export function PlotPickerDialog({
       rowKey="id"
       isLoading={loadingMap["getAll"]}
       error={errorMap["getAll"]}
-      onRetry={() => fetchPlots({ ...filterValues, search: searchQuery, page, per_page: perPage })}
+      onRetry={() => list?.refresh()}
       onSearch={handleSearch}
       searchPlaceholder={t("common.search", "shared") || "Search..."}
-      searchInitialValue={searchQuery}
+      searchInitialValue={list?.filter.search ?? ""}
       filterFields={filterFields}
-      filterValues={filterValues}
+      filterValues={filterInitialValues as Record<string, any>}
       onApplyFilter={handleApplyFilter}
       onResetFilter={handleResetFilter}
-      sortColumn={sortColumn}
-      sortOrder={sortOrder}
+      sortColumn={(list?.filter.sortColumn as any) ?? ""}
+      sortOrder={list?.filter.sortOrder ?? "asc"}
       onSort={handleSort}
-      page={page}
-      perPage={perPage}
+      page={list?.page ?? 1}
+      perPage={list?.perPage ?? 25}
       totalPages={pagination?.lastPage || 1}
       totalItems={pagination?.total || 0}
-      onPageChange={handlePageChange}
-      onPerPageChange={handlePerPageChange}
+      onPageChange={(p: number) => list?.setPage(p)}
+      onPerPageChange={(size: number) => list?.setPerPage(size)}
       emptyMessage={t("plots.no_records", "investments") || "No plots found"}
     />
   )

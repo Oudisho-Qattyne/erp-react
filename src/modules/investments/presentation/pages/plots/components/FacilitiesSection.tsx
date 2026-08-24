@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../../core/presentation/hooks/data/useEntity';
 import type { Facility } from '../../../../domain/entities/facility';
@@ -30,10 +30,10 @@ interface FacilitiesSectionProps {
 export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps) {
   const { t } = useLanguage();
 
-  const { entities: facilities, create, update, remove, loadingMap, errorMap, list } = useEntityCrud<Facility>(
+  const { entities: facilities, create, update, remove, loadingMap, errorMap, list, pagination } = useEntityCrud<Facility>(
     `/investments/facilities?plot_id=${plotId}&plot_dossier_id=${dossierId}`,
     '/investments/facilities',
-    { listState: true, paginate: false }
+    { listState: true }
   );
   const { entities: partnershipTypes, getAll: getPartnershipTypes, create: createPartnershipType } = useEntityCrud<PartnershipType>('/investments/partnership-types', '/investments/partnership-types');
   const { entities: countries, getAll: loadCountries, create: createCountry } = useEntityCrud<Country>('/shared-kernal/countries', '/shared-kernal/countries');
@@ -46,6 +46,11 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
   const [auditItem, setAuditItem] = useState<Facility | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
+
+  useEffect(() => {
+    getPartnershipTypes()
+    loadCountries()
+  } ,[])
   const handleSearch = () => {
     list.setSearch(localSearch);
   };
@@ -100,14 +105,15 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
       type: 'select',
       options: [
         { value: '', label: t('common.all', 'shared') || 'All' },
-        { value: 'commercial_register', label: t('facilities.commercial_register', 'investments') || 'Commercial Register' },
-        { value: 'national_id', label: t('facilities.national_id', 'investments') || 'National ID' },
+        { value: 'existing', label: t('facilities.company_type_existing', 'investments') || 'ُExisting' },
+        { value: 'under_incorporation', label: t('facilities.company_type_under_incorporation', 'investments') || 'Under Incorporation' },
       ],
     },
     {
       name: 'company_nationality_id',
       label: t('facilities.company_nationality', 'investments') || 'Nationality',
       type: 'select',
+      searchable:true,
       options: [
         { value: '', label: t('common.all', 'shared') || 'All' },
         ...countries.map((c) => ({ value: c.id, label: getLocalizedName(c.name) })),
@@ -251,6 +257,15 @@ export function FacilitiesSection({ plotId, dossierId }: FacilitiesSectionProps)
             sortColumn={list.filter.sortColumn}
             sortOrder={list.filter.sortOrder}
             onSort={list.setSort}
+            pagination={{
+              page: pagination?.currentPage || 1,
+              totalPages: pagination?.lastPage || 1,
+              totalItems: pagination?.total || 0,
+              onPageChange: list.setPage,
+              itemsPerPage: list.perPage,
+              onItemsPerPageChange: (size: number) => list.setPerPage(size),
+              itemsPerPageOptions: [10, 25, 50, 100],
+            }}
           />
         )}
       </SectionCard>

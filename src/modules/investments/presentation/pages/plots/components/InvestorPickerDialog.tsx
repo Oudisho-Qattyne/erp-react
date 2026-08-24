@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useMemo } from "react"
 import { useLanguage } from "../../../../../../core/presentation/context/i18n/I18nProvider"
 import { SelectFromTable } from "../../../../../../core/presentation/layouts/ui/picker/SelectFromTable"
 import type { ColumnDef } from "../../../../../../core/presentation/layouts/ui/tables/ResizableTable"
@@ -26,36 +26,15 @@ export function InvestorPickerDialog({
   defaultFilter,
 }: InvestorPickerDialogProps) {
   const { t } = useLanguage()
-  const { entities: investors, getAll, create, loadingMap, errorMap, pagination } = useEntityCrud<Investor>(
+  const { entities: investors, create, loadingMap, errorMap, pagination, list } = useEntityCrud<Investor>(
+    isOpen ? '/investments/investors' : '',
     '/investments/investors',
-    '/investments/investors'
+    { listState: true }
   )
-
-  const [page, setPage] = useState(1)
-  const [perPage, setPerPage] = useState(25)
-  const [extraFilters, setExtraFilters] = useState<Record<string, any>>({})
-  const [searchQuery, setSearchQuery] = useState("")
-  const [sortColumn, setSortColumn] = useState<"first_name" | "">("")
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
-
-  useEffect(() => {
-    if (!isOpen) return
-    const params = new URLSearchParams()
-    if (searchQuery) params.append("search", searchQuery)
-    for (const [key, val] of Object.entries(extraFilters)) {
-      if (val !== undefined && val !== "") params.append(key, String(val))
-    }
-    if (sortColumn) params.append(`sort_by[${sortColumn}]`, sortOrder)
-    params.append("page", String(page))
-    params.append("per_page", String(perPage))
-    getAll(`/investments/investors?${params.toString()}`)
-  }, [isOpen, searchQuery, page, perPage, extraFilters, sortColumn, sortOrder])
 
   const handleSort = (column: string) => {
     if (column !== "first_name") return
-    const newOrder = sortColumn === "first_name" && sortOrder === "asc" ? "desc" : "asc"
-    setSortColumn("first_name")
-    setSortOrder(newOrder)
+    list?.setSort(column)
   }
 
   const handleApplyFilter = (values: Record<string, any>) => {
@@ -66,14 +45,24 @@ export function InvestorPickerDialog({
       else if (val === "false") parsed[key] = false
       else parsed[key] = val
     }
-    setExtraFilters(parsed)
-    setPage(1)
+    list?.setFilter(parsed)
   }
 
   const handleResetFilter = () => {
-    setExtraFilters({})
-    setPage(1)
+    const { search, sortColumn, sortOrder } = list?.filter ?? {}
+    list?.resetFilter()
+    if (search) list?.setSearch(search)
+    if (sortColumn) list?.setFilter({ sortColumn, sortOrder })
   }
+
+  const handleApplyDefaultFilter = (parsed: Record<string, any>) => {
+    list?.setFilter(parsed as any)
+  }
+
+  const filterInitialValues = useMemo(
+    () => Object.fromEntries(Object.entries(list?.filter ?? {}).filter(([k]) => !['search', 'sortColumn', 'sortOrder'].includes(k))),
+    [list?.filter]
+  )
 
   const columns: ColumnDef<Investor>[] = [
     { key: "id", label: "#", width: 60 },
@@ -101,8 +90,7 @@ export function InvestorPickerDialog({
   ]
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query)
-    setPage(1)
+    list?.setSearch(query)
   }
 
   const createFormFields = [
@@ -160,27 +148,28 @@ export function InvestorPickerDialog({
       multiple={multiple}
       initialSelected={initialSelected}
       defaultFilter={defaultFilter}
-      onApplyDefaultFilter={(parsed) => setExtraFilters(parsed as any)}
+      onApplyDefaultFilter={handleApplyDefaultFilter}
       data={investors}
       columns={columns}
       isLoading={loadingMap["getAll"]}
       error={errorMap["getAll"]}
-      onRetry={() => getAll()}
+      onRetry={() => list?.refresh()}
       onSearch={handleSearch}
       searchPlaceholder={t("dossier.search_placeholder", "investments") || "Search investors..."}
+      searchInitialValue={list?.filter.search ?? ""}
       filterFields={filterFields}
-      filterValues={extraFilters}
+      filterValues={filterInitialValues as Record<string, any>}
       onApplyFilter={handleApplyFilter}
       onResetFilter={handleResetFilter}
-      sortColumn={sortColumn}
-      sortOrder={sortOrder}
+      sortColumn={(list?.filter.sortColumn as any) ?? ""}
+      sortOrder={list?.filter.sortOrder ?? "asc"}
       onSort={handleSort}
-      page={page}
-      perPage={perPage}
+      page={list?.page ?? 1}
+      perPage={list?.perPage ?? 25}
       totalPages={pagination?.lastPage || 1}
       totalItems={pagination?.total || 0}
-      onPageChange={setPage}
-      onPerPageChange={(size) => { setPerPage(size); setPage(1) }}
+      onPageChange={(p: number) => list?.setPage(p)}
+      onPerPageChange={(size: number) => list?.setPerPage(size)}
       emptyMessage={t("investors.no_records", "investments") || "No investors found"}
       dialogSize="3xl"
       createConfig={{
@@ -192,7 +181,7 @@ export function InvestorPickerDialog({
           try {
             const res = await create(data)
             toast.success(t('investors.created', 'investments') || 'Investor created successfully')
-            getAll(`/investments/investors?page=1&per_page=25`)
+            list?.refresh()
             return res
           } catch (err: any) {
             handleApiError(err, { module: "investments" })

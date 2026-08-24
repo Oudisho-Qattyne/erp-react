@@ -1,17 +1,21 @@
-import React, { lazy, Suspense, useContext, useMemo, useState } from "react"
+import React, { useMemo, useState } from "react"
 import { Search, X } from "lucide-react"
 import { useLanguage } from "../../../context/i18n/I18nProvider"
-import type { PickerConfig } from "../picker/pickerTypes"
-import { AuthContext } from "../../../../infrastructure/auth/AuthProvider"
-
-const SelectFromTable = lazy(() =>
-  import("../picker/SelectFromTable").then((m) => ({ default: m.SelectFromTable })),
-)
+import type { PickerComponent } from "../picker/pickerTypes"
 
 interface TablePickerInputProps {
   value?: any
   onChange: (value: any) => void
-  pickerConfig?: PickerConfig | null
+  /** Picker dialog component fulfilling { isOpen, onClose, onConfirm } (e.g. PlotPickerDialog) */
+  picker?: PickerComponent | null
+  /** Extra props forwarded to the picker component (multiple, defaultFilter, ...) */
+  pickerProps?: Record<string, any>
+  /** Key of the selected row stored as the field value (default: "id") */
+  valueKey?: string
+  /** Key of the selected row shown in the input (default: "name") */
+  labelKey?: string
+  /** Static text or resolver overriding the automatic label */
+  displayLabel?: string | ((value: any) => string)
   placeholder?: string
   disabled?: boolean
   baseClasses?: string
@@ -20,50 +24,54 @@ interface TablePickerInputProps {
 export function TablePickerInput({
   value,
   onChange,
-  pickerConfig,
+  picker,
+  pickerProps,
+  valueKey = "id",
+  labelKey = "name",
+  displayLabel,
   placeholder,
   disabled,
   baseClasses,
 }: TablePickerInputProps) {
   const { t, direction } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
-  const auth = useContext(AuthContext)
+  const [pickedItems, setPickedItems] = useState<any[]>([])
   const isRTL = direction === "rtl"
 
-  const hasPermission = useMemo(() => {
-    if (!pickerConfig?.requiredPermission) return true
-    return auth?.hasPermission(pickerConfig.requiredPermission) ?? false
-  }, [pickerConfig, auth])
-
-  const valueProp = pickerConfig?.valueProp ?? "id"
-  const labelProp = pickerConfig?.labelProp ?? "name"
-  const data = pickerConfig?.data ?? []
-
-  const selectedItems = useMemo(() => {
-    const current = Array.isArray(value) ? value : value != null && value !== "" ? [value] : []
-    return data.filter((item) => item != null && current.includes(item[valueProp]))
-  }, [data, value, valueProp])
+  const currentValues = useMemo(
+    () => (Array.isArray(value) ? value : value != null && value !== "" ? [value] : []),
+    [value]
+  )
 
   const display = useMemo(() => {
-    if (selectedItems.length > 0) {
-      return selectedItems.map((it) => (it[labelProp] ?? "") as string).join(", ")
-    }
-    if (Array.isArray(value) && value.length > 0) return `${value.length} ${t("common.selected", "shared") || "selected"}`
-    return value != null && value !== "" ? String(value) : ""
-  }, [selectedItems, value, labelProp, t])
+    if (typeof displayLabel === "function") return currentValues.length ? displayLabel(value) : ""
+    if (currentValues.length === 0) return ""
+    if (displayLabel) return displayLabel
 
-  const canPick = !disabled && hasPermission && !!pickerConfig
+    const matched = pickedItems.filter((item) => item != null && currentValues.includes(item[valueKey]))
+    if (matched.length > 0) {
+      return matched.map((it) => (it[labelKey] ?? "") as string).join(", ")
+    }
+    if (Array.isArray(value)) return `${value.length} ${t("common.selected", "shared") || "selected"}`
+    return String(value)
+  }, [displayLabel, currentValues, pickedItems, value, valueKey, labelKey, t])
+
+  const canPick = !disabled && !!picker
   const hasValue = value != null && value !== "" && (!Array.isArray(value) || value.length > 0)
 
   const handleConfirm = (selected: any[]) => {
-    const values = selected.map((s) => s?.[valueProp])
-    onChange(pickerConfig?.multiple ? values : values[0] ?? null)
+    setPickedItems(selected)
+    const values = selected.map((s) => s?.[valueKey])
+    onChange(pickerProps?.multiple ? values : values[0] ?? null)
   }
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation()
+    setPickedItems([])
     onChange(Array.isArray(value) ? [] : null)
   }
+
+  const Picker = picker as PickerComponent | null | undefined
 
   return (
     <>
@@ -72,7 +80,7 @@ export function TablePickerInput({
           type="text"
           readOnly
           value={display}
-          placeholder={placeholder ?? (pickerConfig ? t("common.select", "shared") || "Select" : "")}
+          placeholder={placeholder ?? (t("common.select", "shared") || "Select")}
           disabled={!canPick}
           onClick={() => canPick && setIsOpen(true)}
           className={`${baseClasses} cursor-pointer ${canPick ? "bg-card/50" : "opacity-60 cursor-not-allowed"}`}
@@ -94,43 +102,13 @@ export function TablePickerInput({
         </span>
       </div>
 
-      {isOpen && pickerConfig && (
-        <Suspense fallback={null}>
-          <SelectFromTable
-            isOpen={isOpen}
-            onClose={() => setIsOpen(false)}
-            onConfirm={handleConfirm}
-            title={pickerConfig.dialogTitle || t("common.select", "shared") || "Select"}
-            dialogSize={pickerConfig.dialogSize}
-            multiple={pickerConfig.multiple}
-            defaultFilter={pickerConfig.initialFilter}
-            onApplyDefaultFilter={pickerConfig.onApplyInitialFilter ?? (() => {})}
-            requiredPermission={pickerConfig.requiredPermission}
-            data={data}
-            columns={pickerConfig.columns}
-            rowKey={pickerConfig.rowKey as any}
-            isLoading={pickerConfig.isLoading ?? false}
-            error={pickerConfig.error ?? null}
-            onRetry={pickerConfig.onRetry}
-            onSearch={pickerConfig.onSearch}
-            searchPlaceholder={pickerConfig.searchPlaceholder}
-            filterFields={pickerConfig.filterFields ?? []}
-            filterValues={pickerConfig.filterValues ?? {}}
-            onApplyFilter={pickerConfig.onApplyFilter ?? (() => {})}
-            onResetFilter={pickerConfig.onResetFilter ?? (() => {})}
-            sortColumn={pickerConfig.sortColumn}
-            sortOrder={pickerConfig.sortOrder}
-            onSort={pickerConfig.onSort}
-            page={pickerConfig.page ?? 1}
-            perPage={pickerConfig.perPage ?? 10}
-            totalPages={pickerConfig.totalPages ?? 1}
-            totalItems={pickerConfig.totalItems ?? 0}
-            onPageChange={pickerConfig.onPageChange ?? (() => {})}
-            onPerPageChange={pickerConfig.onPerPageChange ?? (() => {})}
-            emptyMessage={pickerConfig.emptyMessage || t("common.no_data", "shared") || "No data"}
-            createConfig={pickerConfig.createConfig}
-          />
-        </Suspense>
+      {isOpen && Picker && (
+        <Picker
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          onConfirm={handleConfirm}
+          {...pickerProps}
+        />
       )}
     </>
   )

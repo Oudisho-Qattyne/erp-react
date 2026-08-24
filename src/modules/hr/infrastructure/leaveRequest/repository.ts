@@ -1,6 +1,5 @@
 import type { ApiClient } from "../../../../core/domain/common/api/ApiClient";
 import {type DomainResponse } from "../../../../core/domain/common/responce/DomainResponse";
-import { type DpomainResponsePaginated } from "../../domain/entities/common/DomainResponsePaginated";
 import {type LeaveRequest } from "../../domain/entities/leaveRequest/leaveRequest";
 import type { ILeaveRequestRepository } from "../../domain/repositories/leaveRequestRepository";
 import type { LeaveRequestProcessOperations } from "../../domain/valueObjects/leaveRequest/leaveRequestProcessOperations";

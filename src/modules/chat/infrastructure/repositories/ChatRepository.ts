@@ -1,6 +1,5 @@
 import type { ApiClient } from "../../../../core/domain/common/api/ApiClient"
 import type { DomainResponse } from "../../../../core/domain/common/responce/DomainResponse"
-import type { DpomainResponsePaginated } from "../../../hr/domain/entities/common/DomainResponsePaginated"
 import type { Conversation } from "../../domain/entities/Conversation"
 import type { Message } from "../../domain/entities/Message"
 import type { ChatUser } from "../../domain/entities/ChatUser"
@@ -13,10 +12,10 @@ export const createChatRepository = (apiClient: ApiClient): IChatRepository => {
   })
   return {
     getConversations: (page?, perPage?) =>
-      apiClient.get<DpomainResponsePaginated<Conversation[]>>(`${baseUrl}/conversations`, paginate(page, perPage)),
+      apiClient.get<DomainResponse<Conversation[]>>(`${baseUrl}/conversations`, paginate(page, perPage)),
 
     getMessages: (conversationId: number, page?, perPage?) =>
-      apiClient.get<DpomainResponsePaginated<Message[]>>(
+      apiClient.get<DomainResponse<Message[]>>(
         `${baseUrl}/conversations/${conversationId}/messages`,
         paginate(page, perPage),
       ),
@@ -30,6 +29,6 @@ export const createChatRepository = (apiClient: ApiClient): IChatRepository => {
         idempotencyKey ? { headers: { 'Idempotency-Key': idempotencyKey } } : undefined),
 
     getUsers: (page?, perPage?, name?, email?) =>
-      apiClient.get<DpomainResponsePaginated<ChatUser[]>>(`${baseUrl}/users`, paginate(page, perPage, name, email)),
+      apiClient.get<DomainResponse<ChatUser[]>>(`${baseUrl}/users`, paginate(page, perPage, name, email)),
   }
 }

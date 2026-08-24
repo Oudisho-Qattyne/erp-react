@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { DpomainResponsePaginated } from '../../../../modules/hr/domain/entities/common/DomainResponsePaginated';
+import type { DomainResponse } from '../../../domain/common/responce/DomainResponse';
 import type { EntityWithNameOnly } from '../../../domain/entities/EntityWithNameOnly';
 import { useEntityCrud, type UseEntityCrudReturn, type QueryParams } from './useEntity';
 
@@ -15,9 +15,9 @@ export interface UseNestedEntityCrudReturn<T>
   parentId: number | null;
   setParentId: (id: number | null) => void;
   /** Fetch list for a parent id (create/update/delete still use restUrl) */
-  getAllForParent: (parentId: number, params?: QueryParams) => Promise<DpomainResponsePaginated<T[]>>;
+  getAllForParent: (parentId: number, params?: QueryParams) => Promise<DomainResponse<T[]>>;
   /** Pass parent id, or use parentId already set via setParentId / getAllForParent */
-  getAll: (parentId?: number, params?: QueryParams) => Promise<DpomainResponsePaginated<T[]>>;
+  getAll: (parentId?: number, params?: QueryParams) => Promise<DomainResponse<T[]>>;
 }
 
 /**

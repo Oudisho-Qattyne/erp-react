@@ -32,10 +32,10 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  const { entities: licenses, getById, create, update, remove, loadingMap, errorMap, list } = useEntityCrud<BuildingLicense>(
+  const { entities: licenses, getById, create, update, remove, loadingMap, errorMap, list, pagination } = useEntityCrud<BuildingLicense>(
     `/investments/building-licenses?facility_id=${facilityId}`,
     '/investments/building-licenses',
-    { listState: true, paginate: false }
+    { listState: true }
   );
 
   const { entities: licensingStatuses, getAll: getLicensingStatuses, create: createLicensingStatus } = useEntityCrud<LicensingStatus>('/investments/license-statuses', '/investments/license-statuses');
@@ -242,6 +242,15 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
             sortColumn={list.filter.sortColumn}
             sortOrder={list.filter.sortOrder}
             onSort={list.setSort}
+            pagination={{
+              page: pagination?.currentPage || 1,
+              totalPages: pagination?.lastPage || 1,
+              totalItems: pagination?.total || 0,
+              onPageChange: list.setPage,
+              itemsPerPage: list.perPage,
+              onItemsPerPageChange: (size: number) => list.setPerPage(size),
+              itemsPerPageOptions: [10, 25, 50, 100],
+            }}
           />
         )}
       </SectionCard>

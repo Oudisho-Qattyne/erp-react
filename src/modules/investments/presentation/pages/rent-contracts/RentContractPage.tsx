@@ -19,10 +19,10 @@ import { DossierPickerDialog } from '../plots/components/DossierPickerDialog';
 
 export function RentContractPage() {
   const { t } = useLanguage();
-  const { entities: contracts, remove, loadingMap, errorMap, list } = useEntityCrud<RentContract>(
+  const { entities: contracts, remove, loadingMap, errorMap, list, pagination } = useEntityCrud<RentContract>(
     '/investments/rent-contracts',
     '/investments/rent-contracts',
-    { listState: true, paginate: false }
+    { listState: true }
   );
 
   const { entities: industries, getAll: getIndustries } = useEntityCrud<RentContractIndustry>(
@@ -268,6 +268,15 @@ export function RentContractPage() {
           sortColumn={list.filter.sortColumn}
           sortOrder={list.filter.sortOrder}
           onSort={list.setSort}
+          pagination={{
+            page: pagination?.currentPage || 1,
+            totalPages: pagination?.lastPage || 1,
+            totalItems: pagination?.total || 0,
+            onPageChange: list.setPage,
+            itemsPerPage: list.perPage,
+            onItemsPerPageChange: (size: number) => list.setPerPage(size),
+            itemsPerPageOptions: [10, 25, 50, 100],
+          }}
         />
       )}
 

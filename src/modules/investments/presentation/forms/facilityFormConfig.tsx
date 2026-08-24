@@ -154,7 +154,7 @@ export const buildFacilityFormFields = (t: Translate, deps: FacilityFormDeps): F
     dependsOn: ['company_type'],
     compute: (values) => {
       const enabled = values.company_type === 'existing'
-      return { disabled: !enabled, required: enabled, value: enabled ? undefined : '' }
+      return { disabled: !enabled, required: enabled, value: enabled ? undefined : undefined }
     },
   },
   {
@@ -165,7 +165,7 @@ export const buildFacilityFormFields = (t: Translate, deps: FacilityFormDeps): F
     dependsOn: ['company_type'],
     compute: (values) => {
       const enabled = values.company_type === 'existing'
-      return { disabled: !enabled, required: enabled, value: enabled ? undefined : '' }
+      return { disabled: !enabled, required: enabled, value: enabled ? undefined : undefined }
     },
   },
   { name: 'first_phone_number', type: 'numeric', label: t('facilities.first_phone_number', 'investments') || 'Phone', required: true, group: 'contact' },
@@ -261,8 +261,8 @@ export const buildFacilityDefaultValues = (facility: Facility): Record<string, s
   partnership_type_id: facility.partnership_type?.id ?? facility.partnership_type_id ?? null,
   address: facility.address,
   company_type: facility.company_type ?? 'under_incorporation',
-  commercial_register: facility.commercial_register ?? '',
-  commercial_register_date: facility.commercial_register_date ?? '',
+  commercial_register: facility.commercial_register ?? null,
+  commercial_register_date: facility.commercial_register_date ?? null,
   company_nationality_id: facility.company_nationality_id ?? null,
   first_phone_number: facility.first_phone_number,
   second_phone_number: facility.second_phone_number ?? null,
@@ -275,7 +275,7 @@ export const buildFacilityDefaultValues = (facility: Facility): Record<string, s
   number_or_patrols: facility.number_or_patrols ?? null,
   telephone_lines_number: facility.telephone_lines_number ?? null,
   monthly_internet_data_requirement: facility.monthly_internet_data_requirement ?? null,
-  yearly_imported_raw_materials: facility.yearly_imported_raw_materials ?? '',
+  yearly_imported_raw_materials: facility.yearly_imported_raw_materials ?? null,
   export_to_production_ratio: facility.export_to_production_ratio ?? null,
   daily_production_capacities: facility.daily_production_capacities ?? [],
   monthly_production_capacities: facility.monthly_production_capacities ?? [],

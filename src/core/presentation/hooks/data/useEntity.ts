@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useState, useEffect } from 'react';
 import type { CreateEntityDTO, UpdateEntityDTO } from '../../../../modules/hr/application/dtos/entityDto';
-import type { DpomainResponsePaginated } from '../../../../modules/hr/domain/entities/common/DomainResponsePaginated';
+import type { DomainResponse } from '../../../domain/common/responce/DomainResponse';
 import { createCrufRepository } from '../../../infrastructure/repositories/CrudRepository';
 import { createManageEntityUsecase } from '../../../application/usecases/manageEntityUseCase';
 import type { EntityWithNameOnly } from '../../../domain/entities/EntityWithNameOnly';
@@ -41,7 +41,7 @@ export interface ListStateFilter {
   search?: string;
   sortColumn?: string;
   sortOrder?: 'asc' | 'desc';
-  [key: string]: string | boolean | number | undefined;
+  [key: string]: string | boolean | number | (string | number | boolean)[] | undefined;
 }
 
 export interface EntityListState {
@@ -77,13 +77,14 @@ interface PaginationInfo {
   total: number;
 }
 
-function extractPagination(res: DpomainResponsePaginated<unknown>): PaginationInfo | undefined {
-  if (res.lastPage == null) return undefined;
+function extractPagination(res: DomainResponse<unknown>): PaginationInfo | undefined {
+  const p = res.pagination;
+  if (p == null || p.lastPage == null) return undefined;
   return {
-    lastPage: res.lastPage,
-    currentPage: res.currentPage ?? 1,
-    hasMore: res.hasMore ?? false,
-    total: Number((res as any).total ?? 0),
+    lastPage: p.lastPage,
+    currentPage: p.currentPage ?? 1,
+    hasMore: p.hasMore ?? false,
+    total: Number(p.total ?? 0),
   };
 }
 
@@ -97,10 +98,10 @@ export interface UseEntityCrudReturn<T> {
   hasErrors: () => boolean;
   pagination?: PaginationInfo;
   
-  getAll: (listUrlOverride?: string, params?: QueryParams) => Promise<DpomainResponsePaginated<T[]>>;
-  getById: (id: number) => Promise<DpomainResponsePaginated<T> | null>;
-  create: (data: CreateEntityDTO<T>) => Promise<DpomainResponsePaginated<T>>;
-  update: (id: number, data: UpdateEntityDTO<T>) => Promise<DpomainResponsePaginated<T>>;
+  getAll: (listUrlOverride?: string, params?: QueryParams) => Promise<DomainResponse<T[]>>;
+  getById: (id: number) => Promise<DomainResponse<T> | null>;
+  create: (data: CreateEntityDTO<T>) => Promise<DomainResponse<T>>;
+  update: (id: number, data: UpdateEntityDTO<T>) => Promise<DomainResponse<T>>;
   remove: (id: number) => Promise<void>;
   
   clearError: () => void;
@@ -248,7 +249,11 @@ export function useEntityCrud<T extends { id: number }>(
     if (filter.search) params.append(searchParamName, filter.search);
     for (const [key, val] of Object.entries(filter)) {
       if (key === 'search' || key === 'sortColumn' || key === 'sortOrder') continue;
-      if (val !== undefined && val !== '') params.append(key, String(val));
+      if (Array.isArray(val)) {
+        for (const item of val) {
+          if (item !== undefined && item !== null && item !== '') params.append(`${key}[]`, String(item));
+        }
+      } else if (val !== undefined && val !== '') params.append(key, String(val));
     }
     if (filter.sortColumn) {
       params.append(`sort_by[${filter.sortColumn}]`, filter.sortOrder ?? 'asc');

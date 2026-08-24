@@ -121,6 +121,7 @@
     "decimal_places": "Decimal Places",
     "created_at": "Created At",
     "is_base": "Base",
+    "is_active": "Active",
     "created": "Currency created successfully",
     "create_error": "Failed to create currency",
     "updated": "Currency updated successfully",
