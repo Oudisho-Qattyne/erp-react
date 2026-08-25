@@ -74,11 +74,11 @@ export function NotificationsBell() {
   const unreadCount = notifications.filter((n) => !n.read_at).length;
 
   const handleItemClick = (notification: Notification) => {
-    void markAsRead(String(notification.id ?? '')).then(() => {
-      const config = resolveConfig(notification);
-      if (config?.action) config.action(contextFor(notification, config));
-      setOpen(false);
-    });
+    markAsRead(String(notification.id ?? ''))
+    const config = resolveConfig(notification);
+    if (config?.action) config.action(contextFor(notification, config));
+    setOpen(false);
+
   };
 
   const renderTitle = (notification: Notification): string => {
@@ -126,11 +126,10 @@ export function NotificationsBell() {
                 setOpen(false);
               }}
               disabled={unreadCount === 0}
-              className={`flex items-center gap-1 text-xs font-semibold transition-colors cursor-pointer ${
-                unreadCount === 0
+              className={`flex items-center gap-1 text-xs font-semibold transition-colors cursor-pointer ${unreadCount === 0
                   ? 'text-text-muted/50 cursor-not-allowed'
                   : 'text-primary hover:text-primary-dark'
-              }`}
+                }`}
             >
               <CheckCheck size={14} />
               {t('notifications.mark_all_read', 'shared') || 'Mark all as read'}
@@ -176,9 +175,8 @@ export function NotificationsBell() {
                   key={String(notification.id)}
                   type="button"
                   onClick={() => handleItemClick(notification)}
-                  className={`w-full flex items-start gap-3 px-4 py-3 text-start border-b border-border/50 last:border-b-0 transition-colors hover:bg-primary-light/40 cursor-pointer ${
-                    isUnread ? 'bg-primary-light/20' : ''
-                  }`}
+                  className={`w-full flex items-start gap-3 px-4 py-3 text-start border-b border-border/50 last:border-b-0 transition-colors hover:bg-primary-light/40 cursor-pointer ${isUnread ? 'bg-primary-light/20' : ''
+                    }`}
                 >
                   <span
                     className={`mt-1.5 shrink-0 w-2 h-2 rounded-full ${isUnread ? 'bg-gold' : 'bg-text-muted/30'}`}

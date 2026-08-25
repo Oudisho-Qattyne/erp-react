@@ -102,9 +102,11 @@
     "updated": "تم تحديث المناقلة بنجاح",
     "update_error": "فشل تحديث المناقلة",
     "load_error": "فشل تحميل المناقلات",
-    "payment_currency": "عملة الدفع",
+    "payment_currency": "العملة المدفوعة",
+    "base_currency": "العملة الأساسية",
     "paid_amount": "الكمية المدفوعة",
     "confirm_payment": "تأكيد الدفع",
+    "cancel_transaction":"إلغاء المناقلة",
     "validation": {
       "type_required": "نوع المناقلة مطلوب",
       "value_required": "القيمة مطلوبة",

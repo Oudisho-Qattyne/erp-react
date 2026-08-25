@@ -12,8 +12,8 @@ export type CreateTransactionDto = Omit<
 // Status can only move forward: pending -> approved | canceled (no going back, no reset to pending)
 export type UpdateTransactionStatusDto = {
   transaction_status: Exclude<TransactionStatus, "pending">;
-  transaction_currency_id:string;
-  client_payed_amount:number;
+  transaction_currency_id?:string;
+  client_payed_amount?:number;
 };
 
 // New transactions always start as pending
@@ -30,6 +30,7 @@ export interface TransactionFilters {
   // Partial match (LIKE) on reason
   search?: string;
   // Exact-match filters
+  id?:number;
   type?: TransactionType;
   status?: TransactionStatus;
   // Exact match on transaction_value

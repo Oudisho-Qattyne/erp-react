@@ -102,9 +102,12 @@
     "updated": "Transaction updated successfully",
     "update_error": "Failed to update transaction",
     "load_error": "Failed to load transactions",
-    "payment_currency": "Payment currency",
+    "payment_currency": "Paid currency",
+    "base_currency": "Base currency",
     "paid_amount": "Paid amount",
     "confirm_payment": "Confirm payment",
+    "cancel_transaction":"Cancel transaction",
+
     "validation": {
       "type_required": "Transaction type is required",
       "value_required": "Value is required",

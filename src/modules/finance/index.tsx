@@ -69,9 +69,9 @@ registerNotificationHandler('subscription_request.transaction_created', {
   },
   action: ({ navigate, data }): void => {
     const payload = data as SubscriptionRequestPayload | null;
-    const reason = payload?.transaction?.reason;
-    if (reason) {
-      navigate('/finance/transactions', { state: { filter: { search: reason } } });
+    const id = payload?.transaction?.id;
+    if (id) {
+      navigate('/finance/transactions', { state: { filter: { id: id } } });
       return;
     }
     navigate('/investments/plots');

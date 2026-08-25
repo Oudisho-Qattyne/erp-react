@@ -13,15 +13,16 @@ import { CreateTransactionForm } from "../components/CreateTransactionForm"
 import type { Transaction } from "../../domain/entities/Transaction"
 import type { TransactionFilters } from "../../application/dtos/transactionDtos"
 import { Dialog } from "../../../../core/presentation/layouts/ui/dialog/Dialog"
-import { GenericCreateForm } from "../../../../core/presentation/layouts/ui/forms/GenericCreateForm"
-import { getApproveTransactionSchema, buildApproveTransactionFields } from "../forms/transactionApprovalFormConfig"
+import { TablePickerInput } from "../../../../core/presentation/layouts/ui/inputs/TablePickerInput"
+import { CurrencyPickerDialog } from "../components/CurrencyPickerDialog"
+import { getLocalizedName } from "../../../../core/presentation/utils/helpes"
 import { useTransactionableDetails } from "../../../../core/registry/transactionable/TransactionableProvider"
 import { Search, Filter, Plus, Check, X } from "lucide-react"
 
 const MODULE = "finance"
 
 interface TransactionsNavState {
-  filter?: { search?: string }
+  filter?: { id?: number }
 }
 
 const typeStyles: Record<string, string> = {
@@ -45,11 +46,13 @@ export function TransactionsPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [isAddOpen, setIsAddOpen] = useState(false)
   const [paymentTarget, setPaymentTarget] = useState<{ transaction: Transaction; action: "approved" | "canceled" } | null>(null)
+  const [payCurrency, setPayCurrency] = useState("SYP")
+  const [payAmount, setPayAmount] = useState<number>(0)
 
-  const [initialSearch] = useState(
-    () => (location.state as TransactionsNavState | null)?.filter?.search ?? ""
+  const [initialId] = useState(
+    () => (location.state as TransactionsNavState | null)?.filter?.id ?? null
   )
-  const [localSearch, setLocalSearch] = useState(initialSearch)
+  const [localSearch, setLocalSearch] = useState<string>()
   const appliedStateRef = useRef<unknown>(location.state)
 
   const {
@@ -62,7 +65,7 @@ export function TransactionsPage() {
     resetFilter,
     findAllTransactions,
     updateTransactionStatus,
-  } = useTransactions(initialSearch ? { search: initialSearch, page: 1 } : undefined)
+  } = useTransactions(initialId ? { id: initialId, page: 1 } : undefined)
 
   const {
     currencies,
@@ -105,7 +108,7 @@ export function TransactionsPage() {
   }
 
   useEffect(() => {
-    if (!initialSearch) return
+    if (!initialId) return
     navigate(location.pathname, { replace: true, state: null })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -113,11 +116,10 @@ export function TransactionsPage() {
   useEffect(() => {
     if (location.state === appliedStateRef.current) return
     appliedStateRef.current = location.state
-    const search = (location.state as TransactionsNavState | null)?.filter?.search
-    if (!search) return
+    const id = (location.state as TransactionsNavState | null)?.filter?.id
+    if (!id) return
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLocalSearch(search)
-    setFilter({ search, page: 1 })
+    setFilter({ id, page: 1 })
     navigate(location.pathname, { replace: true, state: null })
   }, [location.state, location.pathname, navigate, setFilter])
 
@@ -131,6 +133,33 @@ export function TransactionsPage() {
       findAllCurrencies()
     }
   }, [paymentTarget, currencies.length])
+
+  // Reset the payment currency/amount whenever the action dialog opens
+  useEffect(() => {
+    if (!paymentTarget) return
+    setPayCurrency("SYP")
+    setPayAmount(paymentTarget.transaction.transaction_value)
+  }, [paymentTarget])
+
+  // Convert the base transaction value into the selected payment currency (from_base)
+  useEffect(() => {
+    if (!paymentTarget) return
+    if (payCurrency === "SYP") {
+      setPayAmount(paymentTarget.transaction.transaction_value)
+      return
+    }
+    let active = true
+    convertCurrency({
+      action: "from_base",
+      currency_code: payCurrency,
+      amount: paymentTarget.transaction.transaction_value,
+    }).then((res) => {
+      if (active && res?.result != null) setPayAmount(res.result)
+    })
+    return () => {
+      active = false
+    }
+  }, [payCurrency, paymentTarget])
 
   const sortColumn = filter.sort_by ? (Object.keys(filter.sort_by)[0] as string) : undefined
   const sortOrder = sortColumn ? filter.sort_by?.[sortColumn as keyof TransactionFilters["sort_by"]] : undefined
@@ -378,31 +407,69 @@ export function TransactionsPage() {
         size="md"
       >
         {paymentTarget && (
-          <GenericCreateForm
-            schema={getApproveTransactionSchema()}
-            fields={buildApproveTransactionFields(t, {
-              currencies,
-              convertCurrency,
-              transactionValue: paymentTarget.transaction.transaction_value,
-            })}
-            defaultValues={{
-              transaction_currency_id: "SYP",
-              client_payed_amount: paymentTarget.transaction.transaction_value,
-            }}
-            onSubmit={async (data) => {
-              await updateTransactionStatus(paymentTarget.transaction.id, {
-                transaction_status: paymentTarget.action,
-                transaction_currency_id: data.transaction_currency_id,
-                client_payed_amount: Number(data.client_payed_amount),
-              })
-            }}
-            onSuccess={() => {
-              setPaymentTarget(null)
-              findAllTransactions()
-            }}
-            onCancel={() => setPaymentTarget(null)}
-            submitLabel={t("transaction.confirm_payment", MODULE) || "تأكيد الدفع"}
-          />
+          <div className="space-y-5">
+            <div className="text-center">
+              <p className="text-sm text-text-muted mb-1">{t("transaction.value", MODULE) || "Value"}</p>
+              <p className="text-4xl font-bold leading-none">
+                {paymentTarget.transaction.transaction_value.toLocaleString()}
+                <span className="text-2xl ml-2 text-primary">SYP</span>
+              </p>
+              <p className="text-xs text-text-muted mt-1">
+                {t("transaction.base_currency", MODULE) || "Base currency"}
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                {t("transaction.payment_currency", MODULE) || "العملة المدفوعة"}
+              </label>
+              <TablePickerInput
+                value={payCurrency}
+                onChange={(val) => setPayCurrency(val as string)}
+                picker={CurrencyPickerDialog}
+                valueKey="code"
+                displayLabel={(code) => {
+                  const c = currencies.find((x) => x.code === code)
+                  return c ? `${getLocalizedName(c.name)} (${c.code})` : code || ""
+                }}
+                pickerProps={{ multiple: false }}
+                baseClasses={inputBaseClasses}
+              />
+            </div>
+
+            <div className="rounded-lg bg-card/40 p-3">
+              <p className="text-sm text-text-muted mb-1">
+                {t("transaction.paid_amount", MODULE) || "Client Paid Amount"}
+              </p>
+              <p className="text-2xl font-semibold">
+                {payAmount.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                <span className="text-base ml-2 text-text-muted">{payCurrency}</span>
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setPaymentTarget(null)}>
+                {t("common.cancel", "shared") || "Cancel"}
+              </Button>
+              <Button
+                variant="primary"
+                isLoading={loading.updateTransactionStatus}
+                onClick={async () => {
+                  await updateTransactionStatus(paymentTarget.transaction.id, {
+                    transaction_status: paymentTarget.action,
+                    transaction_currency_id: payCurrency,
+                    client_payed_amount: Number(payAmount),
+                  })
+                  setPaymentTarget(null)
+                  findAllTransactions()
+                }}
+              >
+                {paymentTarget.action === "canceled"
+                  ? t("transaction.cancel_transaction", MODULE) || "إلغاء المناقلة"
+                  : t("transaction.confirm_payment", MODULE) || "تأكيد الدفع"}
+              </Button>
+            </div>
+          </div>
         )}
       </Dialog>
     </div>
