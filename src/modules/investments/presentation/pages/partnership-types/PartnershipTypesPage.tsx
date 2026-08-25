@@ -16,6 +16,7 @@ import { handleApiError } from '../../../../../core/presentation/utils/handleApi
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { Pencil, Trash2, Star, Check, X, History, Filter } from 'lucide-react';
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import { ActiveFilters } from '../../../../../core/presentation/layouts/ui/filter/ActiveFilters';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 
 export function PartnershipTypesPage() {
@@ -169,6 +170,8 @@ export function PartnershipTypesPage() {
             <Button onClick={() => setIsCreateOpen(true)} requiredPermission="investments.partnership-types.create">{t('partnership_types.add', 'investments')}</Button>
         </div>
       </div>
+
+      <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" />
 
       <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={t('partnership_types.add', 'investments')}>
         <GenericCreateForm

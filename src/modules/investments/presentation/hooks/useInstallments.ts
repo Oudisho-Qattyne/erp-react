@@ -53,7 +53,7 @@ export const useInstallments = (): UseInstallmentsReturn => {
       setContract(res.data)
       toast.success(t("installments.pay_success", "investments") || "Installment paid successfully")
     } catch (err: any) {
-      setFnError("payNextUnpaidInstallment", handleApiError(err, { module: "investments" }))
+      setFnError("payNextUnpaidInstallment", handleApiError(err, { module: "investments" , passThrough:true }))
       throw err
     } finally {
       setFnLoading("payNextUnpaidInstallment", false)

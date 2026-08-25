@@ -7,6 +7,7 @@ import { Button } from '../../../../../../core/presentation/layouts/ui/buttons/B
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { FilterDialog, type FilterField } from '../../../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import { ActiveFilters } from '../../../../../../core/presentation/layouts/ui/filter/ActiveFilters';
 import { ErrorState } from '../../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { LoadingState } from '../../../../../../core/presentation/layouts/ui/state/LoadingState';
 import { GenericCreateForm } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
@@ -318,6 +319,8 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
           )}
         </div>
       </div>
+
+      <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" />
 
       {errorMap['getAll'] && <ErrorState message={errorMap['getAll']} onRetry={() => list.refresh()} />}
 

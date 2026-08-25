@@ -5,6 +5,7 @@ import { Button } from "../../../../core/presentation/layouts/ui/buttons/Button"
 import { DataTable, type ColumnDef } from "../../../../core/presentation/layouts/ui/tables/ResizableTable"
 import { ErrorState } from "../../../../core/presentation/layouts/ui/state/ErrorState"
 import { FilterDialog, type FilterField } from "../../../../core/presentation/layouts/ui/filter/FilterDialog"
+import { ActiveFilters } from "../../../../core/presentation/layouts/ui/filter/ActiveFilters"
 import Input from "../../../../core/presentation/layouts/ui/inputs/Input"
 import { inputBaseClasses } from "../../../../core/presentation/layouts/ui/inputs/styles"
 import { usePersonDetails } from "../../../../core/registry/person/PersonProvider"
@@ -147,6 +148,8 @@ export function PersonsPage() {
               {t("common.reset", "shared") || "Reset"}
             </Button>
           </div>
+
+          <ActiveFilters filters={filter} fields={filterFields} className="mt-1" />
 
           <FilterDialog
             isOpen={isFilterOpen}

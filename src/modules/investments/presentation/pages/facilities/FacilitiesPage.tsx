@@ -12,6 +12,7 @@ import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/Re
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import { ActiveFilters } from '../../../../../core/presentation/layouts/ui/filter/ActiveFilters';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
@@ -347,6 +348,8 @@ export function FacilitiesPage() {
           {t('common.reset', 'shared') || 'Reset'}
         </Button>
       </div>
+
+      <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" />
 
       {errorMap["getAll"] ? (
         <ErrorState message={errorMap["getAll"]} onRetry={() => getAll(`/investments/facilities?page=${list.page}&per_page=${list.perPage}`)} />

@@ -81,9 +81,9 @@ export function ShowContractPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="outline" onClick={() => {
-            const plot = contract.plot_id ?? contract.plot?.id
+            const plot = contract.plot_id ?? contract.plot?.id ?? contract.dossier.plot_id
             const dossier = contract.dossier_id ?? contract.dossier?.id
-            if (plot && dossier) navigate(`investments/plots/${plot}/dossiers/${dossier}`)
+             if(plot && dossier) navigate(`/investments/plots/${plot}/dossiers/${dossier}`)
           }}>
             <ArrowLeft size={16} /> {t('common.back', 'shared') || 'Back'}
           </Button>

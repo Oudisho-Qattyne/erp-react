@@ -10,6 +10,7 @@ import { ErrorState } from '../../../../../../core/presentation/layouts/ui/state
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { FilterDialog, type FilterField } from '../../../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import { ActiveFilters } from '../../../../../../core/presentation/layouts/ui/filter/ActiveFilters';
 import { GenericCreateForm } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
@@ -164,7 +165,7 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
       width: 130,
       render: (row: Contract) => (
         <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
-          <Button variant="ghost" size="sm" onClick={() => window.open(`/investments/plots/${plotId}/dossiers/${dossierId}/contract/${row.id}` , '_blank')} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.contracts.view">
+          <Button variant="ghost" size="sm" onClick={() => window.open(`/investments/plots/${plotId}/dossiers/${dossierId}/contract/${row.id}`, '_blank')} title={t('common.view', 'shared') || 'View'} requiredPermission="investments.contracts.view">
             <Eye size={16} />
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setEditingContract(row)} title={t('common.edit', 'shared') || 'Edit'} requiredPermission="investments.contracts.update">
@@ -187,7 +188,7 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
         title={t('contract.title', 'investments') || 'Contracts'}
         icon={<FileSignature size={20} />}
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3 mb-4">
           <div className="relative flex-1 max-w-sm">
             <input
               type="text"
@@ -199,21 +200,25 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
             />
             <Search size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="primary" size="sm" onClick={handleSearch}>
-              {t('common.search', 'shared') || 'Search'}
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
-              {t('common.filter', 'shared') || 'Filter'}
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleResetFilter}>
-              {t('common.reset', 'shared') || 'Reset'}
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="investments.contracts.create">
+          <Button variant="primary" size="sm" onClick={handleSearch}>
+            {t('common.search', 'shared') || 'Search'}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
+            {t('common.filter', 'shared') || 'Filter'}
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleResetFilter}>
+            {t('common.reset', 'shared') || 'Reset'}
+          </Button>
+          {
+            contracts.length == 0 &&
+            <Button variant="outline" size="sm" className="ms-auto" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="investments.contracts.create">
               {t('contract.add', 'investments') || 'Add Contract'}
             </Button>
-          </div>
+          }
         </div>
+
+        <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" />
+
         {errorMap["getAll"] ? (
           <ErrorState message={errorMap["getAll"]} onRetry={() => list.refresh()} />
         ) : (

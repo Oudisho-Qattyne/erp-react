@@ -43,12 +43,14 @@ export function InstallmentsSection({
   };
 
   const handlePay = async () => {
+    
     if (!payDate) return;
     const nextUnpaid = sorted.find((i) => !i.payment_date);
-    if (nextUnpaid && payDate < normalizeDate(nextUnpaid.due_date)) {
-      setPayError(t('installments.validation.payment_before_due', 'investments') || 'Payment date cannot be before the due date');
-      return;
-    }
+    console.log(nextUnpaid , sorted , payDate ,  normalizeDate(nextUnpaid.due_date) , payDate < normalizeDate(nextUnpaid.due_date)) ;
+    // if (nextUnpaid && payDate > normalizeDate(nextUnpaid.due_date)) {
+    //   setPayError(t('installments.validation.payment_before_due', 'investments') || 'Payment date cannot be before the due date');
+    //   return;
+    // }
     setPayError('');
     await onPayNextUnpaid(contractId, payDate);
     setPayDialogOpen(false);
@@ -74,10 +76,10 @@ export function InstallmentsSection({
 
   const handleEdit = async () => {
     if (!editInstallment || !editDate) return;
-    if (editDate < normalizeDate(editInstallment.due_date)) {
-      setEditError(t('installments.validation.payment_before_due', 'investments') || 'Payment date cannot be before the due date');
-      return;
-    }
+    // if (editDate > normalizeDate(editInstallment.due_date)) {
+    //   setEditError(t('installments.validation.payment_before_due', 'investments') || 'Payment date cannot be before the due date');
+    //   return;
+    // }
     setEditError('');
     await onUpdatePaymentDate(editInstallment.id, contractId, editDate);
     setEditDialogOpen(false);

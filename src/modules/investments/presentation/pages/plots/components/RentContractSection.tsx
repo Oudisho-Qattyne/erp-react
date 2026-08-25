@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../../core/presentation/hooks/data/useEntity';
 import type { RentContract } from '../../../../domain/entities/rentContract';
@@ -10,6 +10,7 @@ import { ErrorState } from '../../../../../../core/presentation/layouts/ui/state
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { FilterDialog, type FilterField } from '../../../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import { ActiveFilters } from '../../../../../../core/presentation/layouts/ui/filter/ActiveFilters';
 import { GenericCreateForm } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { AuditLog } from '../../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
@@ -36,6 +37,10 @@ export function RentContractSection({ plotId, dossierId }: RentContractSectionPr
 
   const { entities: industries, getAll: getIndustries } = useEntityCrud<RentContractIndustry>('/investments/rent-contract-industries', '/investments/rent-contract-industries');
   const { create: createIndustry } = useEntityCrud<RentContractIndustry>('/investments/rent-contract-industries', '/investments/rent-contract-industries');
+
+  useEffect(() => {
+    getIndustries('/investments/rent-contract-industries?is_active=true');
+  }, [getIndustries]);
 
   const [localSearch, setLocalSearch] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -177,7 +182,7 @@ export function RentContractSection({ plotId, dossierId }: RentContractSectionPr
         title={t('rent_contract.title', 'investments') || 'Rent Contracts'}
         icon={<FileSignature size={20} />}
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3 mb-4">
           <div className="relative flex-1 max-w-sm">
             <input
               type="text"
@@ -189,21 +194,22 @@ export function RentContractSection({ plotId, dossierId }: RentContractSectionPr
             />
             <Search size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="primary" size="sm" onClick={handleSearch}>
-              {t('common.search', 'shared') || 'Search'}
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
-              {t('common.filter', 'shared') || 'Filter'}
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleResetFilter}>
-              {t('common.reset', 'shared') || 'Reset'}
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="investments.rent-contracts.create">
-              {t('rent_contract.add', 'investments') || 'Add Rent Contract'}
-            </Button>
-          </div>
+          <Button variant="primary" size="sm" onClick={handleSearch}>
+            {t('common.search', 'shared') || 'Search'}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
+            {t('common.filter', 'shared') || 'Filter'}
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleResetFilter}>
+            {t('common.reset', 'shared') || 'Reset'}
+          </Button>
+          <Button variant="outline" size="sm" className="ms-auto" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="investments.rent-contracts.create">
+            {t('rent_contract.add', 'investments') || 'Add Rent Contract'}
+          </Button>
         </div>
+
+        <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" />
+
         {errorMap["getAll"] ? (
           <ErrorState message={errorMap["getAll"]} onRetry={() => list.refresh()} />
         ) : (

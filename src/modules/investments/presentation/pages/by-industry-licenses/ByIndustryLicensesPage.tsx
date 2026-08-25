@@ -15,6 +15,7 @@ import { handleApiError } from '../../../../../core/presentation/utils/handleApi
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { Pencil, Trash2, Star, Check, X, History, Filter, Search } from 'lucide-react';
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import { ActiveFilters } from '../../../../../core/presentation/layouts/ui/filter/ActiveFilters';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
 import type { ByIndustryLicense } from '../../../domain/entities/byIndustryLicense';
 
@@ -180,6 +181,8 @@ export function ByIndustryLicensesPage() {
           <Button onClick={() => setIsCreateOpen(true)} requiredPermission="investments.by-industry-licenses.create">{t('by_industry_licenses.add', 'investments')}</Button>
         </div>
       </div>
+
+      <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" />
 
       <Dialog isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title={t('by_industry_licenses.add', 'investments')}>
         <GenericCreateForm

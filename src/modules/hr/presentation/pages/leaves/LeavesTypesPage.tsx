@@ -6,6 +6,7 @@ import { DataTable, type ColumnDef } from "../../../../../core/presentation/layo
 import { Dialog } from "../../../../../core/presentation/layouts/ui/dialog/Dialog"
 import { ConfirmDialog } from "../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog"
 import { FilterDialog, type FilterField } from "../../../../../core/presentation/layouts/ui/filter/FilterDialog"
+import { ActiveFilters } from "../../../../../core/presentation/layouts/ui/filter/ActiveFilters"
 import Input from "../../../../../core/presentation/layouts/ui/inputs/Input"
 import { inputBaseClasses } from "../../../../../core/presentation/layouts/ui/inputs/styles"
 import { LoadingState } from "../../../../../core/presentation/layouts/ui/state/LoadingState"
@@ -175,7 +176,9 @@ export default function LeavesTypesPage() {
           + {t("leave.add", "hr") || "إضافة إجازة"}
         </Button>
       </div>
- 
+
+      <ActiveFilters filters={filter} fields={filterFields} className="mt-1" />
+
       {error.findAll && !loading.findAll && <ErrorState message={error.findAll} onRetry={() => findAll()} />}
       {!error.findAll && (
         <DataTable loading={loading.findAll}

@@ -15,6 +15,7 @@ import { InfoRow } from "../../../../../core/presentation/layouts/ui/card/InfoRo
 import { YesNo } from "../../../../../core/presentation/layouts/ui/card/YesNo"
 import { DataTable, type ColumnDef } from "../../../../../core/presentation/layouts/ui/tables/ResizableTable"
 import { FilterDialog, type FilterField } from "../../../../../core/presentation/layouts/ui/filter/FilterDialog"
+import { ActiveFilters } from "../../../../../core/presentation/layouts/ui/filter/ActiveFilters"
 import { LeaveTypePickerDialog } from "../../components/leaveTypes/LeaveTypePickerDialog"
 import { CreateEmployeeLeaveRequestDialog } from "./CreateEmployeeLeaveRequestDialog"
 import { Dialog } from "../../../../../core/presentation/layouts/ui/dialog/Dialog"
@@ -897,6 +898,9 @@ export function ShowLeaveRequestAdminPage() {
                 {t("common.reset", "shared") || "Reset"}
               </Button>
             </div>
+
+            <ActiveFilters filters={filter} fields={filterFields} className="mt-1" />
+
             <DataTable
               columns={historyColumns}
               data={historyRows}

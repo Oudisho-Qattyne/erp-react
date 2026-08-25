@@ -9,6 +9,7 @@ import { inputBaseClasses } from "../../../../../core/presentation/layouts/ui/in
 import { LoadingState } from "../../../../../core/presentation/layouts/ui/state/LoadingState"
 import { ErrorState } from "../../../../../core/presentation/layouts/ui/state/ErrorState"
 import { FilterDialog, type FilterField } from "../../../../../core/presentation/layouts/ui/filter/FilterDialog"
+import { ActiveFilters } from "../../../../../core/presentation/layouts/ui/filter/ActiveFilters"
 import { useManageUsers } from "../../hooks/user/userManageUsers"
 import { CreateUserForm } from "../../components/CreateUserForm"
 import { ShowUserDialog } from "../../components/ShowUserDialog"
@@ -256,6 +257,8 @@ export function AllUsers() {
               {t("common.reset", "shared") || "Reset"}
             </Button>
           </div>
+
+          <ActiveFilters filters={filter} fields={filterFields} className="mt-1" />
 
           <FilterDialog
             isOpen={isFilterOpen}

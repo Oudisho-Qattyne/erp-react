@@ -9,6 +9,7 @@ import { ErrorState } from '../../../../core/presentation/layouts/ui/state/Error
 import { Dialog } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { FilterDialog, type FilterField } from '../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import { ActiveFilters } from '../../../../core/presentation/layouts/ui/filter/ActiveFilters';
 import { GenericCreateForm } from '../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import Input from '../../../../core/presentation/layouts/ui/inputs/Input';
 import { inputBaseClasses } from '../../../../core/presentation/layouts/ui/inputs/styles';
@@ -256,6 +257,8 @@ export function ExchangeRatesPage() {
               {t('common.reset', 'shared') || 'Reset'}
             </Button>
           </div>
+
+          <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" />
 
           <FilterDialog
             isOpen={isFilterOpen}

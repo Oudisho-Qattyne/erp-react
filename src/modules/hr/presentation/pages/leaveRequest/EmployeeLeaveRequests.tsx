@@ -6,6 +6,7 @@ import { Button } from "../../../../../core/presentation/layouts/ui/buttons/Butt
 import { DataTable, type ColumnDef } from "../../../../../core/presentation/layouts/ui/tables/ResizableTable"
 import { ErrorState } from "../../../../../core/presentation/layouts/ui/state/ErrorState"
 import { FilterDialog, type FilterField } from "../../../../../core/presentation/layouts/ui/filter/FilterDialog"
+import { ActiveFilters } from "../../../../../core/presentation/layouts/ui/filter/ActiveFilters"
 import { Dialog } from "../../../../../core/presentation/layouts/ui/dialog/Dialog"
 import { useLeaveRequest } from "../../hooks/leaveRequest/useLeaveRequest"
 import { useLeaveTypes } from "../../hooks/leave/useLeaveTypes"
@@ -303,6 +304,9 @@ export const EmployeeLeaveRequests = () => {
                             {t("common.reset", "shared") || "Reset"}
                         </Button>
                     </div>
+
+                    <ActiveFilters filters={filter} fields={filterFields} className="mt-1" />
+
                     <DataTable
                         columns={columns}
                         data={employeeLeaveRequests}

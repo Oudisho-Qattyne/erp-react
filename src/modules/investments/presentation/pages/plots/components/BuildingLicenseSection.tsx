@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../../core/presentation/hooks/data/useEntity';
@@ -14,6 +14,7 @@ import { DataTable } from '../../../../../../core/presentation/layouts/ui/tables
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { FilterDialog, type FilterField } from '../../../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import { ActiveFilters } from '../../../../../../core/presentation/layouts/ui/filter/ActiveFilters';
 import { GenericCreateForm } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import { SectionCard } from '../../../../../../core/presentation/layouts/ui/card/SectionCard';
 import { getCreateBuildingLicenseFormSchema } from '../../../schemas/buildingLicenseForm.schema';
@@ -41,6 +42,12 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
   const { entities: licensingStatuses, getAll: getLicensingStatuses, create: createLicensingStatus } = useEntityCrud<LicensingStatus>('/investments/license-statuses', '/investments/license-statuses');
   const { entities: durationLicenses, getAll: getDurationLicenses, create: createDurationLicense } = useEntityCrud<ByDurationLicense>('/investments/by-duration-licenses', '/investments/by-duration-licenses');
   const { entities: industryLicenses, getAll: getIndustryLicenses, create: createIndustryLicense } = useEntityCrud<ByIndustryLicense>('/investments/by-industry-licenses', '/investments/by-industry-licenses');
+
+  useEffect(() => {
+    getLicensingStatuses();
+    getDurationLicenses();
+    getIndustryLicenses();
+  }, [getLicensingStatuses, getDurationLicenses, getIndustryLicenses]);
 
   const [localSearch, setLocalSearch] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -125,9 +132,7 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
     },
     { name: "from_building_license_date", label: t('building_license.from_building_license_date', 'investments') || 'From License Date', type: 'date' },
     { name: "to_building_license_date", label: t('building_license.to_building_license_date', 'investments') || 'To License Date', type: 'date' },
-    { name: "from_created_at", label: t('building_license.from_created_at', 'investments') || 'From Created', type: 'date' },
-    { name: "to_created_at", label: t('building_license.to_created_at', 'investments') || 'To Created', type: 'date' },
-  ];
+     ];
 
   const filterInitialValues = useMemo(
     () => {
@@ -203,7 +208,7 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
         title={t('building_license.title', 'investments') || 'Building Licenses'}
         icon={<FileText size={20} />}
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3 mb-4">
           <div className="relative flex-1 max-w-sm">
             <input
               type="text"
@@ -215,21 +220,22 @@ export function BuildingLicenseSection({ facilityId }: BuildingLicenseSectionPro
             />
             <Search size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="primary" size="sm" onClick={handleSearch}>
-              {t('common.search', 'shared') || 'Search'}
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
-              {t('common.filter', 'shared') || 'Filter'}
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleResetFilter}>
-              {t('common.reset', 'shared') || 'Reset'}
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="investments.building-licenses.create">
-              {t('building_license.add', 'investments') || 'Add Building License'}
-            </Button>
-          </div>
+          <Button variant="primary" size="sm" onClick={handleSearch}>
+            {t('common.search', 'shared') || 'Search'}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
+            {t('common.filter', 'shared') || 'Filter'}
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleResetFilter}>
+            {t('common.reset', 'shared') || 'Reset'}
+          </Button>
+          <Button variant="outline" size="sm" className="ms-auto" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="investments.building-licenses.create">
+            {t('building_license.add', 'investments') || 'Add Building License'}
+          </Button>
         </div>
+
+        <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" />
+
         {errorMap["getAll"] ? (
           <ErrorState message={errorMap["getAll"]} onRetry={() => list.refresh()} />
         ) : (

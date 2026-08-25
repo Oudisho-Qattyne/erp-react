@@ -6,6 +6,7 @@ import { DataTable, type ColumnDef } from "../../../../../core/presentation/layo
 import { LoadingState } from "../../../../../core/presentation/layouts/ui/state/LoadingState"
 import { ErrorState } from "../../../../../core/presentation/layouts/ui/state/ErrorState"
 import { FilterDialog, type FilterField } from "../../../../../core/presentation/layouts/ui/filter/FilterDialog"
+import { ActiveFilters } from "../../../../../core/presentation/layouts/ui/filter/ActiveFilters"
 import { LeaveTypePickerDialog } from "../../components/leaveTypes/LeaveTypePickerDialog"
 import { EmployeePickerDialog } from "../../components/employee/EmployeePickerDialog"
 import { useLeaveBalance } from "../../hooks/leaveBalance/useLeaveBalance"
@@ -234,6 +235,8 @@ export const EmployeeLeaveBalances = () => {
                             {t("common.reset", "shared") || "Reset"}
                         </Button>
                     </div>
+
+                    <ActiveFilters filters={filter} fields={filterFields} className="mt-1" />
 
                     <DataTable
                         columns={columns}

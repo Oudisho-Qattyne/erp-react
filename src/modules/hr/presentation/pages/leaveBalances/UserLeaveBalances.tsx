@@ -6,6 +6,7 @@ import { LoadingState } from "../../../../../core/presentation/layouts/ui/state/
 import { ErrorState } from "../../../../../core/presentation/layouts/ui/state/ErrorState"
 import { OccupancyCard } from "../../../../../core/presentation/layouts/ui/statistics/OccupancyCard"
 import { FilterDialog, type FilterField } from "../../../../../core/presentation/layouts/ui/filter/FilterDialog"
+import { ActiveFilters } from "../../../../../core/presentation/layouts/ui/filter/ActiveFilters"
 import { LeaveTypePickerDialog } from "../../components/leaveTypes/LeaveTypePickerDialog"
 import { useLeaveBalance } from "../../hooks/leaveBalance/useLeaveBalance"
 import type { LeaveBalance } from "../../../domain/entities/leaveBalance/leaveBalance"
@@ -119,6 +120,9 @@ export const UserLeaveBalances = () => {
               {t("common.reset", "shared") || "Reset"}
             </Button>
           </div>
+
+          <ActiveFilters filters={filter} fields={filterFields} className="mt-1" />
+
           <DataTable
             columns={columns}
             data={myLeaveBalances}

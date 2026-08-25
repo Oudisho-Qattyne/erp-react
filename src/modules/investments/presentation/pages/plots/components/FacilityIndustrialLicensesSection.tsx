@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
 import { useEntityCrud } from '../../../../../../core/presentation/hooks/data/useEntity';
 import type { FacilityIndustrialLicense } from '../../../../domain/entities/facilityIndustrialLicense';
@@ -11,6 +11,7 @@ import { inputBaseClasses } from '../../../../../../core/presentation/layouts/ui
 import { ErrorState } from '../../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { DataTable } from '../../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { FilterDialog, type FilterField } from '../../../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import { ActiveFilters } from '../../../../../../core/presentation/layouts/ui/filter/ActiveFilters';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { GenericCreateForm } from '../../../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
@@ -40,6 +41,13 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
   const { entities: industryTypes, getAll: getIndustryTypes, create: createIndustryType } = useEntityCrud<IndustryType>('/investments/industry-types', '/investments/industry-types');
   const { entities: decisionTypes, getAll: getDecisionTypes, create: createDecisionType } = useEntityCrud<IndustrialDecisionType>('/investments/industrial-decision-types', '/investments/industrial-decision-types');
   const { entities: licenseSources, getAll: getLicenseSources, create: createLicenseSource } = useEntityCrud<IndustrialLicenseSource>('/investments/industrial-license-sources', '/investments/industrial-license-sources');
+
+  useEffect(() => {
+    getCategories();
+    getIndustryTypes();
+    getDecisionTypes();
+    getLicenseSources();
+  }, [getCategories, getIndustryTypes, getDecisionTypes, getLicenseSources]);
 
   const [localSearch, setLocalSearch] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -226,7 +234,7 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
         title={t('facility_industrial_licenses.title', 'investments') || 'Industrial Licenses'}
         icon={<FileCheck size={20} />}
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3 mb-4">
           <div className="relative flex-1 max-w-sm">
             <input
               type="text"
@@ -238,21 +246,22 @@ export function FacilityIndustrialLicensesSection({ facilityId }: FacilityIndust
             />
             <Search size={16} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" />
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="primary" size="sm" onClick={handleSearch}>
-              {t('common.search', 'shared') || 'Search'}
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
-              {t('common.filter', 'shared') || 'Filter'}
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleResetFilter}>
-              {t('common.reset', 'shared') || 'Reset'}
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="investments.facility-industrial-licenses.create">
-              {t('facility_industrial_licenses.add', 'investments') || 'Add License'}
-            </Button>
-          </div>
+          <Button variant="primary" size="sm" onClick={handleSearch}>
+            {t('common.search', 'shared') || 'Search'}
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
+            {t('common.filter', 'shared') || 'Filter'}
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleResetFilter}>
+            {t('common.reset', 'shared') || 'Reset'}
+          </Button>
+          <Button variant="outline" size="sm" className="ms-auto" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={16} />} requiredPermission="investments.facility-industrial-licenses.create">
+            {t('facility_industrial_licenses.add', 'investments') || 'Add License'}
+          </Button>
         </div>
+
+        <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" />
+
         {errorMap["getAll"] ? (
           <ErrorState message={errorMap["getAll"]} onRetry={() => list.refresh()} />
         ) : (
