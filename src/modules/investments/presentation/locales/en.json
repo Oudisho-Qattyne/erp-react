@@ -86,6 +86,7 @@
     "code": "Plot Code",
     "identifier": "Identifier",
     "filter_has_allocated_dossier": "Has Allocated Dossier",
+    "filter_created_by": "Created By",
     "area": "Area (㎡)",
     "plot_area_id": "Plot Area",
     "plot_area_name": "Plot Area",

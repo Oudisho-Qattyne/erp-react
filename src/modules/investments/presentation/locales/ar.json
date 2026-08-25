@@ -87,6 +87,7 @@
     "code": "رقم المقسم",
     "identifier": "ID",
     "filter_has_allocated_dossier": "لديه ملف تخصيص",
+    "filter_created_by": "أنشئ بواسطة",
     "area": "المساحة (م²)",
     "plot_area_id": "المنطقة",
     "plot_area_name": "المنطقة",

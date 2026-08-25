@@ -14,6 +14,7 @@ import { handleApiError } from '../../../../../core/presentation/utils/handleApi
 import { Eye, Trash2, MapPin, History, Filter, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { EntityWithNameOnly } from '../../../../../core/domain/entities/EntityWithNameOnly';
+import { getUserPickerDialog } from '../../../../../core/registry/user/userRegistry';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { PlotAuditLogModal } from './components/PlotAuditLogModal';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
@@ -100,6 +101,15 @@ export function PlotsPage() {
     { name: 'has_allocated_dossier', label: t('plots.filter_has_allocated_dossier', 'investments') || 'Has Allocated Dossier', type: 'checkbox' },
     { name: 'from_date', label: t('plots.from_date', 'investments') || 'From Date', type: 'date' },
     { name: 'to_date', label: t('plots.to_date', 'investments') || 'To Date', type: 'date' },
+    {
+      name: 'created_by',
+      label: t('plots.filter_created_by', 'investments') || 'Created By',
+      type: 'table-picker',
+      picker: getUserPickerDialog(),
+      valueKey: 'id',
+      labelKey: 'name',
+      pickerProps: { multiple: true },
+    },
   ], [t, areaOptions, classificationOptions, statusOptions]);
 
   const columns = [
@@ -220,6 +230,7 @@ export function PlotsPage() {
           <Button onClick={() => window.open('/investments/plots/create' , '_blank')} requiredPermission="investments.plots.create">{t('plots.add', 'investments') || 'Add Plot'}</Button>
         </div>
       </div>
+
         <div className="flex flex-wrap items-center gap-3">
           <Input type="text" value={localSearch} onChange={setLocalSearch}
             placeholder={t('common.search', 'shared') || 'Search by code or identifier...'}
@@ -300,5 +311,4 @@ export function PlotsPage() {
     </div>
   );
 }
-
 

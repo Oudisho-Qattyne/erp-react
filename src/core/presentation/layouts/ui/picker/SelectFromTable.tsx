@@ -3,6 +3,7 @@ import { Dialog } from "../dialog/Dialog"
 import { Button } from "../buttons/Button"
 import { DataTable, type ColumnDef } from "../tables/ResizableTable"
 import { FilterDialog, type FilterField } from "../filter/FilterDialog"
+import { ActiveFilters } from "../filter/ActiveFilters"
 import Input from "../inputs/Input"
 import { LoadingState } from "../state/LoadingState"
 import { ErrorState } from "../state/ErrorState"
@@ -218,12 +219,15 @@ export function SelectFromTable<T extends { id: number | string }>({
             </>
           )}
         </div>
-        {createConfig && (
+          {createConfig && (
             <Button variant="primary" size="sm" onClick={() => setIsCreateOpen(true)} leftIcon={<Plus size={14} />} requiredPermission={createConfig.createButtonPermission}>
               {createConfig.buttonLabel || s("common.create", "Create")}
             </Button>
           )}
           </div>
+        {filterFields.length > 0 && (
+          <ActiveFilters filters={filterValues} fields={filterFields} className="mt-1" />
+        )}
         {isLoading && <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />}
         {error && !isLoading && (
           <ErrorState message={error} onRetry={onRetry || (() => { })} />

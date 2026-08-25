@@ -6,6 +6,7 @@ import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button'
 import { DataTable, type ColumnDef } from '../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { Dialog } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { FilterDialog, type FilterField } from '../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import { ActiveFilters } from '../../../../core/presentation/layouts/ui/filter/ActiveFilters';
 import type { EmployeeListItem } from '../../domain/entities/EmployeeListItem';
 import { EmployeeForm } from './EmployeeForm';
 import { FormInput } from '../../../../core/presentation/layouts/ui/inputs/FormInput';
@@ -259,6 +260,8 @@ export function EmployeesPage() {
           + {t('employees.add', 'hr') || 'إضافة موظف'}
         </Button>
       </div>
+
+      <ActiveFilters filters={extraFilters} fields={filterFields} className="mt-1" />
 
       {/* Table */}
       {error && <ErrorState message={error} onRetry={refetch} />}
