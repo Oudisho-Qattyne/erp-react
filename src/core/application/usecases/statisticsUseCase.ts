@@ -1,14 +1,14 @@
 import type { DomainResponse } from "../../domain/common/responce/DomainResponse";
-import type { ReportStatistics, StatisticsFilters } from "../../domain/repositories/IStatisticsRepository";
-import type { IStatisticsRepository } from "../../domain/repositories/IStatisticsRepository";
-import type { StatisticsUsecase } from "../../domain/usecase/IStatisticsUseCase";
+import type { GroupingReportStatistics, GroupingStatisticsFilters } from "../../domain/repositories/IStatisticsRepository";
+import type { IGroupingStatisticsRepository } from "../../domain/repositories/IStatisticsRepository";
+import type { GroupingStatisticsUsecase } from "../../domain/usecase/IStatisticsUseCase";
 
-interface CreateStatisticsUsecaseOptions {
+interface CreateGroupingStatisticsUsecaseOptions {
   /** Query param name carrying the grouping fields. Default 'factor'. */
   factorParamName? : string;
 }
 
-const buildQuery = (factor: string, filters: StatisticsFilters | undefined, factorParamName: string): URLSearchParams => {
+const buildQuery = (factor: string, filters: GroupingStatisticsFilters | undefined, factorParamName: string): URLSearchParams => {
   const query = new URLSearchParams();
   if (factor) query.append(factorParamName, factor);
   for (const [key, val] of Object.entries(filters ?? {})) {
@@ -24,13 +24,13 @@ const buildQuery = (factor: string, filters: StatisticsFilters | undefined, fact
   return query;
 };
 
-export function createStatisticsUsecase(
-  repository: IStatisticsRepository,
-  options?: CreateStatisticsUsecaseOptions
-): StatisticsUsecase {
+export function createGroupingStatisticsUsecase(
+  repository: IGroupingStatisticsRepository,
+  options?: CreateGroupingStatisticsUsecaseOptions
+): GroupingStatisticsUsecase {
   const factorParamName = options?.factorParamName ?? 'factor';
   return {
-    async getStatistics(factor: string, filters?: StatisticsFilters, idempotencyKey?: string): Promise<DomainResponse<ReportStatistics[]>> {
+    async getStatistics(factor: string, filters?: GroupingStatisticsFilters, idempotencyKey?: string): Promise<DomainResponse<GroupingReportStatistics[]>> {
       try {
         return await repository.getStatistics(buildQuery(factor, filters, factorParamName), idempotencyKey);
       } catch (error : any) {

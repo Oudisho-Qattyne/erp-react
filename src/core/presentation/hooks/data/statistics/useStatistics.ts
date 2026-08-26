@@ -2,11 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useApiClient } from "../../../context/api/ApiClinetProvider";
 import { handleApiError } from "../../../utils/handleApiError";
 import { useIdempotency } from "../../useIdempotency";
-import { createStatisticsRepository } from "../../../../infrastructure/repositories/StatisticsRepository";
-import { createStatisticsUsecase } from "../../../../application/usecases/statisticsUseCase";
-import type { ReportStatistics, StatisticsFilters } from "../../../../domain/repositories/IStatisticsRepository";
+import { createGroupingStatisticsRepository } from "../../../../infrastructure/repositories/StatisticsRepository";
+import { createGroupingStatisticsUsecase } from "../../../../application/usecases/statisticsUseCase";
+import type { GroupingReportStatistics, GroupingStatisticsFilters } from "../../../../domain/repositories/IStatisticsRepository";
 
-export type { StatisticsFilters, ReportStatistics } from "../../../../domain/repositories/IStatisticsRepository";
+export type { GroupingStatisticsFilters, GroupingReportStatistics } from "../../../../domain/repositories/IStatisticsRepository";
 
 const initRecord = <T,>(value: T): Record<string, T> => ({});
 
@@ -16,7 +16,7 @@ export interface UseStatisticsOptions {
   /** Field(s) the statistics are grouped by, e.g. 'status' or 'status,nationality' */
   factor : string;
   /** Initial filter. `resetFilter` returns to this. */
-  defaultFilter? : StatisticsFilters;
+  defaultFilter? : GroupingStatisticsFilters;
   /** Set false to disable auto-fetching (e.g. while a dialog is closed). Default true. */
   enabled? : boolean;
   /** Debounce refetches (ms). Default 0 (immediate). */
@@ -24,7 +24,7 @@ export interface UseStatisticsOptions {
 }
 
 export interface UseStatisticsReturn {
-  data : ReportStatistics[];
+  data : GroupingReportStatistics[];
   loading : boolean;
   loadingMap : Record<string, boolean>;
   isLoading : () => boolean;
@@ -35,8 +35,8 @@ export interface UseStatisticsReturn {
 
   getStatistics : () => Promise<void>;
 
-  filter : StatisticsFilters;
-  setFilter : (patch: Partial<StatisticsFilters>) => void;
+  filter : GroupingStatisticsFilters;
+  setFilter : (patch: Partial<GroupingStatisticsFilters>) => void;
   resetFilter : () => void;
   refresh : () => void;
 }
@@ -49,13 +49,13 @@ export function useStatistics({ baseUrl, factor, defaultFilter = {}, enabled = t
   const apiClient = useApiClient();
   const { run } = useIdempotency();
 
-  const repository = createStatisticsRepository(apiClient, baseUrl);
-  const usecase = createStatisticsUsecase(repository);
+  const repository = createGroupingStatisticsRepository(apiClient, baseUrl);
+  const usecase = createGroupingStatisticsUsecase(repository);
 
-  const [data, setData] = useState<ReportStatistics[]>([]);
+  const [data, setData] = useState<GroupingReportStatistics[]>([]);
   const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>(() => initRecord(false));
   const [errorMap, setErrorMap] = useState<Record<string, string | null>>(() => initRecord(null));
-  const [filter, setFilterState] = useState<StatisticsFilters>(defaultFilter);
+  const [filter, setFilterState] = useState<GroupingStatisticsFilters>(defaultFilter);
   const [refreshKey, setRefreshKey] = useState(0);
   const requestIdRef = useRef(0);
 
@@ -68,7 +68,7 @@ export function useStatistics({ baseUrl, factor, defaultFilter = {}, enabled = t
   const hasErrors = useCallback(() => Object.values(errorMap).some((e) => e !== null), [errorMap]);
   const clearError = useCallback(() => setErrorMap(initRecord(null)), []);
 
-  const setFilter = useCallback((patch: Partial<StatisticsFilters>) => {
+  const setFilter = useCallback((patch: Partial<GroupingStatisticsFilters>) => {
     setFilterState((prev) => ({ ...prev, ...patch }));
   }, []);
 
@@ -79,6 +79,10 @@ export function useStatistics({ baseUrl, factor, defaultFilter = {}, enabled = t
   const refresh = useCallback(() => {
     setRefreshKey((k) => k + 1);
   }, []);
+
+  useEffect(() => {
+    setFilterState(defaultFilter);
+  }, [defaultFilter]);
 
   const getStatistics = useCallback(async (): Promise<void> => {
     const requestId = ++requestIdRef.current;

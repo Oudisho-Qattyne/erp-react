@@ -25,7 +25,7 @@ import { RuleGroupComponent } from "../../components/leaveRules/RuleGroupCompone
 import { getEligibilityFields } from "../../utils/RulesFields"
 import { getLocalizedName } from "../../../../../core/presentation/utils/helpes"
 import { ArrowRight, Check, X, Pencil, CheckCircle2, XCircle, User, Briefcase, GraduationCap, HeartPulse, Users, FileText, Filter, Search } from "lucide-react"
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
+import { DonutCard } from "../../../../../core/presentation/layouts/ui/statistics/DonutCard"
 import type { LeaveRequest } from "../../../domain/entities/leaveRequest/leaveRequest"
 import type { Leave, FixedGrantCase, RuleCondition, RuleGroup } from "../../../domain/entities/leave/leave"
 import type { EmployeeData } from "../../../domain/entities/employee"
@@ -467,54 +467,13 @@ export function ShowLeaveRequestAdminPage() {
             </div>
 
             {donutData.length > 0 ? (
-              <div className="flex flex-col md:flex-row items-center gap-8">
-                <div className="relative w-48 h-48 shrink-0">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={donutData}
-                        dataKey="value"
-                        nameKey="name"
-                        innerRadius={62}
-                        outerRadius={88}
-                        paddingAngle={3}
-                        strokeWidth={0}
-                        startAngle={90}
-                        endAngle={-270}
-                      >
-                        {donutData.map((entry, idx) => (
-                          <Cell key={idx} fill={entry.color} />
-                        ))}
-                      </Pie>
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-2xl font-black text-text">{leaveBalance.available_units}</span>
-                    <span className="text-[10px] font-bold text-text-muted uppercase tracking-wide">
-                      {t("leave_balance.available", "hr")}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-3 flex-1 w-full">
-                  {donutData.map((entry) => (
-                    <div key={entry.name} className="flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: entry.color }} />
-                        <span className="text-xs font-semibold text-text-muted">{entry.name}</span>
-                      </div>
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-sm font-bold text-text">{entry.value}</span>
-                        {leaveBalance.entitled_units > 0 && (
-                          <span className="text-[10px] text-text-muted">
-                            ({Math.round((entry.value / (leaveBalance.available_units - leaveBalance.consumed_units)) * 100)}%)
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <DonutCard
+                items={donutData.map((d) => ({ label: d.name, value: d.value, color: d.color }))}
+                centerValue={leaveBalance.available_units}
+                centerLabel={t("leave_balance.available", "hr")}
+                size="md"
+                className="border-0 shadow-none p-0"
+              />
             ) : null}
 
             <div className="border-t border-border/60 pt-5">

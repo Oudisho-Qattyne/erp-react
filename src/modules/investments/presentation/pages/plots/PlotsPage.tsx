@@ -10,9 +10,11 @@ import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/Er
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
 import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { ActiveFilters } from '../../../../../core/presentation/layouts/ui/filter/ActiveFilters';
+import { GroupingDonut } from '../../../../../core/presentation/layouts/ui/statistics/GroupingDonut';
+import { GroupingCards } from '../../../../../core/presentation/layouts/ui/statistics/GroupingCards';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
-import { Eye, Trash2, MapPin, History, Filter, Search } from 'lucide-react';
+import { Eye, Trash2, MapPin, History, Filter, Search, BarChart3, Layers } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { EntityWithNameOnly } from '../../../../../core/domain/entities/EntityWithNameOnly';
 import { getUserPickerDialog } from '../../../../../core/registry/user/userRegistry';
@@ -248,6 +250,17 @@ export function PlotsPage() {
         </div>
 
         <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" />
+
+        <GroupingCards
+          baseUrl="/investments/plots"
+          factors={[
+            { value: 'status', label: t('plots.status', 'investments') || 'Status', icon: <BarChart3 size={14} /> },
+            { value: 'plot_area', label: t('plots.plot_area_id', 'investments') || 'Region', icon: <MapPin size={14} /> },
+            { value: 'plot_classification', label: t('plots.plot_classification_id', 'investments') || 'Classification', icon: <Layers size={14} /> },
+          ]}
+          filters={list.filter}
+          factorLabel="تجميع حسب الحقل"
+        />
 
       <FilterDialog
         isOpen={isFilterOpen}

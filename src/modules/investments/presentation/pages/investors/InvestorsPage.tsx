@@ -14,8 +14,9 @@ import { toast } from 'sonner';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { YesNo } from '../../../../../core/presentation/layouts/ui/card/YesNo';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
-import { Eye, Trash2, Filter, Search, History } from 'lucide-react';
+import { Eye, Trash2, Filter, Search, History, Users, Globe, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { GroupingCards } from '../../../../../core/presentation/layouts/ui/statistics/GroupingCards';
 
 export function InvestorsPage() {
   const { t } = useLanguage();
@@ -202,7 +203,19 @@ export function InvestorsPage() {
         </Button>
       </div>
 
+
       <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" />
+
+        <GroupingCards
+          baseUrl="/investments/investors"
+          factors={[
+            { value: 'gender', label: t('investors.gender', 'investments') || 'Gender', icon: <Users size={14} /> },
+            { value: 'nationality', label: t('investors.nationality', 'investments') || 'Nationality', icon: <Globe size={14} /> },
+            { value: 'is_possible_investor_in_future', label: t('investors.is_possible_investor_in_future', 'investments') || 'Future Possible Investor', icon: <TrendingUp size={14} /> },
+          ]}
+          filters={list.filter}
+          factorLabel="تجميع حسب الحقل"
+        />
 
       <FilterDialog
         isOpen={isFilterOpen}
