@@ -35,7 +35,7 @@ export function DonutCard({
       </div>
 
       {total === 0 ? (
-        <div className="flex items-center justify-center h-[120px] text-sm text-text-muted">
+        <div className="flex items-center justify-center h-30 text-sm text-text-muted">
           No data
         </div>
       ) : (
@@ -75,7 +75,7 @@ export function DonutCard({
             </div>
           </div>
 
-          <div className="space-y-2.5 flex-1 min-w-[140px]">
+          <div className="space-y-2.5 flex-1 min-w-35">
             {donutData.map((entry) => (
               <div key={entry.label} className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-2">

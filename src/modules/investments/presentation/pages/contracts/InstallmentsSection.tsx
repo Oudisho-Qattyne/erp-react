@@ -46,7 +46,6 @@ export function InstallmentsSection({
     
     if (!payDate) return;
     const nextUnpaid = sorted.find((i) => !i.payment_date);
-    console.log(nextUnpaid , sorted , payDate ,  normalizeDate(nextUnpaid.due_date) , payDate < normalizeDate(nextUnpaid.due_date)) ;
     // if (nextUnpaid && payDate > normalizeDate(nextUnpaid.due_date)) {
     //   setPayError(t('installments.validation.payment_before_due', 'investments') || 'Payment date cannot be before the due date');
     //   return;

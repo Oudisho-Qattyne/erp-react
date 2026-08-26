@@ -38,6 +38,12 @@ function toDisplay(
       const opt = options.find((o) => String(o.value) === String(v));
       if (opt) return opt.label;
     }
+    if( "type" in field){
+      if(field.type == "checkbox"){
+        return v ? 'نعم' : 'لا'
+      }
+    }
+    
     const out = formatValue ? formatValue(field.name, v) : undefined;
     return out ?? String(v);
   });
