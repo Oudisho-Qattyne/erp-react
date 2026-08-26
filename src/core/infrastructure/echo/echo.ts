@@ -30,7 +30,7 @@ export const createEcho = (): Echo<'pusher'> => {
   });
 
   (echoInstance.connector.pusher.connection as any).bind('state_change', (states: { previous?: string; current: string }) => {
-    console.log(`[echo] connection: ${states.previous ?? 'init'} -> ${states.current}`);
+    // console.log(`[echo] connection: ${states.previous ?? 'init'} -> ${states.current}`);
   });
 
   return echoInstance;

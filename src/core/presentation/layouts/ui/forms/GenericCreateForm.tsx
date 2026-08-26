@@ -162,7 +162,6 @@ export function GenericCreateForm({
   const formRef = useRef<HTMLDivElement>(null);
 
   useConfirmOnClose(() => methods.formState.isDirty && !methods.formState.isSubmitting);
-  console.log(errors , getValues());
 
   const handleCancel = () => {
     if (requestClose) {

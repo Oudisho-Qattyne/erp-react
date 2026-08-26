@@ -99,12 +99,9 @@ export function ShowDossierPage() {
         <FacilitiesSection plotId={plotId} dossierId={dossierId} />
       }
       {dossierId && plotId && canShowContracts &&
-        <ContractsSection plotId={plotId} dossierId={dossierId} />
+        <ContractsSection plotId={plotId} dossierId={dossierId}  showRentContracts/>
       }
-      {dossierId && plotId && canShowContracts &&
-        <RentContractSection plotId={plotId} dossierId={dossierId} />
-      }
-
+     
       {plotId && dossierId && (
         <DossierStatusHistoryModal
           isOpen={historyOpen}

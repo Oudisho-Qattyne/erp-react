@@ -119,13 +119,8 @@ export function ShowFacilityPage() {
     );
   };
 
-
-  console.log(facility);
-
   const renderProductionMatrix = (title: string, rows?: ProductionCapacityRow[]) => {
     if (!rows || rows.length === 0) return null;
-    console.log(rows);
-
     return (
       <div className="mb-4 last:mb-0">
         <h3 className="text-sm font-semibold text-text mb-2">{title}</h3>

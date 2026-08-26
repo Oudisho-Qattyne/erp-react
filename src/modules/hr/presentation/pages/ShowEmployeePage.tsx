@@ -82,11 +82,6 @@ export function ShowEmployeePage() {
     }
   }, [id]);
 
-console.log(
-  employee &&
-  employee.spouses.map(s => s.id)
-
-);
   const handlePhotoSelect = async (items: any[]) => {
     if (items.length === 0) return;
     setPhotoUpdating(true);

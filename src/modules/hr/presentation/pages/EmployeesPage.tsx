@@ -75,8 +75,6 @@ export function EmployeesPage() {
 
   const computeUniversities = async () => {
     const response = await loadUniversities();
-    console.log(response);
-    
     return { options: [{ value: '', label: t("common.all", "shared") || "All" }, ...response.data.map((u) => ({ value: u.id, label: getLocalizedName(u.name) }))] };
   };
 

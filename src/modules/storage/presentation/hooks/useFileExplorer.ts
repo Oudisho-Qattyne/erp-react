@@ -191,8 +191,6 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
         setFunctionError("createFolder", null);
         try {
             let parentId: string | undefined | null = null;
-            console.log(rootFolder);
-            
             if (rootFolder) {
                 if (parent == "/") {
                     parentId = rootFolder._id;
@@ -206,7 +204,6 @@ export const useFileExplorer = (folderId?: string, fileTypes?: string[], preview
             }
             else {
                 const storageItem = api.getFile(parent);
-                console.log(storageItem , parent);
                if (storageItem) {
                     parentId = storageItem?._id;
                 }

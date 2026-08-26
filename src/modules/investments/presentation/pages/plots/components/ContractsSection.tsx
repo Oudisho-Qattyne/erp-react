@@ -19,13 +19,15 @@ import { buildContractFormFields, buildContractDefaultValues } from '../../../fo
 import { FileSignature, Plus, Eye, Pencil, Trash2, History, Search, Filter, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../../core/presentation/utils/handleApiError';
+import { RentContractSection } from './RentContractSection';
 
 interface ContractsSectionProps {
   plotId: string;
   dossierId: string;
+  showRentContracts?:boolean;
 }
 
-export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
+export function ContractsSection({ plotId, dossierId , showRentContracts=false }: ContractsSectionProps) {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
@@ -182,6 +184,7 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
     },
   ];
 
+  
   return (
     <>
       <SectionCard
@@ -310,6 +313,10 @@ export function ContractsSection({ plotId, dossierId }: ContractsSectionProps) {
         onCancel={() => setIsFilterOpen(false)}
         onReset={handleResetFilter}
       />
+      {showRentContracts && dossierId && plotId && contracts.length > 0 &&
+        <RentContractSection plotId={plotId} dossierId={dossierId} />
+      }
+
     </>
   );
 }

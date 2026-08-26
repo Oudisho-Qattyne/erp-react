@@ -33,7 +33,6 @@ const parseCreatedAt = (dateStr: string): Date => {
 }
 
 export const storageItem2StorageItemDto = (storageItem: StorageItem): StorageItemDto => {
-console.log(storageItem);
 
     const storageItemDto: StorageItemDto = {
         ...storageItem,

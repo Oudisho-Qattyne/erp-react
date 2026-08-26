@@ -125,7 +125,6 @@ export const Sandbox = () => {
   }, [rows])
 
   const handleSubmit = () => {
-    console.log("Simulated submit — authorized_persons payload:", JSON.stringify(payload, null, 2))
     toast.success("Simulated submit — backend would create/update the persons in CRM")
   }
 
