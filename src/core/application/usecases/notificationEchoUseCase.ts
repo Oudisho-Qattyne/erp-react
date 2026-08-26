@@ -23,13 +23,15 @@ export const subscribeNotificationChannel = (
   notificationChannelSubscribed = true
 
   const channel = echo.private(`notifications.${currentUserId}`)
-  // channel.error((error: any) => { console.log('[notifications echo] channel error:', error) })
+  console.log('[notifications echo] subscribing to channel:', `notifications.${currentUserId}`)
+  channel.error((error: any) => { console.log('[notifications echo] channel error:', error) })
 
   channel.notification((notification: BroadcastNotificationData) => {
+    console.log('[notifications echo] received broadcast notification:', notification)
     cbRef.current.onBroadcastNotification(notification)
   })
 
-  // channel.listenToAll((event: string, data: unknown) => {
-  //   console.log('[notifications echo] received event:', event, data)
-  // })
+  channel.listenToAll((event: string, data: unknown) => {
+    console.log('[notifications echo] received event:', event, data)
+  })
 }

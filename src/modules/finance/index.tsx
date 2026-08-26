@@ -80,7 +80,38 @@ registerNotificationHandler('subscription_request.transaction_created', {
     (notification.data?.payload as SubscriptionRequestPayload | null) ?? null,
 });
 
-registerNotificationHandler('transaction_approved.subscription_reqeust', {
+registerNotificationHandler('transaction.created', {
+  title: ({ t }) =>
+    t('notifications.subscription_request_transaction_created_title', 'finance') ||
+    'Subscription request transaction created',
+  description: ({ notification, t, data }) => {
+    const payload = (data ?? notification.data?.payload) as SubscriptionRequestPayload | null;
+    const transaction = payload?.transaction;
+    const base =
+      t('notifications.subscription_request_transaction_created_description', 'finance') ||
+      'A transaction was created for the subscription request';
+    const extras = [
+      transaction?.id ? `#${String(transaction.id).slice(0, 8)}` : '',
+      transaction?.reason ?? '',
+    ]
+      .filter(Boolean)
+      .join(' - ');
+    return extras ? `${base} (${extras})` : base;
+  },
+  action: ({ navigate, data }): void => {
+    const payload = data as SubscriptionRequestPayload | null;
+    const id = payload?.transaction?.id;
+    if (id) {
+      navigate('/finance/transactions', { state: { filter: { id: id } } });
+      return;
+    }
+    navigate('/investments/plots');
+  },
+  data: (notification: Notification): SubscriptionRequestPayload | null =>
+    (notification.data?.payload as SubscriptionRequestPayload | null) ?? null,
+});
+
+registerNotificationHandler('transaction_approved.subscription_request', {
   title: ({ t }) =>
     t('notifications.subscription_request_transaction_approved_title', 'finance') ||
     'Subscription request transaction approved',
@@ -114,8 +145,7 @@ registerNotificationHandler('transaction_approved.subscription_reqeust', {
   data: (notification: Notification): SubscriptionTransactionPayload | null =>
     (notification.data?.payload as SubscriptionTransactionPayload | null) ?? null,
 });
-
-registerNotificationHandler('transaction_canceled.subscription_reqeust', {
+registerNotificationHandler('transaction_canceled.subscription_request', {
   title: ({ t }) =>
     t('notifications.subscription_request_transaction_canceled_title', 'finance') ||
     'Subscription request transaction canceled',

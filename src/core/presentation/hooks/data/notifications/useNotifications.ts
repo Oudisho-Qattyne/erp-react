@@ -52,11 +52,7 @@ export const useNotifications = (): UseNotificationsReturn => {
   cbRef.current = {
     onBroadcastNotification: (data) => {
       playNotificationSound()
-      if (data.type === 'transaction.created') {
-        pushNotification('subscription_request.transaction_created', data);
-      } else if (data.type === 'subscription_request.transaction_updated') {
-        pushNotification('transaction_approved.subscription_reqeust', data);
-      }
+        pushNotification(data.type, data);
     },
   };
 
