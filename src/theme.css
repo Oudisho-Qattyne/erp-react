@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 
 
 @import '@fontsource/tajawal';
@@ -75,14 +77,6 @@
 }
 
 /* Or use prefers-color-scheme automatically */
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    --color-primary: #2a8b54;
-    --color-primary-dark: #1a5a36;
-    --color-primary-light: #1a3a28;
-    /* ... same as .dark overrides ... */
-  }
-}
 
 /* Define the Tailwind theme */
 @theme {

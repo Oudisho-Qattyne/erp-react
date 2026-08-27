@@ -37,6 +37,8 @@ import { MapPin, Users, Clock, Building2, FileText, Factory, FileSignature } fro
 import { ShowFacilityPage } from './presentation/pages/plots/ShowFacilityPage';
 import { FacilityIndustrialLicensesPage } from './presentation/pages/facility-industrial-licenses/FacilityIndustrialLicensesPage';
 import { BuildingLicensesPage } from './presentation/pages/building-licenses/BuildingLicensesPage';
+import { SubscriptionRequestsPage } from './presentation/pages/subscription-requests/SubscriptionRequestsPage';
+import { ShowSubscriptionRequestPage } from './presentation/pages/subscription-requests/ShowSubscriptionRequestPage';
 
 registerPersonDetailRoute({
   type: 'investor',
@@ -187,6 +189,26 @@ const investmentsModule: Module = {
       label: 'transactions.create_title',
       nav: false,
       requiredPermission: 'investments.plot-reqeusts.subscription_request',
+      moduleName: 'investments',
+      group: 'investments_transactions',
+    },
+    {
+      path: '/investments/subscription-requests',
+      element: <SubscriptionRequestsPage />,
+      layout: 'dashboard',
+      label: 'subscription_requests.title',
+      nav: true,
+      order: 26,
+      moduleName: 'investments',
+      icon: <FileText size={18} />,
+      group: 'investments_transactions',
+    },
+    {
+      path: '/investments/subscription-requests/:id',
+      element: <ShowSubscriptionRequestPage />,
+      layout: 'dashboard',
+      label: 'subscription_requests.view',
+      nav: false,
       moduleName: 'investments',
       group: 'investments_transactions',
     },

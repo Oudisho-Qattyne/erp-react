@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react"
 import { DataMatrixInput, type MatrixFieldConfig } from "./core/presentation/layouts/ui/inputs/DataMatrixInput"
 import { toast } from "sonner"
+import { SubscriptionRequestPaper } from "./modules/investments/presentation/components/subscriptionRequests/SubscriptionRequest"
+import type { SubscriptionRequestV100 } from "./modules/investments/domain/entities/subscriptionRequests/versions/subscriptionRequestV100"
 
 interface PersonRecord {
   id: number
@@ -61,6 +63,132 @@ const emptyRow = (): Record<string, unknown> => ({
   __original_name: "",
   __original_email: "",
 })
+
+const subscriptionRequestExample: SubscriptionRequestV100 = {
+  id: 42,
+  plot: {
+    id: 8,
+    code: "273",
+    identifier: "300",
+    area: "213.00",
+    plot_area_id: 3,
+    plot_classification_id: 2,
+    latitude: "123",
+    longitude: "231",
+    notes: null,
+    folder_id: "01a03d50-8fca-7007-8f06-b90214a5aa98",
+    user_id: 1,
+    status: "subscribed",
+    created_at: "26-08-2026",
+    updated_at: "26-08-2026",
+    allocated_dossier_id: null,
+  },
+  dossier_number: null,
+  status: "pending_subscription_fee",
+  dossier_date: "27-08-2026",
+  allocated_date: null,
+  subscription_date: null,
+  notes: null,
+  created_at: "27-08-2026",
+  partners: [
+    {
+      id: 1,
+      first_name: "اوديشو",
+      last_name: "قطينه",
+      father_name: "والد",
+      mother_name: "ولادة",
+      grandfather_name: "جد",
+      national_id: "123456789",
+      nationality: "سوري",
+      gender: "male",
+      phone: "0956626795",
+      facebook: null,
+      instagram: null,
+      x: null,
+      linkedin: null,
+      is_possible_investor_in_future: true,
+      created_at: "15-08-2026",
+      folder_id: "01a00776-ee9e-714e-8fc8-c878f869ddd1",
+    },
+  ],
+  facilities: [
+    {
+      id: 41,
+      plot_id: 8,
+      plot_dossier_id: 42,
+      name: "مشفى",
+      address: "حمص باب سباع",
+      company_type: "existing",
+      commercial_register: "123",
+      commercial_register_date: "2026-08-27",
+      company_nationality_id: 215,
+      first_phone_number: "0956626795",
+      second_phone_number: "0956626795",
+      email: "oudiqa2003@gmail.com",
+      total_capital_in_usd: 1,
+      total_capital_in_syp: 1,
+      value_of_machines_in_usd: 1,
+      value_of_machines_in_syp: 1,
+      number_of_workers: 1,
+      electrical_power_capacity: 100,
+      yearly_estimated_drinking_water_consumption: 100,
+      yearly_estimated_industrial_water_consumption: 100,
+      number_or_patrols: 3,
+      telephone_lines_number: 10,
+      monthly_internet_data_requirement: 100,
+      yearly_imported_raw_materials: "ورق",
+      export_to_production_ratio: 52,
+      created_at: "27-08-2026",
+      authorized_persons: [
+        {
+          person: {
+            id: 2,
+            name: "غازي",
+            email: "ghazy@gmail.com",
+            role: null,
+            primary_phone_number: "0956626795",
+            secondary_phone_number: null,
+            whatsapp: null,
+            telegram: null,
+            x: null,
+            linkedin: null,
+            facebook: null,
+            type: null,
+            created_at: "15-08-2026",
+          },
+          role_in_facility: "مدير",
+          is_required_for_legal_matters: true,
+        },
+      ],
+      partnership_type: {
+        id: 1,
+        name: "إدارية",
+        is_active: true,
+        is_default: true,
+        created_at: "15-08-2026",
+      },
+      folder_id: "01a04436-366d-70a9-baeb-f8f21d495fea",
+      require_all_persons_for_legal_matters: true,
+    },
+  ],
+  transactions: [
+    {
+      id: "01a04436-3683-73ce-b7b0-b7237a4493d2",
+      transaction_type: "incoming",
+      transaction_status: "pending",
+      transaction_value: 13000,
+      client_payed_amount: 13000,
+      exchange_rate_id: null,
+      exchange_rate: 1,
+      transaction_currency_id: "SYP",
+      transaction_date: "2026-08-27",
+      formatted_transaction_date: "27-08-2026",
+      reason: "معاملة طلب اشتراك للإطبارة ذات الرقم #42 في المفسم ذو الرقم #8.",
+      created_at: "27-08-2026",
+    },
+  ],
+}
+
 
 export const Sandbox = () => {
   const [mode, setMode] = useState<AuthMode>("single")
@@ -129,7 +257,8 @@ export const Sandbox = () => {
   }
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-8">
+    <>
+    {/* <div className="p-6 max-w-4xl mx-auto space-y-8">
       <div>
         <h1 className="text-2xl font-bold mb-1">Authorized Persons — Facility Verification</h1>
         <p className="text-sm text-text-muted">
@@ -194,6 +323,24 @@ export const Sandbox = () => {
           {JSON.stringify(payload, null, 2)}
         </pre>
       </div>
+    </div> */}
+    <div className="py-6 space-y-10">
+      <div>
+        <h2 className="text-xl font-bold text-text mb-4 px-4">Subscription Request — v1.0.0</h2>
+        <SubscriptionRequestPaper request={{ version: "1.0.0", payload: subscriptionRequestExample }} />
+      </div>
     </div>
+
+    {/* <div className="p-6 max-w-4xl mx-auto space-y-4">
+      <div>
+        <h1 className="text-2xl font-bold mb-1">SubscriptionRequestV100 — Example</h1>
+        <p className="text-sm text-text-muted">Typed example payload built from the sample JSON.</p>
+      </div>
+      <pre className="bg-muted/40 border border-border rounded-md p-3 text-xs overflow-x-auto">
+        {JSON.stringify(subscriptionRequestExample, null, 2)}
+      </pre>
+    </div> */}
+    </>
+    
   )
 }

@@ -104,7 +104,7 @@
         "update": "تعديل رسم دفع"
       },
       "transactions": {
-        "list": "عرض المعاملات",
+        "list": "عرض الرسوم",
         "view": "عرض معاملة",
         "add": "إضافة معاملة",
         "change-status": "تغيير حالة المعاملة"
@@ -130,7 +130,7 @@
         "delete": "حذف شرط خدمة"
       },
       "plot-reqeusts": {
-        "subscription_request": "طلب اشتراك"
+        "subscription_request": "طلب اكتتاب"
       },
       "contracts": {
         "list": "عرض العقود",

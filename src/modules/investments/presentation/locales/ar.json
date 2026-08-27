@@ -52,7 +52,6 @@
       "name_required": "الاسم مطلوب"
     }
   },
- 
   "service_status_conditions": {
     "title": "الوضع الحالي للمقسم من حيث التخديم",
     "add": "إضافة شرط حالة خدمة",
@@ -468,7 +467,7 @@
   },
   "investors": {
     "title": "المستثمرين",
-    "invistor":"مستثمر",
+    "invistor": "مستثمر",
     "created_at": "تاريخ الإنشاء",
     "add": "إضافة مستثمر",
     "add_future_possible": "إضافة مستثمر مستقبلي محتمل",
@@ -1110,7 +1109,7 @@
     }
   },
   "transactions": {
-    "title": "المعاملات",
+    "title": "الرسوم",
     "subscription": "اكتتاب",
     "subscription_hint": "إنشاء اكتتاب جديد للمستثمرين",
     "add_subscription": "إضافة اكتتاب جديد",
@@ -1149,7 +1148,6 @@
     "plot_classifications": {
       "title": "التصنيفات"
     },
-   
     "service_status_conditions": {
       "title": "الوضع الحالي للمقسم من حيث التخديم"
     },
@@ -1159,10 +1157,10 @@
     "investors": {
       "title": "المستثمرين"
     },
-  "industrial_management": {
-    "title": "إدارة الصناعة"
-  },
-  "industrial_decision_types": {
+    "industrial_management": {
+      "title": "إدارة الصناعة"
+    },
+    "industrial_decision_types": {
       "title": "أنواع القرارات الصناعية"
     },
     "industrial_license_sources": {
@@ -1207,11 +1205,14 @@
     "contract": {
       "title": "العقود"
     },
-"transactions": {
+    "transactions": {
       "title": "المعاملات"
     },
     "partnership_types": {
       "title": "أنواع الشراكة"
+    },
+    "subscription_requests":{
+      "title":"طلبات الإكتتاب"
     }
   },
   "consumption_materials": {
@@ -1241,5 +1242,134 @@
       "name_required": "الاسم مطلوب",
       "unit_required": "الواحدة مطلوبة"
     }
+  },
+  "subscription_request": {
+    "plot": "المقسم",
+    "code": "رقم المقسم",
+    "identifier": "المعرف",
+    "area": "المساحة",
+    "status": "الحالة",
+    "partners": "الشركاء",
+    "partner_name": "الاسم",
+    "national_id": "الرقم الوطني",
+    "nationality": "الجنسية",
+    "phone": "الهاتف",
+    "facilities": "المنشآت",
+    "facility_name": "الاسم",
+    "address": "العنوان",
+    "email": "البريد الإلكتروني",
+    "company_type": "نوع الشركة",
+    "workers": "عدد العمال",
+    "authorized_persons": "المخولون",
+    "authorized_person_role": "الدور في المنشأة",
+    "authorized_person_required": "مطلوب للمسائل القانونية",
+    "transactions": "الرسوم",
+    "transaction_type": "النوع",
+    "transaction_status": "الحالة",
+    "transaction_value": "القيمة",
+    "currency": "العملة",
+    "date": "التاريخ",
+    "info": "معلومات طلب الاكتتاب",
+    "dossier_number": "رقم الإضبارة",
+    "dossier_date": "تاريخ الإضبارة",
+    "created_at": "تاريخ الإنشاء",
+    "plot_area": "منطقة المقسم",
+    "plot_classification": "تصنيف المقسم",
+    "latitude": "خط العرض",
+    "longitude": "خط الطول",
+    "notes": "ملاحظات",
+    "updated_at": "تاريخ التحديث",
+    "allocated_dossier": "الإضبارة المخصصة",
+    "father_name": "اسم الأب",
+    "mother_name": "اسم الأم",
+    "grandfather_name": "اسم الجد",
+    "facebook": "فيسبوك",
+    "instagram": "انستغرام",
+    "x": "إكس (تويتر)",
+    "linkedin": "لينكد إن",
+    "is_possible_investor": "مستثمر مستقبلي",
+    "commercial_register": "السجل التجاري",
+    "commercial_register_date": "تاريخ السجل التجاري",
+    "company_nationality": "جنسية الشركة",
+    "first_phone": "الهاتف 1",
+    "second_phone": "الهاتف 2",
+    "total_capital_usd": "رأس المال الإجمالي (دولار)",
+    "total_capital_syp": "رأس المال الإجمالي (ليرة)",
+    "machines_usd": "قيمة الآلات (دولار)",
+    "machines_syp": "قيمة الآلات (ليرة)",
+    "electrical_power": "القدرة الكهربائية",
+    "drinking_water": "استهلاك مياه الشرب",
+    "industrial_water": "استهلاك المياه الصناعية",
+    "patrols": "عدد الدوريات",
+    "telephone_lines": "خطوط الهاتف",
+    "internet_data": "البيانات الشهرية للإنترنت",
+    "imported_raw_materials": "المواد الأولية المستوردة",
+    "export_ratio": "نسبة التصدير إلى الإنتاج",
+    "partnership_type": "نوع الشراكة",
+    "require_all_persons": "جميع الأشخاص مطلوبون للمسائل القانونية",
+    "client_payed_amount": "المبلغ المدفوع من العميل",
+    "exchange_rate": "سعر الصرف",
+    "daily_production": "الطاقات الإنتاجية اليومية",
+    "monthly_production": "الطاقات الإنتاجية الشهرية",
+    "yearly_production": "الطاقات الإنتاجية السنوية",
+    "daily_consumption": "الاستهلاك اليومي",
+    "material": "المادة",
+    "production": "الإنتاج",
+    "consumption": "الاستهلاك",
+    "allocated_date": "تاريخ التخصيص",
+    "subscription_date": "تاريخ الاكتتاب",
+    "gender": "الجنس",
+    "gender_male": "ذكر",
+    "gender_female": "أنثى",
+    "company_type_existing": "قائمة",
+    "company_type_under_incorporation": "قيد التأسيس",
+    "plot_status_unsold": "غير مباع",
+    "plot_status_announced": "معلن",
+    "plot_status_subscribed": "مشترك",
+    "plot_status_allocated": "مخصص",
+    "plot_status_separated": "مفصول",
+    "status_draft": "مسودة",
+    "status_active": "نشط",
+    "status_allocatable": "قابل للتخصيص",
+    "status_cancelled": "ملغي",
+    "status_pending_subscription_fee": "بانتظار رسم الاكتتاب",
+    "status_subscription_fee_paid": "تم دفع رسم الاكتتاب",
+    "status_subscription_approved": "موافقة الاكتتاب",
+    "status_pending_approval": "بانتظار الموافقة",
+    "status_approved": "موافق",
+    "status_rejected": "مرفوض",
+    "status_completed": "مكتمل",
+    "type_incoming": "وارد",
+    "type_outgoing": "صادر",
+    "tx_status_pending": "قيد الانتظار",
+    "tx_status_approved": "موافق",
+    "tx_status_rejected": "مرفوض",
+    "tx_status_paid": "مدفوع"
+  },
+  "transaction_receipt": {
+    "title": "وصل",
+    "no": "رقم",
+    "type": "النوع",
+    "status": "الحالة",
+    "value": "المبلغ",
+    "currency": "العملة",
+    "date": "التاريخ",
+    "signature": "التوقيع",
+    "stamp": "الختم"
+  },
+  "subscription_requests": {
+    "title": "طلبات اكتتاب",
+    "back": "رجوع",
+    "detail_title": "طلب اكتتاب #{id}",
+    "search_placeholder": "بحث برقم المفسم أو الإضبارة أو المعرف...",
+    "all_versions": "كل الإصدارات",
+    "all_statuses": "كل الحالات",
+    "empty": "لا توجد طلبات اكتتاب",
+    "not_found": "طلب الاكتتاب غير موجود",
+    "view": "عرض الورقة",
+    "version": "الإصدار",
+    "plot_code": "رقم المفسم",
+    "area": "المساحة",
+    "dossier_number": "رقم الإضبارة"
   }
 }
