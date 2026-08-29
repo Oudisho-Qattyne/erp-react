@@ -47,14 +47,13 @@ export function GroupingCards({
     defaultFilter: filters,
   });
 
-  console.log(data);
   
-  // const items = data.map((row, i) => ({
-  //   label: String(row.label ?? ""),
-  //   value: Number(row.value ?? 0),
-  //   color: generateColor(i),
-  // }));
-const items = []
+  const items = data.map((row, i) => ({
+    label: String(row.label ?? ""),
+    value: Number(row.value ?? 0),
+    color: generateColor(i),
+  }));
+
   const total = items.reduce((sum, i) => sum + i.value, 0);
   const selectedFactor = factors.find((f) => f.value === factor);
 
