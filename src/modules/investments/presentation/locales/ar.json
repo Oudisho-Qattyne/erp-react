@@ -205,7 +205,7 @@
     "status_pending_subscription_fee": "في انتظار رسم الاكتتاب",
     "status_subscription_fee_paid": "تم دفع رسم الاكتتاب",
     "status_subscription_approved": "تمت الموافقة على الاكتتاب",
-    "status_pending_subscription_department_manager": "بانتظار مدير دائرة الاكتتاب",
+    "status_pending_subscription_department_manager": "بانتظار رئيس قسم الاكتتاب",
     "status_pending_general_manager": "بانتظار المدير العام",
     "status_subscription_canceled": "تم إلغاء الاكتتاب",
     "status_subscription_completed": "تم إتمام الاكتتاب",
@@ -1380,6 +1380,7 @@
     "status_updated": "تم تحديث الحالة بنجاح",
     "complete_success": "تم إكمال الطلب بنجاح",
     "complete": "إكمال",
+    "cancel": "إلغاء",
     "version": "الإصدار",
     "plot_code": "رقم المقسم",
     "area": "المساحة",
@@ -1393,10 +1394,11 @@
   "subscription_request_status": {
     "pending_subscription_fee": "بانتظار رسم الاكتتاب",
     "subscription_fee_paid": "تم دفع رسم الاكتتاب",
-    "pending_subscription_department_manager": "بانتظار مدير دائرة الاكتتاب",
+    "pending_subscription_department_manager": "بانتظار رئيس قسم الاكتتاب",
     "pending_general_manager": "بانتظار المدير العام",
     "subscription_approved": "تمت الموافقة على الاكتتاب",
     "subscription_canceled": "تم إلغاء الاكتتاب",
+    "subscription_canceled_by_general_manager": "تم الإلغاء من قبل المدير العام",
     "subscription_completed": "مكتمل"
   }
 }

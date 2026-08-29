@@ -8,8 +8,9 @@ import { DataTable, type ColumnDef } from '../../../../core/presentation/layouts
 import { ErrorState } from '../../../../core/presentation/layouts/ui/state/ErrorState';
 import { Dialog } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
-import { FilterDialog, type FilterField } from '../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import { FilterDialog, type FilterField, type FilterLabelMaps } from '../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { ActiveFilters } from '../../../../core/presentation/layouts/ui/filter/ActiveFilters';
+import { createFilterFormatValue } from '../../../../core/presentation/layouts/ui/filter/filterLabels';
 import { GenericCreateForm } from '../../../../core/presentation/layouts/ui/forms/GenericCreateForm';
 import Input from '../../../../core/presentation/layouts/ui/inputs/Input';
 import { inputBaseClasses } from '../../../../core/presentation/layouts/ui/inputs/styles';
@@ -43,11 +44,23 @@ export function ExchangeRatesPage() {
   const [editing, setEditing] = useState<ExchangeRate | null>(null);
   const [deleting, setDeleting] = useState<ExchangeRate | null>(null);
   const [localSearch, setLocalSearch] = useState('');
+  const [labelMaps, setLabelMaps] = useState<FilterLabelMaps>({});
 
   const { entities: currencies, create: createCurrency, getAll: loadCurrencies } = useEntityCrud<Currency & { id: number }>(
     '/financial-management/currencies',
     '/financial-management/currencies',
   );
+
+  const formatValue = useMemo(() => {
+    const base = createFilterFormatValue(labelMaps);
+    return (key: string, value: any) => {
+      if (key === 'from_currency_code' || key === 'to_currency_code') {
+        const c = currencies.find((x) => x.code === value);
+        if (c) return `${getLocalizedName(c.name)} (${c.code})`;
+      }
+      return base(key, value);
+    };
+  }, [labelMaps, currencies]);
 
   useEffect(() => {
     loadCurrencies();
@@ -190,12 +203,13 @@ export function ExchangeRatesPage() {
     { name: 'effective_to', type: 'date', label: t('exchange_rate.effective_to', MODULE) || 'Effective To' },
   ];
 
-  const handleApplyFilter = (values: Record<string, any>) => {
+  const handleApplyFilter = (values: Record<string, any>, maps?: FilterLabelMaps) => {
     const parsed: Record<string, any> = { page: 1, per_page: list?.perPage };
     for (const [key, val] of Object.entries(values)) {
       if (val !== '' && val !== undefined) parsed[key] = val;
     }
     list?.setFilter(parsed);
+    setLabelMaps(maps ?? {});
     setIsFilterOpen(false);
   };
 
@@ -253,12 +267,12 @@ export function ExchangeRatesPage() {
             <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
               {t('common.filter', 'shared') || 'Filter'}
             </Button>
-            <Button variant="outline" size="sm" onClick={() => list?.resetFilter()}>
+            <Button variant="outline" size="sm" onClick={() => { list?.resetFilter(); setLabelMaps({}); }}>
               {t('common.reset', 'shared') || 'Reset'}
             </Button>
           </div>
 
-          <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" />
+          <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" formatValue={formatValue} />
 
           <FilterDialog
             isOpen={isFilterOpen}
@@ -268,6 +282,7 @@ export function ExchangeRatesPage() {
             onCancel={() => setIsFilterOpen(false)}
             onReset={() => {
               list?.resetFilter();
+              setLabelMaps({});
               setIsFilterOpen(false);
             }}
           />

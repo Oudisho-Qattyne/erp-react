@@ -7,8 +7,9 @@ export interface ActiveFiltersProps {
   filters: Record<string, any>;
   /** Field definitions used to resolve labels/options (and ordering) */
   fields: FilterField[];
-  /** Optional value formatter (e.g. translate enums). Receives the raw value. */
-  formatValue?: (key: string, value: any) => string;
+  /** Optional value formatter (e.g. translate enums). Receives the raw value.
+   *  Return undefined to fall back to the raw value. */
+  formatValue?: (key: string, value: any) => string | undefined;
   /** Optional heading rendered before the chips */
   title?: ReactNode;
   className?: string;
@@ -26,7 +27,7 @@ function getStaticOptions(field: FilterField): { value: any; label: string }[] |
 function toDisplay(
   field: FilterField,
   raw: any,
-  formatValue?: (key: string, value: any) => string,
+  formatValue?: (key: string, value: any) => string | undefined,
   resolvedOptions?: { value: any; label: string }[],
 ): string {
   const values = Array.isArray(raw) ? raw : [raw];
@@ -79,6 +80,13 @@ export function ActiveFilters({
     .join("&");
 
   useEffect(() => {
+    // When a formatValue resolver is provided, the caller owns label resolution
+    // (e.g. captured value→label maps) so we avoid refetching computed options.
+    if (formatValue) {
+      setResolvedOptions((prev) => (Object.keys(prev).length ? {} : prev));
+      return;
+    }
+
     const computedFields = fields.filter(
       (f) =>
         !isEmpty(filters[f.name]) &&
@@ -106,7 +114,7 @@ export function ActiveFilters({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [signature]);
+  }, [signature, formatValue]);
 
   const active = fields.filter(
     (f) => "label" in f && !isEmpty(filters[f.name]),

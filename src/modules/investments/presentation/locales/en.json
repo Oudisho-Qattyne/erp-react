@@ -1381,6 +1381,7 @@
     "status_updated": "Status updated successfully",
     "complete_success": "Request completed successfully",
     "complete": "Complete",
+    "cancel": "Cancel",
     "version": "Version",
     "plot_code": "Plot Code",
     "area": "Area",
@@ -1398,6 +1399,7 @@
     "pending_general_manager": "Pending General Manager",
     "subscription_approved": "Approved",
     "subscription_canceled": "Canceled",
+    "subscription_canceled_by_general_manager": "Canceled by General Manager",
     "subscription_completed": "Completed"
   }
 }

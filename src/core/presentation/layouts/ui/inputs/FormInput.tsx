@@ -64,6 +64,10 @@ export interface FormInputProps<T extends FieldValues> {
   valueKey?: string;
   labelKey?: string;
   displayLabel?: string | ((value: any) => string);
+  /** Called with the full selected rows when a table-picker selection changes */
+  onSelectionChange?: (items: any[]) => void;
+  /** Called whenever the resolved options change (static or computed) */
+  onResolvedOptions?: (options: { value: any; label: string }[]) => void;
   // Dependency
   dependsOn?: Path<T>[];
   compute?: (values: Record<Path<T>, any>) => ComputedProps | Promise<ComputedProps>;
@@ -109,6 +113,8 @@ export function FormInput<T extends FieldValues>({
   valueKey,
   labelKey,
   displayLabel,
+  onSelectionChange,
+  onResolvedOptions,
   dependsOn = [],
   compute,
   infoButton,
@@ -153,6 +159,12 @@ export function FormInput<T extends FieldValues>({
   const finalPickerProps = computed.pickerProps ?? pickerProps;
   // compute can change the allowed characters
   const finalRegex = computed.regex !== undefined ? computed.regex : regex;
+
+  // Report resolved options (static or computed) so the parent can capture value→label maps
+  useEffect(() => {
+    onResolvedOptions?.(finalOptions);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [finalOptions, onResolvedOptions]);
 
   // Map nested array errors from react-hook-form (set by server validationErrors)
   const combinedMatrixErrors = useMemo(() => {
@@ -296,6 +308,7 @@ export function FormInput<T extends FieldValues>({
         valueKey={valueKey}
         labelKey={labelKey}
         displayLabel={displayLabel}
+        onSelectionChange={onSelectionChange}
         baseClasses={baseClasses}
         requiredPermission={requiredPermission}
         createButtonPermission={createButtonPermission}

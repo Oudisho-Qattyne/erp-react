@@ -8,8 +8,9 @@ import { inputBaseClasses } from '../../../../../core/presentation/layouts/ui/in
 import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { ConfirmDialog } from '../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
-import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import { FilterDialog, type FilterField, type FilterLabelMaps } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { ActiveFilters } from '../../../../../core/presentation/layouts/ui/filter/ActiveFilters';
+import { createFilterFormatValue } from '../../../../../core/presentation/layouts/ui/filter/filterLabels';
 import { GroupingDonut } from '../../../../../core/presentation/layouts/ui/statistics/GroupingDonut';
 import { GroupingCards } from '../../../../../core/presentation/layouts/ui/statistics/GroupingCards';
 import { toast } from 'sonner';
@@ -41,6 +42,8 @@ export function PlotsPage() {
 
   // Filter State
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [labelMaps, setLabelMaps] = useState<FilterLabelMaps>({});
+  const formatValue = useMemo(() => createFilterFormatValue(labelMaps), [labelMaps]);
 
   // Fetch Lookups
   useEffect(() => {
@@ -48,7 +51,7 @@ export function PlotsPage() {
     getClassifications();
   }, []);
 
-  const handleApplyFilter = (values: Record<string, unknown>) => {
+  const handleApplyFilter = (values: Record<string, unknown>, maps?: FilterLabelMaps) => {
     const parsed: Record<string, any> = {};
     for (const [key, val] of Object.entries(values)) {
       if (val === '' || val === undefined) { parsed[key] = undefined; continue; }
@@ -57,11 +60,13 @@ export function PlotsPage() {
       else parsed[key] = val;
     }
     list.setFilter(parsed);
+    setLabelMaps(maps ?? {});
     setIsFilterOpen(false);
   };
 
   const handleResetFilter = () => {
     list.resetFilter();
+    setLabelMaps({});
     setLocalSearch('');
     setIsFilterOpen(false);
   };
@@ -249,7 +254,7 @@ export function PlotsPage() {
           </Button>
         </div>
 
-        <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" />
+        <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" formatValue={formatValue} />
 
         <GroupingCards
           baseUrl="/investments/plots"

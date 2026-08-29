@@ -2,8 +2,9 @@ import { useState, useEffect, useContext, useMemo } from "react"
 import { Dialog } from "../dialog/Dialog"
 import { Button } from "../buttons/Button"
 import { DataTable, type ColumnDef } from "../tables/ResizableTable"
-import { FilterDialog, type FilterField } from "../filter/FilterDialog"
+import { FilterDialog, type FilterField, type FilterLabelMaps } from "../filter/FilterDialog"
 import { ActiveFilters } from "../filter/ActiveFilters"
+import { createFilterFormatValue } from "../filter/filterLabels"
 import Input from "../inputs/Input"
 import { LoadingState } from "../state/LoadingState"
 import { ErrorState } from "../state/ErrorState"
@@ -124,6 +125,8 @@ export function SelectFromTable<T extends { id: number | string }>({
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [localSearch, setLocalSearch] = useState(searchInitialValue)
+  const [labelMaps, setLabelMaps] = useState<FilterLabelMaps>({})
+  const formatValue = useMemo(() => createFilterFormatValue(labelMaps), [labelMaps])
 
   useEffect(() => {
     if (isOpen) {
@@ -226,7 +229,7 @@ export function SelectFromTable<T extends { id: number | string }>({
           )}
           </div>
         {filterFields.length > 0 && (
-          <ActiveFilters filters={filterValues} fields={filterFields} className="mt-1" />
+          <ActiveFilters filters={filterValues} fields={filterFields} className="mt-1" formatValue={formatValue} />
         )}
         {isLoading && <LoadingState message={t('common.loading', 'shared') || 'Loading...'} />}
         {error && !isLoading && (
@@ -268,9 +271,9 @@ export function SelectFromTable<T extends { id: number | string }>({
         isOpen={isFilterOpen}
         fields={filterFields}
         initialValues={filterValues}
-        onFilter={(values) => { onApplyFilter(values); setIsFilterOpen(false) }}
+        onFilter={(values, maps) => { setLabelMaps(maps ?? {}); onApplyFilter(values); setIsFilterOpen(false) }}
         onCancel={() => setIsFilterOpen(false)}
-        onReset={() => { onResetFilter(); setIsFilterOpen(false) }}
+        onReset={() => { setLabelMaps({}); onResetFilter(); setIsFilterOpen(false) }}
       />
 
       {createConfig && (

@@ -56,6 +56,7 @@ interface InputProps {
   valueKey?: string;
   labelKey?: string;
   displayLabel?: string | ((value: any) => string);
+  onSelectionChange?: (items: any[]) => void;
   infoButton?: () => void | null;
   requiredPermission?: string | string[];
   createButtonPermission?: string | string[];
@@ -126,6 +127,7 @@ const InputTypes: React.FC<InputProps> = ({
   valueKey,
   labelKey,
   displayLabel,
+  onSelectionChange,
   createButtonPermission,
   toggleVariant,
   toggleSize,
@@ -243,6 +245,7 @@ const InputTypes: React.FC<InputProps> = ({
           valueKey={valueKey}
           labelKey={labelKey}
           displayLabel={displayLabel}
+          onSelectionChange={onSelectionChange}
           placeholder={finalPlaceholder}
           disabled={finalDisabled}
           baseClasses={localClass}

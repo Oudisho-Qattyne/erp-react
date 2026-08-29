@@ -7,7 +7,7 @@ interface TopBarProps {
     full_name: string;
     position?: string;
     role: string;
-    photo?:string;
+    photo?: string;
   };
 }
 
@@ -47,7 +47,7 @@ export function TopBar({
 
       {/* Right side: notifications + user info */}
       <div className="flex items-center gap-4">
-<ThemeToggle />
+        <ThemeToggle />
         <NotificationsBell />
 
         {/* User info */}
@@ -55,11 +55,11 @@ export function TopBar({
           <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center text-white text-sm font-bold shadow overflow-hidden">
             {
               user?.photo ?
-              <img src={user?.photo} className='relative w-full h-full'/>
-              :
-              user?.full_name?.[0] === 'م'
-              ? user?.full_name?.[2] || user.full_name[0]
-              : user?.full_name?.[0] || 'U' 
+                <img src={user?.photo} className='relative w-full h-full' />
+                :
+                user?.full_name?.[0] === 'م'
+                  ? user?.full_name?.[2] || user.full_name[0]
+                  : user?.full_name?.[0] || 'U'
             }
           </div>
           <div className="hidden sm:block">

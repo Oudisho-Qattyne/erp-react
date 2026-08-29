@@ -1,12 +1,13 @@
 // src/modules/hr/presentation/pages/EmployeesPage.tsx
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../../../../core/presentation/context/i18n/I18nProvider';
 import { Button } from '../../../../core/presentation/layouts/ui/buttons/Button';
 import { DataTable, type ColumnDef } from '../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { Dialog } from '../../../../core/presentation/layouts/ui/dialog/Dialog';
-import { FilterDialog, type FilterField } from '../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import { FilterDialog, type FilterField, type FilterLabelMaps } from '../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { ActiveFilters } from '../../../../core/presentation/layouts/ui/filter/ActiveFilters';
+import { createFilterFormatValue } from '../../../../core/presentation/layouts/ui/filter/filterLabels';
 import type { EmployeeListItem } from '../../domain/entities/EmployeeListItem';
 import { EmployeeForm } from './EmployeeForm';
 import { FormInput } from '../../../../core/presentation/layouts/ui/inputs/FormInput';
@@ -29,6 +30,8 @@ export function EmployeesPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState('');
   const [auditItem, setAuditItem] = useState<EmployeeListItem | null>(null);
+  const [labelMaps, setLabelMaps] = useState<FilterLabelMaps>({});
+  const formatValue = useMemo(() => createFilterFormatValue(labelMaps), [labelMaps]);
 
   const { getAll: loadUniversities } = useEntityCrud<University>('/shared-kernal/universities', '/shared-kernal/universities');
   const { getAllByUniversity } = useFaculties();
@@ -208,7 +211,7 @@ export function EmployeesPage() {
     { name: "organizational_unit", type: "select", searchable: true, label: t("employees.org_unit_id", "hr") || "Organizational Unit", compute: computeOrgUnits },
   ]
 
-  const handleApplyFilter = (values: Record<string, any>) => {
+  const handleApplyFilter = (values: Record<string, any>, maps?: FilterLabelMaps) => {
     const parsed: Record<string, any> = {}
     for (const [key, val] of Object.entries(values)) {
       if (val !== "" && val !== undefined) {
@@ -220,6 +223,7 @@ export function EmployeesPage() {
       }
     }
     setExtraFilters(parsed)
+    setLabelMaps(maps ?? {})
     setPage(1)
     setIsFilterOpen(false)
   }
@@ -248,7 +252,7 @@ export function EmployeesPage() {
           <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
             {t('common.filter', 'shared') || 'تصفية'}
           </Button>
-          <Button variant="outline" onClick={resetFilters} size="sm">
+          <Button variant="outline" onClick={() => { resetFilters(); setLabelMaps({}); }} size="sm">
             {t('common.reset', 'shared') || 'مسح'}
           </Button>
         </div>
@@ -259,7 +263,7 @@ export function EmployeesPage() {
         </Button>
       </div>
 
-      <ActiveFilters filters={extraFilters} fields={filterFields} className="mt-1" />
+      <ActiveFilters filters={extraFilters} fields={filterFields} className="mt-1" formatValue={formatValue} />
 
       {/* Table */}
       {error && <ErrorState message={error} onRetry={refetch} />}
@@ -299,7 +303,7 @@ export function EmployeesPage() {
         initialValues={extraFilters}
         onFilter={handleApplyFilter}
         onCancel={() => setIsFilterOpen(false)}
-        onReset={() => { setExtraFilters({}); setPage(1); setIsFilterOpen(false) }}
+        onReset={() => { setExtraFilters({}); setLabelMaps({}); setPage(1); setIsFilterOpen(false) }}
       />
 
       <AuditLog

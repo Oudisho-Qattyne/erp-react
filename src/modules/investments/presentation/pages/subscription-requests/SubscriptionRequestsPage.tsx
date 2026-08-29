@@ -3,10 +3,11 @@ import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nP
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
 import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
-import { FilterDialog, type FilterField } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import { FilterDialog, type FilterField, type FilterLabelMaps } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
 import { ActiveFilters } from '../../../../../core/presentation/layouts/ui/filter/ActiveFilters';
+import { createFilterFormatValue } from '../../../../../core/presentation/layouts/ui/filter/filterLabels';
 import { getModules } from '../../../../../core/moduleRegistry';
-import { Eye, FileText, Check, CheckCheck, X, Filter } from 'lucide-react';
+import { Eye, FileText, Check, CheckCheck, X, Ban, Filter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import type { SubscriptionRequest } from '../../../domain/entities/subscriptionRequests/subscriptionRequest';
 import { useSubscription } from '../../hooks/useSubscription';
@@ -14,6 +15,7 @@ import { UserPickerDialog } from '../../../../users/presentation/components/User
 import { PlotPickerDialog } from '../plots/components/PlotPickerDialog';
 import { Badge, type BadgeVariant } from '../../../../../core/presentation/layouts/ui/badges/Badge';
 import type { SubscriptionRequestStatus } from '../../../domain/valueObjects/investments/subscriptionRequestStatus';
+import { canShowSubscriptionAction } from '../../utils/subscriptionActions';
 
 const STATUS_LABELS: Record<string, string> = {
   pending_subscription_fee: 'Pending Fee',
@@ -22,6 +24,7 @@ const STATUS_LABELS: Record<string, string> = {
   pending_general_manager: 'Pending General Manager',
   subscription_approved: 'Approved',
   subscription_canceled: 'Canceled',
+  subscription_canceled_by_general_manager: 'Canceled by GM',
   subscription_completed: 'Completed',
 };
 
@@ -51,20 +54,16 @@ export function SubscriptionRequestsPage() {
   const label = (key: string) => t(`subscription_requests.${key}`, 'investments');
   const statusLabel = (status?: string) => t(`subscription_request_status.${status}`, 'investments') || STATUS_LABELS[status ?? ''] || status || '';
 
-  const canShowAction = (status: SubscriptionRequestStatus | undefined, action: 'approve' | 'reject' | 'complete'): boolean => {
-    if (status === 'pending_subscription_department_manager') return action === 'approve' || action === 'reject';
-    if (status === 'pending_general_manager') return action === 'complete';
-    return false;
-  };
-
   const statusVariant = (status?: string): BadgeVariant => {
     if (status === 'subscription_approved' || status === 'subscription_completed') return 'success';
-    if (status === 'subscription_canceled') return 'danger';
+    if (status === 'subscription_canceled' || status === 'subscription_canceled_by_general_manager') return 'danger';
     if (status === 'subscription_fee_paid') return 'info';
     return 'warning';
   };
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [labelMaps, setLabelMaps] = useState<FilterLabelMaps>({});
+  const formatValue = useMemo(() => createFilterFormatValue(labelMaps), [labelMaps]);
 
   const usersModuleRegistered = useMemo(() => getModules().some(m => m.name === 'users'), []);
 
@@ -142,18 +141,20 @@ export function SubscriptionRequestsPage() {
     },
   ];
 
-  const handleApplyFilter = (values: Record<string, any>) => {
+  const handleApplyFilter = (values: Record<string, any>, maps?: FilterLabelMaps) => {
     const parsed: Record<string, any> = {};
     for (const [key, val] of Object.entries(values)) {
       if (val === '' || val === undefined || val === null) continue;
       parsed[key] = val;
     }
     setFilters(parsed);
+    setLabelMaps(maps ?? {});
     setIsFilterOpen(false);
   };
 
   const handleResetFilter = () => {
     resetFilters();
+    setLabelMaps({});
     setIsFilterOpen(false);
   };
 
@@ -167,6 +168,7 @@ export function SubscriptionRequestsPage() {
 
   const handleApprove = (plotId: number, id: number) => handleStatusAction(plotId, id, 'pending_general_manager');
   const handleReject = (plotId: number, id: number) => handleStatusAction(plotId, id, 'subscription_canceled');
+  const handleCancelByGeneralManager = (plotId: number, id: number) => handleStatusAction(plotId, id, 'subscription_canceled_by_general_manager');
 
   const handleComplete = async (plotId: number, id: number) => {
     try {
@@ -237,10 +239,11 @@ export function SubscriptionRequestsPage() {
               size="sm"
               onClick={() => navigate(`/investments/subscription-requests/${row.id}`)}
               title={label('view')}
+              requiredPermission="investments.plot-reqeusts.subscription_requests.view"
             >
               <Eye size={16} />
             </Button>
-            {canShowAction(row.status, 'approve') && (
+            {canShowSubscriptionAction(row.status, 'approve') && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -251,7 +254,7 @@ export function SubscriptionRequestsPage() {
                 <Check size={16} />
               </Button>
             )}
-            {canShowAction(row.status, 'reject') && (
+            {canShowSubscriptionAction(row.status, 'reject') && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -262,15 +265,26 @@ export function SubscriptionRequestsPage() {
                 <X size={16} />
               </Button>
             )}
-            {canShowAction(row.status, 'complete') && (
+            {canShowSubscriptionAction(row.status, 'complete') && (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => handleComplete(row.plot_id ?? 0, row.id ?? 0)}
                 title={label('complete')}
-                className="text-primary hover:text-primary"
+                className="text-success hover:text-success"
               >
                 <CheckCheck size={16} />
+              </Button>
+            )}
+            {canShowSubscriptionAction(row.status, 'cancel') && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleCancelByGeneralManager(row.plot_id ?? 0, row.id ?? 0)}
+                title={label('cancel')}
+                className="text-danger hover:text-danger"
+              >
+                <Ban size={16} />
               </Button>
             )}
           </div>
@@ -306,7 +320,7 @@ export function SubscriptionRequestsPage() {
         </Button>
       </div>
 
-      <ActiveFilters filters={filters} fields={filterFields} />
+      <ActiveFilters filters={filters} fields={filterFields} formatValue={formatValue} />
 
       {error['listAllSubscriptionRequests'] ? (
         <ErrorState message={error['listAllSubscriptionRequests']} onRetry={() => listAllSubscriptionRequests()} />

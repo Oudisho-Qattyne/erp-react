@@ -16,6 +16,8 @@ interface TablePickerInputProps {
   labelKey?: string
   /** Static text or resolver overriding the automatic label */
   displayLabel?: string | ((value: any) => string)
+  /** Called with the full selected rows when the user confirms or clears the picker */
+  onSelectionChange?: (items: any[]) => void
   placeholder?: string
   disabled?: boolean
   baseClasses?: string
@@ -29,6 +31,7 @@ export function TablePickerInput({
   valueKey = "id",
   labelKey = "name",
   displayLabel,
+  onSelectionChange,
   placeholder,
   disabled,
   baseClasses,
@@ -63,12 +66,14 @@ export function TablePickerInput({
     setPickedItems(selected)
     const values = selected.map((s) => s?.[valueKey])
     onChange(pickerProps?.multiple ? values : values[0] ?? null)
+    onSelectionChange?.(selected)
   }
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation()
     setPickedItems([])
     onChange(Array.isArray(value) ? [] : null)
+    onSelectionChange?.([])
   }
 
   const Picker = picker as PickerComponent | null | undefined
