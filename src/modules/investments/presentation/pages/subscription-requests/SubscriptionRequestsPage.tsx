@@ -23,8 +23,9 @@ const STATUS_LABELS: Record<string, string> = {
   pending_subscription_department_manager: 'Pending Dept. Manager',
   pending_general_manager: 'Pending General Manager',
   subscription_approved: 'Approved',
-  subscription_canceled: 'Canceled',
+  subscription_canceled_by_department_manager: 'Canceled by Dept. Manager',
   subscription_canceled_by_general_manager: 'Canceled by GM',
+  subscription_payment_canceled: 'Payment Canceled',
   subscription_completed: 'Completed',
 };
 
@@ -56,7 +57,7 @@ export function SubscriptionRequestsPage() {
 
   const statusVariant = (status?: string): BadgeVariant => {
     if (status === 'subscription_approved' || status === 'subscription_completed') return 'success';
-    if (status === 'subscription_canceled' || status === 'subscription_canceled_by_general_manager') return 'danger';
+    if (status === 'subscription_canceled_by_department_manager' || status === 'subscription_canceled_by_general_manager' || status === 'subscription_payment_canceled') return 'danger';
     if (status === 'subscription_fee_paid') return 'info';
     return 'warning';
   };
@@ -167,7 +168,7 @@ export function SubscriptionRequestsPage() {
   }
 
   const handleApprove = (plotId: number, id: number) => handleStatusAction(plotId, id, 'pending_general_manager');
-  const handleReject = (plotId: number, id: number) => handleStatusAction(plotId, id, 'subscription_canceled');
+  const handleReject = (plotId: number, id: number) => handleStatusAction(plotId, id, 'subscription_canceled_by_department_manager');
   const handleCancelByGeneralManager = (plotId: number, id: number) => handleStatusAction(plotId, id, 'subscription_canceled_by_general_manager');
 
   const handleComplete = async (plotId: number, id: number) => {
@@ -237,7 +238,7 @@ export function SubscriptionRequestsPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate(`/investments/subscription-requests/${row.id}`)}
+              onClick={() => window.open(`/investments/subscription-requests/${row.id}` , '_blank')}
               title={label('view')}
               requiredPermission="investments.plot-reqeusts.subscription_requests.view"
             >

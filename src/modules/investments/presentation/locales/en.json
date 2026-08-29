@@ -208,6 +208,9 @@
     "status_pending_subscription_department_manager": "Pending Subscription Department Manager",
     "status_pending_general_manager": "Pending General Manager",
     "status_subscription_canceled": "Subscription Canceled",
+    "status_subscription_canceled_by_department_manager": "Subscription Canceled by Department Manager",
+    "status_subscription_canceled_by_general_manager": "Subscription Canceled by General Manager",
+    "status_subscription_payment_canceled": "Subscription Payment Canceled",
     "status_subscription_completed": "Subscription Completed",
     "view": "View Dossier",
     "allocate": "Allocate",
@@ -1398,8 +1401,9 @@
     "pending_subscription_department_manager": "Pending Department Manager",
     "pending_general_manager": "Pending General Manager",
     "subscription_approved": "Approved",
-    "subscription_canceled": "Canceled",
+    "subscription_canceled_by_department_manager": "Canceled by Department Manager",
     "subscription_canceled_by_general_manager": "Canceled by General Manager",
+    "subscription_payment_canceled": "Payment Canceled",
     "subscription_completed": "Completed"
   }
 }

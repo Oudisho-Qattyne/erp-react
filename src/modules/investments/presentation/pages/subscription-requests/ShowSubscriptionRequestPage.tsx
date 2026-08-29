@@ -82,7 +82,7 @@ export function ShowSubscriptionRequestPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleStatusAction('subscription_canceled_by_general_manager')}
+                onClick={handleStatusAction('subscription_canceled_by_department_manager')}
                 className="text-danger hover:text-danger"
               >
                 <X size={16} />

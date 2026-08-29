@@ -8452,7 +8452,7 @@ paths:
       tags:
         - 'Subscription Requests'
       summary: 'Change Subscription Request Status'
-      description: "Sets a new status on the subscription request. Allowed values:\n- `pending_general_manager` - forward the request to the general manager for final approval\n- `subscription_canceled` - cancel the request (terminal)\n\nNo status eligibility check is performed server-side; only the Enum values above are validated.\n\n**Notification fired:** none currently.\n"
+      description: "Sets a new status on the subscription request. Allowed values:\n- `pending_general_manager` - forward the request to the general manager for final approval\n- `subscription_canceled_by_department_manager ` - cancel the request (terminal)\n\nNo status eligibility check is performed server-side; only the Enum values above are validated.\n\n**Notification fired:** none currently.\n"
       security:
         -
           sanctumAuth: {  }
@@ -13857,7 +13857,7 @@ components:
         - pending_subscription_department_manager
         - pending_general_manager
         - subscription_approved
-        - subscription_canceled
+        - subscription_canceled_by_department_manager 
     AddSubscriptionRequestRequest:
       type: object
       description: "Payload sent when creating a subscription request. It is stored as-is on the request\nrecord and only materialized later when the request is completed.\n"
@@ -14176,7 +14176,7 @@ components:
           description: 'New status to set on the subscription request.'
           enum:
             - pending_general_manager
-            - subscription_canceled
+            - subscription_canceled_by_department_manager 
       example:
         status: pending_general_manager
     PlotSubscriptionRequestResource:

@@ -28,11 +28,11 @@ interface SubscriptionRequestPayload {
 }
 
 interface SubscriptionTransactionPayload {
-  dossier?: {
+  subscription_request?: {
     id?: number | string;
-    plot_id?: number | string;
-    dossier_number?: string | null;
-    status?: string;
+    created_at?:string;
+    created_by?:number;
+    deleted_at?:string;
   };
   transaction?: {
     id?: string;
@@ -118,7 +118,7 @@ registerNotificationHandler('transaction_approved.subscription_request', {
   description: ({ notification, t, data }) => {
     const payload = (data ?? notification.data?.payload) as SubscriptionTransactionPayload | null;
     const transaction = payload?.transaction;
-    const dossier = payload?.dossier;
+    const subscription_request = payload?.subscription_request;
     const paymentFee = payload?.payment_fee;
     const base =
       t('notifications.subscription_request_transaction_approved_description', 'finance') ||
@@ -126,7 +126,7 @@ registerNotificationHandler('transaction_approved.subscription_request', {
     const extras = [
       transaction?.id ? `#${String(transaction.id).slice(0, 8)}` : '',
       transaction?.transaction_value != null ? `$${String(transaction.transaction_value)}` : '',
-      dossier?.dossier_number ?? (dossier?.id ? `Dossier #${dossier.id}` : ''),
+      subscription_request?.id ?? (subscription_request?.id ? `Subscription Request #${subscription_request.id}` : ''),
       paymentFee?.name ?? '',
     ]
       .filter(Boolean)
@@ -135,9 +135,9 @@ registerNotificationHandler('transaction_approved.subscription_request', {
   },
   action: ({ navigate, data }): void => {
     const payload = data as SubscriptionTransactionPayload | null;
-    const dossier = payload?.dossier;
-    if (dossier?.id && dossier?.plot_id) {
-      navigate(`/investments/plots/${dossier.plot_id}/dossiers/${dossier.id}`);
+    const subscription_request = payload?.subscription_request;
+    if (subscription_request?.id) {
+      navigate(`/investments/subscription-requests/${subscription_request?.id}`);
       return;
     }
     navigate('/finance/transactions');
@@ -152,7 +152,7 @@ registerNotificationHandler('transaction_canceled.subscription_request', {
   description: ({ notification, t, data }) => {
     const payload = (data ?? notification.data?.payload) as SubscriptionTransactionPayload | null;
     const transaction = payload?.transaction;
-    const dossier = payload?.dossier;
+    const subscription_request = payload?.subscription_request;
     const paymentFee = payload?.payment_fee;
     const base =
       t('notifications.subscription_request_transaction_canceled_description', 'finance') ||
@@ -160,7 +160,7 @@ registerNotificationHandler('transaction_canceled.subscription_request', {
     const extras = [
       transaction?.id ? `#${String(transaction.id).slice(0, 8)}` : '',
       transaction?.transaction_value != null ? `$${String(transaction.transaction_value)}` : '',
-      dossier?.dossier_number ?? (dossier?.id ? `Dossier #${dossier.id}` : ''),
+      subscription_request?.id ?? (subscription_request?.id ? `Subscription Request #${subscription_request.id}` : ''),
       paymentFee?.name ?? '',
     ]
       .filter(Boolean)
@@ -169,9 +169,9 @@ registerNotificationHandler('transaction_canceled.subscription_request', {
   },
   action: ({ navigate, data }): void => {
     const payload = data as SubscriptionTransactionPayload | null;
-    const dossier = payload?.dossier;
-    if (dossier?.id && dossier?.plot_id) {
-      navigate(`/investments/plots/${dossier.plot_id}/dossiers/${dossier.id}`);
+    const subscription_request = payload?.subscription_request;
+    if (subscription_request?.id ) {
+      navigate(`/investments/subscription-requests/${subscription_request?.id}`);
       return;
     }
     navigate('/finance/transactions');

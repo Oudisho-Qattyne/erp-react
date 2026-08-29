@@ -205,9 +205,12 @@
     "status_pending_subscription_fee": "في انتظار رسم الاكتتاب",
     "status_subscription_fee_paid": "تم دفع رسم الاكتتاب",
     "status_subscription_approved": "تمت الموافقة على الاكتتاب",
-    "status_pending_subscription_department_manager": "بانتظار رئيس قسم الاكتتاب",
+    "status_pending_subscription_department_manager": "بانتظار رئيس شعبة الاكتتاب",
     "status_pending_general_manager": "بانتظار المدير العام",
     "status_subscription_canceled": "تم إلغاء الاكتتاب",
+    "status_subscription_canceled_by_department_manager": "تم إلغاء الاكتتاب من قبل رئيس شعبة الاكتتاب",
+    "status_subscription_canceled_by_general_manager": "تم إلغاء الاكتتاب من قبل المدير العام",
+    "status_subscription_payment_canceled": "تم إلغاء دفع الاكتتاب",
     "status_subscription_completed": "تم إتمام الاكتتاب",
     "view": "عرض الإضبارة",
     "allocate": "تخصيص",
@@ -1215,8 +1218,8 @@
     "partnership_types": {
       "title": "أنواع الشراكة"
     },
-    "subscription_requests":{
-      "title":"طلبات الإكتتاب"
+    "subscription_requests": {
+      "title": "طلبات الإكتتاب"
     }
   },
   "consumption_materials": {
@@ -1322,7 +1325,7 @@
     "consumption": "الاستهلاك",
     "allocated_date": "تاريخ التخصيص",
     "subscription_date": "تاريخ الاكتتاب",
-    "passport_number":"رقم جواز السفر",
+    "passport_number": "رقم جواز السفر",
     "gender": "الجنس",
     "gender_male": "ذكر",
     "gender_female": "أنثى",
@@ -1394,11 +1397,12 @@
   "subscription_request_status": {
     "pending_subscription_fee": "بانتظار رسم الاكتتاب",
     "subscription_fee_paid": "تم دفع رسم الاكتتاب",
-    "pending_subscription_department_manager": "بانتظار رئيس قسم الاكتتاب",
+    "pending_subscription_department_manager": "بانتظار رئيس شعبة الاكتتاب",
     "pending_general_manager": "بانتظار المدير العام",
     "subscription_approved": "تمت الموافقة على الاكتتاب",
-    "subscription_canceled": "تم إلغاء الاكتتاب",
     "subscription_canceled_by_general_manager": "تم الإلغاء من قبل المدير العام",
-    "subscription_completed": "مكتمل"
+    "subscription_completed": "مكتمل",
+    "subscription_canceled_by_department_manager": "تم الإلغاء من قبل رئيس شعبة الاكتتاب",
+    "subscription_payment_canceled": "تم إلغاء الدفع"
   }
 }

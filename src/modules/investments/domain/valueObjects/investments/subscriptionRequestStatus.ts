@@ -5,5 +5,6 @@ export type SubscriptionRequestStatus = "pending_subscription_fee"
     | "subscription_approved"
     | "subscription_canceled_by_department_manager"
     | "subscription_canceled_by_general_manager"
+    | "subscription_payment_canceled"
     | "subscription_completed";
 
