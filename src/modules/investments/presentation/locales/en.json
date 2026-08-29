@@ -1381,6 +1381,7 @@
     "reject": "Reject",
     "approve_message": "Request approved",
     "reject_message": "Request rejected",
+    "cancel_message": "Request canceled",
     "status_updated": "Status updated successfully",
     "complete_success": "Request completed successfully",
     "complete": "Complete",

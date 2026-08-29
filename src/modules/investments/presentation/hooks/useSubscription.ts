@@ -17,6 +17,9 @@ const OP_KEYS = [
   'listAllSubscriptionRequests',
   'getSubscriptionRequestById',
   'changeSubscriptionRequestStatus',
+  'approveSubscriptionRequest',
+  'rejectSubscriptionRequest',
+  'cancelSubscriptionRequestByGeneralManager',
   'completeSubscriptionRequest',
   'createSubscription',
 ] as const;
@@ -63,6 +66,9 @@ export interface UseSubscriptionReturn {
   listAllSubscriptionRequests: () => Promise<void>;
   getSubscriptionRequestById: (subRequestId: number) => Promise<SubscriptionRequest>;
   changeSubscriptionRequestStatus: (plotId: number, subRequestId: number, status: SubscriptionRequestStatus) => Promise<void>;
+  approveSubscriptionRequest: (plotId: number, subRequestId: number) => Promise<void>;
+  rejectSubscriptionRequest: (plotId: number, subRequestId: number) => Promise<void>;
+  cancelSubscriptionRequestByGeneralManager: (plotId: number, subRequestId: number) => Promise<void>;
   completeSubscriptionRequest: (plotId: number, subRequestId: number) => Promise<void>;
   createSubscription: (plotId: number, data: CreateSubscriptionDTO) => Promise<void>;
 }
@@ -210,6 +216,57 @@ export const useSubscription = (): UseSubscriptionReturn => {
     }
   }, [usecase, t, idem, listAllSubscriptionRequests]);
 
+  const approveSubscriptionRequest = useCallback(async (plotId: number, subRequestId: number) => {
+    setFnLoading('approveSubscriptionRequest', true);
+    setFnError('approveSubscriptionRequest', null);
+    try {
+      await idem.run('approveSubscriptionRequest', { plotId, subRequestId }, (key) =>
+        usecase.approveSubscriptionRequest(plotId, subRequestId, key)
+      );
+      await listAllSubscriptionRequests();
+      toast.success(t('subscription_requests.approve_message', MODULE) || 'Request approved');
+    } catch (err: unknown) {
+      setFnError('approveSubscriptionRequest', handleApiError(err, { module: MODULE, passThrough: true }));
+      throw err;
+    } finally {
+      setFnLoading('approveSubscriptionRequest', false);
+    }
+  }, [usecase, t, idem, listAllSubscriptionRequests]);
+
+  const rejectSubscriptionRequest = useCallback(async (plotId: number, subRequestId: number) => {
+    setFnLoading('rejectSubscriptionRequest', true);
+    setFnError('rejectSubscriptionRequest', null);
+    try {
+      await idem.run('rejectSubscriptionRequest', { plotId, subRequestId }, (key) =>
+        usecase.rejectSubscriptionRequest(plotId, subRequestId, key)
+      );
+      await listAllSubscriptionRequests();
+      toast.success(t('subscription_requests.reject_message', MODULE) || 'Request rejected');
+    } catch (err: unknown) {
+      setFnError('rejectSubscriptionRequest', handleApiError(err, { module: MODULE, passThrough: true }));
+      throw err;
+    } finally {
+      setFnLoading('rejectSubscriptionRequest', false);
+    }
+  }, [usecase, t, idem, listAllSubscriptionRequests]);
+
+  const cancelSubscriptionRequestByGeneralManager = useCallback(async (plotId: number, subRequestId: number) => {
+    setFnLoading('cancelSubscriptionRequestByGeneralManager', true);
+    setFnError('cancelSubscriptionRequestByGeneralManager', null);
+    try {
+      await idem.run('cancelSubscriptionRequestByGeneralManager', { plotId, subRequestId }, (key) =>
+        usecase.cancelSubscriptionRequestByGeneralManager(plotId, subRequestId, key)
+      );
+      await listAllSubscriptionRequests();
+      toast.success(t('subscription_requests.cancel_message', MODULE) || 'Request canceled');
+    } catch (err: unknown) {
+      setFnError('cancelSubscriptionRequestByGeneralManager', handleApiError(err, { module: MODULE, passThrough: true }));
+      throw err;
+    } finally {
+      setFnLoading('cancelSubscriptionRequestByGeneralManager', false);
+    }
+  }, [usecase, t, idem, listAllSubscriptionRequests]);
+
   const completeSubscriptionRequest = useCallback(async (plotId: number, subRequestId: number) => {
     setFnLoading('completeSubscriptionRequest', true);
     setFnError('completeSubscriptionRequest', null);
@@ -270,6 +327,9 @@ export const useSubscription = (): UseSubscriptionReturn => {
     listAllSubscriptionRequests,
     getSubscriptionRequestById,
     changeSubscriptionRequestStatus,
+    approveSubscriptionRequest,
+    rejectSubscriptionRequest,
+    cancelSubscriptionRequestByGeneralManager,
     completeSubscriptionRequest,
     createSubscription,
   };

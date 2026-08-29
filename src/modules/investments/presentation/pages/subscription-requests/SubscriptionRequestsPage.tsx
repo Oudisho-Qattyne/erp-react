@@ -14,7 +14,6 @@ import { useSubscription } from '../../hooks/useSubscription';
 import { UserPickerDialog } from '../../../../users/presentation/components/UserPickerDialog';
 import { PlotPickerDialog } from '../plots/components/PlotPickerDialog';
 import { Badge, type BadgeVariant } from '../../../../../core/presentation/layouts/ui/badges/Badge';
-import type { SubscriptionRequestStatus } from '../../../domain/valueObjects/investments/subscriptionRequestStatus';
 import { canShowSubscriptionAction } from '../../utils/subscriptionActions';
 
 const STATUS_LABELS: Record<string, string> = {
@@ -48,7 +47,9 @@ export function SubscriptionRequestsPage() {
     setPerPage,
     pagination,
     listAllSubscriptionRequests,
-    changeSubscriptionRequestStatus,
+    approveSubscriptionRequest,
+    rejectSubscriptionRequest,
+    cancelSubscriptionRequestByGeneralManager,
     completeSubscriptionRequest,
   } = useSubscription();
 
@@ -159,26 +160,6 @@ export function SubscriptionRequestsPage() {
     setIsFilterOpen(false);
   };
 
-  const handleStatusAction = async (plotId: number, id: number, status: SubscriptionRequestStatus) => {
-    try {
-      await changeSubscriptionRequestStatus(plotId, id, status);
-    } catch {
-      // handled by hook
-    }
-  }
-
-  const handleApprove = (plotId: number, id: number) => handleStatusAction(plotId, id, 'pending_general_manager');
-  const handleReject = (plotId: number, id: number) => handleStatusAction(plotId, id, 'subscription_canceled_by_department_manager');
-  const handleCancelByGeneralManager = (plotId: number, id: number) => handleStatusAction(plotId, id, 'subscription_canceled_by_general_manager');
-
-  const handleComplete = async (plotId: number, id: number) => {
-    try {
-      await completeSubscriptionRequest(plotId, id);
-    } catch {
-      // handled by hook
-    }
-  }
-
   const columns = [
     {
       key: 'id',
@@ -248,9 +229,10 @@ export function SubscriptionRequestsPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handleApprove(row.plot_id ?? 0, row.id ?? 0)}
+                onClick={() => approveSubscriptionRequest(row.plot_id ?? 0, row.id ?? 0).catch(() => {})}
                 title={label('approve')}
                 className="text-success hover:text-success"
+                isLoading={loading['approveSubscriptionRequest']}
               >
                 <Check size={16} />
               </Button>
@@ -259,9 +241,10 @@ export function SubscriptionRequestsPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handleReject(row.plot_id ?? 0, row.id ?? 0)}
+                onClick={() => rejectSubscriptionRequest(row.plot_id ?? 0, row.id ?? 0).catch(() => {})}
                 title={label('reject')}
                 className="text-danger hover:text-danger"
+                isLoading={loading['rejectSubscriptionRequest']}
               >
                 <X size={16} />
               </Button>
@@ -270,9 +253,10 @@ export function SubscriptionRequestsPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handleComplete(row.plot_id ?? 0, row.id ?? 0)}
+                onClick={() => completeSubscriptionRequest(row.plot_id ?? 0, row.id ?? 0).catch(() => {})}
                 title={label('complete')}
                 className="text-success hover:text-success"
+                isLoading={loading['completeSubscriptionRequest']}
               >
                 <CheckCheck size={16} />
               </Button>
@@ -281,9 +265,10 @@ export function SubscriptionRequestsPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => handleCancelByGeneralManager(row.plot_id ?? 0, row.id ?? 0)}
+                onClick={() => cancelSubscriptionRequestByGeneralManager(row.plot_id ?? 0, row.id ?? 0).catch(() => {})}
                 title={label('cancel')}
                 className="text-danger hover:text-danger"
+                isLoading={loading['cancelSubscriptionRequestByGeneralManager']}
               >
                 <Ban size={16} />
               </Button>

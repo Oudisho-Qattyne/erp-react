@@ -138,7 +138,7 @@ export function CreateSubscriptionPage() {
         partners: ((data.investors as SubscriptionInvestorPayload[] | undefined) ?? []).map((investor) => ({ investor })),
       };
       await createSubscription(plotId, payload);
-      navigate('/investments/plots');
+      navigate('/investments/subscription-requests');
       return { data: { id: plotId } };
     } catch (err: unknown) {
       handleApiError(err, { module: 'investments' , passThrough:true });

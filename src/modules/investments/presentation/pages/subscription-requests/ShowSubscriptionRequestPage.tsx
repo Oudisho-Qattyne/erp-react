@@ -7,7 +7,6 @@ import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/Er
 import { ArrowLeft, Check, X, CheckCheck, Ban } from 'lucide-react';
 import { SubscriptionRequestPaper } from '../../components/subscriptionRequests/SubscriptionRequest';
 import { useSubscription } from '../../hooks/useSubscription';
-import type { SubscriptionRequestStatus } from '../../../domain/valueObjects/investments/subscriptionRequestStatus';
 import { canShowSubscriptionAction } from '../../utils/subscriptionActions';
 
 export function ShowSubscriptionRequestPage() {
@@ -19,12 +18,15 @@ export function ShowSubscriptionRequestPage() {
     loading,
     error,
     getSubscriptionRequestById,
-    changeSubscriptionRequestStatus,
+    approveSubscriptionRequest,
+    rejectSubscriptionRequest,
+    cancelSubscriptionRequestByGeneralManager,
     completeSubscriptionRequest,
   } = useSubscription();
 
   const label = (key: string) => t(`subscription_requests.${key}`, 'investments');
   const requestId = Number(id);
+  const plotId = selectedRequest?.plot_id ?? 0;
 
   useEffect(() => {
     if (!Number.isNaN(requestId)) {
@@ -32,20 +34,9 @@ export function ShowSubscriptionRequestPage() {
     }
   }, [requestId]);
 
-  const handleStatusAction = (status: SubscriptionRequestStatus) => async () => {
-    if (!selectedRequest) return;
+  const runAction = async (action: () => Promise<void>) => {
     try {
-      await changeSubscriptionRequestStatus(selectedRequest.plot_id ?? 0, requestId, status);
-      await getSubscriptionRequestById(requestId);
-    } catch {
-      /* errors surfaced by hook */
-    }
-  };
-
-  const handleComplete = async () => {
-    if (!selectedRequest) return;
-    try {
-      await completeSubscriptionRequest(selectedRequest.plot_id ?? 0, requestId);
+      await action();
       await getSubscriptionRequestById(requestId);
     } catch {
       /* errors surfaced by hook */
@@ -71,8 +62,9 @@ export function ShowSubscriptionRequestPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleStatusAction('pending_general_manager')}
+                onClick={() => runAction(() => approveSubscriptionRequest(plotId, requestId))}
                 className="text-success hover:text-success"
+                isLoading={loading['approveSubscriptionRequest']}
               >
                 <Check size={16} />
                 {label('approve')}
@@ -82,8 +74,9 @@ export function ShowSubscriptionRequestPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleStatusAction('subscription_canceled_by_department_manager')}
+                onClick={() => runAction(() => rejectSubscriptionRequest(plotId, requestId))}
                 className="text-danger hover:text-danger"
+                isLoading={loading['rejectSubscriptionRequest']}
               >
                 <X size={16} />
                 {label('reject')}
@@ -93,8 +86,9 @@ export function ShowSubscriptionRequestPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleComplete}
+                onClick={() => runAction(() => completeSubscriptionRequest(plotId, requestId))}
                 className="text-success hover:text-success"
+                isLoading={loading['completeSubscriptionRequest']}
               >
                 <CheckCheck size={16} />
                 {label('complete')}
@@ -104,8 +98,9 @@ export function ShowSubscriptionRequestPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleStatusAction('subscription_canceled_by_general_manager')}
+                onClick={() => runAction(() => cancelSubscriptionRequestByGeneralManager(plotId, requestId))}
                 className="text-danger hover:text-danger"
+                isLoading={loading['cancelSubscriptionRequestByGeneralManager']}
               >
                 <Ban size={16} />
                 {label('cancel')}

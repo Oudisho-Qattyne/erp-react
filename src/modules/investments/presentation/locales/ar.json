@@ -1380,6 +1380,7 @@
     "reject": "رفض",
     "approve_message": "تمت الموافقة على الطلب",
     "reject_message": "تم رفض الطلب",
+    "cancel_message": "تم إلغاء الطلب",
     "status_updated": "تم تحديث الحالة بنجاح",
     "complete_success": "تم إكمال الطلب بنجاح",
     "complete": "إكمال",
