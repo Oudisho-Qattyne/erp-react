@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
+import { useAuth } from '../../../../../core/infrastructure/auth/AuthProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import type { Plot } from '../../../domain/entities/plot';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
@@ -13,6 +14,7 @@ import { ActiveFilters } from '../../../../../core/presentation/layouts/ui/filte
 import { createFilterFormatValue } from '../../../../../core/presentation/layouts/ui/filter/filterLabels';
 import { GroupingDonut } from '../../../../../core/presentation/layouts/ui/statistics/GroupingDonut';
 import { GroupingCards } from '../../../../../core/presentation/layouts/ui/statistics/GroupingCards';
+import { FactorSelect } from '../../../../../core/presentation/layouts/ui/statistics/FactorSelect';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { Eye, Trash2, MapPin, History, Filter, Search, BarChart3, Layers } from 'lucide-react';
@@ -25,6 +27,7 @@ import { getLocalizedName } from '../../../../../core/presentation/utils/helpes'
 
 export function PlotsPage() {
   const { t } = useLanguage();
+  const { hasPermission } = useAuth();
   const navigate = useNavigate();
   const { entities: plots, remove, loadingMap, errorMap, pagination, list } = useEntityCrud<Plot>(
     '/investments/plots',
@@ -39,6 +42,14 @@ export function PlotsPage() {
   const [confirmDelete, setConfirmDelete] = useState<Plot | null>(null);
   // const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [auditItem, setAuditItem] = useState<Plot | null>(null);
+
+  const groupingFactors = [
+    { value: 'status', label: t('plots.status', 'investments') || 'Status', icon: <BarChart3 size={14} /> },
+    { value: 'plot_area', label: t('plots.plot_area_id', 'investments') || 'Region', icon: <MapPin size={14} /> },
+    { value: 'plot_classification', label: t('plots.plot_classification_id', 'investments') || 'Classification', icon: <Layers size={14} /> },
+  ];
+  const [groupingFactor, setGroupingFactor] = useState<string>(groupingFactors[0]?.value ?? '');
+  const canGroupStats = hasPermission('investments.plots.grouping-stats');
 
   // Filter State
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -252,20 +263,27 @@ export function PlotsPage() {
           <Button variant="outline" onClick={handleResetFilter} size="sm">
             {t('common.reset', 'shared') || 'Reset'}
           </Button>
+          {canGroupStats && (
+            <FactorSelect
+              options={groupingFactors}
+              value={groupingFactor}
+              onChange={(v) => setGroupingFactor(String(v))}
+              label={t('plots.group_by', 'investments') || 'Group by field'}
+              className="ms-auto"
+            />
+          )}
         </div>
 
         <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" formatValue={formatValue} />
 
-        <GroupingCards
-          baseUrl="/investments/plots"
-          factors={[
-            { value: 'status', label: t('plots.status', 'investments') || 'Status', icon: <BarChart3 size={14} /> },
-            { value: 'plot_area', label: t('plots.plot_area_id', 'investments') || 'Region', icon: <MapPin size={14} /> },
-            { value: 'plot_classification', label: t('plots.plot_classification_id', 'investments') || 'Classification', icon: <Layers size={14} /> },
-          ]}
-          filters={list.filter}
-          factorLabel="تجميع حسب الحقل"
-        />
+        {canGroupStats && (
+          <GroupingCards
+            baseUrl="/investments/plots"
+            factors={groupingFactors}
+            factor={groupingFactor}
+            filters={list.filter}
+          />
+        )}
 
       <FilterDialog
         isOpen={isFilterOpen}

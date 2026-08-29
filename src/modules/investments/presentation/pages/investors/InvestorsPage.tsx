@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
+import { useAuth } from '../../../../../core/infrastructure/auth/AuthProvider';
 import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEntity';
 import type { Investor } from '../../../domain/entities/investor';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
@@ -17,9 +18,11 @@ import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/
 import { Eye, Trash2, Filter, Search, History, Users, Globe, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { GroupingCards } from '../../../../../core/presentation/layouts/ui/statistics/GroupingCards';
+import { FactorSelect } from '../../../../../core/presentation/layouts/ui/statistics/FactorSelect';
 
 export function InvestorsPage() {
   const { t } = useLanguage();
+  const { hasPermission } = useAuth();
   const navigate = useNavigate();
   const { entities: investors, getAll, remove, loadingMap, errorMap, pagination, list } = useEntityCrud<Investor>(
     '/investments/investors',
@@ -30,6 +33,14 @@ export function InvestorsPage() {
   const [localSearch, setLocalSearch] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<Investor | null>(null);
   const [auditItem, setAuditItem] = useState<Investor | null>(null);
+
+  const groupingFactors = [
+    { value: 'gender', label: t('investors.gender', 'investments') || 'Gender', icon: <Users size={14} /> },
+    { value: 'nationality', label: t('investors.nationality', 'investments') || 'Nationality', icon: <Globe size={14} /> },
+    { value: 'is_possible_investor_in_future', label: t('investors.is_possible_investor_in_future', 'investments') || 'Future Possible Investor', icon: <TrendingUp size={14} /> },
+  ];
+  const [groupingFactor, setGroupingFactor] = useState<string>(groupingFactors[0]?.value ?? '');
+  const canGroupStats = hasPermission('investments.investors.grouping-stats');
 
   // Filter State
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -201,21 +212,28 @@ export function InvestorsPage() {
         <Button variant="outline" onClick={handleResetFilter} size="sm">
           {t('common.reset', 'shared') || 'Reset'}
         </Button>
+        {canGroupStats && (
+          <FactorSelect
+            options={groupingFactors}
+            value={groupingFactor}
+            onChange={(v) => setGroupingFactor(String(v))}
+            label={t('investors.group_by', 'investments') || 'Group by field'}
+            className="ms-auto"
+          />
+        )}
       </div>
 
 
       <ActiveFilters filters={filterInitialValues} fields={filterFields} className="mt-1" />
 
-        <GroupingCards
-          baseUrl="/investments/investors"
-          factors={[
-            { value: 'gender', label: t('investors.gender', 'investments') || 'Gender', icon: <Users size={14} /> },
-            { value: 'nationality', label: t('investors.nationality', 'investments') || 'Nationality', icon: <Globe size={14} /> },
-            { value: 'is_possible_investor_in_future', label: t('investors.is_possible_investor_in_future', 'investments') || 'Future Possible Investor', icon: <TrendingUp size={14} /> },
-          ]}
-          filters={list.filter}
-          factorLabel="تجميع حسب الحقل"
-        />
+        {canGroupStats && (
+          <GroupingCards
+            baseUrl="/investments/investors"
+            factors={groupingFactors}
+            factor={groupingFactor}
+            filters={list.filter}
+          />
+        )}
 
       <FilterDialog
         isOpen={isFilterOpen}
