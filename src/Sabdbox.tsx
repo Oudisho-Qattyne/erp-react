@@ -183,7 +183,7 @@ const subscriptionRequestExample: SubscriptionRequestV100 = {
       transaction_currency_id: "SYP",
       transaction_date: "2026-08-27",
       formatted_transaction_date: "27-08-2026",
-      reason: "معاملة طلب اشتراك للإطبارة ذات الرقم #42 في المفسم ذو الرقم #8.",
+      reason: "معاملة طلب اشتراك للإطبارة ذات الرقم #42 في المقسم ذو الرقم #8.",
       created_at: "27-08-2026",
     },
   ],
@@ -344,3 +344,25 @@ export const Sandbox = () => {
     
   )
 }
+
+
+
+// Audit of every registry consumer in the codebase (module registry + the 6 `core/registry/*` registries):
+
+// **Unguarded (the offenders):**
+
+// 1. `src/modules/investments/presentation/pages/plots/PlotsPage.tsx:111` — `picker: getUserPickerDialog()` calls the registry getter and passes its result straight into the field config **without checking it exists**. If the `users` module isn't registered, `getUserPickerDialog()` returns `null` → the "Created By" filter silently degrades to a dead, disabled input. This is the exact pattern you had me guard in `SubscriptionRequestsPage.tsx` (`getModules().some(m => m.name === 'users')`), but PlotsPage is still unguarded.
+
+// 2. `src/App.tsx:63` — `<Navigate to={'/hr'} />` hard-codes a redirect to a **module-registry route** without verifying the `hr` module was registered. If HR is absent, the user lands on `NotFoundPage`.
+
+// **Guarded (OK, for reference):**
+// - `SubscriptionRequestsPage.tsx:56` — `getModules().some(...users)` guard (ours).
+// - `AuthProvider.tsx:46` — `if (!api?.getCurrentUser) return`.
+// - `LinkUserToEmployee.tsx:22,194` — `useHr() || {}` + `{EmployeePickerComponent && ...}`.
+// - `DefaultLayout.tsx:21` — `chatApi?.ChatFloatingButtonComponent`.
+// - All `useStorage()` consumers (ShowFacilityPage:143, EditInvestorPage:171, EditPlotPage:59, ShowEmployeePage:126) — `storage?.FileExplorerDialogComponent && ...`.
+// - `usePersons.ts` — `NullPersonsHook` fallback; `AuthorizedPersonsInput.tsx:66` checks `isRegistered`.
+// - `PersonsPage.tsx:74-75` — `getPersonDetailRoute()` result checked (`if (!config) return null`).
+// - `NotificationsBell.tsx:40` — `getNotificationHandler()` returns undefined, consumed via `config?`.
+
+// Want me to fix `PlotsPage.tsx:111` with the same `getModules().some(m => m.name === 'users')` guard → user-picker vs. plain-text fallback, and guard the `/hr` redirect in `App.tsx`?

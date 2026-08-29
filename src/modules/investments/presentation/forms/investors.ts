@@ -1,4 +1,4 @@
-import type { SubscriptionInvestorPayload } from '../../domain/repositories/ISubscriptionRepository';
+import type { SubscriptionInvestorPayload } from '../../application/dtos/subscriptionDtos';
 
 export const INVESTOR_DATA_FIELDS: readonly (keyof SubscriptionInvestorPayload)[] = [
   'first_name',

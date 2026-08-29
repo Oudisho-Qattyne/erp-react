@@ -18,7 +18,7 @@ import type { PartnershipType } from '../../../domain/entities/partnershipType';
 import type { Country } from '../../../../../core/domain/entities/regions/Country';
 import { useSubscription } from '../../hooks/useSubscription';
 import { mapSubscriptionServerValidationErrors } from '../../forms/subscriptionServerErrors';
-import type { CreateSubscriptionDTO, SubscriptionAuthorizedPersonPayload, SubscriptionInvestorPayload } from '../../../domain/repositories/ISubscriptionRepository';
+import type { CreateSubscriptionDTO, SubscriptionAuthorizedPersonPayload, SubscriptionInvestorPayload } from '../../../application/dtos/subscriptionDtos';
 import type { ProductionCapacityRow } from '../../../domain/entities/facility';
 import type { ConsumptionMaterial } from '../../../domain/entities/consumptionMaterial';
 import { PlotPickerDialog } from '../plots/components/PlotPickerDialog';

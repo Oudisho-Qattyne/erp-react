@@ -44,6 +44,8 @@
     "new": "New",
     "create": "Create",
     "created_at": "Created At",
+    "from_date": "From Date",
+    "to_date": "To Date",
     "notes": "Notes",
     "confirm_delete": "Are you sure you want to delete this?",
     "error": "An error occurred",

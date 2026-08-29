@@ -1,34 +1,27 @@
-import { useMemo } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
+import { Spinner } from '../../../../../core/presentation/layouts/ui/state/Spinner';
+import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { ArrowLeft } from 'lucide-react';
 import { SubscriptionRequestPaper } from '../../components/subscriptionRequests/SubscriptionRequest';
-import { mockSubscriptionRequests } from '../../../domain/entities/subscriptionRequests/mockSubscriptionRequests';
+import { useSubscription } from '../../hooks/useSubscription';
 
 export function ShowSubscriptionRequestPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { direction, t } = useLanguage();
+  const { selectedRequest, loading, error, getSubscriptionRequestById } = useSubscription();
 
   const label = (key: string) => t(`subscription_requests.${key}`, 'investments');
+  const requestId = Number(id);
 
-  const request = useMemo(
-    () => mockSubscriptionRequests.find(r => r.payload.id === Number(id)),
-    [id]
-  );
-
-  if (!request) {
-    return (
-      <div className="p-6 space-y-4">
-        <Button variant="outline" size="sm" onClick={() => navigate('/investments/subscription-requests')}>
-          <ArrowLeft size={16} />
-          {label('back')}
-        </Button>
-        <p className="text-text-muted">{label('not_found')}</p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!Number.isNaN(requestId)) {
+      getSubscriptionRequestById(requestId).catch(() => {});
+    }
+  }, [requestId]);
 
   return (
     <div className="p-6 space-y-6">
@@ -38,14 +31,26 @@ export function ShowSubscriptionRequestPage() {
             <ArrowLeft size={16} className={direction === 'rtl' ? 'rotate-180' : ''} />
             {label('back')}
           </Button>
-          <h1 className="text-xl font-bold text-text">{label('detail_title').replace('{id}', String(request.payload.id))}</h1>
+          <h1 className="text-xl font-bold text-text">{label('detail_title').replace('{id}', String(requestId))}</h1>
         </div>
-        <span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full bg-green-dark text-white">
-          v{request.version}
-        </span>
+        {selectedRequest && (
+          <span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full bg-green-dark text-white">
+            v{selectedRequest.version}
+          </span>
+        )}
       </div>
 
-      <SubscriptionRequestPaper request={request} />
+      {loading['getSubscriptionRequestById'] ? (
+        <div className="flex items-center justify-center py-16">
+          <Spinner size="xl" className="mx-auto text-primary" />
+        </div>
+      ) : error['getSubscriptionRequestById'] ? (
+        <ErrorState message={error['getSubscriptionRequestById']} onRetry={() => getSubscriptionRequestById(requestId)} />
+      ) : selectedRequest ? (
+        <SubscriptionRequestPaper request={selectedRequest} />
+      ) : (
+        <p className="text-text-muted">{label('not_found')}</p>
+      )}
     </div>
   );
 }

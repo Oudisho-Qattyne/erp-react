@@ -9,8 +9,8 @@ export const TransactionReceipt = ({ transactions }: TransactionReceiptProps) =>
     const { t } = useLanguage();
 
     const text = (key: string) => t(`transaction_receipt.${key}`, 'investments');
-    const typeLabel = (v: string) => t(`subscription_request.type_${v}`, 'investments') || v;
-    const statusLabel = (v: string) => t(`subscription_request.tx_status_${v}`, 'investments') || v;
+    const typeLabel = (v?: string) => t(`subscription_request.type_${v}`, 'investments') || v;
+    const statusLabel = (v?: string) => t(`subscription_request.tx_status_${v}`, 'investments') || v;
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

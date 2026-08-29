@@ -13,7 +13,7 @@ import {
   INVESTOR_DATA_FIELDS,
   toRowFieldValue,
 } from './investors';
-import type { SubscriptionInvestorPayload } from '../../domain/repositories/ISubscriptionRepository';
+import type { SubscriptionInvestorPayload } from '../../application/dtos/subscriptionDtos';
 
 interface InvestorsFieldProps {
   methods: UseFormReturn<FieldValues>;

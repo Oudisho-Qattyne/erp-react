@@ -1151,6 +1151,48 @@ paths:
           schema:
             type: string
           description: 'Partial (LIKE) match on `facebook`'
+        -
+          name: 'sort_by[name]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            example: asc
+          description: 'Sort by name'
+        -
+          name: 'sort_by[email]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by email'
+        -
+          name: 'sort_by[role]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by role'
+        -
+          name: 'sort_by[created_at]'
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            example: desc
+          description: 'Sort by creation date. Defaults to `desc` when no `sort_by` is provided.'
       responses:
         200:
           description: 'List of people'
@@ -3314,9 +3356,7 @@ paths:
         -
           $ref: '#/components/parameters/HrSortByConsumedUnits'
         -
-          $ref: '#/components/parameters/HrSortBySystemCorrectionAddedUnits'
-        -
-          $ref: '#/components/parameters/HrSortBySystemCorrectionDeductedUnits'
+          $ref: '#/components/parameters/HrSortByLeaveRestoredUnits'
         -
           $ref: '#/components/parameters/HrSortByAdjustmentAddedUnits'
         -
@@ -3592,6 +3632,18 @@ paths:
             type: string
             format: date
           example: '2026-12-31'
+        -
+          $ref: '#/components/parameters/HrSortByCreatedAt'
+        -
+          $ref: '#/components/parameters/HrSortByStartDate'
+        -
+          $ref: '#/components/parameters/HrSortByEndDate'
+        -
+          $ref: '#/components/parameters/HrSortBySubmittedAt'
+        -
+          $ref: '#/components/parameters/HrSortByRequestedUnits'
+        -
+          $ref: '#/components/parameters/HrSortByStatus'
       responses:
         200:
           description: 'Paginated list of leave requests'
@@ -5064,7 +5116,7 @@ paths:
           in: query
           schema:
             type: string
-          description: 'Search by code or identifier'
+          description: 'Search by code, identifier or notes (LIKE match)'
         -
           name: code
           in: query
@@ -5081,14 +5133,16 @@ paths:
           name: status
           in: query
           schema:
-            type: string
-            enum:
-              - unsold
-              - announced
-              - subscribed
-              - allocated
-              - separated
-          description: 'Filter by status'
+            type: array
+            items:
+              type: string
+              enum:
+                - unsold
+                - announced
+                - subscribed
+                - allocated
+                - separated
+          description: 'Filter by status. Pass a single value (`?status=unsold`) or multiple values (`?status[]=unsold&status[]=allocated`) to match plots whose status is any of them.'
         -
           name: plot_area_id
           in: query
@@ -5759,6 +5813,93 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
+  /investments/investors/seed-random:
+    post:
+      tags:
+        - Investors
+      summary: 'Seed 20 random Investors'
+      security:
+        -
+          sanctumAuth: {  }
+      responses:
+        200:
+          description: 'Seeded successfully'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: object, properties: { created: { type: integer, example: 20 }, possible_investor_in_future: { type: integer, example: 9 }, not_possible_investor_in_future: { type: integer, example: 11 } } } } }
+        500:
+          $ref: '#/components/responses/NotFound'
+  /investments/investors/reports/grouping:
+    get:
+      tags:
+        - Investors
+      summary: 'Get Investor grouping statistics by a given factor'
+      description: 'Returns labels and values grouped by the requested factor. Supported factors: gender, nationality, is_possible_investor_in_future.'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: factor
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - gender
+              - nationality
+              - is_possible_investor_in_future
+          description: 'The grouping factor to group by'
+      responses:
+        200:
+          description: 'Grouping statistics'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { type: object, properties: { label: { type: string, example: male }, value: { type: number, example: 8 } } } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
+  /investments/plots/reports/grouping:
+    get:
+      tags:
+        - Plots
+      summary: 'Get Plot grouping statistics by a given factor'
+      description: 'Returns labels and values grouped by the requested factor. Supported factors: status, plot_area, plot_classification.'
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: factor
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - status
+              - plot_area
+              - plot_classification
+          description: 'The grouping factor to group by'
+      responses:
+        200:
+          description: 'Grouping statistics'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { type: object, properties: { label: { type: string, example: allocated }, value: { type: number, example: 5 } } } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        422:
+          $ref: '#/components/responses/ValidationError'
   /investments/industry-categories:
     get:
       tags:
@@ -7644,47 +7785,6 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
-  '/investments/plots/{plotId}/requests/subscription':
-    post:
-      tags:
-        - 'Subscription Requests'
-      summary: 'Create a Subscription Request'
-      description: "Creates, inside one database transaction:\n  1. A new plot dossier with status `pending_subscription_fee`\n  2. Its partners — investors are created or updated from the passed `investor` objects,\n     then attached to the dossier\n  3. A new facility linked to the dossier\n  4. The facility authorized persons\n\nForeign keys (`plot_id`, `plot_dossier_id`, `facility_id`) are derived server-side from the\nroute parameter and the created records, and must NOT be sent by the client.\n"
-      security:
-        -
-          sanctumAuth: {  }
-      parameters:
-        -
-          name: plotId
-          in: path
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AddSubscriptionRequestRequest'
-      responses:
-        200:
-          description: "Subscription request created successfully. Returns the created plot dossier\n(with its plot, partners and facilities including their authorized persons).\nThe created dossier has status `pending_subscription_fee`.\n"
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - { $ref: '#/components/schemas/SuccessResponse' }
-                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierInfoResource' } } }
-        400:
-          $ref: '#/components/responses/BadRequest'
-        401:
-          $ref: '#/components/responses/Unauthenticated'
-        404:
-          $ref: '#/components/responses/NotFound'
-        422:
-          $ref: '#/components/responses/ValidationError'
-        500:
-          $ref: '#/components/responses/InternalServerError'
   /investments/rent-contract-industries:
     get:
       tags:
@@ -8209,6 +8309,230 @@ paths:
           $ref: '#/components/responses/Unauthenticated'
         404:
           $ref: '#/components/responses/NotFound'
+  '/investments/plots/{plotId}/requests/subscription':
+    get:
+      tags:
+        - 'Subscription Requests'
+      summary: 'List Subscription Requests'
+      description: "Paginated list of subscription requests, filtered via the entity `scopeFilter`.\n\n**Filters (query params):**\n- `id` - exact match (also accepts a comma-separated/array of ids)\n- `plot_id` - exact plot id (also accepts multiple)\n- `status` - exact match on status (also accepts multiple of them)\n- `request_type` - exact match\n- `version` - exact match\n- `created_by` - exact user id (also accepts multiple)\n- `from_date` - minimum `created_at` (inclusive)\n- `to_date` - maximum `created_at` (inclusive)\n\n**Sorting** via `sort_by[column]=asc|desc`: `id`, `plot_id`, `request_type`, `status`,\n`version`, `created_at` - default `created_at` desc if omitted.\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+          description: 'Page number'
+        -
+          name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+          description: 'Items per page'
+        -
+          name: id
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'Exact subscription request id (or comma-separated ids)'
+        -
+          name: status
+          in: query
+          required: false
+          schema:
+            $ref: '#/components/schemas/SubscriptionRequestStatus'
+          description: 'Filter by request status (or comma-separated statuses)'
+        -
+          name: request_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - subscription_request
+          description: 'Filter by request type'
+        -
+          name: version
+          in: query
+          required: false
+          schema:
+            type: string
+          description: 'Filter by version'
+        -
+          name: created_by
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: 'Filter by the user who created the request'
+        -
+          name: from_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: 'Minimum created date (inclusive)'
+        -
+          name: to_date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+          description: 'Maximum created date (inclusive)'
+      responses:
+        200:
+          description: "Paginated list of subscription requests.\n**Notification hint:** no notification is fired for a plain list request.\n"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { type: array, items: { $ref: '#/components/schemas/PlotSubscriptionRequestResource' } } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - 'Subscription Requests'
+      summary: 'Create a Subscription Request'
+      description: "Creates a subscription request with status `pending_subscription_fee` and a pending\nfee transaction (fee: payment fee with code `subscription_request_code`,\ntransaction type `incoming`, status `pending`, attached to the request).\n\nThe passed body is stored as the request `payload` (with `plot_id` added server-side).\nNO dossier/facility/partners are created at this step - they are materialized later\nwhen the request is completed.\n\nFails with `422` if the plot does not exist in a subscribable status\n(`announced` / `subscribed`).\n\n**Notification fired:**\n`TransactionCreatedNotification` to all users with permission\n`financial.transactions.change-status`. See the module description for the payload shape.\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddSubscriptionRequestRequest'
+      responses:
+        200:
+          description: "Subscription request created (status `pending_subscription_fee`), including its\npending fee transaction.\n"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotSubscriptionRequestResource' } } }
+        400:
+          $ref: '#/components/responses/BadRequest'
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  '/investments/plots/{plotId}/requests/subscription/{subRequestId}/change-status':
+    put:
+      tags:
+        - 'Subscription Requests'
+      summary: 'Change Subscription Request Status'
+      description: "Sets a new status on the subscription request. Allowed values:\n- `pending_general_manager` - forward the request to the general manager for final approval\n- `subscription_canceled` - cancel the request (terminal)\n\nNo status eligibility check is performed server-side; only the Enum values above are validated.\n\n**Notification fired:** none currently.\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: subRequestId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 'ID of the subscription request'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeSubscriptionRequestStatusRequest'
+      responses:
+        200:
+          description: 'Subscription request with the updated status and its transactions.'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotSubscriptionRequestResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
+  '/investments/plots/{plotId}/requests/subscription/{subRequestId}/complete':
+    put:
+      tags:
+        - 'Subscription Requests'
+      summary: 'Complete a Subscription Request'
+      description: "Final step. Requires the request status to be `pending_general_manager`, otherwise\nfails with `422` (\"subscription request must be pending general manager\").\n\nInside one database transaction it:\n  1. Marks the request as `subscription_approved`\n  2. Creates a new plot dossier with status `allocatable`\n  3. Creates/updates the partners' investors and attaches them to the dossier\n  4. Creates the facility linked to the dossier + its authorized persons\n  5. Syncs daily consumption and production capacities, logs dossier partners, creates folders\n  6. Updates the plot status to `subscribed`\n\n**Notifications fired:**\nDomain events `InvestorCreated` / `InvestorUpdated` for new/updated partners.\nNo user notification is currently fired.\n"
+      security:
+        -
+          sanctumAuth: {  }
+      parameters:
+        -
+          name: plotId
+          in: path
+          required: true
+          schema:
+            type: integer
+        -
+          name: subRequestId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: 'ID of the subscription request'
+      responses:
+        200:
+          description: 'The materialized plot dossier (with plot, partners, facilities and authorized persons).'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - { $ref: '#/components/schemas/SuccessResponse' }
+                  - { type: object, properties: { data: { $ref: '#/components/schemas/PlotDossierInfoResource' } } }
+        401:
+          $ref: '#/components/responses/Unauthenticated'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/ValidationError'
+        500:
+          $ref: '#/components/responses/InternalServerError'
   /storage-management:
     get:
       summary: 'List root-level storage items'
@@ -8763,6 +9087,35 @@ paths:
             type: boolean
           required: false
           description: 'Filter by whether user is linked to an employee'
+        -
+          in: query
+          name: 'sort_by[name]'
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            example: asc
+          description: 'Sort by user name'
+        -
+          in: query
+          name: 'sort_by[email]'
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by email'
+        -
+          in: query
+          name: 'sort_by[created_at]'
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            example: desc
+          description: 'Sort by creation date. Defaults to `desc` when no `sort_by` is provided.'
       responses:
         200:
           description: 'List of users'
@@ -8965,6 +9318,45 @@ paths:
       security:
         -
           sanctumAuth: {  }
+      parameters:
+        -
+          in: query
+          name: 'sort_by[name]'
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            example: asc
+          description: 'Sort by permission name'
+        -
+          in: query
+          name: 'sort_by[module]'
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by module'
+        -
+          in: query
+          name: 'sort_by[group]'
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by permission group'
+        -
+          in: query
+          name: 'sort_by[created_at]'
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            example: desc
+          description: 'Sort by creation date. Defaults to `desc` when no `sort_by` is provided.'
       responses:
         200:
           description: 'List of permissions'
@@ -9028,6 +9420,46 @@ paths:
       security:
         -
           sanctumAuth: {  }
+      parameters:
+        -
+          in: query
+          name: 'sort_by[id]'
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+          description: 'Sort by role ID'
+        -
+          in: query
+          name: 'sort_by[name]'
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            example: asc
+          description: 'Sort by role name'
+        -
+          in: query
+          name: 'sort_by[number_of_users]'
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            example: desc
+          description: 'Sort by the number of users assigned to the role'
+        -
+          in: query
+          name: 'sort_by[created_at]'
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            example: desc
+          description: 'Sort by creation date. Defaults to `desc` when no `sort_by` is provided.'
       responses:
         200:
           description: 'List of roles'
@@ -9888,10 +10320,20 @@ components:
           description: 'The model that sourced the transaction (e.g. a payment fee definition). Null when the transaction has no source.'
           type: object
           nullable: true
+        sourceable_type:
+          description: 'Class name of the related sourceable model. Null when the transaction has no source or the relation is not loaded.'
+          type: string
+          nullable: true
+          example: App\Modules\FinancialManagement\Domain\Entities\PaymentFee
         transactionable:
           description: 'The model the transaction belongs to (e.g. a plot dossier). Null when the transaction is not attached to any model.'
           type: object
           nullable: true
+        transactionable_type:
+          description: 'Class name of the related transactionable model. Null when the transaction is not attached to any model or the relation is not loaded.'
+          type: string
+          nullable: true
+          example: App\Modules\Investments\Domain\Entities\PlotDossier
     OrganizationalLevel:
       type: object
       properties:
@@ -11132,11 +11574,7 @@ components:
           type: number
           format: float
           example: 5
-        system_correction_added_units:
-          type: number
-          format: float
-          example: 0
-        system_correction_deducted_units:
+        leave_restored_units:
           type: number
           format: float
           example: 0
@@ -11845,19 +12283,6 @@ components:
           type: string
           format: date
           example: '2026-06-27'
-        service_conditions:
-          type: array
-          description: 'Array of service condition objects with id and optional note'
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-                example: 1
-              note:
-                type: string
-                nullable: true
-                example: 'Some note'
         service_status_conditions:
           type: array
           description: 'Array of service status condition objects with id and optional note and service_status'
@@ -12758,7 +13183,7 @@ components:
           nullable: true
           allOf:
             -
-              $ref: '#/components/schemas/CountryInfoResource'
+              $ref: '#/components/schemas/Country'
         first_phone_number:
           type: string
           example: '+963111111111'
@@ -12948,30 +13373,63 @@ components:
         - role_in_facility
       properties:
         person:
-          $ref: '#/components/schemas/PersonData'
+          type: object
+          description: "Person to create or update. When `id` is not provided, `name` is required.\n"
+          required:
+            - name
+          properties:
+            id:
+              type: integer
+              nullable: true
+              example: 1
+              description: 'ID of an existing person (soft-deleted persons are excluded).'
+            name:
+              type: string
+              example: 'John Doe'
+            role:
+              type: string
+              nullable: true
+              example: Manager
+            email:
+              type: string
+              format: email
+              nullable: true
+              example: john.doe@example.com
+            primary_phone_number:
+              type: string
+              nullable: true
+              example: '+963911111111'
+            secondary_phone_number:
+              type: string
+              nullable: true
+              example: '+963922222222'
+            whatsapp:
+              type: string
+              nullable: true
+              example: '+963933333333'
+            telegram:
+              type: string
+              nullable: true
+              example: '@johndoe'
+            x:
+              type: string
+              nullable: true
+              example: '@johndoe'
+            linkedin:
+              type: string
+              nullable: true
+              example: 'https://linkedin.com/in/johndoe'
+            facebook:
+              type: string
+              nullable: true
+              example: 'https://facebook.com/johndoe'
         role_in_facility:
           type: string
           example: 'Factory Manager'
-          description: 'The role of the person inside the facility (stored in the pivot table).'
         is_required_for_legal_matters:
           type: boolean
           default: false
-          description: 'Optional. Whether this person is required for legal matters. Defaults to false when omitted.'
-          example: false
-      example:
-        person:
-          name: 'John Doe'
-          role: Manager
-          email: john.doe@example.com
-          primary_phone_number: '+963911111111'
-          secondary_phone_number: '+963922222222'
-          whatsapp: '+963933333333'
-          telegram: '@johndoe'
-          x: '@johndoe'
-          linkedin: 'https://linkedin.com/in/johndoe'
-          facebook: 'https://facebook.com/johndoe'
-        role_in_facility: 'Factory Manager'
-        is_required_for_legal_matters: true
+          example: true
     AuthorizedPersonResource:
       type: object
       required:
@@ -13240,152 +13698,6 @@ components:
           type: string
           format: date
           example: 12-07-2026
-    SubscriptionRequestPartners:
-      type: object
-      description: 'Existing investors to attach to the created dossier as partners.'
-      required:
-        - investor_ids
-      properties:
-        investor_ids:
-          type: array
-          description: 'IDs of existing investors (from the `investors` table) to attach to the dossier as partners.'
-          items:
-            type: integer
-          example:
-            - 1
-            - 2
-    SubscriptionRequestFacility:
-      type: object
-      description: "Facility data. `plot_id` and `plot_dossier_id` are derived server-side from the route\nparameter and the created dossier, and must NOT be sent by the client.\n"
-      required:
-        - name
-        - address
-        - city
-        - first_phone_number
-        - capital_in_usd
-        - capital_in_syp
-        - value_of_machines_in_usd
-        - value_of_machines_in_syp
-        - number_of_workers
-        - daily_production_capacity
-        - monthly_production_capacity
-        - yearly_production_capacity
-        - electrical_power_capacity
-        - yearly_estimated_water_consumption
-      properties:
-        name:
-          type: string
-          example: 'Main Factory'
-        address:
-          type: string
-          example: '123 Industrial Zone'
-        city:
-          type: string
-          example: Damascus
-        first_phone_number:
-          type: string
-          example: '+963111111111'
-        second_phone_number:
-          type: string
-          nullable: true
-          example: '+963222222222'
-        email:
-          type: string
-          nullable: true
-          example: factory@example.com
-        partnership_type_id:
-          type: integer
-          nullable: true
-          example: 1
-        capital_in_usd:
-          type: number
-          example: 500000.0
-        capital_in_syp:
-          type: number
-          example: 250000000.0
-        value_of_machines_in_usd:
-          type: number
-          example: 200000.0
-        value_of_machines_in_syp:
-          type: number
-          example: 100000000.0
-        number_of_workers:
-          type: integer
-          example: 50
-        daily_production_capacity:
-          type: number
-          example: 1000.0
-        monthly_production_capacity:
-          type: number
-          example: 30000.0
-        yearly_production_capacity:
-          type: number
-          example: 365000.0
-        electrical_power_capacity:
-          type: number
-          example: 500.0
-        yearly_estimated_water_consumption:
-          type: number
-          example: 10000.0
-        require_all_persons_for_legal_matters:
-          type: boolean
-          default: false
-          example: false
-          description: "Optional. When true, all authorized persons are required for legal matters.\nDefaults to false when omitted.\n"
-    AddPlotSubscriptionRequestRequest:
-      type: object
-      required:
-        - facility
-        - authorized_persons
-        - partners
-      properties:
-        facility:
-          $ref: '#/components/schemas/SubscriptionRequestFacility'
-        authorized_persons:
-          type: array
-          description: "Authorized persons for the facility. Each item either creates a new person\n(when `person.id` is not provided) or updates an existing one (when `person.id` is provided).\nWhen `person.id` is not provided, `person.name` is required.\n"
-          items:
-            $ref: '#/components/schemas/AuthorizedPersonItem'
-        partners:
-          $ref: '#/components/schemas/SubscriptionRequestPartners'
-      example:
-        facility:
-          name: 'Main Factory'
-          address: '123 Industrial Zone'
-          city: Damascus
-          first_phone_number: '+963111111111'
-          second_phone_number: '+963222222222'
-          email: factory@example.com
-          capital_in_usd: 500000.0
-          capital_in_syp: 250000000.0
-          value_of_machines_in_usd: 200000.0
-          value_of_machines_in_syp: 100000000.0
-          number_of_workers: 50
-          daily_production_capacity: 1000.0
-          monthly_production_capacity: 30000.0
-          yearly_production_capacity: 365000.0
-          electrical_power_capacity: 500.0
-          yearly_estimated_water_consumption: 10000.0
-          require_all_persons_for_legal_matters: false
-        authorized_persons:
-          -
-            person:
-              name: 'John Doe'
-              role: Manager
-              email: john.doe@example.com
-              primary_phone_number: '+963911111111'
-              secondary_phone_number: '+963922222222'
-              whatsapp: '+963933333333'
-              telegram: '@johndoe'
-              x: '@johndoe'
-              linkedin: 'https://linkedin.com/in/johndoe'
-              facebook: 'https://facebook.com/johndoe'
-            role_in_facility: 'Factory Manager'
-            is_required_for_legal_matters: true
-        partners:
-          investor_ids:
-            - 1
-            - 2
     RentContractIndustryDTO:
       type: object
       required:
@@ -13536,8 +13848,19 @@ components:
           type: string
           format: date
           example: 16-07-2026
+    SubscriptionRequestStatus:
+      type: string
+      description: 'Current lifecycle status of a subscription request.'
+      enum:
+        - pending_subscription_fee
+        - subscription_fee_paid
+        - pending_subscription_department_manager
+        - pending_general_manager
+        - subscription_approved
+        - subscription_canceled
     AddSubscriptionRequestRequest:
       type: object
+      description: "Payload sent when creating a subscription request. It is stored as-is on the request\nrecord and only materialized later when the request is completed.\n"
       required:
         - partners
         - facility
@@ -13545,16 +13868,21 @@ components:
       properties:
         partners:
           type: array
-          description: "Investors to attach to the created dossier as partners.\nEach item either creates a new investor (when `investor.id` is not provided)\nor updates an existing investor (when `investor.id` is provided).\n"
+          description: "Investors to attach to the final dossier as partners.\nEach item either creates a new investor (when `investor.id` is not provided)\nor updates an existing investor (when `investor.id` is provided).\n"
           items:
             $ref: '#/components/schemas/SubscriptionPartnerItem'
         facility:
           $ref: '#/components/schemas/AddSubscriptionRequestFacility'
         authorized_persons:
           type: array
-          description: "Authorized persons for the created facility. Each item either creates a new person\n(when `person.id` is not provided) or updates an existing one (when `person.id` is provided).\nWhen `person.id` is not provided, `person.name` is required.\n"
+          description: "Authorized persons for the final facility. Each item either creates a new person\n(when `person.id` is not provided) or updates an existing one (when `person.id` is provided).\nWhen `person.id` is not provided, `person.name` is required.\n"
           items:
             $ref: '#/components/schemas/AuthorizedPersonItem'
+        require_all_persons_for_legal_matters:
+          type: boolean
+          default: false
+          example: false
+          description: "Optional. When true, all authorized persons are treated as required for legal matters.\nDefaults to false when omitted.\n"
       example:
         partners:
           -
@@ -13569,21 +13897,26 @@ components:
         facility:
           name: 'Main Factory'
           address: '123 Industrial Zone'
-          city: Damascus
+          company_type: existing
+          commercial_register: CR-112233
+          commercial_register_date: '2020-01-15'
           first_phone_number: '+963111111111'
-          second_phone_number: '+963222222222'
-          email: factory@example.com
-          capital_in_usd: 500000.0
-          capital_in_syp: 250000000.0
+          total_capital_in_usd: 500000.0
+          total_capital_in_syp: 250000000.0
           value_of_machines_in_usd: 200000.0
           value_of_machines_in_syp: 100000000.0
           number_of_workers: 50
-          daily_production_capacity: 1000.0
-          monthly_production_capacity: 30000.0
-          yearly_production_capacity: 365000.0
           electrical_power_capacity: 500.0
-          yearly_estimated_water_consumption: 10000.0
+          yearly_estimated_drinking_water_consumption: 10000.0
+          yearly_estimated_industrial_water_consumption: 20000.0
           require_all_persons_for_legal_matters: false
+          daily_consumption: {  }
+          daily_production_capacities: {  }
+          monthly_production_capacities: {  }
+          yearly_production_capacities:
+            -
+              material: Steel
+              production: '1000 tons'
         authorized_persons:
           -
             person:
@@ -13686,22 +14019,19 @@ components:
           example: false
     AddSubscriptionRequestFacility:
       type: object
-      description: "Facility data. `plot_id` and `plot_dossier_id` are derived server-side from the route\nparameter and the created dossier, and must NOT be sent by the client.\n"
+      description: "Facility data. `plot_id` and `plot_dossier_id` are derived server-side and must NOT\nbe sent by the client. `authorized_persons` is handled at the top level.\n"
       required:
         - name
         - address
-        - city
+        - company_type
         - first_phone_number
-        - capital_in_usd
-        - capital_in_syp
+        - total_capital_in_usd
+        - total_capital_in_syp
         - value_of_machines_in_usd
         - value_of_machines_in_syp
         - number_of_workers
-        - daily_production_capacity
-        - monthly_production_capacity
-        - yearly_production_capacity
         - electrical_power_capacity
-        - yearly_estimated_water_consumption
+        - yearly_production_capacities
       properties:
         name:
           type: string
@@ -13709,9 +14039,26 @@ components:
         address:
           type: string
           example: '123 Industrial Zone'
-        city:
+        company_type:
           type: string
-          example: Damascus
+          enum:
+            - existing
+            - under_incorporation
+          description: 'When `existing`, `commercial_register` and `commercial_register_date` are required.'
+          example: existing
+        commercial_register:
+          type: string
+          nullable: true
+          example: CR-112233
+        commercial_register_date:
+          type: string
+          format: date
+          nullable: true
+          example: '2020-01-15'
+        company_nationality_id:
+          type: integer
+          nullable: true
+          example: 1
         first_phone_number:
           type: string
           example: '+963111111111'
@@ -13721,16 +14068,17 @@ components:
           example: '+963222222222'
         email:
           type: string
+          format: email
           nullable: true
           example: factory@example.com
         partnership_type_id:
           type: integer
           nullable: true
           example: 1
-        capital_in_usd:
+        total_capital_in_usd:
           type: number
           example: 500000.0
-        capital_in_syp:
+        total_capital_in_syp:
           type: number
           example: 250000000.0
         value_of_machines_in_usd:
@@ -13742,26 +14090,130 @@ components:
         number_of_workers:
           type: integer
           example: 50
-        daily_production_capacity:
-          type: number
-          example: 1000.0
-        monthly_production_capacity:
-          type: number
-          example: 30000.0
-        yearly_production_capacity:
-          type: number
-          example: 365000.0
         electrical_power_capacity:
           type: number
           example: 500.0
-        yearly_estimated_water_consumption:
+        yearly_estimated_drinking_water_consumption:
           type: number
+          nullable: true
           example: 10000.0
+        yearly_estimated_industrial_water_consumption:
+          type: number
+          nullable: true
+          example: 20000.0
+        number_or_patrols:
+          type: integer
+          nullable: true
+          example: 4
+        telephone_lines_number:
+          type: integer
+          nullable: true
+          example: 2
+        monthly_internet_data_requirement:
+          type: number
+          nullable: true
+          example: 500.0
+        yearly_imported_raw_materials:
+          type: string
+          nullable: true
+          example: 'Steel, Chemicals'
+        export_to_production_ratio:
+          type: number
+          nullable: true
+          minimum: 0
+          maximum: 100
+          example: 40
+        daily_consumption:
+          type: array
+          nullable: true
+          description: 'Optional daily consumption of consumable materials.'
+          items:
+            type: object
+            required:
+              - id
+              - consumption
+            properties:
+              id:
+                type: integer
+                example: 1
+              consumption:
+                type: string
+                example: '10 units/day'
+        daily_production_capacities:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductionCapacity'
+        monthly_production_capacities:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductionCapacity'
+        yearly_production_capacities:
+          type: array
+          required: true
+          items:
+            $ref: '#/components/schemas/ProductionCapacity'
         require_all_persons_for_legal_matters:
           type: boolean
           default: false
           example: false
           description: "Optional. When true, all authorized persons are required for legal matters.\nDefaults to false when omitted.\n"
+    ProductionCapacity:
+      type: object
+      properties:
+        material:
+          type: string
+          example: Steel
+        production:
+          type: string
+          example: '1000 tons'
+    ChangeSubscriptionRequestStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          description: 'New status to set on the subscription request.'
+          enum:
+            - pending_general_manager
+            - subscription_canceled
+      example:
+        status: pending_general_manager
+    PlotSubscriptionRequestResource:
+      type: object
+      description: "Subscription request record. `transactions` is only present when the relation is loaded\n(it is loaded on create, change-status and complete responses; the list response does\nnot include it).\n"
+      properties:
+        id:
+          type: integer
+          example: 1
+        plot_id:
+          type: integer
+          example: 5
+        request_type:
+          type: string
+          enum:
+            - subscription_request
+          example: subscription_request
+        status:
+          $ref: '#/components/schemas/SubscriptionRequestStatus'
+        version:
+          type: string
+          example: 1.0.0
+        payload:
+          type: object
+          description: 'The stored payload (partners, facility, authorized_persons...).'
+        created_by:
+          type: integer
+          example: 1
+        created_at:
+          type: string
+          format: date
+          example: 04-08-2026
+        transactions:
+          type: array
+          description: 'Related transactions (present only when loaded).'
+          items:
+            $ref: '#/components/schemas/TransactionInfoResource'
     StorageItemBase:
       type: object
       properties:
@@ -14444,17 +14896,8 @@ components:
           - asc
           - desc
         example: desc
-    HrSortBySystemCorrectionAddedUnits:
-      name: 'sort_by[system_correction_added_units]'
-      in: query
-      required: false
-      schema:
-        type: string
-        enum:
-          - asc
-          - desc
-    HrSortBySystemCorrectionDeductedUnits:
-      name: 'sort_by[system_correction_deducted_units]'
+    HrSortByLeaveRestoredUnits:
+      name: 'sort_by[leave_restored_units]'
       in: query
       required: false
       schema:
@@ -14501,6 +14944,56 @@ components:
         example: asc
     HrSortByLeaveTypeName:
       name: 'sort_by[leave_type_name]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: asc
+    HrSortByStartDate:
+      name: 'sort_by[start_date]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: asc
+    HrSortByEndDate:
+      name: 'sort_by[end_date]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: desc
+    HrSortBySubmittedAt:
+      name: 'sort_by[submitted_at]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: desc
+    HrSortByRequestedUnits:
+      name: 'sort_by[requested_units]'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        example: desc
+    HrSortByStatus:
+      name: 'sort_by[status]'
       in: query
       required: false
       schema:
@@ -14738,9 +15231,6 @@ tags:
     name: 'Partnership Types'
     description: 'Manage Partnership Type definitions'
   -
-    name: 'Plot Requests'
-    description: 'Submit plot requests'
-  -
     name: 'Rent Contract Industries'
     description: 'Manage Rent Contract Industry definitions'
   -
@@ -14751,7 +15241,7 @@ tags:
     description: 'Manage Service Status Condition definitions'
   -
     name: 'Subscription Requests'
-    description: 'Create a complete subscription request for a plot'
+    description: 'Create, list, approve and complete plot subscription requests'
   -
     name: Storage
     description: 'Resolve storage items by ID or list root-level items'

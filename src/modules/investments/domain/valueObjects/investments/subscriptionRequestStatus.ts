@@ -1,0 +1,8 @@
+export type SubscriptionRequestStatus = "pending_subscription_fee"
+    | "subscription_fee_paid"
+    | "pending_subscription_department_manager"
+    | "pending_general_manager"
+    | "subscription_approved"
+    | "subscription_canceled"
+    | "subscription_completed";
+

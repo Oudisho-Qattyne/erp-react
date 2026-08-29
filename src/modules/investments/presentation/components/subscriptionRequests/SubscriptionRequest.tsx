@@ -5,7 +5,7 @@ export const SubscriptionRequestPaper = ({ request }: { request: SubscriptionReq
    switch (request.version) {
     case "1.0.0":
         return(
-            <SubscriptionRequestpaperV100 payload={request.payload}/>
+            <SubscriptionRequestpaperV100 request={request}/>
         )
     default:
         break;
