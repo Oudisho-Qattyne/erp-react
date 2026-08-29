@@ -5,6 +5,8 @@ import { Map, List, FileCheck, BadgeCheck, Tags, Layers, Flag, SlidersHorizontal
 import type { Module } from '../../core/moduleRegistry';
 import { registerPersonDetailRoute } from '../../core/registry/person/personRegistry';
 import { registerTransactionableRoute } from '../../core/registry/transactionable/transactionableRegistry';
+import { registerNotificationHandler } from '../../core/registry/notifications/notificationRegistry';
+import type { Notification } from '../../core/domain/entities/notification/notification';
 import { PlotAreasPage } from './presentation/pages/plot-areas/PlotAreasPage';
 import { PlotClassificationsPage } from './presentation/pages/plot-classifications/PlotClassificationsPage';
 import { PlotsPage } from './presentation/pages/plots/PlotsPage';
@@ -52,6 +54,115 @@ registerTransactionableRoute({
   resolve: (entity) => `/investments/plots/${entity.plot_id}/dossiers/${entity.id}`,
   permission: 'investments.plot-dossier.view',
 });
+
+interface SubscriptionRequestNotificationPayload {
+  subscription_request?: {
+    id?: number | string;
+    plot_id?: number | string;
+    status?: string;
+  };
+  plot?: {
+    id?: number;
+    code?: string;
+  };
+  dossier?: {
+    id?: number;
+    dossier_number?: string | null;
+  };
+}
+
+const subscriptionRequestNotificationTypes: Array<{
+  type: string;
+  key: string;
+  fallbackTitle: string;
+  fallbackDescription: string;
+}> = [
+  {
+    type: 'subscription_fee_paid.subscription_request',
+    key: 'subscription_fee_paid_subscription_request',
+    fallbackTitle: 'Subscription request fee paid',
+    fallbackDescription: 'The subscription fee for the request has been paid',
+  },
+  {
+    type: 'pending_subscription_department_manager.subscription_request',
+    key: 'pending_subscription_department_manager_subscription_request',
+    fallbackTitle: 'Subscription request pending department manager',
+    fallbackDescription: 'A subscription request is pending your review',
+  },
+  {
+    type: 'pending_general_manager.subscription_request',
+    key: 'pending_general_manager_subscription_request',
+    fallbackTitle: 'Subscription request pending general manager',
+    fallbackDescription: 'A subscription request is pending your review',
+  },
+  {
+    type: 'subscription_approved.subscription_request',
+    key: 'subscription_approved_subscription_request',
+    fallbackTitle: 'Subscription request approved',
+    fallbackDescription: 'The subscription request has been approved',
+  },
+  {
+    type: 'subscription_canceled_by_department_manager.subscription_request',
+    key: 'subscription_canceled_by_department_manager_subscription_request',
+    fallbackTitle: 'Subscription request canceled by department manager',
+    fallbackDescription: 'The subscription request was canceled by the department manager',
+  },
+  {
+    type: 'subscription_canceled_by_general_manager.subscription_request',
+    key: 'subscription_canceled_by_general_manager_subscription_request',
+    fallbackTitle: 'Subscription request canceled by general manager',
+    fallbackDescription: 'The subscription request was canceled by the general manager',
+  },
+  {
+    type: 'subscription_payment_canceled.subscription_request',
+    key: 'subscription_payment_canceled_subscription_request',
+    fallbackTitle: 'Subscription request payment canceled',
+    fallbackDescription: 'The payment for the subscription request was canceled',
+  },
+  {
+    type: 'subscription_completed.subscription_request',
+    key: 'subscription_completed_subscription_request',
+    fallbackTitle: 'Subscription request completed',
+    fallbackDescription: 'The subscription request has been completed',
+  },
+];
+
+const registerSubscriptionRequestNotification = (
+  type: string,
+  key: string,
+  fallbackTitle: string,
+  fallbackDescription: string
+): void => {
+  registerNotificationHandler(type, {
+    title: ({ t }) =>
+      t(`notifications.${key}_title`, 'investments') || fallbackTitle,
+    description: ({ notification, t, data }) => {
+      const payload = (data ?? notification.data?.payload) as SubscriptionRequestNotificationPayload | null;
+      const subscription_request = payload?.subscription_request;
+      const base =
+        t(`notifications.${key}_description`, 'investments') || fallbackDescription;
+      const extras = [
+        subscription_request?.id ? `Request #${String(subscription_request.id)}` : '',
+        payload?.plot?.code ?? '',
+        payload?.dossier?.dossier_number ?? '',
+      ]
+        .filter(Boolean)
+        .join(' - ');
+      return extras ? `${base} (${extras})` : base;
+    },
+    action: ({ navigate, data }): void => {
+      const payload = data as SubscriptionRequestNotificationPayload | null;
+      const id = payload?.subscription_request?.id;
+      navigate(id != null ? `/investments/subscription-requests/${id}` : '/investments/subscription-requests');
+    },
+    data: (notification: Notification): SubscriptionRequestNotificationPayload | null =>
+      (notification.data?.payload as SubscriptionRequestNotificationPayload | null) ?? null,
+  });
+};
+
+subscriptionRequestNotificationTypes.forEach(({ type, key, fallbackTitle, fallbackDescription }) =>
+  registerSubscriptionRequestNotification(type, key, fallbackTitle, fallbackDescription)
+);
 
 const investmentsModule: Module = {
   name: 'investments',

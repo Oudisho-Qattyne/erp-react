@@ -1407,5 +1407,23 @@
     "subscription_completed": "مكتمل",
     "subscription_canceled_by_department_manager": "تم الإلغاء من قبل رئيس شعبة الاكتتاب",
     "subscription_payment_canceled": "تم إلغاء الدفع"
+  },
+  "notifications": {
+    "subscription_fee_paid_subscription_request_title": "تم دفع رسم الاكتتاب",
+    "subscription_fee_paid_subscription_request_description": "تم دفع رسم الاكتتاب للطلب",
+    "pending_subscription_department_manager_subscription_request_title": "طلب اكتتاب بانتظار رئيس شعبة الاكتتاب",
+    "pending_subscription_department_manager_subscription_request_description": "طلب اكتتاب بانتظار مراجعتك",
+    "pending_general_manager_subscription_request_title": "طلب اكتتاب بانتظار المدير العام",
+    "pending_general_manager_subscription_request_description": "طلب اكتتاب بانتظار مراجعتك",
+    "subscription_approved_subscription_request_title": "تمت الموافقة على طلب الاكتتاب",
+    "subscription_approved_subscription_request_description": "تمت الموافقة على طلب الاكتتاب",
+    "subscription_canceled_by_department_manager_subscription_request_title": "تم إلغاء طلب الاكتتاب من قبل رئيس شعبة الاكتتاب",
+    "subscription_canceled_by_department_manager_subscription_request_description": "تم إلغاء طلب الاكتتاب من قبل رئيس شعبة الاكتتاب",
+    "subscription_canceled_by_general_manager_subscription_request_title": "تم إلغاء طلب الاكتتاب من قبل المدير العام",
+    "subscription_canceled_by_general_manager_subscription_request_description": "تم إلغاء طلب الاكتتاب من قبل المدير العام",
+    "subscription_payment_canceled_subscription_request_title": "تم إلغاء دفع طلب الاكتتاب",
+    "subscription_payment_canceled_subscription_request_description": "تم إلغاء دفع طلب الاكتتاب",
+    "subscription_completed_subscription_request_title": "اكتمل طلب الاكتتاب",
+    "subscription_completed_subscription_request_description": "اكتمل طلب الاكتتاب"
   }
 }

@@ -1408,5 +1408,23 @@
     "subscription_canceled_by_general_manager": "Canceled by General Manager",
     "subscription_payment_canceled": "Payment Canceled",
     "subscription_completed": "Completed"
+  },
+  "notifications": {
+    "subscription_fee_paid_subscription_request_title": "Subscription request fee paid",
+    "subscription_fee_paid_subscription_request_description": "The subscription fee for the request has been paid",
+    "pending_subscription_department_manager_subscription_request_title": "Subscription request pending department manager",
+    "pending_subscription_department_manager_subscription_request_description": "A subscription request is pending your review",
+    "pending_general_manager_subscription_request_title": "Subscription request pending general manager",
+    "pending_general_manager_subscription_request_description": "A subscription request is pending your review",
+    "subscription_approved_subscription_request_title": "Subscription request approved",
+    "subscription_approved_subscription_request_description": "The subscription request has been approved",
+    "subscription_canceled_by_department_manager_subscription_request_title": "Subscription request canceled by department manager",
+    "subscription_canceled_by_department_manager_subscription_request_description": "The subscription request was canceled by the department manager",
+    "subscription_canceled_by_general_manager_subscription_request_title": "Subscription request canceled by general manager",
+    "subscription_canceled_by_general_manager_subscription_request_description": "The subscription request was canceled by the general manager",
+    "subscription_payment_canceled_subscription_request_title": "Subscription request payment canceled",
+    "subscription_payment_canceled_subscription_request_description": "The payment for the subscription request was canceled",
+    "subscription_completed_subscription_request_title": "Subscription request completed",
+    "subscription_completed_subscription_request_description": "The subscription request has been completed"
   }
 }

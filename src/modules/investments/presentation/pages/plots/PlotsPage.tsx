@@ -21,6 +21,7 @@ import { Eye, Trash2, MapPin, History, Filter, Search, BarChart3, Layers } from 
 import { useNavigate } from 'react-router-dom';
 import type { EntityWithNameOnly } from '../../../../../core/domain/entities/EntityWithNameOnly';
 import { getUserPickerDialog } from '../../../../../core/registry/user/userRegistry';
+import { getModules } from '../../../../../core/moduleRegistry';
 import { AuditLog } from '../../../../../core/presentation/layouts/ui/auditLogs/AuditLog';
 import { PlotAuditLogModal } from './components/PlotAuditLogModal';
 import { getLocalizedName } from '../../../../../core/presentation/utils/helpes';
@@ -50,6 +51,7 @@ export function PlotsPage() {
   ];
   const [groupingFactor, setGroupingFactor] = useState<string>(groupingFactors[0]?.value ?? '');
   const canGroupStats = hasPermission('investments.plots.grouping-stats');
+  const usersModuleRegistered = useMemo(() => getModules().some(m => m.name === 'users'), []);
 
   // Filter State
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -120,16 +122,22 @@ export function PlotsPage() {
     { name: 'has_allocated_dossier', label: t('plots.filter_has_allocated_dossier', 'investments') || 'Has Allocated Dossier', type: 'checkbox' },
     { name: 'from_date', label: t('plots.from_date', 'investments') || 'From Date', type: 'date' },
     { name: 'to_date', label: t('plots.to_date', 'investments') || 'To Date', type: 'date' },
-    {
-      name: 'created_by',
-      label: t('plots.filter_created_by', 'investments') || 'Created By',
-      type: 'table-picker',
-      picker: getUserPickerDialog(),
-      valueKey: 'id',
-      labelKey: 'name',
-      pickerProps: { multiple: true },
-    },
-  ], [t, areaOptions, classificationOptions, statusOptions]);
+    usersModuleRegistered
+      ? {
+          name: 'created_by',
+          label: t('plots.filter_created_by', 'investments') || 'Created By',
+          type: 'table-picker',
+          picker: getUserPickerDialog(),
+          valueKey: 'id',
+          labelKey: 'name',
+          pickerProps: { multiple: true },
+        }
+      : {
+          name: 'created_by',
+          label: t('plots.filter_created_by', 'investments') || 'Created By',
+          type: 'text',
+        },
+  ], [t, areaOptions, classificationOptions, statusOptions, usersModuleRegistered]);
 
   const columns = [
     {
