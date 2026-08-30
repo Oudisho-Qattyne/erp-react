@@ -65,11 +65,11 @@ export interface UseSubscriptionReturn {
   getAllSubscriptionRequests: (plotId: number) => Promise<void>;
   listAllSubscriptionRequests: () => Promise<void>;
   getSubscriptionRequestById: (subRequestId: number) => Promise<SubscriptionRequest>;
-  changeSubscriptionRequestStatus: (plotId: number, subRequestId: number, status: SubscriptionRequestStatus) => Promise<void>;
-  approveSubscriptionRequest: (plotId: number, subRequestId: number) => Promise<void>;
-  rejectSubscriptionRequest: (plotId: number, subRequestId: number) => Promise<void>;
-  cancelSubscriptionRequestByGeneralManager: (plotId: number, subRequestId: number) => Promise<void>;
-  completeSubscriptionRequest: (plotId: number, subRequestId: number) => Promise<void>;
+  changeSubscriptionRequestStatus: (plotId: number, subRequestId: number, status: SubscriptionRequestStatus, notes?: string) => Promise<void>;
+  approveSubscriptionRequest: (plotId: number, subRequestId: number, notes?: string) => Promise<void>;
+  rejectSubscriptionRequest: (plotId: number, subRequestId: number, notes?: string) => Promise<void>;
+  cancelSubscriptionRequestByGeneralManager: (plotId: number, subRequestId: number, notes?: string) => Promise<void>;
+  completeSubscriptionRequest: (plotId: number, subRequestId: number, notes?: string) => Promise<void>;
   createSubscription: (plotId: number, data: CreateSubscriptionDTO) => Promise<void>;
 }
 
@@ -199,12 +199,12 @@ export const useSubscription = (): UseSubscriptionReturn => {
     }
   }, [usecase]);
 
-  const changeSubscriptionRequestStatus = useCallback(async (plotId: number, subRequestId: number, status: SubscriptionRequestStatus) => {
+  const changeSubscriptionRequestStatus = useCallback(async (plotId: number, subRequestId: number, status: SubscriptionRequestStatus, notes?: string) => {
     setFnLoading('changeSubscriptionRequestStatus', true);
     setFnError('changeSubscriptionRequestStatus', null);
     try {
-      await idem.run('changeSubscriptionRequestStatus', { plotId, subRequestId, status }, (key) =>
-        usecase.changeSubscriptionRequestStatus(plotId, subRequestId, status, key)
+      await idem.run('changeSubscriptionRequestStatus', { plotId, subRequestId, status, notes }, (key) =>
+        usecase.changeSubscriptionRequestStatus(plotId, subRequestId, status, notes, key)
       );
       await listAllSubscriptionRequests();
       toast.success(t('subscription_requests.status_updated', MODULE) || 'Status updated successfully');
@@ -216,12 +216,12 @@ export const useSubscription = (): UseSubscriptionReturn => {
     }
   }, [usecase, t, idem, listAllSubscriptionRequests]);
 
-  const approveSubscriptionRequest = useCallback(async (plotId: number, subRequestId: number) => {
+  const approveSubscriptionRequest = useCallback(async (plotId: number, subRequestId: number, notes?: string) => {
     setFnLoading('approveSubscriptionRequest', true);
     setFnError('approveSubscriptionRequest', null);
     try {
-      await idem.run('approveSubscriptionRequest', { plotId, subRequestId }, (key) =>
-        usecase.approveSubscriptionRequest(plotId, subRequestId, key)
+      await idem.run('approveSubscriptionRequest', { plotId, subRequestId, notes }, (key) =>
+        usecase.approveSubscriptionRequest(plotId, subRequestId, notes, key)
       );
       await listAllSubscriptionRequests();
       toast.success(t('subscription_requests.approve_message', MODULE) || 'Request approved');
@@ -233,12 +233,12 @@ export const useSubscription = (): UseSubscriptionReturn => {
     }
   }, [usecase, t, idem, listAllSubscriptionRequests]);
 
-  const rejectSubscriptionRequest = useCallback(async (plotId: number, subRequestId: number) => {
+  const rejectSubscriptionRequest = useCallback(async (plotId: number, subRequestId: number, notes?: string) => {
     setFnLoading('rejectSubscriptionRequest', true);
     setFnError('rejectSubscriptionRequest', null);
     try {
-      await idem.run('rejectSubscriptionRequest', { plotId, subRequestId }, (key) =>
-        usecase.rejectSubscriptionRequest(plotId, subRequestId, key)
+      await idem.run('rejectSubscriptionRequest', { plotId, subRequestId, notes }, (key) =>
+        usecase.rejectSubscriptionRequest(plotId, subRequestId, notes, key)
       );
       await listAllSubscriptionRequests();
       toast.success(t('subscription_requests.reject_message', MODULE) || 'Request rejected');
@@ -250,12 +250,12 @@ export const useSubscription = (): UseSubscriptionReturn => {
     }
   }, [usecase, t, idem, listAllSubscriptionRequests]);
 
-  const cancelSubscriptionRequestByGeneralManager = useCallback(async (plotId: number, subRequestId: number) => {
+  const cancelSubscriptionRequestByGeneralManager = useCallback(async (plotId: number, subRequestId: number, notes?: string) => {
     setFnLoading('cancelSubscriptionRequestByGeneralManager', true);
     setFnError('cancelSubscriptionRequestByGeneralManager', null);
     try {
-      await idem.run('cancelSubscriptionRequestByGeneralManager', { plotId, subRequestId }, (key) =>
-        usecase.cancelSubscriptionRequestByGeneralManager(plotId, subRequestId, key)
+      await idem.run('cancelSubscriptionRequestByGeneralManager', { plotId, subRequestId, notes }, (key) =>
+        usecase.cancelSubscriptionRequestByGeneralManager(plotId, subRequestId, notes, key)
       );
       await listAllSubscriptionRequests();
       toast.success(t('subscription_requests.cancel_message', MODULE) || 'Request canceled');
@@ -267,12 +267,12 @@ export const useSubscription = (): UseSubscriptionReturn => {
     }
   }, [usecase, t, idem, listAllSubscriptionRequests]);
 
-  const completeSubscriptionRequest = useCallback(async (plotId: number, subRequestId: number) => {
+  const completeSubscriptionRequest = useCallback(async (plotId: number, subRequestId: number, notes?: string) => {
     setFnLoading('completeSubscriptionRequest', true);
     setFnError('completeSubscriptionRequest', null);
     try {
-      await idem.run('completeSubscriptionRequest', { plotId, subRequestId }, (key) =>
-        usecase.completeSubscriptionRequest(plotId, subRequestId, key)
+      await idem.run('completeSubscriptionRequest', { plotId, subRequestId, notes }, (key) =>
+        usecase.completeSubscriptionRequest(plotId, subRequestId, notes, key)
       );
       await listAllSubscriptionRequests();
       toast.success(t('subscription_requests.complete_success', MODULE) || 'Request completed successfully');

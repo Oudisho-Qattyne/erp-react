@@ -15,6 +15,7 @@ import { UserPickerDialog } from '../../../../users/presentation/components/User
 import { PlotPickerDialog } from '../plots/components/PlotPickerDialog';
 import { Badge, type BadgeVariant } from '../../../../../core/presentation/layouts/ui/badges/Badge';
 import { canShowSubscriptionAction } from '../../utils/subscriptionActions';
+import { ChangeSubscriptionStatusDialog } from '../../components/subscriptionRequests/components/ChangeSubscriptionStatusDialog';
 
 const STATUS_LABELS: Record<string, string> = {
   pending_subscription_fee: 'Pending Fee',
@@ -27,6 +28,8 @@ const STATUS_LABELS: Record<string, string> = {
   subscription_payment_canceled: 'Payment Canceled',
   subscription_completed: 'Completed',
 };
+
+type StatusActionKey = 'approve' | 'reject' | 'complete' | 'cancel';
 
 export function SubscriptionRequestsPage() {
   const { t } = useLanguage();
@@ -66,6 +69,26 @@ export function SubscriptionRequestsPage() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [labelMaps, setLabelMaps] = useState<FilterLabelMaps>({});
   const formatValue = useMemo(() => createFilterFormatValue(labelMaps), [labelMaps]);
+
+  const [pendingAction, setPendingAction] = useState<{ key: StatusActionKey; row: SubscriptionRequest } | null>(null);
+
+  const actionFns: Record<StatusActionKey, (plotId: number, subRequestId: number, notes?: string) => Promise<void>> = {
+    approve: approveSubscriptionRequest,
+    reject: rejectSubscriptionRequest,
+    complete: completeSubscriptionRequest,
+    cancel: cancelSubscriptionRequestByGeneralManager,
+  };
+
+  const handleConfirmAction = async (notes: string) => {
+    if (!pendingAction) return;
+    const { key, row } = pendingAction;
+    try {
+      await actionFns[key](row.plot_id ?? 0, row.id ?? 0, notes);
+      setPendingAction(null);
+    } catch {
+      setPendingAction(null);
+    }
+  };
 
   const usersModuleRegistered = useMemo(() => getModules().some(m => m.name === 'users'), []);
 
@@ -229,7 +252,7 @@ export function SubscriptionRequestsPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => approveSubscriptionRequest(row.plot_id ?? 0, row.id ?? 0).catch(() => {})}
+                onClick={() => setPendingAction({ key: 'approve', row })}
                 title={label('approve')}
                 className="text-success hover:text-success"
                 isLoading={loading['approveSubscriptionRequest']}
@@ -241,7 +264,7 @@ export function SubscriptionRequestsPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => rejectSubscriptionRequest(row.plot_id ?? 0, row.id ?? 0).catch(() => {})}
+                onClick={() => setPendingAction({ key: 'reject', row })}
                 title={label('reject')}
                 className="text-danger hover:text-danger"
                 isLoading={loading['rejectSubscriptionRequest']}
@@ -253,7 +276,7 @@ export function SubscriptionRequestsPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => completeSubscriptionRequest(row.plot_id ?? 0, row.id ?? 0).catch(() => {})}
+                onClick={() => setPendingAction({ key: 'complete', row })}
                 title={label('complete')}
                 className="text-success hover:text-success"
                 isLoading={loading['completeSubscriptionRequest']}
@@ -265,7 +288,7 @@ export function SubscriptionRequestsPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => cancelSubscriptionRequestByGeneralManager(row.plot_id ?? 0, row.id ?? 0).catch(() => {})}
+                onClick={() => setPendingAction({ key: 'cancel', row })}
                 title={label('cancel')}
                 className="text-danger hover:text-danger"
                 isLoading={loading['cancelSubscriptionRequestByGeneralManager']}
@@ -331,6 +354,16 @@ export function SubscriptionRequestsPage() {
         onFilter={handleApplyFilter}
         onCancel={() => setIsFilterOpen(false)}
         onReset={handleResetFilter}
+      />
+
+      <ChangeSubscriptionStatusDialog
+        isOpen={pendingAction !== null}
+        title={`${(pendingAction && label(pendingAction.key)) || ''} — ${label('title')}`}
+        message={label('note_message') || ''}
+        confirmLabel={pendingAction ? label(pendingAction.key) : undefined}
+        danger={pendingAction?.key === 'reject' || pendingAction?.key === 'cancel'}
+        onConfirm={handleConfirmAction}
+        onCancel={() => setPendingAction(null)}
       />
     </div>
   );

@@ -10,16 +10,16 @@ export const createSubscriptionUseCase = (repository: ISubscriptionRepository) =
       repository.listAllSubscriptionRequests(params, idempotencyKey),
     getSubscriptionRequestById: (subRequestId: number, idempotencyKey?: string) =>
       repository.getSubscriptionRequestById(subRequestId, idempotencyKey),
-    changeSubscriptionRequestStatus: (plotId: number, subRequestId: number, status: SubscriptionRequestStatus, idempotencyKey?: string) =>
-      repository.changeSubscriptionRequestStatus(plotId, subRequestId, status, idempotencyKey),
-    approveSubscriptionRequest: (plotId: number, subRequestId: number, idempotencyKey?: string) =>
-      repository.changeSubscriptionRequestStatus(plotId, subRequestId, 'pending_general_manager', idempotencyKey),
-    rejectSubscriptionRequest: (plotId: number, subRequestId: number, idempotencyKey?: string) =>
-      repository.changeSubscriptionRequestStatus(plotId, subRequestId, 'subscription_canceled_by_department_manager', idempotencyKey),
-    cancelSubscriptionRequestByGeneralManager: (plotId: number, subRequestId: number, idempotencyKey?: string) =>
-      repository.changeSubscriptionRequestStatus(plotId, subRequestId, 'subscription_canceled_by_general_manager', idempotencyKey),
-    completeSubscriptionRequest: (plotId: number, subRequestId: number, idempotencyKey?: string) =>
-      repository.completeSubscriptionRequest(plotId, subRequestId, idempotencyKey),
+    changeSubscriptionRequestStatus: (plotId: number, subRequestId: number, status: SubscriptionRequestStatus, notes?: string, idempotencyKey?: string) =>
+      repository.changeSubscriptionRequestStatus(plotId, subRequestId, status, notes, idempotencyKey),
+    approveSubscriptionRequest: (plotId: number, subRequestId: number, notes?: string, idempotencyKey?: string) =>
+      repository.changeSubscriptionRequestStatus(plotId, subRequestId, 'pending_general_manager', notes, idempotencyKey),
+    rejectSubscriptionRequest: (plotId: number, subRequestId: number, notes?: string, idempotencyKey?: string) =>
+      repository.changeSubscriptionRequestStatus(plotId, subRequestId, 'subscription_canceled_by_department_manager', notes, idempotencyKey),
+    cancelSubscriptionRequestByGeneralManager: (plotId: number, subRequestId: number, notes?: string, idempotencyKey?: string) =>
+      repository.changeSubscriptionRequestStatus(plotId, subRequestId, 'subscription_canceled_by_general_manager', notes, idempotencyKey),
+    completeSubscriptionRequest: (plotId: number, subRequestId: number, notes?: string, idempotencyKey?: string) =>
+      repository.completeSubscriptionRequest(plotId, subRequestId, notes, idempotencyKey),
     createSubscription: (plotId: number, data: CreateSubscriptionDTO, idempotencyKey?: string) =>
       repository.createSubscription(plotId, data, idempotencyKey),
   };

@@ -1395,7 +1395,10 @@
     "request_type": "نوع الطلب",
     "request_type_subscription": "طلب اكتتاب",
     "created_by": "أنشئ بواسطة",
-    "plot_id": "المقاسم"
+    "plot_id": "المقاسم",
+    "note_message": "أضف ملاحظة لتوضيح هذا التغيير في الحالة.",
+    "note_label": "ملاحظة",
+    "note_placeholder": "اكتب ملاحظة حول هذا التغيير في الحالة..."
   },
   "subscription_request_status": {
     "pending_subscription_fee": "بانتظار رسم الاكتتاب",

@@ -1396,7 +1396,10 @@
     "request_type": "Request Type",
     "request_type_subscription": "Subscription Request",
     "created_by": "Created By",
-    "plot_id": "Plots"
+    "plot_id": "Plots",
+    "note_message": "Add a note to explain this status change.",
+    "note_label": "Note",
+    "note_placeholder": "Write a note about this status change..."
   },
   "subscription_request_status": {
     "pending_subscription_fee": "Pending Subscription Fee",

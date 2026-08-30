@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
@@ -6,8 +6,11 @@ import { Spinner } from '../../../../../core/presentation/layouts/ui/state/Spinn
 import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
 import { ArrowLeft, Check, X, CheckCheck, Ban } from 'lucide-react';
 import { SubscriptionRequestPaper } from '../../components/subscriptionRequests/SubscriptionRequest';
+import { ChangeSubscriptionStatusDialog } from '../../components/subscriptionRequests/components/ChangeSubscriptionStatusDialog';
 import { useSubscription } from '../../hooks/useSubscription';
 import { canShowSubscriptionAction } from '../../utils/subscriptionActions';
+
+type StatusActionKey = 'approve' | 'reject' | 'complete' | 'cancel';
 
 export function ShowSubscriptionRequestPage() {
   const { id } = useParams<{ id: string }>();
@@ -34,12 +37,23 @@ export function ShowSubscriptionRequestPage() {
     }
   }, [requestId]);
 
-  const runAction = async (action: () => Promise<void>) => {
+  const [pendingAction, setPendingAction] = useState<StatusActionKey | null>(null);
+
+  const actionFns: Record<StatusActionKey, (plotId: number, subRequestId: number, notes?: string) => Promise<void>> = {
+    approve: approveSubscriptionRequest,
+    reject: rejectSubscriptionRequest,
+    complete: completeSubscriptionRequest,
+    cancel: cancelSubscriptionRequestByGeneralManager,
+  };
+
+  const handleConfirmAction = async (notes: string) => {
+    if (!pendingAction) return;
     try {
-      await action();
+      await actionFns[pendingAction](plotId, requestId, notes);
       await getSubscriptionRequestById(requestId);
+      setPendingAction(null);
     } catch {
-      /* errors surfaced by hook */
+      setPendingAction(null);
     }
   };
 
@@ -62,7 +76,7 @@ export function ShowSubscriptionRequestPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => runAction(() => approveSubscriptionRequest(plotId, requestId))}
+                onClick={() => setPendingAction('approve')}
                 className="text-success hover:text-success"
                 isLoading={loading['approveSubscriptionRequest']}
               >
@@ -74,7 +88,7 @@ export function ShowSubscriptionRequestPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => runAction(() => rejectSubscriptionRequest(plotId, requestId))}
+                onClick={() => setPendingAction('reject')}
                 className="text-danger hover:text-danger"
                 isLoading={loading['rejectSubscriptionRequest']}
               >
@@ -86,7 +100,7 @@ export function ShowSubscriptionRequestPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => runAction(() => completeSubscriptionRequest(plotId, requestId))}
+                onClick={() => setPendingAction('complete')}
                 className="text-success hover:text-success"
                 isLoading={loading['completeSubscriptionRequest']}
               >
@@ -98,7 +112,7 @@ export function ShowSubscriptionRequestPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => runAction(() => cancelSubscriptionRequestByGeneralManager(plotId, requestId))}
+                onClick={() => setPendingAction('cancel')}
                 className="text-danger hover:text-danger"
                 isLoading={loading['cancelSubscriptionRequestByGeneralManager']}
               >
@@ -106,6 +120,15 @@ export function ShowSubscriptionRequestPage() {
                 {label('cancel')}
               </Button>
             )}
+            <ChangeSubscriptionStatusDialog
+              isOpen={pendingAction !== null}
+              title={`${(pendingAction && label(pendingAction)) || ''} — ${label('detail_title').replace('{id}', String(requestId))}`}
+              message={label('note_message') || ''}
+              confirmLabel={pendingAction ? label(pendingAction) : undefined}
+              danger={pendingAction === 'reject' || pendingAction === 'cancel'}
+              onConfirm={handleConfirmAction}
+              onCancel={() => setPendingAction(null)}
+            />
           </div>
         )}
       </div>

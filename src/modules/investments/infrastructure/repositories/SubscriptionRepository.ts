@@ -22,16 +22,19 @@ export const createSubscriptionRepository = (apiClient: ApiClient): ISubscriptio
       `/investments/plots/requests/subscription/${subRequestId}`,
       idempotencyConfig(idempotencyKey)
     ),
-    changeSubscriptionRequestStatus: (plotId: number, subRequestId: number, status: string, idempotencyKey?: string) => apiClient.put<DomainResponse<SubscriptionRequest>>(
+    changeSubscriptionRequestStatus: (plotId: number, subRequestId: number, status: string, notes?: string, idempotencyKey?: string) => apiClient.put<DomainResponse<SubscriptionRequest>>(
       `/investments/plots/${plotId}/requests/subscription/${subRequestId}/change-status`,
       {
-        status: status
+        status: status,
+        notes: notes,
       },
       idempotencyConfig(idempotencyKey)
     ),
-    completeSubscriptionRequest: (plotId: number, subRequestId: number, idempotencyKey?: string) => apiClient.put<DomainResponse<SubscriptionRequest>>(
+    completeSubscriptionRequest: (plotId: number, subRequestId: number, notes?: string, idempotencyKey?: string) => apiClient.put<DomainResponse<SubscriptionRequest>>(
       `/investments/plots/${plotId}/requests/subscription/${subRequestId}/complete`,
-      {},
+      {
+        notes: notes
+      },
       idempotencyConfig(idempotencyKey)
 
     ),
