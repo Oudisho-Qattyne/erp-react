@@ -1,21 +1,21 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
-import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
-import { DataTable } from '../../../../../core/presentation/layouts/ui/tables/ResizableTable';
-import { ErrorState } from '../../../../../core/presentation/layouts/ui/state/ErrorState';
-import { FilterDialog, type FilterField, type FilterLabelMaps } from '../../../../../core/presentation/layouts/ui/filter/FilterDialog';
-import { ActiveFilters } from '../../../../../core/presentation/layouts/ui/filter/ActiveFilters';
-import { createFilterFormatValue } from '../../../../../core/presentation/layouts/ui/filter/filterLabels';
-import { getModules } from '../../../../../core/moduleRegistry';
-import { Eye, FileText, Check, CheckCheck, X, Ban, Filter, Plus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import type { SubscriptionRequest } from '../../../domain/entities/subscriptionRequests/subscriptionRequest';
-import { useSubscription } from '../../hooks/useSubscription';
-import { UserPickerDialog } from '../../../../users/presentation/components/UserPickerDialog';
-import { PlotPickerDialog } from '../plots/components/PlotPickerDialog';
-import { Badge, type BadgeVariant } from '../../../../../core/presentation/layouts/ui/badges/Badge';
-import { canShowSubscriptionAction } from '../../utils/subscriptionActions';
-import { ChangeSubscriptionStatusDialog } from '../../components/subscriptionRequests/components/ChangeSubscriptionStatusDialog';
+import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
+import { Button } from '../../../../../../core/presentation/layouts/ui/buttons/Button';
+import { DataTable } from '../../../../../../core/presentation/layouts/ui/tables/ResizableTable';
+import { ErrorState } from '../../../../../../core/presentation/layouts/ui/state/ErrorState';
+import { FilterDialog, type FilterField, type FilterLabelMaps } from '../../../../../../core/presentation/layouts/ui/filter/FilterDialog';
+import { ActiveFilters } from '../../../../../../core/presentation/layouts/ui/filter/ActiveFilters';
+import { createFilterFormatValue } from '../../../../../../core/presentation/layouts/ui/filter/filterLabels';
+import { Badge, type BadgeVariant } from '../../../../../../core/presentation/layouts/ui/badges/Badge';
+import { getModules } from '../../../../../../core/moduleRegistry';
+import { Eye, Check, X, CheckCheck, Ban, Filter, Plus } from 'lucide-react';
+import type { SubscriptionRequest } from '../../../../domain/entities/subscriptionRequests/subscriptionRequest';
+import { useSubscription } from '../../../hooks/useSubscription';
+import { UserPickerDialog } from '../../../../../users/presentation/components/UserPickerDialog';
+import { canShowSubscriptionAction } from '../../../utils/subscriptionActions';
+import { ChangeSubscriptionStatusDialog } from '../../../components/subscriptionRequests/components/ChangeSubscriptionStatusDialog';
+
+type StatusActionKey = 'approve' | 'reject' | 'complete' | 'cancel';
 
 const STATUS_LABELS: Record<string, string> = {
   pending_subscription_fee: 'Pending Fee',
@@ -29,11 +29,12 @@ const STATUS_LABELS: Record<string, string> = {
   subscription_completed: 'Completed',
 };
 
-type StatusActionKey = 'approve' | 'reject' | 'complete' | 'cancel';
+interface Props {
+  plotId: number;
+}
 
-export function SubscriptionRequestsPage() {
+export function SubscriptionRequestsSection({ plotId }: Props) {
   const { t } = useLanguage();
-  const navigate = useNavigate();
   const {
     requests,
     loading,
@@ -44,12 +45,7 @@ export function SubscriptionRequestsPage() {
     sortColumn,
     sortOrder,
     setSort,
-    page,
-    setPage,
-    perPage,
-    setPerPage,
-    pagination,
-    listAllSubscriptionRequests,
+    getAllSubscriptionRequests,
     approveSubscriptionRequest,
     rejectSubscriptionRequest,
     cancelSubscriptionRequestByGeneralManager,
@@ -79,22 +75,11 @@ export function SubscriptionRequestsPage() {
     cancel: cancelSubscriptionRequestByGeneralManager,
   };
 
-  const handleConfirmAction = async (notes: string) => {
-    if (!pendingAction) return;
-    const { key, row } = pendingAction;
-    try {
-      await actionFns[key](row.plot_id ?? 0, row.id ?? 0, notes);
-      setPendingAction(null);
-    } catch {
-      setPendingAction(null);
-    }
-  };
-
   const usersModuleRegistered = useMemo(() => getModules().some(m => m.name === 'users'), []);
 
   useEffect(() => {
-    listAllSubscriptionRequests().catch(() => {});
-  }, [filters, sortColumn, sortOrder, page, perPage]);
+    getAllSubscriptionRequests(plotId).catch(() => {});
+  }, [plotId, filters, sortColumn, sortOrder]);
 
   const createdByField: FilterField = usersModuleRegistered
     ? {
@@ -112,23 +97,12 @@ export function SubscriptionRequestsPage() {
       type: 'text',
     };
 
-  const plotIdField: FilterField = {
-    name: 'plot_id',
-    label: label('plot_id') || 'Plot',
-    type: 'table-picker',
-    picker: PlotPickerDialog,
-    pickerProps: { multiple: true },
-    valueKey: 'id',
-    labelKey: 'code',
-  };
-
-  const filterFields: FilterField[] = [
+  const filterFields: FilterField[] = useMemo(() => [
     {
       name: 'id',
       label: label('filter_id') || 'ID',
       type: 'text',
     },
-    plotIdField,
     {
       name: 'status',
       label: t('subscription_request.status', 'investments') || 'Status',
@@ -164,7 +138,7 @@ export function SubscriptionRequestsPage() {
       label: t('common.to_date', 'shared') || 'To Date',
       type: 'date',
     },
-  ];
+  ], [t, usersModuleRegistered]);
 
   const handleApplyFilter = (values: Record<string, any>, maps?: FilterLabelMaps) => {
     const parsed: Record<string, any> = {};
@@ -183,7 +157,19 @@ export function SubscriptionRequestsPage() {
     setIsFilterOpen(false);
   };
 
-  const columns = [
+  const handleConfirmAction = async (notes: string) => {
+    if (!pendingAction) return;
+    const { key, row } = pendingAction;
+    try {
+      await actionFns[key](row.plot_id ?? plotId, row.id ?? 0, notes);
+      await getAllSubscriptionRequests(plotId);
+      setPendingAction(null);
+    } catch {
+      setPendingAction(null);
+    }
+  };
+
+  const columns = useMemo(() => [
     {
       key: 'id',
       label: 'ID',
@@ -238,119 +224,105 @@ export function SubscriptionRequestsPage() {
       label: t('common.actions', 'shared') || 'Actions',
       width: 200,
       render: (row: SubscriptionRequest) => (
-          <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-center gap-1" onClick={e => e.stopPropagation()}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => window.open(`/investments/subscription-requests/${row.id}`, '_blank')}
+            title={label('view')}
+            requiredPermission="investments.plot-reqeusts.subscription_requests.view"
+          >
+            <Eye size={16} />
+          </Button>
+          {canShowSubscriptionAction(row.status, 'approve') && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => window.open(`/investments/subscription-requests/${row.id}` , '_blank')}
-              title={label('view')}
-              requiredPermission="investments.plot-reqeusts.subscription_requests.view"
+              onClick={() => setPendingAction({ key: 'approve', row })}
+              title={label('approve')}
+              className="text-success hover:text-success"
+              isLoading={loading['approveSubscriptionRequest']}
             >
-              <Eye size={16} />
+              <Check size={16} />
             </Button>
-            {canShowSubscriptionAction(row.status, 'approve') && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setPendingAction({ key: 'approve', row })}
-                title={label('approve')}
-                className="text-success hover:text-success"
-                isLoading={loading['approveSubscriptionRequest']}
-              >
-                <Check size={16} />
-              </Button>
-            )}
-            {canShowSubscriptionAction(row.status, 'reject') && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setPendingAction({ key: 'reject', row })}
-                title={label('reject')}
-                className="text-danger hover:text-danger"
-                isLoading={loading['rejectSubscriptionRequest']}
-              >
-                <X size={16} />
-              </Button>
-            )}
-            {canShowSubscriptionAction(row.status, 'complete') && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setPendingAction({ key: 'complete', row })}
-                title={label('complete')}
-                className="text-success hover:text-success"
-                isLoading={loading['completeSubscriptionRequest']}
-              >
-                <CheckCheck size={16} />
-              </Button>
-            )}
-            {canShowSubscriptionAction(row.status, 'cancel') && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setPendingAction({ key: 'cancel', row })}
-                title={label('cancel')}
-                className="text-danger hover:text-danger"
-                isLoading={loading['cancelSubscriptionRequestByGeneralManager']}
-              >
-                <Ban size={16} />
-              </Button>
-            )}
-          </div>
-        ),
+          )}
+          {canShowSubscriptionAction(row.status, 'reject') && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPendingAction({ key: 'reject', row })}
+              title={label('reject')}
+              className="text-danger hover:text-danger"
+              isLoading={loading['rejectSubscriptionRequest']}
+            >
+              <X size={16} />
+            </Button>
+          )}
+          {canShowSubscriptionAction(row.status, 'complete') && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPendingAction({ key: 'complete', row })}
+              title={label('complete')}
+              className="text-success hover:text-success"
+              isLoading={loading['completeSubscriptionRequest']}
+            >
+              <CheckCheck size={16} />
+            </Button>
+          )}
+          {canShowSubscriptionAction(row.status, 'cancel') && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPendingAction({ key: 'cancel', row })}
+              title={label('cancel')}
+              className="text-danger hover:text-danger"
+              isLoading={loading['cancelSubscriptionRequestByGeneralManager']}
+            >
+              <Ban size={16} />
+            </Button>
+          )}
+        </div>
+      ),
     },
-  ];
-
-  const paginationProps = {
-    page: pagination?.currentPage || 1,
-    totalPages: pagination?.lastPage || 1,
-    totalItems: pagination?.total || 0,
-    onPageChange: setPage,
-    itemsPerPage: perPage,
-    onItemsPerPageChange: (s: number) => setPerPage(s),
-    itemsPerPageOptions: [10, 25, 50],
-  };
+  ], [t, loading]);
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">{label('title') || 'Subscription Requests'}</h2>
         <div className="flex items-center gap-2">
-          <FileText size={20} className="text-primary" />
-          <h1 className="text-2xl font-bold text-text">{label('title')}</h1>
+          <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
+            {t('common.filter', 'shared') || 'Filter'}
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleResetFilter}>
+            {t('common.reset', 'shared') || 'Reset'}
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => window.open('/investments/transactions/create', '_blank')}
+            requiredPermission="investments.plot_subscription_requests.create"
+          >
+            <Plus size={16} className="mr-1" />
+            {t('transactions.create_title', 'investments') || 'Create Subscription'}
+          </Button>
         </div>
-        <Button
-          onClick={() => window.open('/investments/transactions/create', '_blank')}
-          requiredPermission="investments.plot_subscription_requests.create"
-        >
-          <Plus size={16} className="mr-1" />
-          {t('transactions.create_title', 'investments') || 'Create Subscription'}
-        </Button>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-3">
-        <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
-          {t('common.filter', 'shared') || 'Filter'}
-        </Button>
-        <Button variant="outline" size="sm" onClick={handleResetFilter}>
-          {t('common.reset', 'shared') || 'Reset'}
-        </Button>
       </div>
 
       <ActiveFilters filters={filters} fields={filterFields} formatValue={formatValue} />
 
-      {error['listAllSubscriptionRequests'] ? (
-        <ErrorState message={error['listAllSubscriptionRequests']} onRetry={() => listAllSubscriptionRequests()} />
+      {error['getAllSubscriptionRequests'] ? (
+        <ErrorState message={error['getAllSubscriptionRequests']} onRetry={() => getAllSubscriptionRequests(plotId)} />
       ) : (
         <DataTable
           columns={columns}
           data={requests}
           rowKey="id"
           emptyMessage={label('empty')}
-          loading={loading['listAllSubscriptionRequests']}
+          loading={loading['getAllSubscriptionRequests']}
           sortColumn={sortColumn}
           sortOrder={sortOrder}
           onSort={setSort}
-          pagination={paginationProps}
         />
       )}
 

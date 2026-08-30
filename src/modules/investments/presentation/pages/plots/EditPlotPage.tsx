@@ -4,6 +4,7 @@ import { useEntityCrud } from '../../../../../core/presentation/hooks/data/useEn
 import type { Plot } from '../../../domain/entities/plot';
 import { PlotForm } from './components/PlotForm';
 import { DossiersSection } from './components/DossiersSection';
+import { SubscriptionRequestsSection } from './components/SubscriptionRequestsSection';
 import { toast } from 'sonner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -91,6 +92,10 @@ export function EditPlotPage() {
       {
         plot.status != "unsold" && plot.status != "announced" &&
         <DossiersSection plotId={Number(id)} plotStatus={plot.status}  />
+      }
+      {
+        plot.status != "unsold" && plot.status != "announced" &&
+        <SubscriptionRequestsSection plotId={Number(id)} />
       }
     </div>
   );

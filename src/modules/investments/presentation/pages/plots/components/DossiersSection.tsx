@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEntityCrud } from '../../../../../../core/presentation/hooks/data/useEntity';
 import { useLanguage } from '../../../../../../core/presentation/context/i18n/I18nProvider';
 import { DataTable } from '../../../../../../core/presentation/layouts/ui/tables/ResizableTable';
+import { Badge, type BadgeVariant } from '../../../../../../core/presentation/layouts/ui/badges/Badge';
 import { Button } from '../../../../../../core/presentation/layouts/ui/buttons/Button';
 import { Dialog } from '../../../../../../core/presentation/layouts/ui/dialog/Dialog';
 import { ConfirmDialog } from '../../../../../../core/presentation/layouts/ui/dialog/ConfirmDialog';
@@ -80,6 +81,13 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       ),
     [list.filter]
   );
+
+  const statusVariant = (status?: string): BadgeVariant => {
+    if (status === 'active') return 'success';
+    if (status === 'cancelled') return 'danger';
+    if (status === 'allocatable') return 'info';
+    return 'warning';
+  };
 
   const handleApplyFilter = (values: Record<string, unknown>) => {
     const parsed: Record<string, any> = {};
@@ -257,13 +265,10 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
       label: t('dossier.status', 'investments') || 'Status',
       width: 120,
       render: (row: Dossier) => (
-        <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
-          style={{
-            color: row.status === 'active' ? '#16a34a' : row.status === 'cancelled' ? '#dc2626' : row.status === 'allocatable' ? '#2563eb' : '#ca8a04',
-            background: row.status === 'active' ? '#dcfce7' : row.status === 'cancelled' ? '#fef2f2' : row.status === 'allocatable' ? '#dbeafe' : '#fefce8',
-          }}>
-          {t(`dossier.status_${row.status}`, 'investments') || row.status}
-        </span>
+        <Badge
+          label={t(`dossier.status_${row.status}`, 'investments') || row.status}
+          variant={statusVariant(row.status)}
+        />
       ),
     },
     ...(canManage ? [{
@@ -309,6 +314,9 @@ export function DossiersSection({ plotId, plotStatus }: Props) {
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => setIsFilterOpen(true)} leftIcon={<Filter size={14} />}>
             {t('common.filter', 'shared') || 'Filter'}
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleResetFilter}>
+            {t('common.reset', 'shared') || 'Reset'}
           </Button>
           {canManage && (
             <Button size="sm" onClick={() => setShowAdd(true)}
