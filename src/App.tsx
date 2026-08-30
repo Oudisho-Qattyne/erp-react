@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import { autoRegisterModulesSync, getAllRoutes } from './core/moduleRegistry'
 import LayoutSwitcher from './core/presentation/layouts/LayoutSwitcher'
@@ -31,13 +30,9 @@ function FullPageSpinner({ text }: { text: string }) {
   );
 }
 
-function AppContent() {
-  const { loading } = useAuth();
+autoRegisterModulesSync();
 
-  if (loading) {
-    return <FullPageSpinner text="جاري التحقق من المصادقة..." />;
-  }
-
+const buildRouteConfigs = () => {
   const registeredRoutes = getAllRoutes();
   const routeConfigs = registeredRoutes.map(route => {
     const requiresAuth = route.requiresAuth !== false;
@@ -63,7 +58,17 @@ function AppContent() {
   routeConfigs.push({ path: '/', element: <Navigate to={'/hr'} /> });
   routeConfigs.push({ path: '/my-sandbox', element: <Sandbox /> });
 
-  const router = createBrowserRouter(routeConfigs);
+  return routeConfigs;
+};
+
+const router = createBrowserRouter(buildRouteConfigs());
+
+function AppContent() {
+  const { loading } = useAuth();
+
+  if (loading) {
+    return <FullPageSpinner text="جاري التحقق من المصادقة..." />;
+  }
 
   return (
     <>
@@ -86,17 +91,6 @@ function AppContent() {
 }
 
 function App() {
-  const [isReady, setIsReady] = useState(false)
-
-  useEffect(() => {
-    autoRegisterModulesSync();
-    setIsReady(true);
-  }, []);
-
-  if (!isReady) {
-    return <FullPageSpinner text="جاري تحميل الوحدات..." />;
-  }
-
   return (
     <ThemeProvider>
       <SidebarProvider>

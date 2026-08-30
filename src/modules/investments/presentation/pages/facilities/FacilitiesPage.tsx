@@ -197,7 +197,7 @@ export function FacilitiesPage() {
     from_commercial_register_date: (list.filter.from_commercial_register_date as string | undefined) || '',
     to_commercial_register_date: (list.filter.to_commercial_register_date as string | undefined) || '',
     from_created_at: (list.filter.from_created_at as string | undefined) || '',
-    to_created_at: (list.filter.to_created_at as string | undefined) || '',
+    to_created_at: (list.filter.to_created_at as string | undefined) || '',    
     plot_id: (list.filter.plot_id as number | undefined) || '',
     plot_dossier_id: (list.filter.plot_dossier_id as number | undefined) || '',
   }), [list.filter]);
