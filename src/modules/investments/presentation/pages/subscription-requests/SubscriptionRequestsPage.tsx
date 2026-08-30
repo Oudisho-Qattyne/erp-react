@@ -58,6 +58,16 @@ export function SubscriptionRequestsPage() {
 
   const label = (key: string) => t(`subscription_requests.${key}`, 'investments');
   const statusLabel = (status?: string) => t(`subscription_request_status.${status}`, 'investments') || STATUS_LABELS[status ?? ''] || status || '';
+  const plotStatusLabel = (status?: string) => t(`plot_status.${status}`, 'investments') || status || '—';
+
+  const plotStatusVariant = (status?: string): BadgeVariant => {
+    if (status === 'unsold') return 'muted';
+    if (status === 'announced') return 'info';
+    if (status === 'subscribed') return 'success';
+    if (status === 'allocated') return 'warning';
+    if (status === 'separated') return 'danger';
+    return 'muted';
+  };
 
   const statusVariant = (status?: string): BadgeVariant => {
     if (status === 'subscription_approved' || status === 'subscription_completed') return 'success';
@@ -202,6 +212,14 @@ export function SubscriptionRequestsPage() {
       label: label('area'),
       width: 120,
       render: (row: SubscriptionRequest) => row.payload?.plot?.area ? `${row.payload.plot?.area} ㎡` : '—',
+    },
+    {
+      key: 'plot_status',
+      label: t('plots.status', 'investments') || 'Plot Status',
+      width: 140,
+      render: (row: SubscriptionRequest) => (
+        <Badge label={plotStatusLabel(row.payload?.plot?.status)} variant={plotStatusVariant(row.payload?.plot?.status)} />
+      ),
     },
     {
       key: 'request_type',

@@ -13,6 +13,7 @@
     "add": "إضافة شخص",
     "load_error": "فشل تحميل الأشخاص",
     "person_name": "الاسم",
+    "picker_title": "اختيار الأشخاص",
     "primary_phone": "الهاتف الأساسي",
     "secondary_phone": "الهاتف الثانوي",
     "email": "البريد الإلكتروني",

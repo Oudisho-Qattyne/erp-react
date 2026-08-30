@@ -2,6 +2,7 @@
   "common": {
     "actions":"العمليات",
     "name": "الاسم",
+    "id": "المعرف",
     "reset": "مسح",
     "search": "بحث",
     "selected": "محدد",

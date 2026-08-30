@@ -1,3 +1,5 @@
+import type { ComponentType } from 'react'
+
 export interface PersonDetailRouteConfig {
   type: string
   routePattern: string
@@ -49,3 +51,20 @@ export const registerPersonsHook = (hook: PersonsHook): void => {
 }
 
 export const getPersonsHook = (): PersonsHook | null => personsHook
+
+export interface PersonPickerDialogProps {
+  isOpen: boolean
+  onClose: () => void
+  onConfirm: (selected: PersonSearchResult[]) => void
+  multiple?: boolean
+  initialSelected?: PersonSearchResult[]
+  defaultFilter?: Record<string, any>
+}
+
+let personPickerDialog: ComponentType<PersonPickerDialogProps> | null = null
+
+export const registerPersonPickerDialog = (component: ComponentType<PersonPickerDialogProps>): void => {
+  personPickerDialog = component
+}
+
+export const getPersonPickerDialog = (): ComponentType<PersonPickerDialogProps> | null => personPickerDialog

@@ -23,6 +23,7 @@ import { ShowContractPage } from './presentation/pages/contracts/ShowContractPag
 import { ContractsPage } from './presentation/pages/contracts/ContractsPage';
 import { TransactionsPage } from './presentation/pages/transactions/TransactionsPage';
 import { CreateSubscriptionPage } from './presentation/pages/transactions/CreateSubscriptionPage';
+import { CreateContractRequestPage } from './presentation/pages/contracts/CreateContractRequestPage';
 import { PartnershipTypesPage } from './presentation/pages/partnership-types/PartnershipTypesPage';
 import { IndustrialDecisionTypesPage } from './presentation/pages/industrial-decision-types/IndustrialDecisionTypesPage';
 import { IndustrialLicenseSourcesPage } from './presentation/pages/industrial-license-sources/IndustrialLicenseSourcesPage';
@@ -300,6 +301,16 @@ const investmentsModule: Module = {
       label: 'transactions.create_title',
       nav: false,
       requiredPermission: 'investments.plot-reqeusts.subscription_request',
+      moduleName: 'investments',
+      group: 'investments_transactions',
+    },
+    {
+      path: '/investments/transactions/create-contract',
+      element: <CreateContractRequestPage />,
+      layout: 'dashboard',
+      label: 'transactions.create_contract_title',
+      nav: false,
+      requiredPermission: 'investments.contracts.create',
       moduleName: 'investments',
       group: 'investments_transactions',
     },

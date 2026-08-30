@@ -115,9 +115,35 @@ export function FacilityPickerDialog({
   ]
 
   const columns: ColumnDef<Facility>[] = [
+    { key: "id", label: t("common.id", "shared") || "ID", width: 80, align: "center" },
     { key: "name", label: t("facilities.name", "investments") || "Name", width: 200, sortable: true },
-    { key: "address", label: t("facilities.address", "investments") || "Address", width: 250 },
-    { key: "created_at", label: t("facilities.created_at", "investments") || "Created At", width: 160, sortable: true, render: (row: Facility) => row.created_at || "—" },
+    {
+      key: "partnership_type",
+      label: t("facilities.partnership_type", "investments") || "Partnership Type",
+      width: 150,
+      render: (row: Facility) => (row.partnership_type ? getLocalizedName(row.partnership_type.name) : "—"),
+    },
+    {
+      key: "company_nationality",
+      label: t("facilities.company_nationality", "investments") || "Nationality",
+      width: 140,
+      render: (row: Facility) => (row.company_nationality ? getLocalizedName(row.company_nationality.name) : "—"),
+    },
+    {
+      key: "company_type",
+      label: t("facilities.company_type", "investments") || "Company Status",
+      width: 150,
+      render: (row: Facility) =>
+        row.company_type === "existing"
+          ? t("facilities.company_type_existing", "investments") || "Existing"
+          : row.company_type === "under_incorporation"
+            ? t("facilities.company_type_under_incorporation", "investments") || "Under Incorporation"
+            : "—",
+    },
+    { key: "first_phone_number", label: t("facilities.first_phone_number", "investments") || "Phone", width: 140, render: (row: Facility) => row.first_phone_number || "—" },
+    { key: "email", label: t("facilities.email", "investments") || "Email", width: 180, render: (row: Facility) => row.email || "—" },
+    { key: "address", label: t("facilities.address", "investments") || "Address", width: 200 },
+    { key: "created_at", label: t("facilities.created_at", "investments") || "Created At", width: 150, sortable: true, render: (row: Facility) => row.created_at || "—" },
   ]
 
   return (

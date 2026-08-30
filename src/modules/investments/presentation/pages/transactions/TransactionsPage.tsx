@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Coins, Plus, type LucideIcon } from 'lucide-react';
+import { Coins, Plus, FileSignature, type LucideIcon } from 'lucide-react';
 import { useLanguage } from '../../../../../core/presentation/context/i18n/I18nProvider';
 import { useAuth } from '../../../../../core/infrastructure/auth/AuthProvider';
 import { Button } from '../../../../../core/presentation/layouts/ui/buttons/Button';
@@ -23,6 +23,7 @@ interface TransactionCardConfig {
 
 const transactionCards: TransactionCardConfig[] = [
   { key: 'subscription', icon: Coins, permission: 'investments.plot-reqeusts.subscription_request' },
+  { key: 'contract_request', icon: FileSignature, permission: 'investments.contracts.create' },
   // { key: 'bonds', icon: Landmark },
   // { key: 'financing', icon: Banknote },
   // { key: 'dividends', icon: TrendingUp },
@@ -40,6 +41,10 @@ export function TransactionsPage() {
   const openCreate = (key: string) => {
     if (key === 'subscription') {
       navigate('/investments/transactions/create');
+      return;
+    }
+    if (key === 'contract_request') {
+      navigate('/investments/transactions/create-contract');
       return;
     }
     setActiveCard(key);

@@ -2,6 +2,7 @@
   "common": {
     "actions":"Actions",
     "name": "Name",
+    "id": "ID",
     "reset": "Reset",
     "search": "Search",
     "selected": "selected",

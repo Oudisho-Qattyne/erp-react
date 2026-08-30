@@ -104,7 +104,7 @@
     "load_error": "فشل تحميل المناقلات",
     "payment_currency": "العملة المدفوعة",
     "base_currency": "العملة الأساسية",
-    "paid_amount": "الكمية المدفوعة",
+    "paid_amount": "القيمة المدفوعة",
     "confirm_payment": "تأكيد الدفع",
     "cancel_transaction":"إلغاء المناقلة",
     "validation": {

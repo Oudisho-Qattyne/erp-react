@@ -15,6 +15,7 @@ import { createFilterFormatValue } from '../../../../../core/presentation/layout
 import { GroupingDonut } from '../../../../../core/presentation/layouts/ui/statistics/GroupingDonut';
 import { GroupingCards } from '../../../../../core/presentation/layouts/ui/statistics/GroupingCards';
 import { FactorSelect } from '../../../../../core/presentation/layouts/ui/statistics/FactorSelect';
+import { Badge, type BadgeVariant } from '../../../../../core/presentation/layouts/ui/badges/Badge';
 import { toast } from 'sonner';
 import { handleApiError } from '../../../../../core/presentation/utils/handleApiError';
 import { Eye, Trash2, MapPin, History, Filter, Search, BarChart3, Layers } from 'lucide-react';
@@ -52,6 +53,15 @@ export function PlotsPage() {
   const [groupingFactor, setGroupingFactor] = useState<string>(groupingFactors[0]?.value ?? '');
   const canGroupStats = hasPermission('investments.plots.grouping-stats');
   const usersModuleRegistered = useMemo(() => getModules().some(m => m.name === 'users'), []);
+
+  const plotStatusVariant = (status?: string): BadgeVariant => {
+    if (status === 'unsold') return 'muted';
+    if (status === 'announced') return 'info';
+    if (status === 'subscribed') return 'success';
+    if (status === 'allocated') return 'warning';
+    if (status === 'separated') return 'danger';
+    return 'muted';
+  };
 
   // Filter State
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -160,9 +170,7 @@ export function PlotsPage() {
       width: 140,
       render: (row: Plot) => (
         <div className="flex flex-col gap-1 items-start">
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-primary-dark bg-primary-light/20 px-2 py-0.5 rounded-full">
-            {t(`plot_status.${row.status}`, 'investments') || row.status}
-          </span>
+          <Badge label={t(`plot_status.${row.status}`, 'investments') || row.status || '—'} variant={plotStatusVariant(row.status)} />
           {row.status_date && (
             <span className="text-[10px] text-text-muted">{row.status_date}</span>
           )}

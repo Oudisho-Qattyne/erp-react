@@ -9,8 +9,8 @@ import { handleApiError } from '../../../../../../core/presentation/utils/handle
 import { FileText } from 'lucide-react';
 
 interface Props {
-  dossierId: string;
-  plotId: string;
+  dossierId?: string;
+  plotId?: string;
   dossier?: Dossier | null;
 }
 
@@ -44,7 +44,7 @@ export function DossierDetailsSection({ dossierId, plotId, dossier: dossierProp 
       .catch((err) => setError(handleApiError(err, { module: "investments", silent: true })));
   }, [dossierId, plotId, dossierProp]);
 
-  if (!dossierId || !plotId) return null;
+  if (!dossierProp && (!dossierId || !plotId)) return null;
 
   const st = dossier?.status ? statusStyles[dossier.status] || statusStyles.draft : statusStyles.draft;
 

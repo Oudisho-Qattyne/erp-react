@@ -9,7 +9,7 @@ import { handleApiError } from '../../../../../../core/presentation/utils/handle
 import { MapPin } from 'lucide-react';
 
 interface Props {
-  plotId: string;
+  plotId?: string;
   plot?: Plot | null;
 }
 
@@ -33,7 +33,7 @@ export function PlotDetailsSection({ plotId, plot: plotProp }: Props) {
       .catch((err) => setError(handleApiError(err, { module: "investments", silent: true })));
   }, [plotId, plotProp]);
 
-  if (!plotId) return null;
+  if (!plotProp && !plotId) return null;
 
   return (
     <SectionCard title={t('plots.section_title', 'investments') || 'Plot'} icon={<MapPin size={20} />}>

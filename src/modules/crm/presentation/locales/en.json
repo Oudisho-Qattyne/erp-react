@@ -13,6 +13,7 @@
     "add": "Add Person",
     "load_error": "Failed to load persons",
     "person_name": "Name",
+    "picker_title": "Select Persons",
     "primary_phone": "Primary Phone",
     "secondary_phone": "Secondary Phone",
     "email": "Email",

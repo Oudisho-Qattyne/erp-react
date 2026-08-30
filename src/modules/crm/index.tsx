@@ -1,12 +1,14 @@
 import { Users } from 'lucide-react';
 import type { Module } from '../../core/moduleRegistry';
-import { registerPersonsHook } from '../../core/registry/person/personRegistry';
+import { registerPersonsHook, registerPersonPickerDialog } from '../../core/registry/person/personRegistry';
 import { PersonsPage } from './presentation/pages/PersonsPage';
+import { PersonPickerDialog } from './presentation/components/PersonPickerDialog';
 import { usePersons } from './presentation/hooks/usePersons';
 import enLocales from './presentation/locales/en.json';
 import arLocales from './presentation/locales/ar.json';
 
 registerPersonsHook(() => usePersons());
+registerPersonPickerDialog(PersonPickerDialog);
 
 const crmModule: Module = {
   name: 'crm',
